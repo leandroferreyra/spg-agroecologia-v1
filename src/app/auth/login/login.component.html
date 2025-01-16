@@ -1,0 +1,141 @@
+<div class="main-content d-flex align-items-center justify-content-center" style="margin-top: 100px">
+    <div class="row w-100 justify-content-center">
+      <div class="col-md-6">
+  
+        <h1 class="title text-center" style="color: #CC0F4F">Informes BTC</h1>
+        <div class="d-flex justify-content-center mt-3 mb-3" style="font-size: 20px">
+          <div style="border-bottom: #cc0F4F 5px solid;">
+            <a [routerLink]="['/auth/login']" routerLinkActive="active-link-ingreso"
+              [ngClass]="{ 'inactive-link': !isActive('/auth/login') }" class="mx-3">Ingresar</a>
+          </div>
+          <div style="border-bottom: #ada8a8 5px solid;">
+            <a [routerLink]="['/auth/register']" routerLinkActive="active-link-ingreso"
+              [ngClass]="{ 'inactive-link': !isActive('/auth/register') }" class="mx-3">Registrarse</a>
+          </div>
+        </div>
+  
+        <form [formGroup]="loginForm" > <!-- (keydown.enter)="ingresar()" -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="text" class="form-control" formControlName="email">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <label>Contraseña</label>
+              <div class="input-group">
+                <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="password">
+                <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text" style="cursor: pointer;"
+                  (click)="toggleClave()"></fa-icon>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 pr-1 d-flex justify-content-between">
+              <a style="cursor: pointer; text-decoration: underline;font-size: 13px; font-weight: bold; color: #ada8a8"
+                (click)="openModalEnvioEmail(envioMail, 'recupero')">
+                ¿Olvidaste tu contraseña? Recuperala acá
+              </a>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-12 text-center">
+              <div class="form-group">
+                <button class="btn btn-wd btn-primary" id="login-button" (click)="ingresar()"
+                  [disabled]="!loginForm.valid">Ingresar</button>
+              </div>
+            </div>
+          </div>
+        </form>
+  
+  
+  
+      </div>
+      <div class="row" style="margin-top: 8rem !important">
+        <a href="#" class="logo-ingreso">
+          <img src="./assets/img/logo-transparent.png" class="logo-ingreso-img" />
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- MODAL seleccionar dashboard -->
+  <ng-template #seleccionDashboard>
+    <div class="container d-flex flex-column justify-content-between">
+  
+      <div class="row justify-content-center mt-3 mb-3">
+        <div class="col-md-12">
+          <h4 class="text-center" style="font-size: 1.7em; font-weight: bold;">Ingresar como</h4>
+        </div>
+      </div>
+  
+      <div class="row justify-content-center flex-grow-1 align-items-center mt-5 mb-5">
+        <div class="col-md-12 d-flex flex-wrap justify-content-center">
+          @for(rol of usuarioLogueado.roles ; track rol) {
+          <div
+            [ngClass]="{'col-lg-4': usuarioLogueado.roles.length === 3, 'col-lg-6': usuarioLogueado.roles.length === 2}"
+            class="col-md-6 col-sm-6 col-xs-6 d-flex flex-column align-items-center">
+            <button class="btn btn-wd btn-primary m-2" (click)="ingresarAlDashboard(rol)">
+              <span style="font-size: 1.3em;">
+                {{ rol.name }}
+              </span>
+            </button>
+            <span style="color: #ada8a8; font-weight: bold;">
+              {{
+              rol.name === 'COACH' ? 'Gestionar informes' :
+              rol.name === 'COACHEE' ? 'Realizar los tests' :
+              (rol.name === 'ADMIN' || rol.name === 'SUPER_ADMIN') ? 'Administrar sistema' : ''
+              }}
+            </span>
+          </div>
+          }
+        </div>
+      </div>
+      
+      <div class="row mt-5">
+        <div class="col-md-12 text-center">
+          <div class="form-group">
+            <button class="btn btn-wd" id="back-button" (click)="cancelarSeleccionDashboard()">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+  
+    </div>
+  </ng-template>
+  
+  <!-- MODAL RECUPERAR CLAVE -->
+  <ng-template #envioMail>
+    <div class="container">
+      <div class="row justify-content-center mt-5 mb-5">
+        <div class="col-md-12">
+          <h4 class="text-center mt-3">{{tituloModalMail}}</h4>
+          <form [formGroup]="envioEmailForm" (keydown.enter)="enviarEmail()">
+            <div class="row">
+              <div class="col-12">
+                <label>Email</label>
+                <input class="form-control" formControlName="email">
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-6 pr-1 text-end">
+                <button type="button" class="btn btn-wd btn-primary" (click)="enviarEmail()">Confirmar</button>
+              </div>
+              <div class="col-6 pr-1 text-start">
+                <button type="button" class="btn btn-wd" id="back-button-with-border" (click)="cerrarModal()">Cancelar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  
+  <!-- Spinner -->
+  <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+  </ngx-spinner>
