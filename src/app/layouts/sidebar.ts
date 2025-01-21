@@ -1,11 +1,14 @@
 ﻿import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
 import { slideDownUp } from '../shared/animations';
+import { CommonModule } from '@angular/common';
+import { SharedModule } from 'src/shared.module';
 
 @Component({
     selector: 'sidebar',
+    standalone: true,
+    imports: [CommonModule, SharedModule, RouterLink, RouterLinkActive],
     templateUrl: './sidebar.html',
     animations: [slideDownUp],
 })
@@ -15,7 +18,6 @@ export class SidebarComponent {
     activeDropdown: string[] = [];
     parentDropdown: string = '';
     constructor(
-        public translate: TranslateService,
         public storeData: Store<any>,
         public router: Router,
     ) {

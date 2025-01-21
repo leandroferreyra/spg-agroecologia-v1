@@ -1,13 +1,16 @@
 ﻿import { Component } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { Store } from '@ngrx/store';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { AppService } from '../service/app.service';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslateService } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { SharedModule } from 'src/shared.module';
 
 @Component({
     selector: 'header',
+    standalone: true,
+    imports: [CommonModule, SharedModule, RouterLink, RouterLinkActive],
     templateUrl: './header.html',
     animations: [toggleAnimation],
 })
@@ -74,7 +77,6 @@ export class HeaderComponent {
     ];
 
     constructor(
-        public translate: TranslateService,
         public storeData: Store<any>,
         public router: Router,
         private appSetting: AppService,
@@ -128,14 +130,5 @@ export class HeaderComponent {
         this.messages = this.messages.filter((d) => d.id !== value);
     }
 
-    changeLanguage(item: any) {
-        this.translate.use(item.code);
-        this.appSetting.toggleLanguage(item);
-        if (this.store.locale?.toLowerCase() === 'ae') {
-            this.storeData.dispatch({ type: 'toggleRTL', payload: 'rtl' });
-        } else {
-            this.storeData.dispatch({ type: 'toggleRTL', payload: 'ltr' });
-        }
-        window.location.reload();
-    }
+
 }

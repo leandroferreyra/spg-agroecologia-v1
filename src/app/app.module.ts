@@ -18,21 +18,6 @@ import { indexReducer } from './store/index.reducer';
 // shared module
 import { SharedModule } from 'src/shared.module';
 
-// i18n
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-// AOT compilation support
-export function HttpLoaderFactory(httpHandler: HttpBackend): TranslateHttpLoader {
-    return new TranslateHttpLoader(new HttpClient(httpHandler));
-}
-
-// Layouts
-import { AppLayout } from './layouts/app-layout';
-
-import { HeaderComponent } from './layouts/header';
-import { FooterComponent } from './layouts/footer';
-import { SidebarComponent } from './layouts/sidebar';
-
 @NgModule({
     imports: [
         RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' }),
@@ -41,22 +26,11 @@ import { SidebarComponent } from './layouts/sidebar';
         CommonModule,
         FormsModule,
         HttpClientModule,
-        TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: HttpLoaderFactory,
-                deps: [HttpBackend],
-            },
-        }),
         StoreModule.forRoot({ index: indexReducer }),
         SharedModule.forRoot(),
     ],
     declarations: [
-        AppComponent,
-        HeaderComponent,
-        FooterComponent,
-        SidebarComponent,
-        AppLayout
+        AppComponent
     ],
 
     providers: [Title],

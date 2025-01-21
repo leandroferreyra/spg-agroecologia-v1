@@ -2,21 +2,19 @@ import { Component } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
 import { AppService } from 'src/app/service/app.service';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/shared.module';
 
 @Component({
     standalone: true,
-    imports: [CommonModule,SharedModule, RouterLink],
+    imports: [CommonModule, SharedModule, RouterLink],
     templateUrl: './boxed-password-reset.html',
     animations: [toggleAnimation],
 })
 export class BoxedPasswordResetComponent {
     store: any;
     constructor(
-        public translate: TranslateService,
         public storeData: Store<any>,
         public router: Router,
         private appSetting: AppService,
@@ -31,14 +29,5 @@ export class BoxedPasswordResetComponent {
             });
     }
 
-    changeLanguage(item: any) {
-        this.translate.use(item.code);
-        this.appSetting.toggleLanguage(item);
-        if (this.store.locale?.toLowerCase() === 'ae') {
-            this.storeData.dispatch({ type: 'toggleRTL', payload: 'rtl' });
-        } else {
-            this.storeData.dispatch({ type: 'toggleRTL', payload: 'ltr' });
-        }
-        window.location.reload();
-    }
+
 }

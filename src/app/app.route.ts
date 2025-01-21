@@ -1,8 +1,5 @@
 import { Routes } from '@angular/router';
 
-// layouts
-import { AppLayout } from './layouts/app-layout';
-
 export const routes: Routes = [
     {
         path: '', redirectTo: 'auth/boxed-signin', pathMatch: 'full'
@@ -12,15 +9,7 @@ export const routes: Routes = [
         loadChildren: () => import('./auth/auth.routes').then(m => m.AUTH_ROUTES)
     },
     {
-        path: '',
-        component: AppLayout,
-        children: [
-
-            // users
-            { path: '', loadChildren: () => import('./users/user.module').then((d) => d.UsersModule) }
-
-        ],
-    },
-
-
+        path: 'dashboard',
+        loadChildren: () => import('./layouts/dashboard.routes').then(m => m.DASHBOARD_ROUTES),
+    }
 ];

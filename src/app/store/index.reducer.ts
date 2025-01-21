@@ -98,11 +98,6 @@ export function indexReducer(state = initialState, action: any) {
         payload = payload || false;
         localStorage.setItem('semidark', payload);
         return { ...state, ...{ semidark: payload } };
-    } else if (type === 'toggleLocale') {
-        payload = payload || state.locale;
-        // i18n.global.locale.value = payload;
-        localStorage.setItem('i18n_locale', payload);
-        return { ...state, ...{ locale: payload } };
     } else if (type === 'toggleSidebar') {
         return { ...state, ...{ sidebar: !state.sidebar } };
     }

@@ -1,17 +1,23 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppService } from '../service/app.service';
-import { Router, NavigationEnd, Event as RouterEvent } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { Router, NavigationEnd, Event as RouterEvent, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { SharedModule } from 'src/shared.module';
+import { SidebarComponent } from './sidebar';
+import { HeaderComponent } from './header';
+import { FooterComponent } from './footer';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app-layout.html',
+    selector: 'app-dashboard',
+    standalone: true,
+    imports: [CommonModule,SharedModule, RouterOutlet, SidebarComponent, HeaderComponent, FooterComponent],
+    templateUrl: './dashboard.component.html',
 })
-export class AppLayout {
+export class DashboardComponent {
     store: any;
     showTopButton = false;
-    constructor(public translate: TranslateService, public storeData: Store<any>, private service: AppService, private router: Router) {
+    constructor(public storeData: Store<any>, private service: AppService, private router: Router) {
         this.initStore();
     }
     headerClass = '';

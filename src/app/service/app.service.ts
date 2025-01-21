@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { $themeConfig } from '../theme.config';
-import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class AppService {
     storeData: any;
 
-    constructor(public translate: TranslateService, public store: Store<any>) {
+    constructor(public store: Store<any>) {
         this.initStoreData();
     }
 
@@ -36,9 +35,6 @@ export class AppService {
 
         const list = this.storeData.languageList;
         const item = list.find((item: any) => item.code === val);
-        if (item) {
-            this.toggleLanguage(item);
-        }
 
         val = localStorage.getItem('rtlClass'); // rtl, ltr
         val = val || $themeConfig.rtlClass;
@@ -57,31 +53,7 @@ export class AppService {
         this.store.dispatch({ type: 'toggleSemidark', payload: val });
     }
 
-    toggleLanguage(item: any) {
-        let lang: any = null;
-        lang = 'en';
-        if (item) {
-            lang = item;
-        } else {
-            let code = this.translate.currentLang || null;
-            if (!code) {
-                code = localStorage.getItem('i18n_locale');
-            }
-
-            item = this.storeData.languageList.find((d: any) => d.code === code);
-            if (item) {
-                lang = item;
-            }
-        }
-
-        if (!lang) {
-            lang = this.storeData.languageList.find((d: any) => d.code === 'en');
-        }
-
-        this.translate.use(lang.code); // set language
-        this.store.dispatch({ type: 'toggleLocale', payload: lang.code });
-        return lang;
-    }
+ 
 
     changeAnimation(type = 'add') {
         if (this.storeData.animation) {

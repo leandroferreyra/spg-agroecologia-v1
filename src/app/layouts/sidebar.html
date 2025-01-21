@@ -27,7 +27,7 @@
                                 <icon-menu-dashboard class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
-                                    {{ 'dashboard' | translate }}
+                                    {{ 'dashboard' }}
                                 </span>
                             </div>
                             <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('dashboard') }">
@@ -38,17 +38,17 @@
                             <ul class="sub-menu text-gray-500">
                                 <li>
                                     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleMobileMenu()"
-                                        >{{ 'sales' | translate }}</a
+                                        >{{ 'sales' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/analytics" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'analytics' | translate }}</a>
+                                    <a routerLink="/analytics" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'analytics'  }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/finance" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'finance' | translate }}</a>
+                                    <a routerLink="/finance" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'finance' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/crypto" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'crypto' | translate }}</a>
+                                    <a routerLink="/crypto" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'crypto' }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -56,7 +56,7 @@
 
                     <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 px-7 py-3 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
                         <icon-minus class="hidden h-5 w-4 flex-none" />
-                        <span>{{ ('apps' | translate) || '&nbsp;' }}</span>
+                        <span>{{ ('apps') || '&nbsp;' }}</span>
                     </h2>
 
                     <li class="nav-item">
@@ -67,7 +67,7 @@
                                         <icon-menu-chat class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                            >{{ 'chat' | translate }}</span
+                                            >{{ 'chat' }}</span
                                         >
                                     </div>
                                 </a>
@@ -78,7 +78,7 @@
                                         <icon-menu-mailbox class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                            >{{ 'mailbox' | translate }}</span
+                                            >{{ 'mailbox' }}</span
                                         >
                                     </div>
                                 </a>
@@ -89,7 +89,7 @@
                                         <icon-menu-todo class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                            >{{ 'todo_list' | translate }}</span
+                                            >{{ 'todo_list'  }}</span
                                         >
                                     </div>
                                 </a>
@@ -100,7 +100,7 @@
                                         <icon-menu-notes class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                            >{{ 'notes' | translate }}</span
+                                            >{{ 'notes' }}</span
                                         >
                                     </div>
                                 </a>
@@ -111,7 +111,7 @@
                                         <icon-menu-scrumboard class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                            >{{ 'scrumboard' | translate }}</span
+                                            >{{ 'scrumboard' }}</span
                                         >
                                     </div>
                                 </a>
@@ -122,7 +122,7 @@
                                         <icon-menu-contacts class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                            >{{ 'contacts' | translate }}</span
+                                            >{{ 'contacts' }}</span
                                         >
                                     </div>
                                 </a>
@@ -139,7 +139,7 @@
                                         <icon-menu-invoice class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                            >{{ 'invoice' | translate }}</span
+                                            >{{ 'invoice' }}</span
                                         >
                                     </div>
                                     <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('invoice') }">
@@ -150,20 +150,20 @@
                                     <ul class="sub-menu text-gray-500">
                                         <li>
                                             <a routerLink="/apps/invoice/list" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                                >{{ 'list' | translate }}</a
+                                                >{{ 'list' }}</a
                                             >
                                         </li>
                                         <li>
                                             <a routerLink="/apps/invoice/preview" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                                >{{ 'preview' | translate }}</a
+                                                >{{ 'preview' }}</a
                                             >
                                         </li>
                                         <li>
-                                            <a routerLink="/apps/invoice/add" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'add' | translate }}</a>
+                                            <a routerLink="/apps/invoice/add" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'add' }}</a>
                                         </li>
                                         <li>
                                             <a routerLink="/apps/invoice/edit" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                                >{{ 'edit' | translate }}</a
+                                                >{{ 'edit' }}</a
                                             >
                                         </li>
                                     </ul>
@@ -176,7 +176,7 @@
                                         <icon-menu-calendar class="shrink-0 group-hover:!text-primary" />
 
                                         <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                            >{{ 'calendar' | translate }}</span
+                                            >{{ 'calendar' }}</span
                                         >
                                     </div>
                                 </a>
@@ -186,7 +186,7 @@
 
                     <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 px-7 py-3 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
                         <icon-minus class="hidden h-5 w-4 flex-none" />
-                        <span>{{ ('user_interface' | translate) || '&nbsp;' }}</span>
+                        <span>{{ ('user_interface' ) || '&nbsp;' }}</span>
                     </h2>
 
                     <li class="accordion menu nav-item">
@@ -200,7 +200,7 @@
                                 <icon-menu-components class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'components' | translate }}</span
+                                    >{{ 'components' }}</span
                                 >
                             </div>
                             <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('components') }">
@@ -210,60 +210,60 @@
                         <div [@slideDownUp]="!activeDropdown.includes('components')" class="accordion-content">
                             <ul class="sub-menu text-gray-500">
                                 <li>
-                                    <a routerLink="/components/tabs" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'tabs' | translate }}</a>
+                                    <a routerLink="/components/tabs" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'tabs' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/components/accordions" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'accordions' | translate }}</a
+                                        >{{ 'accordions' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/components/modals" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'modals' | translate }}</a>
+                                    <a routerLink="/components/modals" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'modals' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/components/cards" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'cards' | translate }}</a>
+                                    <a routerLink="/components/cards" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'cards' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/components/carousel" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'carousel' | translate }}</a>
+                                    <a routerLink="/components/carousel" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'carousel' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/components/countdown" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'countdown' | translate }}</a
+                                        >{{ 'countdown' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/components/counter" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'counter' | translate }}</a>
+                                    <a routerLink="/components/counter" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'counter' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/components/sweetalert" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'sweet_alerts' | translate }}</a
+                                        >{{ 'sweet_alerts' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/components/timeline" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'timeline' | translate }}</a>
+                                    <a routerLink="/components/timeline" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'timeline'  }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/components/notifications" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'notifications' | translate }}</a
+                                        >{{ 'notifications' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/components/media-object" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'media_object' | translate }}</a
+                                        >{{ 'media_object' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/components/list-group" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'list_group' | translate }}</a
+                                        >{{ 'list_group'  }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/components/pricing-table" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'pricing_tables' | translate }}</a
+                                        >{{ 'pricing_tables'  }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/components/lightbox" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'lightbox' | translate }}</a>
+                                    <a routerLink="/components/lightbox" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'lightbox'  }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -280,7 +280,7 @@
                                 <icon-menu-elements class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'elements' | translate }}</span
+                                    >{{ 'elements' }}</span
                                 >
                             </div>
                             <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('elements') }">
@@ -290,69 +290,69 @@
                         <div [@slideDownUp]="!activeDropdown.includes('elements')" class="accordion-content">
                             <ul class="sub-menu text-gray-500">
                                 <li>
-                                    <a routerLink="/elements/alerts" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'alerts' | translate }}</a>
+                                    <a routerLink="/elements/alerts" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'alerts' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/avatar" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'avatar' | translate }}</a>
+                                    <a routerLink="/elements/avatar" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'avatar' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/badges" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'badges' | translate }}</a>
+                                    <a routerLink="/elements/badges" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'badges' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/elements/breadcrumbs" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'breadcrumbs' | translate }}</a
+                                        >{{ 'breadcrumbs' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/buttons" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'buttons' | translate }}</a>
+                                    <a routerLink="/elements/buttons" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'buttons' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/elements/buttons-group" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'button_groups' | translate }}</a
+                                        >{{ 'button_groups' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/elements/color-library" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'color_library' | translate }}</a
+                                        >{{ 'color_library' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/dropdown" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'dropdown' | translate }}</a>
+                                    <a routerLink="/elements/dropdown" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'dropdown' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/infobox" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'infobox' | translate }}</a>
+                                    <a routerLink="/elements/infobox" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'infobox' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/jumbotron" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'jumbotron' | translate }}</a>
+                                    <a routerLink="/elements/jumbotron" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'jumbotron' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/loader" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'loader' | translate }}</a>
+                                    <a routerLink="/elements/loader" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'loader' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/elements/pagination" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'pagination' | translate }}</a
+                                        >{{ 'pagination' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/popovers" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'popovers' | translate }}</a>
+                                    <a routerLink="/elements/popovers" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'popovers' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/elements/progress-bar" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'progress_bar' | translate }}</a
+                                        >{{ 'progress_bar' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/search" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'search' | translate }}</a>
+                                    <a routerLink="/elements/search" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'search' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/tooltips" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'tooltips' | translate }}</a>
+                                    <a routerLink="/elements/tooltips" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'tooltips' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/elements/treeview" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'treeview' | translate }}</a>
+                                    <a routerLink="/elements/treeview" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'treeview' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/elements/typography" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'typography' | translate }}</a
+                                        >{{ 'typography' }}</a
                                     >
                                 </li>
                             </ul>
@@ -365,7 +365,7 @@
                                 <icon-menu-charts class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'charts' | translate }}</span
+                                    >{{ 'charts' }}</span
                                 >
                             </div>
                         </a>
@@ -377,7 +377,7 @@
                                 <icon-menu-widgets class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'widgets' | translate }}</span
+                                    >{{ 'widgets' }}</span
                                 >
                             </div>
                         </a>
@@ -389,7 +389,7 @@
                                 <icon-menu-font-icons class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'font_icons' | translate }}</span
+                                    >{{ 'font_icons' }}</span
                                 >
                             </div>
                         </a>
@@ -401,7 +401,7 @@
                                 <icon-menu-drag-and-drop class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'drag_and_drop' | translate }}</span
+                                    >{{ 'drag_and_drop' }}</span
                                 >
                             </div>
                         </a>
@@ -409,7 +409,7 @@
 
                     <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 px-7 py-3 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
                         <icon-minus class="hidden h-5 w-4 flex-none" />
-                        <span>{{ ('tables_and_forms' | translate) || '&nbsp;' }}</span>
+                        <span>{{ ('tables_and_forms') || '&nbsp;' }}</span>
                     </h2>
 
                     <li class="menu nav-item">
@@ -418,7 +418,7 @@
                                 <icon-menu-tables class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'tables' | translate }}</span
+                                    >{{ 'tables' }}</span
                                 >
                             </div>
                         </a>
@@ -435,7 +435,7 @@
                                 <icon-menu-datatables class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'datatables' | translate }}</span
+                                    >{{ 'datatables' }}</span
                                 >
                             </div>
                             <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('datatables') }">
@@ -445,63 +445,63 @@
                         <div [@slideDownUp]="!activeDropdown.includes('datatables')" class="accordion-content">
                             <ul class="sub-menu text-gray-500">
                                 <li>
-                                    <a routerLink="/datatables/basic" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'basic' | translate }}</a>
+                                    <a routerLink="/datatables/basic" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'basic' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/datatables/advanced" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'advanced' | translate }}</a>
+                                    <a routerLink="/datatables/advanced" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'advanced' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/datatables/skin" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'skin' | translate }}</a>
+                                    <a routerLink="/datatables/skin" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'skin' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/order-sorting" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'order_sorting' | translate }}</a
+                                        >{{ 'order_sorting' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/columns-filter" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'columns_filter' | translate }}</a
+                                        >{{ 'columns_filter' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/multi-column" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'multi_column' | translate }}</a
+                                        >{{ 'multi_column' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/multiple-tables" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'multiple_tables' | translate }}</a
+                                        >{{ 'multiple_tables' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/alt-pagination" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'alt_pagination' | translate }}</a
+                                        >{{ 'alt_pagination' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/datatables/checkbox" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'checkbox' | translate }}</a>
+                                    <a routerLink="/datatables/checkbox" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'checkbox' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/range-search" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'range_search' | translate }}</a
+                                        >{{ 'range_search' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/datatables/export" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'export' | translate }}</a>
+                                    <a routerLink="/datatables/export" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'export' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/sticky-header" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'sticky_header' | translate }}</a
+                                        >{{ 'sticky_header' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/clone-header" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'clone_header' | translate }}</a
+                                        >{{ 'clone_header' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/datatables/column-chooser" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'column_chooser' | translate }}</a
+                                        >{{ 'column_chooser' }}</a
                                     >
                                 </li>
                             </ul>
@@ -518,7 +518,7 @@
                             <div class="flex items-center">
                                 <icon-menu-forms class="shrink-0 group-hover:!text-primary" />
 
-                                <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{{ 'forms' | translate }}</span>
+                                <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{{ 'forms' }}</span>
                             </div>
                             <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('forms') }">
                                 <icon-caret-down />
@@ -527,53 +527,53 @@
                         <div [@slideDownUp]="!activeDropdown.includes('forms')" class="accordion-content">
                             <ul class="sub-menu text-gray-500">
                                 <li>
-                                    <a routerLink="/forms/basic" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'basic' | translate }}</a>
+                                    <a routerLink="/forms/basic" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'basic' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/forms/input-group" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'input_group' | translate }}</a
+                                        >{{ 'input_group' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/forms/layouts" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'layouts' | translate }}</a>
+                                    <a routerLink="/forms/layouts" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'layouts' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/forms/validation" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'validation' | translate }}</a>
+                                    <a routerLink="/forms/validation" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'validation' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/forms/input-mask" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'input_mask' | translate }}</a>
+                                    <a routerLink="/forms/input-mask" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'input_mask' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/forms/select2" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'select2' | translate }}</a>
+                                    <a routerLink="/forms/select2" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'select2' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/forms/checkbox-radio" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'checkbox_and_radio' | translate }}</a
+                                        >{{ 'checkbox_and_radio' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/forms/switches" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'switches' | translate }}</a>
+                                    <a routerLink="/forms/switches" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'switches' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/forms/wizards" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'wizards' | translate }}</a>
+                                    <a routerLink="/forms/wizards" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'wizards' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/forms/file-upload" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'file_upload' | translate }}</a
+                                        >{{ 'file_upload' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/forms/quill-editor" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'quill_editor' | translate }}</a
+                                        >{{ 'quill_editor' }}</a
                                     >
                                 </li>
                                 <li>
                                     <a routerLink="/forms/date-picker" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'date_and_range_picker' | translate }}</a
+                                        >{{ 'date_and_range_picker' }}</a
                                     >
                                 </li>
                                 <li>
-                                    <a routerLink="/forms/clipboard" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'clipboard' | translate }}</a>
+                                    <a routerLink="/forms/clipboard" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'clipboard' }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -581,7 +581,7 @@
 
                     <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 px-7 py-3 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
                         <icon-minus class="hidden h-5 w-4 flex-none" />
-                        <span>{{ ('user_and_pages' | translate) || '&nbsp;' }}</span>
+                        <span>{{ ('user_and_pages') || '&nbsp;' }}</span>
                     </h2>
 
                     <li class="accordion menu nav-item">
@@ -594,7 +594,7 @@
                             <div class="flex items-center">
                                 <icon-menu-users class="shrink-0 group-hover:!text-primary" />
 
-                                <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{{ 'users' | translate }}</span>
+                                <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{{ 'users' }}</span>
                             </div>
                             <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('users') }">
                                 <icon-caret-down />
@@ -603,11 +603,11 @@
                         <div [@slideDownUp]="!activeDropdown.includes('users')" class="accordion-content">
                             <ul class="sub-menu text-gray-500">
                                 <li>
-                                    <a routerLink="/users/profile" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'profile' | translate }}</a>
+                                    <a routerLink="/users/profile" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'profile' }}</a>
                                 </li>
                                 <li>
                                     <a routerLink="/users/user-account-settings" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'account_settings' | translate }}</a
+                                        >{{ 'account_settings' }}</a
                                     >
                                 </li>
                             </ul>
@@ -624,7 +624,7 @@
                             <div class="flex items-center">
                                 <icon-menu-pages class="shrink-0 group-hover:!text-primary" />
 
-                                <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{{ 'pages' | translate }}</span>
+                                <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">{{ 'pages' }}</span>
                             </div>
                             <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('pages') && !activeDropdown.includes('error')}">
                                 <icon-caret-down />
@@ -634,23 +634,23 @@
                             <ul class="sub-menu text-gray-500">
                                 <li>
                                     <a routerLink="/pages/knowledge-base" routerLinkActive="active" (click)="toggleMobileMenu()"
-                                        >{{ 'knowledge_base' | translate }}</a
+                                        >{{ 'knowledge_base' }}</a
                                     >
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/pages/contact-us-boxed" target="_blank">{{ 'contact_us_boxed' | translate }}</a>
+                                    <a routerLink="/pages/contact-us-boxed" target="_blank">{{ 'contact_us_boxed' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/pages/contact-us-cover" target="_blank">{{ 'contact_us_cover' | translate }}</a>
+                                    <a routerLink="/pages/contact-us-cover" target="_blank">{{ 'contact_us_cover' }}</a>
                                 </li>
                                 <li>
-                                    <a routerLink="/pages/faq" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'faq' | translate }}</a>
+                                    <a routerLink="/pages/faq" routerLinkActive="active" (click)="toggleMobileMenu()">{{ 'faq' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/pages/coming-soon-boxed" target="_blank">{{ 'coming_soon_boxed' | translate }}</a>
+                                    <a routerLink="/pages/coming-soon-boxed" target="_blank">{{ 'coming_soon_boxed' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/pages/coming-soon-cover" target="_blank">{{ 'coming_soon_cover' | translate }}</a>
+                                    <a routerLink="/pages/coming-soon-cover" target="_blank">{{ 'coming_soon_cover' }}</a>
                                 </li>
                                 <li class="accordion menu nav-item">
                                     <button
@@ -658,7 +658,7 @@
                                         class="w-full before:h-[5px] before:w-[5px] before:rounded before:bg-gray-300 hover:bg-gray-100 dark:text-[#888ea8] dark:hover:bg-gray-900 ltr:before:mr-2 rtl:before:ml-2"
                                         (click)="toggleAccordion('error', 'pages')"
                                     >
-                                        {{ 'error' | translate }}
+                                        {{ 'error' }}
                                         <div class="ltr:ml-auto rtl:mr-auto" [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('error') }">
                                             <icon-carets-down [fill]="true" class="h-4 w-4" />
                                         </div>
@@ -667,19 +667,19 @@
                                     <div [@slideDownUp]="!activeDropdown.includes('error')" class="accordion-content">
                                         <ul class="sub-menu text-gray-500">
                                             <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                                <a routerLink="/pages/error404" target="_blank">{{ '404' | translate }}</a>
+                                                <a routerLink="/pages/error404" target="_blank">{{ '404' }}</a>
                                             </li>
                                             <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                                <a routerLink="/pages/error500" target="_blank">{{ '500' | translate }}</a>
+                                                <a routerLink="/pages/error500" target="_blank">{{ '500' }}</a>
                                             </li>
                                             <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                                <a routerLink="/pages/error503" target="_blank">{{ '503' | translate }}</a>
+                                                <a routerLink="/pages/error503" target="_blank">{{ '503' }}</a>
                                             </li>
                                         </ul>
                                     </div>
                                 </li>
                                 <li>
-                                    <a routerLink="/pages/maintenence" target="_blank">{{ 'maintenence' | translate }}</a>
+                                    <a routerLink="/pages/maintenence" target="_blank">{{ 'maintenence' }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -696,7 +696,7 @@
                                 <icon-menu-authentication class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'authentication' | translate }}</span
+                                    >{{ 'authentication' }}</span
                                 >
                             </div>
                             <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('authentication') }">
@@ -706,28 +706,28 @@
                         <div [@slideDownUp]="!activeDropdown.includes('authentication')" class="accordion-content">
                             <ul class="sub-menu text-gray-500">
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/auth/boxed-signin" target="_blank">{{ 'login_boxed' | translate }}</a>
+                                    <a routerLink="/auth/boxed-signin" target="_blank">{{ 'login_boxed' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/auth/boxed-signup" target="_blank">{{ 'register_boxed' | translate }}</a>
+                                    <a routerLink="/auth/boxed-signup" target="_blank">{{ 'register_boxed' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/auth/boxed-lockscreen" target="_blank">{{ 'unlock_boxed' | translate }}</a>
+                                    <a routerLink="/auth/boxed-lockscreen" target="_blank">{{ 'unlock_boxed' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/auth/boxed-password-reset" target="_blank">{{ 'recover_id_boxed' | translate }}</a>
+                                    <a routerLink="/auth/boxed-password-reset" target="_blank">{{ 'recover_id_boxed' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/auth/cover-login" target="_blank">{{ 'login_cover' | translate }}</a>
+                                    <a routerLink="/auth/cover-login" target="_blank">{{ 'login_cover' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/auth/cover-register" target="_blank">{{ 'register_cover' | translate }}</a>
+                                    <a routerLink="/auth/cover-register" target="_blank">{{ 'register_cover' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/auth/cover-lockscreen" target="_blank">{{ 'unlock_cover' | translate }}</a>
+                                    <a routerLink="/auth/cover-lockscreen" target="_blank">{{ 'unlock_cover' }}</a>
                                 </li>
                                 <li routerLinkActive="active" (click)="toggleMobileMenu()">
-                                    <a routerLink="/auth/cover-password-reset" target="_blank">{{ 'recover_id_cover' | translate }}</a>
+                                    <a routerLink="/auth/cover-password-reset" target="_blank">{{ 'recover_id_cover' }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -735,7 +735,7 @@
 
                     <h2 class="-mx-4 mb-1 flex items-center bg-white-light/30 px-7 py-3 font-extrabold uppercase dark:bg-dark dark:bg-opacity-[0.08]">
                         <icon-minus class="hidden h-5 w-4 flex-none" />
-                        <span>{{ ('supports' | translate) || '&nbsp;' }}</span>
+                        <span>{{ ('supports') || '&nbsp;' }}</span>
                     </h2>
 
                     <li class="menu nav-item">
@@ -744,7 +744,7 @@
                                 <icon-menu-documentation class="shrink-0 group-hover:!text-primary" />
 
                                 <span class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3"
-                                    >{{ 'documentation' | translate }}</span
+                                    >{{ 'documentation' }}</span
                                 >
                             </div>
                         </a>
