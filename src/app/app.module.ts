@@ -26,10 +26,6 @@ export function HttpLoaderFactory(httpHandler: HttpBackend): TranslateHttpLoader
     return new TranslateHttpLoader(new HttpClient(httpHandler));
 }
 
-// pages
-import { KnowledgeBaseComponent } from './pages/knowledge-base';
-import { FaqComponent } from './pages/faq';
-
 // Layouts
 import { AppLayout } from './layouts/app-layout';
 
@@ -60,9 +56,7 @@ import { SidebarComponent } from './layouts/sidebar';
         HeaderComponent,
         FooterComponent,
         SidebarComponent,
-        AppLayout,
-        KnowledgeBaseComponent,
-        FaqComponent,
+        AppLayout
     ],
 
     providers: [Title],
