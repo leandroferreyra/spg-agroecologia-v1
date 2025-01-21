@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 @Injectable()
 export class AppService {
     storeData: any;
+
     constructor(public translate: TranslateService, public store: Store<any>) {
         this.initStoreData();
     }

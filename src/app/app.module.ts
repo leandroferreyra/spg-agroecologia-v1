@@ -26,27 +26,6 @@ export function HttpLoaderFactory(httpHandler: HttpBackend): TranslateHttpLoader
     return new TranslateHttpLoader(new HttpClient(httpHandler));
 }
 
-// dashboard
-import { IndexComponent } from './index';
-// import { AnalyticsComponent } from './analytics';
-import { FinanceComponent } from './finance';
-import { CryptoComponent } from './crypto';
-
-// widgets
-import { WidgetsComponent } from './widgets';
-
-// tables
-import { TablesComponent } from './tables';
-
-// font-icons
-import { FontIconsComponent } from './font-icons';
-
-// charts
-import { ChartsComponent } from './charts';
-
-// dragndrop
-import { DragndropComponent } from './dragndrop';
-
 // pages
 import { KnowledgeBaseComponent } from './pages/knowledge-base';
 import { FaqComponent } from './pages/faq';
@@ -57,7 +36,6 @@ import { AppLayout } from './layouts/app-layout';
 import { HeaderComponent } from './layouts/header';
 import { FooterComponent } from './layouts/footer';
 import { SidebarComponent } from './layouts/sidebar';
-import { ThemeCustomizerComponent } from './layouts/theme-customizer';
 
 @NgModule({
     imports: [
@@ -82,16 +60,6 @@ import { ThemeCustomizerComponent } from './layouts/theme-customizer';
         HeaderComponent,
         FooterComponent,
         SidebarComponent,
-        ThemeCustomizerComponent,
-        TablesComponent,
-        FontIconsComponent,
-        ChartsComponent,
-        IndexComponent,
-        // AnalyticsComponent,
-        FinanceComponent,
-        CryptoComponent,
-        WidgetsComponent,
-        DragndropComponent,
         AppLayout,
         KnowledgeBaseComponent,
         FaqComponent,
