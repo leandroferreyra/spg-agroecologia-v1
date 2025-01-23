@@ -21,8 +21,9 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
     registroFormGroup!: FormGroup;
     isSubmitRegistro = false;
 
-    tiposUsuarios: string[] = [
-        'Persona fisica', 'Persona jurídica'
+    tiposUsuarios: any[] = [
+        { "name": "Persona física", "id": "fisica" },
+        { "name": "Persona jurídica", "id": "juridica" },
     ]
 
     // Obtén la referencia al modal
@@ -60,10 +61,21 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
 
     inicializarFormRegistro() {
         this.registroFormGroup = new FormGroup({
-            tipoUsuario: new FormControl(null, [Validators.required]),
+            tipoUsuario: new FormControl('fisica', [Validators.required]),
             nombre: new FormControl(null, [Validators.required]),
             apellido: new FormControl(null, [Validators.required]),
-            usuario: new FormControl(null, [Validators.required])
+            usuario: new FormControl(null, [Validators.required]),
+            tipoDocumento: new FormControl(null, [Validators.required]),
+            numeroDocumento: new FormControl(null, [Validators.required]),
+            cuit: new FormControl(null, [Validators.required]),
+            genero: new FormControl(null, [Validators.required]),
+            password: new FormControl(null, [Validators.required]),
+            confirmPassword: new FormControl(null, [Validators.required]),
+            direccionCalle: new FormControl(null, [Validators.required]),
+            direccionNumero: new FormControl(null, [Validators.required]),
+            direccionDetalle: new FormControl(null, [Validators.required]),
+            pais: new FormControl(null, [Validators.required]),
+            ciudad: new FormControl(null, [Validators.required])
         });
     }
 
