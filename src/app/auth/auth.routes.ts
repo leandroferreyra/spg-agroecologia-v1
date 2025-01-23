@@ -7,7 +7,7 @@ export const AUTH_ROUTES: Routes = [
     },
     {
         path: 'boxed-signup',
-        loadComponent: () => import('../auth/boxed-signup').then((m) => m.BoxedSignupComponent)
+        loadComponent: () => import('./registro/boxed-signup').then((m) => m.BoxedSignupComponent)
     },
     // {
     //     path: 'register/:uuid/:hash',
@@ -15,7 +15,7 @@ export const AUTH_ROUTES: Routes = [
     // },
     {
         path: 'boxed-password-reset',
-        loadComponent: () => import('../auth/boxed-password-reset').then((m) => m.BoxedPasswordResetComponent)
+        loadComponent: () => import('./recupero-clave/boxed-password-reset').then((m) => m.BoxedPasswordResetComponent)
     },
     // {
     //     path: 'verify/:uuid/:token',

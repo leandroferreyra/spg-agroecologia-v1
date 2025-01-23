@@ -98,8 +98,7 @@
             <ul class="sub-menu">
                 @for(sub of menu.submenu; track sub) {
                 <li>
-                    <a routerLink="/" routerLinkActive="active"
-                        [routerLinkActiveOptions]="{exact: true}">{{sub.label}}</a>
+                    <a (click)="navigateTo(sub.route)">{{sub.label}}</a>
                 </li>
                 }
             </ul>

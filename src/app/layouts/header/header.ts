@@ -84,4 +84,8 @@ export class HeaderComponent {
         });
     }
 
+    navigateTo(route: string) {
+        this.router.navigate([`dashboard/${route}`])
+    }
+
 }

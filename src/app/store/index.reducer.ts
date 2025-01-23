@@ -105,13 +105,21 @@ function getMenuByRole(role: string) {
         case 'ADMIN':
             return [
                 {
-                    label: 'Dashboard', route: '/dashboard', submenu: [
+                    label: 'Productos', route: '/dashboard', submenu: [
                         { label: 'Users', route: '/users' },
                         { label: 'Settings', route: '/settings' },
                     ]
                 },
-                { label: 'Users', route: '/users' },
-                { label: 'Settings', route: '/settings' },
+                { label: 'Clientes', route: '/users' },
+                { label: 'Proveedores', route: '/settings' },
+                { label: 'Producción', route: '/settings' },
+                { label: 'Usuarios', route: '/settings' },
+                {
+                    label: 'Configuraciones', route: '' ,submenu: [
+                        { label: 'Bancos', route: 'bancos' },
+                        { label: 'Países', route: 'paises' },
+                    ]
+                },
             ];
         case 'user':
             return [

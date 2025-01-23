@@ -16,9 +16,6 @@ import { NgScrollbarModule, provideScrollbarOptions } from 'ngx-scrollbar';
 // datatable
 import { DataTableModule } from '@bhplugin/ng-datatable';
 
-// apexchart
-import { NgApexchartsModule } from 'ng-apexcharts';
-
 // highlightjs
 import { HighlightModule, provideHighlightOptions } from 'ngx-highlightjs';
 
@@ -77,7 +74,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         DataTableModule,
         MenuModule,
         NgxTippyModule,
-        NgApexchartsModule,
         HighlightModule,
         SortablejsModule,
         QuillModule.forRoot(),
@@ -103,7 +99,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         DataTableModule,
         MenuModule,
         NgxTippyModule,
-        NgApexchartsModule,
         HighlightModule,
         SortablejsModule,
         QuillModule,

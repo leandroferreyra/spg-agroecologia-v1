@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppService } from '../core/services/app.service';
+import { AppService } from '../../core/services/app.service';
 import { Router, NavigationEnd, Event as RouterEvent, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/shared.module';
-import { FooterComponent } from './footer/footer';
-import { HeaderComponent } from './header/header';
-import { SidebarComponent } from './sidebar/sidebar';
+import { FooterComponent } from '../footer/footer';
+import { HeaderComponent } from '../header/header';
+import { SidebarComponent } from '../sidebar/sidebar';
 
 
 @Component({

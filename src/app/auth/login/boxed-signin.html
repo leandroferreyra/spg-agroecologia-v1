@@ -116,23 +116,39 @@
 
 
 <div>
-    <!-- Modal -->
-    <ngx-custom-modal #modalRecuperoClave class="modal-top large-modal animate animate-slide-down-up">
+    <ngx-custom-modal #modalRecuperoClave class="modal-top animate animate-fade-in">
         <ng-template #modalHeader>
             <div class="text-center">Recuperar contraseña</div>
         </ng-template>
         <ng-template #modalBody>
-            <!-- input email -->
-            <form ngNativeValidate [formGroup]="envioEmailForm" (keydown.enter)="enviarEmail()">
-                <input type="email" placeholder="email@mail.com" class="form-input" formControlName="email" required />
+
+            <form class="space-y-5" [formGroup]="envioEmailForm" (ngSubmit)="enviarEmail()" novalidate>
+                <div
+                    [ngClass]="isSubmitRecuperoClave ? envioEmailForm.controls['email'].errors ? 'has-error' : 'has-success' : ''">
+                    <label for="Email">Email</label>
+                    <input id="Email" type="text" placeholder="Ingresa email" class="form-input"
+                        formControlName="email" />
+                    <ng-container *ngIf="isSubmitRecuperoClave && !envioEmailForm.controls['email'].errors">
+                        <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                    </ng-container>
+                    <ng-container *ngIf="isSubmitRecuperoClave && envioEmailForm.controls['email'].errors">
+                        <p class="mt-1 text-danger">Ingresa Email</p>
+                    </ng-container>
+                </div>
+                <div class="row">
+                    <div class="col-6 pr-1 text-end">
+                        <button type="submit" class="btn btn-primary">Recuperar</button>
+                    </div>
+                    <div class="col-6 pr-1">
+                        <button type="button" (click)="closeModalRecuperoClave()"
+                            class="btn btn-outline-danger">Cancelar</button>
+                    </div>
+                </div>
+
             </form>
-
-
 
         </ng-template>
         <ng-template #modalFooter>
-            <button type="button" (click)="closeModalRecuperoClave()" class="btn btn-outline-danger">Cerrar</button>
-            <button (click)="enviarEmail()" class="btn btn-primary">Recuperar</button>
         </ng-template>
     </ngx-custom-modal>
 </div>
