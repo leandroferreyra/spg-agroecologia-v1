@@ -3,8 +3,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Constantes } from 'src/Constantes';
 import { environment } from 'src/environments/environment.prod';
-import { LoginDTO } from '../core/models/request/loginDTO';
-import { AuthResponse } from '../core/models/response/authResponse';
+import { LoginDTO } from '../models/request/loginDTO';
+import { AuthResponse } from '../models/response/authResponse';
+import { EmailDTO } from '../models/request/emailDTO';
 // import { AuthResponse } from '../models/response/authResponse';
 // import { EmailDTO } from '../models/request/emailDTO';
 // import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
@@ -20,8 +21,8 @@ import { AuthResponse } from '../core/models/response/authResponse';
 export class AuthService {
 
   private apiLogin = '/login';
-  // private apiLogout = '/logout';
-  // private apiResetMail = '/password/reset';
+  private apiLogout = '/logout';
+  private apiResetMail = '/password/reset';
   // private apiResetPass = '/password/new';
   // private apiResendMail = '/email/resend';
   // private apiVerifyUser = '/email/verify/';
@@ -46,15 +47,20 @@ export class AuthService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiLogin, JSON.stringify(login), { headers });
   }
 
-  // logout(): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiLogout, { headers });
-  // }
+  logout(): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiLogout, { headers });
+  }
 
   // sendMail(email: EmailDTO): Observable<AuthResponse> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
   //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetMail, JSON.stringify(email), { headers });
   // }
+
+  sendMail(email: EmailDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetMail, JSON.stringify(email), { headers });
+  }
 
   // reSendMail(email: EmailDTO): Observable<AuthResponse> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
@@ -71,9 +77,9 @@ export class AuthService {
   //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiVerifyUser + hash + '/' + token, { headers });
   // }
 
-  // isLoggedIn(): boolean {
-  //   return !!localStorage.getItem('token');
-  // }
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
 
   // getUserRoles(): Rol[] {
   //   let usuarioLogueado = JSON.parse(localStorage.getItem('usuarioLogueado') || '[]');

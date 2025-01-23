@@ -92,7 +92,7 @@ export function indexReducer(state = initialState, action: any) {
     } else if (type === 'toggleSidebar') {
         return { ...state, ...{ sidebar: !state.sidebar } };
     } else if (type === 'setUserRole') {
-        payload = payload || 'admin';
+        payload = payload || state.userRole;
         const menuItems = getMenuByRole(payload);
         return { ...state, userRole: payload, menuItems };
     }
@@ -102,7 +102,7 @@ export function indexReducer(state = initialState, action: any) {
 
 function getMenuByRole(role: string) {
     switch (role) {
-        case 'admin':
+        case 'ADMIN':
             return [
                 {
                     label: 'Dashboard', route: '/dashboard', submenu: [

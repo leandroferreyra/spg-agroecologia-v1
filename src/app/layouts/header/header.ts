@@ -4,6 +4,9 @@ import { Store } from '@ngrx/store';
 import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/shared.module';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { TokenService } from 'src/app/core/services/token.service';
+import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 
 @Component({
     selector: 'header',
@@ -18,9 +21,15 @@ export class HeaderComponent {
 
     constructor(
         public storeData: Store<any>,
-        public router: Router
+        public router: Router,
+        public _authService: AuthService, public _tokenService: TokenService, public _userLogged: UserLoggedService
     ) {
         this.initStore();
+        let usuarioLogueado = this._userLogged.getUsuarioLogueado;
+        if (usuarioLogueado) {
+            //TODO: Reemplazar ADMIN por el rol del usuario
+            this.storeData.dispatch({ type: 'setUserRole', payload: 'ADMIN' });
+        }
     }
     async initStore() {
         this.storeData
@@ -60,6 +69,19 @@ export class HeaderComponent {
                 }
             }
         }
+    }
+
+    cerrarSesion() {
+        this._authService.logout().subscribe({
+            next: res => {
+                this._tokenService.logout();
+                this._userLogged.clearUsuarioLogueado();
+                this.router.navigate(['/auth/boxed-signin']);
+            },
+            error: error => {
+                console.error(error);
+            }
+        });
     }
 
 }

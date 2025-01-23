@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppService } from '../services/app.service';
+import { AppService } from '../core/services/app.service';
 import { Router, NavigationEnd, Event as RouterEvent, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/shared.module';

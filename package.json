@@ -34,6 +34,7 @@
         "@ngx-translate/http-loader": "^8.0.0",
         "angularx-flatpickr": "^7.3.0",
         "apexcharts": "^3.49.2",
+        "bootstrap": "^5.3.3",
         "file-saver": "^2.0.5",
         "file-upload-with-preview": "^6.0.2",
         "flatpickr": "^4.6.13",

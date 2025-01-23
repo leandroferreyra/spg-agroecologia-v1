@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
 // service
-import { AppService } from 'src/app/services/app.service';
+import { AppService } from 'src/app/core/services/app.service';
 
 // i18n
 import { TranslateModule } from '@ngx-translate/core';
@@ -63,6 +63,8 @@ import { FlatpickrModule } from 'angularx-flatpickr';
 
 // clipboard
 import { ClipboardModule } from 'ngx-clipboard';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
     imports: [
@@ -70,7 +72,6 @@ import { ClipboardModule } from 'ngx-clipboard';
         FormsModule,
         ReactiveFormsModule,
         RouterModule,
-
         TranslateModule.forChild(),
         NgScrollbarModule,
         DataTableModule,
@@ -90,13 +91,13 @@ import { ClipboardModule } from 'ngx-clipboard';
         NouisliderModule,
         FlatpickrModule.forRoot(),
         ClipboardModule,
+        NgxSpinnerModule
     ],
     declarations: [],
     exports: [
         // modules
         FormsModule,
         ReactiveFormsModule,
-
         TranslateModule,
         NgScrollbarModule,
         DataTableModule,
@@ -116,6 +117,7 @@ import { ClipboardModule } from 'ngx-clipboard';
         NouisliderModule,
         FlatpickrModule,
         ClipboardModule,
+        NgxSpinnerModule
     ],
 })
 export class SharedModule {

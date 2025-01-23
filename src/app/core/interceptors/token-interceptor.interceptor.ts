@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, EMPTY, tap, throwError } from 'rxjs';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { TokenService } from 'src/app/services/token.service';
+import { TokenService } from 'src/app/core/services/token.service';
 
 export const tokenInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
 
@@ -29,7 +29,7 @@ export const tokenInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status === 401 && error.error?.message === "Unauthenticated.") {
         tokenService.logout();
         spinner.hide();
-        router.navigate(['auth/login']);
+        router.navigate(['auth/boxed-signin']);
         return EMPTY;
       }
       return throwError(() => error);

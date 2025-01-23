@@ -3,7 +3,7 @@ import { Routes } from "@angular/router";
 export const AUTH_ROUTES: Routes = [
     {
         path: 'boxed-signin',
-        loadComponent: () => import('../auth/boxed-signin').then((m) => m.BoxedSigninComponent)
+        loadComponent: () => import('./login/boxed-signin').then((m) => m.BoxedSigninComponent)
     },
     {
         path: 'boxed-signup',
