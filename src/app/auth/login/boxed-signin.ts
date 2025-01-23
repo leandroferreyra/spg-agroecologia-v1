@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
+import { Console } from 'console';
 
 @Component({
     standalone: true,
