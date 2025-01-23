@@ -30,12 +30,6 @@ export class AppService {
         val = val || $themeConfig.layout;
         this.store.dispatch({ type: 'toggleLayout', payload: val });
 
-        val = localStorage.getItem('i18n_locale'); // en, da, de, el, es, fr, hu, it, ja, pl, pt, ru, sv, tr, zh
-        val = val || $themeConfig.locale;
-
-        const list = this.storeData.languageList;
-        const item = list.find((item: any) => item.code === val);
-
         val = localStorage.getItem('rtlClass'); // rtl, ltr
         val = val || $themeConfig.rtlClass;
         this.store.dispatch({ type: 'toggleRTL', payload: val });

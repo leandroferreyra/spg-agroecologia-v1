@@ -1,9 +1,32 @@
 ﻿import { Component } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { slideDownUp } from '../shared/animations';
+import { slideDownUp } from '../../shared/animations';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/shared.module';
+
+
+declare interface RouteInfo {
+    path: string;
+    title: string;
+    icon: string;
+    class: string;
+}
+
+export const ROUTES_SUPER_ADMIN: RouteInfo[] = [
+    { path: '/dashboard/:tipo/listado-permisos', title: 'Permisos', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-roles', title: 'Roles', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-clientes', title: 'Clientes', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-carreras', title: 'Carreras', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-clasificaciones', title: 'Clasificaciones', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-subclasificaciones', title: 'Subclasificaciones', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-precios', title: 'Precios', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-generos', title: 'Generos', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-paises', title: 'Países', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/listado-ciudades', title: 'Provincias', icon: 'design_bullet-list-67', class: '' },
+    { path: '/dashboard/:tipo/user-profile', title: 'Mi perfil', icon: 'users_single-02', class: '' }
+];
+
 
 @Component({
     selector: 'sidebar',

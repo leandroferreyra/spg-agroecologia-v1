@@ -8,16 +8,16 @@ import { CommonModule } from '@angular/common';
 
 @Component({
     standalone: true,
-    imports: [CommonModule,SharedModule, RouterLink],
+    imports: [CommonModule, SharedModule, RouterLink],
     templateUrl: './boxed-signin.html',
     animations: [toggleAnimation],
 })
 export class BoxedSigninComponent {
     store: any;
+
     constructor(
         public storeData: Store<any>,
-        public router: Router,
-        private appSetting: AppService,
+        public router: Router
     ) {
         this.initStore();
     }
@@ -29,5 +29,10 @@ export class BoxedSigninComponent {
             });
     }
 
+    iniciarSesion() {
+        // Servicio para iniciar sesión y obtener datos. 
+        this.storeData.dispatch({ type: 'setUserRole', payload: 'admin' });
+        this.router.navigate(['/dashboard/user-profile']);
+    }
 
 }

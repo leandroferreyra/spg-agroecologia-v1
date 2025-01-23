@@ -9,27 +9,18 @@ export const initialState = {
     navbar: 'navbar-sticky',
     locale: 'en',
     sidebar: false,
-    languageList: [
-        { code: 'zh', name: 'Chinese' },
-        { code: 'da', name: 'Danish' },
-        { code: 'en', name: 'English' },
-        { code: 'fr', name: 'French' },
-        { code: 'de', name: 'German' },
-        { code: 'el', name: 'Greek' },
-        { code: 'hu', name: 'Hungarian' },
-        { code: 'it', name: 'Italian' },
-        { code: 'ja', name: 'Japanese' },
-        { code: 'pl', name: 'Polish' },
-        { code: 'pt', name: 'Portuguese' },
-        { code: 'ru', name: 'Russian' },
-        { code: 'es', name: 'Spanish' },
-        { code: 'sv', name: 'Swedish' },
-        { code: 'tr', name: 'Turkish' },
-        { code: 'ae', name: 'Arabic' },
-    ],
     isShowMainLoader: true,
     semidark: false,
+    userRole: '',
+    menuItems: [] as MenuItem[]
+
 };
+
+export interface MenuItem {
+    label: string;
+    route: string;
+    submenu?: MenuItem[];
+}
 
 export function indexReducer(state = initialState, action: any) {
     const type = action.type;
@@ -100,7 +91,39 @@ export function indexReducer(state = initialState, action: any) {
         return { ...state, ...{ semidark: payload } };
     } else if (type === 'toggleSidebar') {
         return { ...state, ...{ sidebar: !state.sidebar } };
+    } else if (type === 'setUserRole') {
+        payload = payload || 'admin';
+        const menuItems = getMenuByRole(payload);
+        return { ...state, userRole: payload, menuItems };
     }
 
     return state;
 }
+
+function getMenuByRole(role: string) {
+    switch (role) {
+        case 'admin':
+            return [
+                {
+                    label: 'Dashboard', route: '/dashboard', submenu: [
+                        { label: 'Users', route: '/users' },
+                        { label: 'Settings', route: '/settings' },
+                    ]
+                },
+                { label: 'Users', route: '/users' },
+                { label: 'Settings', route: '/settings' },
+            ];
+        case 'user':
+            return [
+                { label: 'Dashboard', route: '/dashboard' },
+                { label: 'Profile', route: '/profile' },
+            ];
+        case 'guest':
+        default:
+            return [
+                { label: 'Login', route: '/login' },
+                { label: 'Register', route: '/register' },
+            ];
+    }
+}
+
