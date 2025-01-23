@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
 // service
-import { AppService } from 'src/app/service/app.service';
+import { AppService } from 'src/app/services/app.service';
 
 // i18n
 import { TranslateModule } from '@ngx-translate/core';

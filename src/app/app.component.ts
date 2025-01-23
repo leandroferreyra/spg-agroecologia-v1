@@ -1,11 +1,18 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterModule, RouterOutlet } from '@angular/router';
+import { StoreModule } from '@ngrx/store';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { indexReducer } from './store/index.reducer';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
+    standalone: true,
+    imports: [
+        RouterOutlet
+    ]
 })
 export class AppComponent {
     constructor(

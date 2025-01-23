@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppService } from 'src/app/service/app.service';
+import { AppService } from 'src/app/services/app.service';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/shared.module';
 

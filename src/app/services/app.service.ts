@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { $themeConfig } from '../theme.config';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+}) 
 export class AppService {
     storeData: any;
 
@@ -47,7 +49,7 @@ export class AppService {
         this.store.dispatch({ type: 'toggleSemidark', payload: val });
     }
 
- 
+
 
     changeAnimation(type = 'add') {
         if (this.storeData.animation) {

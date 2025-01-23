@@ -8,6 +8,9 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors } from '@angular
 // import { NgbDateCustomParserFormatter } from './core/pipes/NgbDateCustomParserFormatter';
 import { HashLocationStrategy, LocationStrategy, registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import { provideStore } from '@ngrx/store';
+import { indexReducer } from './store/index.reducer';
+import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
 registerLocaleData(localeEs);
 // import { provideToastr } from 'ngx-toastr';
 // import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
@@ -17,7 +20,8 @@ export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }),
   provideRouter(routes, withHashLocation()),
   provideAnimations(),
-  // provideHttpClient(withInterceptors([tokenInterceptorInterceptor])),
+  provideStore({ index: indexReducer }),
+  provideHttpClient(withInterceptors([tokenInterceptorInterceptor])),
   // provideToastr(),
   { provide: LOCALE_ID, useValue: 'es-ES' },
   // { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
