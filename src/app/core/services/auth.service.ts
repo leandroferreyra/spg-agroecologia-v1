@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment.prod';
 import { LoginDTO } from '../models/request/loginDTO';
 import { AuthResponse } from '../models/response/authResponse';
 import { EmailDTO } from '../models/request/emailDTO';
+import { RegistroDTO } from '../models/request/registroDTO';
 // import { AuthResponse } from '../models/response/authResponse';
 // import { EmailDTO } from '../models/request/emailDTO';
 // import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
@@ -25,17 +26,17 @@ export class AuthService {
   private apiResetMail = '/password/reset';
   // private apiResetPass = '/password/new';
   // private apiResendMail = '/email/resend';
-  // private apiVerifyUser = '/email/verify/';
-  // private apiRegister = '/register';
+  private apiVerifyUser = '/email/verify/';
+  private apiRegister = '/register';
   // private apiChangePassword = '/change_password';
   // private apiUsers = '/users';
 
   constructor(private http: HttpClient) { }
 
-  // register(registro: RegistroDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiRegister, JSON.stringify(registro), { headers });
-  // }
+  register(registro: RegistroDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiRegister, JSON.stringify(registro), { headers });
+  }
 
   // registerByAdmin(registro: RegistroDTO): Observable<AuthResponse> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
@@ -72,10 +73,10 @@ export class AuthService {
   //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetPass, JSON.stringify(resetPassword), { headers });
   // }
 
-  // verifyUser(hash: string, token: string): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiVerifyUser + hash + '/' + token, { headers });
-  // }
+  verifyUser(hash: string, token: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiVerifyUser + hash + '/' + token, { headers });
+  }
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');

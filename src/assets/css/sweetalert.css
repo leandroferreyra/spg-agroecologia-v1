@@ -62,7 +62,7 @@ body.swal2-toast-shown .swal2-container.toast {
 
 .swal2-popup .swal2-html-container {
     margin: 0 !important;
-    color: #e95f2b;
+    color: #888ea8;
     font-weight: 300;
     @apply ltr:!pr-10 rtl:!pl-10;
 }

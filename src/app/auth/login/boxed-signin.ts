@@ -15,10 +15,12 @@ import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { Console } from 'console';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterModule],
+    imports: [CommonModule, SharedModule, RouterModule, FontAwesomeModule],
     templateUrl: './boxed-signin.html',
     styleUrl: './boxed-signin.component.css',
     animations: [toggleAnimation]
@@ -32,8 +34,14 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
 
     envioEmailForm!: FormGroup;
     isSubmitRecuperoClave = false;
+    isSubmitLogin = false;
+    showPassword: boolean = false;
 
     usuarioLogueado: any;
+
+    // Iconos
+    iconEye = faEye;
+    iconEyeSlash = faEyeSlash;
 
     // Obtén la referencia al modal
     @ViewChild('modalRecuperoClave') modalRecuperoClave!: NgxCustomModalComponent;
@@ -76,6 +84,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     }
 
     iniciarSesion() {
+        this.isSubmitLogin = true;
         if (this.loginForm.valid) {
             this._spinner.show();
             let login = new LoginDTO();
@@ -97,6 +106,15 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                     },
                     error: error => {
                         console.log(error);
+                        Swal.fire({
+                            position: "top-right",
+                            toast: true,
+                            width: '30em',
+                            icon: "error",
+                            title: error.error.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                         this._spinner.hide();
                     }
                 })
@@ -106,16 +124,6 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
 
     tieneVariosRoles(): boolean {
         return (this.usuarioLogueado.roles.length > 1);
-    }
-
-    openModalRecuperoClave() {
-        this.modalRecuperoClave.options = this.modalOptions;
-        this.modalRecuperoClave.open();
-        // this._modalService.open(content, { backdrop: 'static', centered: true, animation: true });
-
-        this.envioEmailForm = new FormGroup({
-            email: new FormControl(null, [Validators.required, Validators.email])
-        });;
     }
 
     enviarEmail() {
@@ -159,6 +167,59 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
             }
         });
     }
+
+    togglePassword() {
+        this.showPassword = !this.showPassword;
+    }
+
+
+    async openModalRecuperoClave() {
+        const { value: email } = await Swal.fire({
+            title: 'Recupera tu clave',
+            input: 'email',
+            inputLabel: 'Email',
+            inputPlaceholder: 'tuemail@ejemplo.com',
+            confirmButtonText: 'Recuperar',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            inputValidator: (value) => {
+                if (!value) {
+                    return '¡Email es requerido!';
+                }
+                return null;
+            },
+        });
+
+        if (email) {
+            this._spinner.show();
+            let emailDto = new EmailDTO();
+            emailDto.email = email;
+
+            this.subscription.add(
+                this._authService.sendMail(emailDto).subscribe({
+                    next: res => {
+                        this._spinner.hide();
+                        this.showSwalFire("Se le envió un correo con el link para cambiar la clave. Recuerde revisar los spam.");
+                    },
+                    error: error => {
+                        console.error(error);
+                        this._spinner.hide();
+                        Swal.fire({
+                            position: "top-right",
+                            toast: true,
+                            width: '30em',
+                            icon: "error",
+                            title: error.error.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                }
+                ));
+        }
+    }
+
+
 
 
 }

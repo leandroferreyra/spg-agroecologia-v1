@@ -12,7 +12,7 @@ import { provideStore } from '@ngrx/store';
 import { indexReducer } from './store/index.reducer';
 import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
 registerLocaleData(localeEs);
-// import { provideToastr } from 'ngx-toastr';
+import { provideToastr } from 'ngx-toastr';
 // import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
 
 
@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
   provideAnimations(),
   provideStore({ index: indexReducer }),
   provideHttpClient(withInterceptors([tokenInterceptorInterceptor])),
-  // provideToastr(),
+  provideToastr(),
   { provide: LOCALE_ID, useValue: 'es-ES' },
   // { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
   { provide: LocationStrategy, useClass: HashLocationStrategy },

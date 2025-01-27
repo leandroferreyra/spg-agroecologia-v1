@@ -11,38 +11,21 @@
             <div
                 class="relative flex flex-col justify-center rounded-md bg-white/60 px-6 py-20 backdrop-blur-lg dark:bg-black/50 lg:min-h-[500px]">
 
-                <div class="mx-auto w-full max-w-[440px]">
+                <div class="mx-auto w-full max-w-[1000px]">
                     <div class="mb-10">
                         <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Registrate
                         </h1>
-                        <p class="text-base font-bold leading-normal text-white-dark">Ingresa usuario, email y
-                            contraseña para registrarte</p>
+                        <p class="text-base font-bold leading-normal text-white-dark">Completá los campos obligatorios
+                            (*)</p>
                     </div>
 
 
                     <form class="space-y-5" [formGroup]="registroFormGroup" (ngSubmit)="registrarUsuario()" novalidate>
                         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                            <div [ngClass]="isSubmitRegistro ? registroFormGroup.controls['tipoUsuario'].errors ? 'has-error'
-                            : 'has-success' : ''">
-                                <label for="tipoUsuario">Tipo</label>
-                                <ng-select [items]="tiposUsuarios" bindLabel="name" bindValue="id" [clearable]="false"
-                                    placeholder="" class="custom-multiselect" formControlName="tipoUsuario">
-                                </ng-select>
-                                <ng-container
-                                    *ngIf="isSubmitRegistro && !registroFormGroup.controls['tipoUsuario'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container
-                                    *ngIf="isSubmitRegistro && registroFormGroup.controls['tipoUsuario'].errors">
-                                    <p class="mt-1 text-danger">Selecciona tipo de usuario</p>
-                                </ng-container>
-                            </div>
-
-
                             <div [ngClass]="isSubmitRegistro ? registroFormGroup.controls['nombre'].errors ? 'has-error'
                                 : 'has-success' : ''">
-                                <label for=" customFname">Nombre</label>
+                                <label for=" customFname">Nombres *</label>
                                 <input id="customFname" type="text" placeholder="" class="form-control"
                                     formControlName="nombre" />
                                 <ng-container *ngIf="isSubmitRegistro && !registroFormGroup.controls['nombre'].errors">
@@ -52,10 +35,11 @@
                                     <p class="mt-1 text-danger">Ingresa nombre</p>
                                 </ng-container>
                             </div>
+
                             <div
                                 [ngClass]="isSubmitRegistro ? registroFormGroup.controls['apellido'].errors ? 'has-error' : 'has-success' : ''">
-                                <label for="customLname">Apellido</label>
-                                <input id="customLname" type="text" placeholder="" class="form-control"
+                                <label for="apellido">Apellidos *</label>
+                                <input id="apellido" type="text" placeholder="" class="form-control"
                                     formControlName="apellido" />
                                 <ng-container
                                     *ngIf="isSubmitRegistro && !registroFormGroup.controls['apellido'].errors">
@@ -65,9 +49,10 @@
                                     <p class="mt-1 text-danger">Ingresa apellido</p>
                                 </ng-container>
                             </div>
+
                             <div
                                 [ngClass]="isSubmitRegistro ? registroFormGroup.controls['usuario'].errors ? 'has-error' : 'has-success' : ''">
-                                <label for="customLname">Usuario</label>
+                                <label for="customLname">Usuario *</label>
                                 <input id="customLname" type="text" placeholder="" class="form-control"
                                     formControlName="usuario" />
                                 <ng-container *ngIf="isSubmitRegistro && !registroFormGroup.controls['usuario'].errors">
@@ -79,10 +64,64 @@
                             </div>
 
                             <div
+                                [ngClass]="isSubmitRegistro ? registroFormGroup.controls['email'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="email">Email *</label>
+                                <input id="email" type="text" placeholder="" class="form-control"
+                                    formControlName="email" />
+                                <ng-container *ngIf="isSubmitRegistro && !registroFormGroup.controls['email'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmitRegistro && registroFormGroup.controls['email'].errors">
+                                    <p class="mt-1 text-danger">Ingresa email</p>
+                                </ng-container>
+                            </div>
+
+
+                            <div
+                                [ngClass]="isSubmitRegistro ? registroFormGroup.controls['password'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Contraseña *</label>
+                                <div class="input-group">
+                                    <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                                        formControlName="password">
+                                    <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
+                                        style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
+                                </div>
+                                <ng-container
+                                    *ngIf="isSubmitRegistro && !registroFormGroup.controls['password'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmitRegistro && registroFormGroup.controls['password'].errors">
+                                    <p class="mt-1 text-danger">Ingresa contraseña</p>
+                                </ng-container>
+                            </div>
+
+
+                            <div
+                                [ngClass]="isSubmitRegistro ? registroFormGroup.controls['confirmPassword'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Confirmar contraseña *</label>
+                                <div class="input-group">
+                                    <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control"
+                                        formControlName="confirmPassword">
+                                    <fa-icon [icon]="showConfirmPassword ? iconEyeSlash : iconEye"
+                                        class="input-group-text" style="cursor: pointer;"
+                                        (click)="toggleConfirmPassword()"></fa-icon>
+                                </div>
+                                <ng-container
+                                    *ngIf="isSubmitRegistro && !registroFormGroup.controls['confirmPassword'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container
+                                    *ngIf="isSubmitRegistro && registroFormGroup.controls['confirmPassword'].errors">
+                                    <p class="mt-1 text-danger">Ingresa contraseña</p>
+                                </ng-container>
+                            </div>
+
+                            <div
                                 [ngClass]="isSubmitRegistro ? registroFormGroup.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
                                 <label for="tipoDocumento">Tipo documento</label>
-                                <input id="tipoDocumento" type="text" placeholder="" class="form-control"
-                                    formControlName="tipoDocumento" />
+                                <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
+                                    formControlName="tipoDocumento">
+                                </ng-select>
                                 <ng-container
                                     *ngIf="isSubmitRegistro && !registroFormGroup.controls['tipoDocumento'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
@@ -124,8 +163,10 @@
                             <div
                                 [ngClass]="isSubmitRegistro ? registroFormGroup.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
                                 <label for="genero">Género</label>
-                                <input id="genero" type="text" placeholder="" class="form-control"
-                                    formControlName="genero" />
+                                <!-- <input id="genero" type="text" placeholder="" class="form-control"
+                                    formControlName="genero" /> -->
+                                <ng-select [items]="generos" bindLabel="name" bindValue="uuid" formControlName="genero">
+                                </ng-select>
                                 <ng-container *ngIf="isSubmitRegistro && !registroFormGroup.controls['genero'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
@@ -134,41 +175,14 @@
                                 </ng-container>
                             </div>
 
-                            <div
-                                [ngClass]="isSubmitRegistro ? registroFormGroup.controls['password'].errors ? 'has-error' : 'has-success' : ''">
-                                <label for="password">Password</label>
-                                <input id="password" type="text" placeholder="" class="form-control"
-                                    formControlName="password" />
-                                <ng-container
-                                    *ngIf="isSubmitRegistro && !registroFormGroup.controls['password'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container *ngIf="isSubmitRegistro && registroFormGroup.controls['password'].errors">
-                                    <p class="mt-1 text-danger">Ingresa contraseña</p>
-                                </ng-container>
-                            </div>
 
-                            <div
-                                [ngClass]="isSubmitRegistro ? registroFormGroup.controls['confirmPassword'].errors ? 'has-error' : 'has-success' : ''">
-                                <label for="confirmPassword">Confirmar Password</label>
-                                <input id="confirmPassword" type="text" placeholder="" class="form-control"
-                                    formControlName="confirmPassword" />
-                                <ng-container
-                                    *ngIf="isSubmitRegistro && !registroFormGroup.controls['confirmPassword'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container
-                                    *ngIf="isSubmitRegistro && registroFormGroup.controls['confirmPassword'].errors">
-                                    <p class="mt-1 text-danger">Ingresa contraseña</p>
-                                </ng-container>
-                            </div>
 
 
                             <div
                                 [ngClass]="isSubmitRegistro ? registroFormGroup.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                 <label for="pais">País</label>
-                                <input id="pais" type="text" placeholder="" class="form-control"
-                                    formControlName="pais" />
+                                <ng-select [items]="paises" bindLabel="name" bindValue="uuid" formControlName="pais">
+                                </ng-select>
                                 <ng-container *ngIf="isSubmitRegistro && !registroFormGroup.controls['pais'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
@@ -178,10 +192,27 @@
                             </div>
 
                             <div
+                                [ngClass]="isSubmitRegistro ? registroFormGroup.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="provincia">Provincia</label>
+                                <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
+                                    formControlName="provincia">
+                                </ng-select>
+                                <ng-container
+                                    *ngIf="isSubmitRegistro && !registroFormGroup.controls['provincia'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container
+                                    *ngIf="isSubmitRegistro && registroFormGroup.controls['provincia'].errors">
+                                    <p class="mt-1 text-danger">Selecciona provincia</p>
+                                </ng-container>
+                            </div>
+
+                            <div
                                 [ngClass]="isSubmitRegistro ? registroFormGroup.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
                                 <label for="ciudad">Ciudad</label>
-                                <input id="ciudad" type="text" placeholder="" class="form-control"
-                                    formControlName="ciudad" />
+                                <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid" formControlName="ciudad"
+                                    [virtualScroll]="true">
+                                </ng-select>
                                 <ng-container *ngIf="isSubmitRegistro && !registroFormGroup.controls['ciudad'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>

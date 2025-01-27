@@ -23,7 +23,8 @@
                     </div>
 
                     <form class="space-y-4 dark:text-white" [formGroup]="loginForm">
-                        <div>
+
+                        <!-- <div>
                             <label for="Usuario">Usuario</label>
                             <div class="relative text-white-dark">
                                 <input id="Usuario" placeholder="Ingresa usuario" formControlName="usuario"
@@ -32,8 +33,23 @@
                                     <icon-user [fill]="true" />
                                 </span>
                             </div>
+                        </div> -->
+
+                        <div [ngClass]="isSubmitLogin ? loginForm.controls['usuario'].errors ? 'has-error'
+                        : 'has-success' : ''">
+                            <label for=" usuario">Usuario</label>
+                            <input id="usuario" type="text" placeholder="" class="form-control"
+                                formControlName="usuario" />
+                            <ng-container *ngIf="isSubmitLogin && !loginForm.controls['usuario'].errors">
+                                <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                            </ng-container>
+                            <ng-container *ngIf="isSubmitLogin && loginForm.controls['usuario'].errors">
+                                <p class="mt-1 text-danger">Ingresa usuario</p>
+                            </ng-container>
                         </div>
-                        <div>
+
+
+                        <!-- <div>
                             <label for="Password">Contraseña</label>
                             <div class="relative text-white-dark">
                                 <input id="Password" type="password" placeholder="Ingresa contraseña"
@@ -42,11 +58,42 @@
                                     <icon-lock-dots [fill]="true" />
                                 </span>
                             </div>
+                        </div> -->
+
+                        <!-- <div [ngClass]="isSubmitLogin ? loginForm.controls['password'].errors ? 'has-error'
+                        : 'has-success' : ''">
+                            <label for=" password">Contraseña *</label>
+                            <input id="password" type="text" placeholder="" class="form-control"
+                                formControlName="password" />
+                            <ng-container *ngIf="isSubmitLogin && !loginForm.controls['password'].errors">
+                                <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                            </ng-container>
+                            <ng-container *ngIf="isSubmitLogin && loginForm.controls['password'].errors">
+                                <p class="mt-1 text-danger">Ingresa password</p>
+                            </ng-container>
+                        </div> -->
+
+                        <div
+                            [ngClass]="isSubmitLogin ? loginForm.controls['password'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Contraseña *</label>
+                            <div class="input-group">
+                                <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                                    formControlName="password">
+                                <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
+                                    style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
+                            </div>
+                            <ng-container *ngIf="isSubmitLogin && !loginForm.controls['password'].errors">
+                                <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                            </ng-container>
+                            <ng-container *ngIf="isSubmitLogin && loginForm.controls['password'].errors">
+                                <p class="mt-1 text-danger">Ingresa contraseña</p>
+                            </ng-container>
                         </div>
+
                         <div class="row">
                             <div class="col-md-12 pr-1 d-flex justify-content-between">
                                 <a (click)="openModalRecuperoClave()"
-                                    style="cursor: pointer; text-decoration: underline;font-size: 13px; font-weight: bold; color: #ada8a8">
+                                    style="cursor: pointer !important; text-decoration: underline;font-size: 13px; font-weight: bold; color: #ada8a8">
                                     ¿Olvidaste tu contraseña? Recuperala acá
                                 </a>
                             </div>
@@ -63,44 +110,6 @@
                         </button>
                     </form>
 
-                    <!-- <div class="relative my-7 text-center md:mb-9">
-                        <span
-                            class="absolute inset-x-0 top-1/2 h-px w-full -translate-y-1/2 bg-white-light dark:bg-white-dark"></span>
-                        <span
-                            class="relative bg-white px-2 font-bold uppercase text-white-dark dark:bg-dark dark:text-white-light">or</span>
-                    </div> -->
-                    <!-- <div class="mb-10 md:mb-[60px]">
-                        <ul class="flex justify-center gap-3.5 text-white">
-                            <li>
-                                <a href="javascript:"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
-                                    style="background: linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)">
-                                    <icon-instagram />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
-                                    style="background: linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)">
-                                    <icon-facebook-circle />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
-                                    style="background: linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)">
-                                    <icon-twitter [fill]="true" />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-full p-0 transition hover:scale-110"
-                                    style="background: linear-gradient(135deg, rgba(239, 18, 98, 1) 0%, rgba(67, 97, 238, 1) 100%)">
-                                    <icon-google />
-                                </a>
-                            </li>
-                        </ul>
-                    </div> -->
                     <div class="text-center dark:text-white mt-4">
                         ¿ No tenes cuenta ?
                         <a routerLink="/auth/boxed-signup"
@@ -117,11 +126,12 @@
 
 <div>
     <ngx-custom-modal #modalRecuperoClave class="modal-top animate animate-fade-in">
+
         <ng-template #modalHeader>
             <div class="text-center">Recuperar contraseña</div>
         </ng-template>
-        <ng-template #modalBody>
 
+        <ng-template #modalBody>
             <form class="space-y-5" [formGroup]="envioEmailForm" (ngSubmit)="enviarEmail()" novalidate>
                 <div
                     [ngClass]="isSubmitRecuperoClave ? envioEmailForm.controls['email'].errors ? 'has-error' : 'has-success' : ''">
@@ -144,11 +154,7 @@
                             class="btn btn-outline-danger">Cancelar</button>
                     </div>
                 </div>
-
             </form>
-
-        </ng-template>
-        <ng-template #modalFooter>
         </ng-template>
     </ngx-custom-modal>
 </div>

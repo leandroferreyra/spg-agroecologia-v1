@@ -1,5 +1,5 @@
 {
-  "name": "vristo-angular",
+  "name": "ladie-angular",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -22,6 +22,9 @@
     "@auth0/angular-jwt": "^5.2.0",
     "@bhplugin/ng-datatable": "^0.1.0",
     "@dustfoundation/ngx-sortablejs": "^15.0.0",
+    "@fortawesome/angular-fontawesome": "^0.15.0",
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fullcalendar/angular": "^6.1.8",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.8",
@@ -50,6 +53,7 @@
     "ngx-scrollbar": "^15.1.2",
     "ngx-spinner": "^17.0.0",
     "ngx-tippy-wrapper": "^6.1.0",
+    "ngx-toastr": "^19.0.0",
     "nouislider": "^15.7.1",
     "quill": "^2.0.2",
     "rxjs": "~7.8.0",

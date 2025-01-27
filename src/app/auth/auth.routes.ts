@@ -14,13 +14,13 @@ export const AUTH_ROUTES: Routes = [
     //     loadComponent: () => import('./register/register.component').then((m) => m.RegisterComponent)
     // },
     {
-        path: 'boxed-password-reset',
+        path: 'reset/:hash',
         loadComponent: () => import('./recupero-clave/boxed-password-reset').then((m) => m.BoxedPasswordResetComponent)
     },
-    // {
-    //     path: 'verify/:uuid/:token',
-    //     loadComponent: () => import('./habilitar-usuario/habilitar-usuario.component').then((m) => m.HabilitarUsuarioComponent)
-    // },
+    {
+        path: 'verify/:uuid/:token',
+        loadComponent: () => import('./habilitar-usuario/habilitar-usuario.component').then((m) => m.HabilitarUsuarioComponent)
+    },
     // {
     //     path: 'acceso-denegado',
     //     loadComponent: () => import('./acceso-denegado/acceso-denegado.component').then((m) => m.AccesoDenegadoComponent)
