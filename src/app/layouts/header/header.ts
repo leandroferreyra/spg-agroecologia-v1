@@ -7,17 +7,22 @@ import { SharedModule } from 'src/shared.module';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'header',
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterLink, RouterLinkActive],
+    imports: [CommonModule, SharedModule, RouterLink, RouterLinkActive, FontAwesomeModule],
     templateUrl: './header.html',
     animations: [toggleAnimation],
 })
 export class HeaderComponent {
     store: any;
     menuItems: any[] = [];
+    usuarioLogueado: any;
+
+    iconUser = faUser;
 
     constructor(
         public storeData: Store<any>,
@@ -25,8 +30,9 @@ export class HeaderComponent {
         public _authService: AuthService, public _tokenService: TokenService, public _userLogged: UserLoggedService
     ) {
         this.initStore();
-        let usuarioLogueado = this._userLogged.getUsuarioLogueado;
-        if (usuarioLogueado) {
+        this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
+        // console.log(this.usuarioLogueado);
+        if (this.usuarioLogueado) {
             //TODO: Reemplazar ADMIN por el rol del usuario
             this.storeData.dispatch({ type: 'setUserRole', payload: 'ADMIN' });
         }
@@ -37,7 +43,6 @@ export class HeaderComponent {
             .subscribe((d) => {
                 this.store = d;
                 this.menuItems = this.store.menuItems;
-                console.log(this.menuItems);
             });
     }
 

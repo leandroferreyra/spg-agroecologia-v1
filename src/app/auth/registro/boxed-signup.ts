@@ -13,10 +13,12 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowAltCircleLeft, faEye, faEyeSlash, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { SwalService } from 'src/app/core/services/swal.service';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterModule, FontAwesomeModule],
+    imports: [CommonModule, SharedModule, RouterModule, FontAwesomeModule, NgxSpinnerModule],
     templateUrl: './boxed-signup.html',
     animations: [toggleAnimation],
 })
@@ -51,7 +53,8 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
 
     constructor(
         public storeData: Store<any>,
-        public router: Router, private _authService: AuthService, private _catalogService: CatalogoService
+        public router: Router, private _authService: AuthService, private _catalogService: CatalogoService,
+        public spinner: NgxSpinnerService, private swalService: SwalService
     ) {
         this.initStore();
     }
@@ -61,7 +64,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
         forkJoin({
             generos: this._catalogService.getGeneros(),
             paises: this._catalogService.getPaises(),
-            documentos:  this._catalogService.getDocumentos()
+            documentos: this._catalogService.getDocumentos()
         }).subscribe({
             next: res => {
                 // console.log(res);
@@ -121,15 +124,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                         this.provincias = res.data.districts;
                     },
                     error: error => {
-                        Swal.fire({
-                            position: "center",
-                            toast: true,
-                            width: '30em',
-                            icon: "error",
-                            title: "Error al traer provincias del servidor",
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
+                        this.swalService.toast('center', 'Error al traer provincias del servidor.');
                         console.error(error);
                     }
                 });
@@ -144,15 +139,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                             this.ciudades = res.data.cities;
                         },
                         error: error => {
-                            Swal.fire({
-                                position: "center",
-                                toast: true,
-                                width: '30em',
-                                icon: "error",
-                                title: "Error al traer ciudades del servidor",
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
+                            this.swalService.toast('center', 'Error al traer ciudades del servidor.');
                             console.error(error);
                         }
                     });
@@ -164,6 +151,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
         this.isSubmitRegistro = true;
         if (this.registroFormGroup.valid) {
             if (this.coincidePassword()) {
+                this.spinner.show();
                 let registro = new RegistroDTO();
                 registro.firstname = this.registroFormGroup.get('nombre')?.value;
                 registro.lastname = this.registroFormGroup.get('apellido')?.value;
@@ -184,22 +172,16 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                             console.log(res);
                             this.showSwalFire("¡Genial!. Se te ha enviado un e-mail a tu casilla de correo electrónico para confirmar tu cuenta. Recordá revisar SPAM.");
                             this.router.navigate(['auth/boxed-signin']);
+                            this.spinner.hide();
                         },
                         error: error => {
+                            this.spinner.hide();
                             console.log(error);
                         }
                     })
                 )
             } else {
-                Swal.fire({
-                    position: "center",
-                    toast: true,
-                    width: '30em',
-                    icon: "error",
-                    title: "Las contraseñas no coinciden",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                this.swalService.toast('center', 'Las contraseñas no coinciden');
             }
         }
     }
@@ -229,7 +211,6 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
     toggleConfirmPassword() {
         this.showConfirmPassword = !this.showConfirmPassword;
     }
-
 
 
 

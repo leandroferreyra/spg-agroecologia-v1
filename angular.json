@@ -21,8 +21,8 @@
                         "index": "src/index.html",
                         "main": "src/main.ts",
                         "polyfills": [
-                          "src/polyfills.ts",
-                          "@angular/localize/init"
+                            "src/polyfills.ts",
+                            "@angular/localize/init"
                         ],
                         "tsConfig": "tsconfig.app.json",
                         "assets": [
@@ -30,10 +30,10 @@
                         ],
                         "styles": [
                             "node_modules/bootstrap/dist/css/bootstrap.min.css",
+                            "node_modules/ngx-spinner/animations/ball-spin-fade.css",
                             "node_modules/@ng-select/ng-select/themes/default.theme.css",
                             "src/assets/css/app.css",
-                            "node_modules/ngx-toastr/toastr.css",
-                            "node_modules/ngx-spinner/animations/ball-spin-fade.css"
+                            "node_modules/ngx-toastr/toastr.css"
                         ],
                         "scripts": [
                             "node_modules/bootstrap/dist/js/bootstrap.min.js"
@@ -99,8 +99,8 @@
                     "builder": "@angular-devkit/build-angular:karma",
                     "options": {
                         "polyfills": [
-                          "src/polyfills.ts",
-                          "@angular/localize/init"
+                            "src/polyfills.ts",
+                            "@angular/localize/init"
                         ],
                         "tsConfig": "tsconfig.spec.json",
                         "assets": [

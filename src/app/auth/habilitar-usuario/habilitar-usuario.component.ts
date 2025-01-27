@@ -27,6 +27,7 @@ export class HabilitarUsuarioComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log(this.uuid, this.token);
     this.spinner.show();
     this.route.params.subscribe(params => {
       this.uuid = params['uuid'];
@@ -43,7 +44,7 @@ export class HabilitarUsuarioComponent implements OnInit, OnDestroy {
             confirmButtonText: 'Continuar',
           }).then((result) => {
             if (result.isConfirmed) {
-              this.router.navigate(['auth/login']);
+              this.router.navigate(['auth/boxed-signin']);
             }
           });
         },
@@ -56,7 +57,7 @@ export class HabilitarUsuarioComponent implements OnInit, OnDestroy {
             confirmButtonText: 'Continuar',
           }).then((result) => {
             if (result.isConfirmed) {
-              this.router.navigate(['auth/login']);
+              this.router.navigate(['auth/boxed-signin']);
             }
           });
           console.error(error);

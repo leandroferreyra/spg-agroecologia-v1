@@ -14,9 +14,9 @@ import Swal from 'sweetalert2';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
-import { Console } from 'console';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { SwalService } from 'src/app/core/services/swal.service';
 
 @Component({
     standalone: true,
@@ -57,7 +57,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         public _authService: AuthService,
         private _spinner: NgxSpinnerService,
         private _tokenService: TokenService,
-        private _userLogged: UserLoggedService
+        private _userLogged: UserLoggedService, private swalService: SwalService
     ) {
         this.initStore();
     }
@@ -79,6 +79,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     inicializarForm() {
         this.loginForm = new FormGroup({
             usuario: new FormControl(null, [Validators.required]),
+            email: new FormControl(null, [Validators.email]),
             password: new FormControl(null, [Validators.required])
         });
     }
@@ -88,7 +89,12 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         if (this.loginForm.valid) {
             this._spinner.show();
             let login = new LoginDTO();
-            login.user_name = this.loginForm.get('usuario')?.value;
+            let usuario = this.loginForm.get('usuario')?.value;
+            if (this.isEmail(usuario)) {
+                login.email = usuario;
+            } else {
+                login.user_name = usuario;
+            }
             login.password = this.loginForm.get('password')?.value;
             login.with.push('roles');
             login.with.push('permissions');
@@ -106,21 +112,19 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                     },
                     error: error => {
                         console.log(error);
-                        Swal.fire({
-                            position: "top-right",
-                            toast: true,
-                            width: '30em',
-                            icon: "error",
-                            title: error.error.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
+                        this.swalService.toast('top-right', error.error.message);
                         this._spinner.hide();
                     }
                 })
             )
         }
     }
+
+    isEmail(value: string): boolean {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(value);
+    }
+
 
     tieneVariosRoles(): boolean {
         return (this.usuarioLogueado.roles.length > 1);
@@ -163,7 +167,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
             confirmButtonText: 'Continuar',
         }).then((result) => {
             if (result.isConfirmed) {
-                this.router.navigate(['auth/reset']);
+
             }
         });
     }
@@ -204,15 +208,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                     error: error => {
                         console.error(error);
                         this._spinner.hide();
-                        Swal.fire({
-                            position: "top-right",
-                            toast: true,
-                            width: '30em',
-                            icon: "error",
-                            title: error.error.message,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
+                        this.swalService.toast('top-right', error.error.message);
                     }
                 }
                 ));

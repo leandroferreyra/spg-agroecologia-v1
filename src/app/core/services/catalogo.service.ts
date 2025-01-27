@@ -29,18 +29,25 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers });
   }
 
+  getPaisesWithPaging(): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams().append('paging', '1');
+
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
+  }
+
   getDocumentos(): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiDocumentos, { headers });
   }
 
 
-  getCiudades(): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    const params = new HttpParams()
-      .set('with', 'country');
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
-  }
+  // getCiudades(): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   const params = new HttpParams()
+  //     .set('with', 'country');
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
+  // }
 
   getProvinciasByCountry(idPais: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
