@@ -9,3 +9,17 @@
 @import 'flatpickr/dist/flatpickr.min.css';
 @import 'nouislider/dist/nouislider.min.css'; */
 @import 'tailwind.css';
+
+
+#back-button-with-border {
+    background: white;
+    color: #ada8a8;
+    border: 2px solid;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+#back-button-with-border:hover {
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+}

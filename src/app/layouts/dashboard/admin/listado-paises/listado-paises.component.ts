@@ -226,7 +226,29 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
     console.log(data);
     this.params.current_page = data.current_page;
     this.params.pagesize = data.pagesize;
-    this.obtenerPaises(data.pagesize, data.current_page);
+    if (data.change_type === 'search') {
+      this.obtenerPaisesConFiltro(data.pagesize, data.search);
+    } else {
+      this.obtenerPaises(data.pagesize, data.current_page);
+    }
+  }
+
+  obtenerPaisesConFiltro(paging: number, filter: string) {
+    this.subscription.add(
+      this._catalogoService.getPaisesWithFilter(paging, filter).subscribe({
+        next: res => {
+          console.log(res);
+          this.paises = res.data;
+          this.total_rows = res.meta.total;
+          this.params.last_page = res.meta.last_page;
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          console.log(error);
+        }
+      })
+    )
   }
 
 }

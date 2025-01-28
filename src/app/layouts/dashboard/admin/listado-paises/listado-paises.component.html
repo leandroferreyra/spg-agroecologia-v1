@@ -13,8 +13,8 @@
 
         <div class="datatable">
             <ng-datatable [rows]="paises" [columns]="cols" [search]="search" [sortable]="true" [isServerMode]="true"
-                (changeServer)="changeServer($event)" [totalRows]="total_rows" [paginationInfo]="paginationInfo" [pageSize]="params.pagesize"
-                skin="whitespace-nowrap table-hover" [pageSizeOptions]="pageSizeOptions"
+                (changeServer)="changeServer($event)" [totalRows]="total_rows" [paginationInfo]="paginationInfo"
+                [pageSize]="params.pagesize" skin="whitespace-nowrap table-hover" [pageSizeOptions]="pageSizeOptions"
                 firstArrow='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 rtl:rotate-180"> <path d="M13 19L7 12L13 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path opacity="0.5" d="M16.9998 19L10.9998 12L16.9998 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> </svg>'
                 lastArrow='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 rtl:rotate-180"> <path d="M11 19L17 12L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path opacity="0.5" d="M6.99976 19L12.9998 12L6.99976 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> </svg> '
                 previousArrow='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 rtl:rotate-180"> <path d="M15 5L9 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> </svg>'
@@ -24,7 +24,8 @@
                 <ng-template slot="action" let-value="data">
                     <div class="flex items-center">
                         <div>
-                            <button type="button" class="ltr:mr-2 rtl:ml-2" ngxTippy="Editar" (click)="openModalNuevoPais('EDIT', value)">
+                            <button type="button" class="ltr:mr-2 rtl:ml-2" ngxTippy="Editar"
+                                (click)="openModalNuevoPais('EDIT', value)">
                                 <icon-pencil />
                             </button>
                         </div>
@@ -70,23 +71,11 @@
                                 </ng-container>
                             </div>
 
-
-                            <!-- <div class="row">
-                                <div class="col-12 pr-1">
-                                    <label>País</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" formControlName="nombre">
-                                    </div>
-                                </div>
-                            </div> -->
-
                             <div class="row mt-3">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-wd btn-primary"
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
                                         (click)="confirmarPais()">Confirmar</button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-wd" id="back-button-with-border"
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
                                         (click)="cerrarModal()">Cancelar</button>
                                 </div>
                             </div>
