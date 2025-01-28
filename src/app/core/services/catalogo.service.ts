@@ -24,6 +24,17 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers });
   }
 
+  getGenerosWithPaging(paging: number, page?: number) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams();
+    if (page) {
+      params = params.append('paging', paging).append('page', page);
+    } else {
+      params = params.append('paging', paging);
+    }
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params });
+  }
+
   getPaises(): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers });

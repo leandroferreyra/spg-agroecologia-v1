@@ -118,6 +118,7 @@ function getMenuByRole(role: string) {
                 { label: 'Configuraciones', route: '', submenu: [
                         { label: 'Bancos', route: 'bancos' },
                         { label: 'Países', route: 'paises' },
+                        { label: 'Géneros', route: 'generos' },
                     ]
                 },
             ];

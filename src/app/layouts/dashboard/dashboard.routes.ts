@@ -19,6 +19,10 @@ export const DASHBOARD_ROUTES: Routes = [
             {
                 path: 'paises',
                 loadComponent: () => import('../dashboard/admin/listado-paises/listado-paises.component').then(m => m.ListadoPaisesComponent)
+            },
+            {
+                path: 'generos',
+                loadComponent: () => import('../dashboard/admin/listado-generos/listado-generos.component').then(m => m.ListadoGenerosComponent)
             }
 
         ]
