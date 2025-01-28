@@ -8,12 +8,17 @@
         <div class="flex items-center">
             <div class="ltr:mr-4 rtl:ml-4">
                 <button type="button" ngxTippy="Editar datos" class="hover:text-primary">
-                    <icon-edit />
+                    <icon-edit class="h-6 w-6"/>
                 </button>
             </div>
-            <div>
+            <div class="ltr:mr-4 rtl:ml-4">
                 <button type="button" ngxTippy="Cambiar clave" class="hover:text-primary">
                     <icon-lock class="h-6 w-6" />
+                </button>
+            </div>
+            <div class="ltr:mr-4 rtl:ml-4">
+                <button type="button" ngxTippy="Cambiar rol" class="hover:text-primary">
+                    <icon-refresh class="h-6 w-6" />
                 </button>
             </div>
         </div>
@@ -24,14 +29,6 @@
     <div class="flex flex-col sm:flex-row">
         <div class="grid flex-1 grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-                <label for="name">Nombres</label>
-                <input id="name" type="text" placeholder="Jimmy Turner" class="form-input" />
-            </div>
-            <div>
-                <label for="profession">Apellidos</label>
-                <input id="profession" type="text" placeholder="Web Developer" class="form-input" />
-            </div>
-            <div>
                 <label for="profession">Email</label>
                 <input id="profession" type="email" placeholder="Web Developer" class="form-input" />
             </div>
@@ -40,19 +37,27 @@
                 <input id="address" type="text" placeholder="New York" class="form-input" />
             </div>
             <div>
-                <label for="location">Location</label>
+                <label for="name">Nombres</label>
+                <input id="name" type="text" placeholder="Jimmy Turner" class="form-input" />
+            </div>
+            <div>
+                <label for="profession">Apellidos</label>
+                <input id="profession" type="text" placeholder="Web Developer" class="form-input" />
+            </div>
+            <div>
+                <label for="location">Género</label>
                 <input id="location" type="text" placeholder="Location" class="form-input" />
             </div>
             <div>
-                <label for="phone">Phone</label>
+                <label for="phone">País</label>
                 <input id="phone" type="text" placeholder="+1 (530) 555-12121" class="form-input" />
             </div>
             <div>
-                <label for="email">Email</label>
+                <label for="email">Provincia</label>
                 <input id="email" type="email" placeholder="Jimmy@gmail.com" class="form-input" />
             </div>
             <div>
-                <label for="web">Website</label>
+                <label for="web">Ciudad</label>
                 <input id="web" type="text" placeholder="Enter URL" class="form-input" />
             </div>
             <div>
