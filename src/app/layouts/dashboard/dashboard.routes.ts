@@ -10,7 +10,7 @@ export const DASHBOARD_ROUTES: Routes = [
             // Shared
             {
                 path: 'user-profile',
-                loadComponent: () => import('../../users/profile').then(m => m.ProfileComponent)
+                loadComponent: () => import('../dashboard/user-profile/user-profile.component').then(m => m.UserProfileComponent)
             },
             {
                 path: 'bancos',

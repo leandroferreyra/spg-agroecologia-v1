@@ -5,29 +5,6 @@ import { slideDownUp } from '../../shared/animations';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/shared.module';
 
-
-declare interface RouteInfo {
-    path: string;
-    title: string;
-    icon: string;
-    class: string;
-}
-
-export const ROUTES_SUPER_ADMIN: RouteInfo[] = [
-    { path: '/dashboard/:tipo/listado-permisos', title: 'Permisos', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-roles', title: 'Roles', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-clientes', title: 'Clientes', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-carreras', title: 'Carreras', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-clasificaciones', title: 'Clasificaciones', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-subclasificaciones', title: 'Subclasificaciones', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-precios', title: 'Precios', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-generos', title: 'Generos', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-paises', title: 'Países', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/listado-ciudades', title: 'Provincias', icon: 'design_bullet-list-67', class: '' },
-    { path: '/dashboard/:tipo/user-profile', title: 'Mi perfil', icon: 'users_single-02', class: '' }
-];
-
-
 @Component({
     selector: 'sidebar',
     standalone: true,
@@ -40,17 +17,19 @@ export class SidebarComponent {
     store: any;
     activeDropdown: string[] = [];
     parentDropdown: string = '';
-    constructor(
-        public storeData: Store<any>,
-        public router: Router,
-    ) {
+    menuItems: any[] = [];
+
+
+    constructor(public storeData: Store<any>, public router: Router) {
         this.initStore();
     }
+
     async initStore() {
         this.storeData
             .select((d) => d.index)
             .subscribe((d) => {
                 this.store = d;
+                this.menuItems = this.store.menuItems;
             });
     }
 
@@ -88,4 +67,16 @@ export class SidebarComponent {
             this.activeDropdown.push(name);
         }
     }
+
+    isIncludedInActive(label: string) {
+       return this.activeDropdown.includes(label)
+    }
+
+
+    navigateTo(route: string) {
+        this.toggleMobileMenu();
+        this.router.navigate([`dashboard/${route}`])
+    }
+
+
 }
