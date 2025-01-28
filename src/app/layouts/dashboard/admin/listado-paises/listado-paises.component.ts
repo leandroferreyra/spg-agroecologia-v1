@@ -48,9 +48,8 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
-  paisAModificar: any;
 
-  // Obtén la referencia al modal
+  // Referencia al modal para crear y editar países.
   @ViewChild('modalPais') modalPais!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
@@ -154,7 +153,6 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
       console.log(pais);
       this.isEdicion = true;
       this.tituloModal = 'Edición país';
-      this.paisAModificar = pais;
       this.paisForm = new FormGroup({
         uuid: new FormControl(pais?.uuid, []),
         nombre: new FormControl(pais?.name, [Validators.required])
