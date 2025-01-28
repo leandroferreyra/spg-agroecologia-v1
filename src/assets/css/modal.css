@@ -13,6 +13,11 @@ ngx-custom-modal .modal {
     @apply my-auto w-full max-w-lg overflow-hidden rounded-lg;
 }
 
+.modal .modal-header {
+    justify-content: center;
+    border-bottom: none;
+}
+
 .modal .modal-content {
     @apply relative bg-white text-base text-black shadow dark:bg-[#0e1726] dark:text-white-dark;
 }
@@ -24,12 +29,13 @@ ngx-custom-modal .modal {
     @apply absolute top-3 shrink-0 !text-3xl font-normal !leading-7 text-gray-400 hover:text-gray-800 dark:hover:text-gray-600 ltr:right-5  rtl:left-5;
 }
 
-.modal .modal-body {
+/* .modal .modal-body {
     @apply px-5 pt-5;
-}
+} */
 
 .modal .modal-footer {
     @apply mt-8 flex items-center justify-end px-5 pb-5;
+    border: none;
 }
 
 .modal.modal-top .modal-dialog {

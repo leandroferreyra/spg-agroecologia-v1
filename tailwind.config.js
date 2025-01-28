@@ -77,7 +77,7 @@ module.exports = {
                         '--tw-prose-invert-headings': theme('colors.white.dark'),
                         '--tw-prose-invert-links': theme('colors.white.dark'),
                         h1: {
-                            fontSize: '40px',
+                            fontSize: '40px !important',
                             marginBottom: '0.5rem',
                             marginTop: 0,
                         },

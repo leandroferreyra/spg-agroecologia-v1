@@ -43,13 +43,13 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     iconEye = faEye;
     iconEyeSlash = faEyeSlash;
 
-    // Obtén la referencia al modal
-    @ViewChild('modalRecuperoClave') modalRecuperoClave!: NgxCustomModalComponent;
-    modalOptions: ModalOptions = {
-        closeOnOutsideClick: false,
-        hideCloseButton: true,
-        closeOnEscape: false
-    };
+    // // Obtén la referencia al modal
+    // @ViewChild('modalRecuperoClave') modalRecuperoClave!: NgxCustomModalComponent;
+    // modalOptions: ModalOptions = {
+    //     closeOnOutsideClick: false,
+    //     hideCloseButton: true,
+    //     closeOnEscape: false
+    // };
 
     constructor(
         public storeData: Store<any>,
@@ -112,7 +112,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                     },
                     error: error => {
                         console.log(error);
-                        this.swalService.toast('top-right', error.error.message);
+                        this.swalService.toastError('top-right', error.error.message);
                         this._spinner.hide();
                     }
                 })
@@ -142,7 +142,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                     next: res => {
                         this._spinner.hide();
                         this.showSwalFire("Se le envió un correo con el link para cambiar la clave. Recuerde revisar los spam.");
-                        this.closeModalRecuperoClave();
+                        // this.closeModalRecuperoClave();
                     },
                     error: error => {
                         console.error(error);
@@ -154,10 +154,10 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         }
     }
 
-    closeModalRecuperoClave() {
-        this.modalRecuperoClave.close();
-        this.isSubmitRecuperoClave = false;
-    }
+    // closeModalRecuperoClave() {
+    //     this.modalRecuperoClave.close();
+    //     this.isSubmitRecuperoClave = false;
+    // }
 
     showSwalFire(text: string) {
         Swal.fire({
@@ -208,7 +208,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                     error: error => {
                         console.error(error);
                         this._spinner.hide();
-                        this.swalService.toast('top-right', error.error.message);
+                        this.swalService.toastError('top-right', error.error.message);
                     }
                 }
                 ));

@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEventType, HttpHeaders, HttpParams, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { filter, map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 
@@ -29,10 +29,14 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers });
   }
 
-  getPaisesWithPaging(): Observable<AuthResponse> {
+  getPaisesWithPaging(paging: number, page?: number): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams().append('paging', '1');
-
+    let params = new HttpParams();
+    if (page) {
+      params = params.append('paging', paging).append('page', page);
+    } else {
+      params = params.append('paging', paging);
+    }
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
   }
 
@@ -40,14 +44,6 @@ export class CatalogoService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiDocumentos, { headers });
   }
-
-
-  // getCiudades(): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-  //   const params = new HttpParams()
-  //     .set('with', 'country');
-  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
-  // }
 
   getProvinciasByCountry(idPais: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });

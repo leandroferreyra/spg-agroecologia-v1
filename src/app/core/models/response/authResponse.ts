@@ -4,6 +4,7 @@ export class AuthResponse {
     message!: string;
     data: any;
     token!: string;
+    meta?: any;
 
     constructor() {
         

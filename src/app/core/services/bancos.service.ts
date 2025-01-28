@@ -15,11 +15,10 @@ export class BancosService {
 
   constructor(private http: HttpClient) { }
 
-  getBancos(genericDTO: GenericDTO): Observable<AuthResponse> {
+  getBancos(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams()
-      .append('actual_role', genericDTO.actual_role)
-      .append('paging', genericDTO.paging)
+      .append('actual_role', rol)
       .append('with []', 'bank_accounts.currency');
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
   }

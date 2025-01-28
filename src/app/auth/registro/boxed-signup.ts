@@ -124,7 +124,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                         this.provincias = res.data.districts;
                     },
                     error: error => {
-                        this.swalService.toast('center', 'Error al traer provincias del servidor.');
+                        this.swalService.toastError('center', 'Error al traer provincias del servidor.');
                         console.error(error);
                     }
                 });
@@ -139,7 +139,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                             this.ciudades = res.data.cities;
                         },
                         error: error => {
-                            this.swalService.toast('center', 'Error al traer ciudades del servidor.');
+                            this.swalService.toastError('center', 'Error al traer ciudades del servidor.');
                             console.error(error);
                         }
                     });
@@ -181,7 +181,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                     })
                 )
             } else {
-                this.swalService.toast('center', 'Las contraseñas no coinciden');
+                this.swalService.toastError('center', 'Las contraseñas no coinciden');
             }
         }
     }

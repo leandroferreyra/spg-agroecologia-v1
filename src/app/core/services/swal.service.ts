@@ -9,7 +9,19 @@ export class SwalService {
 
   constructor() { }
 
-  toast(position: SweetAlertPosition, message: string) {
+  toastSuccess(position: SweetAlertPosition, message: string) {
+    Swal.fire({
+      position: position,
+      toast: true,
+      width: '30em',
+      icon: "success",
+      title: message,
+      showConfirmButton: false,
+      timer: 1500
+    });
+  }
+
+  toastError(position: SweetAlertPosition, message: string) {
     Swal.fire({
       position: position,
       toast: true,
@@ -20,4 +32,5 @@ export class SwalService {
       timer: 1500
     });
   }
+
 }

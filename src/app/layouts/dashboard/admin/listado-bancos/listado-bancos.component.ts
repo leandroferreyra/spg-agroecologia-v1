@@ -44,11 +44,8 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    let genericDTO = new GenericDTO();
-    genericDTO.actual_role = this.actual_role;
-    genericDTO.paging = 10;
     this.subscription.add(
-      this._bancosService.getBancos(genericDTO).subscribe({
+      this._bancosService.getBancos(this.actual_role).subscribe({
         next: res => {
           this.spinner.hide();
           this.bancos = res.data;
