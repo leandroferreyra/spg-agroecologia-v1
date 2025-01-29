@@ -67,6 +67,12 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiDocumentos, { headers });
   }
 
+  getProvincias(): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    const params = new HttpParams();
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
+  }
+
   getProvinciasByCountry(idPais: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     const params = new HttpParams()
@@ -80,6 +86,28 @@ export class CatalogoService {
       .append('with[]', 'cities')
       .append('with[]', 'country');
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias + '/' + provincia, { headers, params });
+  }
+
+  getCiudadesWithDistrictsAndPaging(paging: number, page?: number): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams();
+    if (page) {
+      params = params.append('paging', paging).append('page', page).append('with[]', 'district');;
+    } else {
+      params = params.append('paging', paging).append('with[]', 'district');;
+    }
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
+  }
+
+  getProvinciasWithCountryAndPaging(paging: number, page?: number): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams();
+    if (page) {
+      params = params.append('paging', paging).append('page', page).append('with[]', 'country');
+    } else {
+      params = params.append('paging', paging).append('with[]', 'country');
+    }
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
   }
 
   getPermisos(actual_role: string): Observable<AuthResponse> {

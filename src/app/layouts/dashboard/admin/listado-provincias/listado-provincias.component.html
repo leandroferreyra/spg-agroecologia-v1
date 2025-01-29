@@ -1,0 +1,108 @@
+<div>
+    <div class="panel mt-6 pb-0">
+        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
+            <h5 class="text-lg font-semibold dark:text-white-light">Provincias
+            </h5>
+            <button type="button" ngxTippy="Agregar provincia" (click)="openModalNuevaProvincia('NEW')">
+                <icon-plus />
+            </button>
+            <div class="ltr:ml-auto rtl:mr-auto">
+                <input [(ngModel)]="search" type="text" class="form-input w-auto" placeholder="Buscar..." />
+            </div>
+        </div>
+
+        <div class="datatable">
+            <ng-datatable [rows]="provincias" [columns]="cols" [search]="search" [sortable]="true" [isServerMode]="true"
+                (changeServer)="changeServer($event)" [totalRows]="total_rows" [paginationInfo]="paginationInfo"
+                [pageSize]="params.pagesize" skin="whitespace-nowrap table-hover" [pageSizeOptions]="pageSizeOptions"
+                firstArrow='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 rtl:rotate-180"> <path d="M13 19L7 12L13 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path opacity="0.5" d="M16.9998 19L10.9998 12L16.9998 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> </svg>'
+                lastArrow='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 rtl:rotate-180"> <path d="M11 19L17 12L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> <path opacity="0.5" d="M6.99976 19L12.9998 12L6.99976 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> </svg> '
+                previousArrow='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 rtl:rotate-180"> <path d="M15 5L9 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> </svg>'
+                nextArrow='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 rtl:rotate-180"> <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/> </svg>'>
+
+
+                <ng-template slot="action" let-value="data">
+                    <div class="flex items-center">
+                        <div>
+                            <button type="button" class="ltr:mr-2 rtl:ml-2" ngxTippy="Editar"
+                                (click)="openModalNuevaProvincia('EDIT', value)">
+                                <icon-pencil />
+                            </button>
+                        </div>
+                        <div>
+                            <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(value)">
+                                <icon-trash-lines />
+                            </button>
+                        </div>
+                    </div>
+                </ng-template>
+
+            </ng-datatable>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div>
+    <ngx-custom-modal #modalProvincia class="modal-top animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="provinciaForm" (keydown.enter)="confirmarProvincia()">
+
+                            <div
+                                [ngClass]="isSubmit ? provinciaForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Provincia</label>
+                                <input type="text" class="form-control" formControlName="nombre">
+
+                                <ng-container *ngIf="isSubmit && !provinciaForm.controls['nombre'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && provinciaForm.controls['nombre'].errors">
+                                    <p class="mt-1 text-danger">Ingresa nombre de la provincia</p>
+                                </ng-container>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? provinciaForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>País</label>
+                                <ng-select [items]="paises" bindLabel="name" bindValue="uuid" formControlName="pais"
+                                    [virtualScroll]="true" [appendTo]="'body'">
+                                </ng-select>
+                                <ng-container *ngIf="isSubmit && !provinciaForm.controls['pais'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && provinciaForm.controls['pais'].errors">
+                                    <p class="mt-1 text-danger">Selecciona un país</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarProvincia()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="large" color="#fff" type="ball-scale-multiple" [fullScreen]="true">
+    <p style="color: white"> Cargando... </p>
+</ngx-spinner>

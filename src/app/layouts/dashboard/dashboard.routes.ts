@@ -21,6 +21,14 @@ export const DASHBOARD_ROUTES: Routes = [
                 loadComponent: () => import('../dashboard/admin/listado-paises/listado-paises.component').then(m => m.ListadoPaisesComponent)
             },
             {
+                path: 'provincias',
+                loadComponent: () => import('../dashboard/admin/listado-provincias/listado-provincias.component').then(m => m.ListadoProvinciasComponent)
+            },
+            {
+                path: 'ciudades',
+                loadComponent: () => import('../dashboard/admin/listado-ciudades/listado-ciudades.component').then(m => m.ListadoCiudadesComponent)
+            },
+            {
                 path: 'generos',
                 loadComponent: () => import('../dashboard/admin/listado-generos/listado-generos.component').then(m => m.ListadoGenerosComponent)
             }
