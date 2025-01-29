@@ -1,4 +1,5 @@
-<form class="mb-5 rounded-md border border-[#ebedf2] bg-white p-4 dark:border-[#191e3a] dark:bg-[#0e1726]">
+<form [formGroup]="userForm"
+    class="mb-5 rounded-md border border-[#ebedf2] bg-white p-4 dark:border-[#191e3a] dark:bg-[#0e1726]">
 
     <div class="flex items-center justify-between p-4">
         <div>
@@ -7,8 +8,8 @@
 
         <div class="flex items-center">
             <div class="ltr:mr-4 rtl:ml-4">
-                <button type="button" ngxTippy="Editar datos" class="hover:text-primary">
-                    <icon-edit class="h-6 w-6"/>
+                <button type="button" ngxTippy="Editar datos" class="hover:text-primary" (click)="toggleEdicion()">
+                    <icon-edit class="h-6 w-6" />
                 </button>
             </div>
             <div class="ltr:mr-4 rtl:ml-4">
@@ -30,35 +31,36 @@
         <div class="grid flex-1 grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
                 <label for="profession">Email</label>
-                <input id="profession" type="email" placeholder="Web Developer" class="form-input" />
+                <input id="profession" type="email" placeholder="Email" class="form-control" formControlName="email" />
             </div>
             <div>
                 <label for="address">Usuario</label>
-                <input id="address" type="text" placeholder="New York" class="form-input" />
+                <input id="address" type="text" placeholder="New York" class="form-control" formControlName="usuario" />
             </div>
             <div>
                 <label for="name">Nombres</label>
-                <input id="name" type="text" placeholder="Jimmy Turner" class="form-input" />
+                <input id="name" type="text" placeholder="" class="form-control" formControlName="nombres" />
             </div>
             <div>
                 <label for="profession">Apellidos</label>
-                <input id="profession" type="text" placeholder="Web Developer" class="form-input" />
+                <input id="profession" type="text" placeholder="" class="form-control"
+                    formControlName="apellidos" />
             </div>
             <div>
                 <label for="location">Género</label>
-                <input id="location" type="text" placeholder="Location" class="form-input" />
+                <input id="location" type="text" placeholder="" class="form-control" formControlName="genero" />
             </div>
             <div>
                 <label for="phone">País</label>
-                <input id="phone" type="text" placeholder="+1 (530) 555-12121" class="form-input" />
+                <input id="phone" type="text" placeholder="" class="form-control" formControlName="ciudad"/>
             </div>
             <div>
                 <label for="email">Provincia</label>
-                <input id="email" type="email" placeholder="Jimmy@gmail.com" class="form-input" />
+                <input id="email" type="email" placeholder="" class="form-control" formControlName="direccion"/>
             </div>
             <div>
                 <label for="web">Ciudad</label>
-                <input id="web" type="text" placeholder="Enter URL" class="form-input" />
+                <input id="web" type="text" placeholder="" class="form-control" formControlName="ciudad" />
             </div>
             <div>
                 <label class="inline-flex cursor-pointer">
