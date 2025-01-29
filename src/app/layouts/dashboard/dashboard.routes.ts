@@ -31,6 +31,10 @@ export const DASHBOARD_ROUTES: Routes = [
             {
                 path: 'generos',
                 loadComponent: () => import('../dashboard/admin/listado-generos/listado-generos.component').then(m => m.ListadoGenerosComponent)
+            },
+            {
+                path: 'monedas',
+                loadComponent: () => import('../dashboard/admin/listado-monedas/listado-monedas.component').then(m => m.ListadoMonedasComponent)
             }
 
         ]

@@ -118,6 +118,7 @@ function getMenuByRole(role: string) {
                         { label: 'Provincias', route: 'provincias' },
                         { label: 'Ciudades', route: 'ciudades' },
                         { label: 'Géneros', route: 'generos' },
+                        { label: 'Monedas', route: 'monedas' },
                     ]
                 },
             ];
