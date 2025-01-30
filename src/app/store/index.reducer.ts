@@ -103,9 +103,10 @@ export function indexReducer(state = initialState, action: any) {
 function getMenuByRole(role: string) {
     switch (role) {
         case 'ADMIN':
+        case 'ADMINISTRACION':
             return [
                 { label: 'Productos', route: '/dashboard' },
-                { label: 'Producción', route: '/settings' },
+                { label: 'Producción', route: '/produccion' },
                 { label: 'Compras', route: '/users' },
                 { label: 'Ventas', route: '/settings' },
                 { label: 'Proveedores', route: '/settings' },
@@ -122,11 +123,10 @@ function getMenuByRole(role: string) {
                     ]
                 },
             ];
-        case 'guest':
+        case 'PRODUCCION':
         default:
             return [
-                { label: 'Login', route: '/login' },
-                { label: 'Register', route: '/register' },
+                { label: 'Producción', route: '/produccion' },
             ];
     }
 }

@@ -88,41 +88,51 @@
     </div>
 </div>
 
-<!-- 
+
 <div>
-    <ngx-custom-modal #modalRecuperoClave class="modal-top animate animate-fade-in">
+    <ngx-custom-modal #modalSeleccionRol class="modal-top extra-large-modal animate animate-fade-in">
 
         <ng-template #modalHeader>
-            <div class="text-center">Recuperar contraseña</div>
+            <h5 class="text-lg font-semibold dark:text-white-light">Ingresar con rol</h5>
         </ng-template>
 
         <ng-template #modalBody>
-            <form class="space-y-5" [formGroup]="envioEmailForm" (ngSubmit)="enviarEmail()" novalidate>
-                <div
-                    [ngClass]="isSubmitRecuperoClave ? envioEmailForm.controls['email'].errors ? 'has-error' : 'has-success' : ''">
-                    <label for="Email">Email</label>
-                    <input id="Email" type="text" placeholder="Ingresa email" class="form-input"
-                        formControlName="email" />
-                    <ng-container *ngIf="isSubmitRecuperoClave && !envioEmailForm.controls['email'].errors">
-                        <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                    </ng-container>
-                    <ng-container *ngIf="isSubmitRecuperoClave && envioEmailForm.controls['email'].errors">
-                        <p class="mt-1 text-danger">Ingresa Email</p>
-                    </ng-container>
-                </div>
-                <div class="row">
-                    <div class="col-6 pr-1 text-end">
-                        <button type="submit" class="btn btn-primary">Recuperar</button>
+
+            <div class="row justify-content-center flex-grow-1 align-items-center mt-5 mb-5">
+                <div class="col-md-12 d-flex flex-wrap justify-content-center">
+                    @for(rol of usuarioLogueado.roles ; track rol) {
+                    <div [ngClass]="{'col-lg-4': usuarioLogueado.roles.length === 3, 'col-lg-6': usuarioLogueado.roles.length === 2}"
+                        class="col-md-6 col-sm-6 col-xs-6 d-flex flex-column align-items-center">
+                        <button class="btn btn-wd btn-primary m-2" (click)="ingresarAlDashboard(rol)">
+                            <span style="font-size: 1.3em;">
+                                {{ rol.name }}
+                            </span>
+                        </button>
+                        <!-- <span style="color: #ada8a8; font-weight: bold;">
+                            {{
+                            rol.name === 'COACH' ? 'Gestionar informes' :
+                            rol.name === 'COACHEE' ? 'Realizar los tests' :
+                            (rol.name === 'ADMIN' || rol.name === 'SUPER_ADMIN') ? 'Administrar sistema' : ''
+                            }}
+                        </span> -->
                     </div>
-                    <div class="col-6 pr-1">
-                        <button type="button" (click)="closeModalRecuperoClave()"
-                            class="btn btn-outline-danger">Cancelar</button>
-                    </div>
+                    }
                 </div>
-            </form>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cancelarSeleccionDashboard()">Cancelar</button>
+                </div>
+            </div>
+
+
+
+
         </ng-template>
     </ngx-custom-modal>
-</div> -->
+</div>
 
 
 <!-- Spinner -->

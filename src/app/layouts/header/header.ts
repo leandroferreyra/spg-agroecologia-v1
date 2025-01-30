@@ -34,7 +34,7 @@ export class HeaderComponent {
         // console.log(this.usuarioLogueado);
         if (this.usuarioLogueado) {
             //TODO: Reemplazar ADMIN por el rol del usuario
-            this.storeData.dispatch({ type: 'setUserRole', payload: 'ADMIN' });
+            this.storeData.dispatch({ type: 'setUserRole' });
         }
     }
     async initStore() {

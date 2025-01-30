@@ -1,7 +1,8 @@
+@if (dataLoaded) {
 <form [formGroup]="userForm"
     class="mb-5 rounded-md border border-[#ebedf2] bg-white p-4 dark:border-[#191e3a] dark:bg-[#0e1726]">
 
-    <div class="flex items-center justify-between p-4">
+    <div class="flex items-center justify-between mb-4">
         <div>
             <h6 class="text-lg font-bold">Mi perfil</h6>
         </div>
@@ -30,44 +31,64 @@
     <div class="flex flex-col sm:flex-row">
         <div class="grid flex-1 grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-                <label for="profession">Email</label>
-                <input id="profession" type="email" placeholder="Email" class="form-control" formControlName="email" />
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="Email" class="form-control" formControlName="email" />
             </div>
             <div>
-                <label for="address">Usuario</label>
-                <input id="address" type="text" placeholder="New York" class="form-control" formControlName="usuario" />
+                <label for="usuario">Usuario</label>
+                <input id="usuario" type="text" placeholder="New York" class="form-control" formControlName="usuario" />
             </div>
             <div>
-                <label for="name">Nombres</label>
-                <input id="name" type="text" placeholder="" class="form-control" formControlName="nombres" />
+                <label for="nombres">Nombres</label>
+                <input id="nombres" type="text" placeholder="" class="form-control" formControlName="nombres" />
             </div>
             <div>
-                <label for="profession">Apellidos</label>
-                <input id="profession" type="text" placeholder="" class="form-control"
-                    formControlName="apellidos" />
+                <label for="apelliddos">Apellidos</label>
+                <input id="apelliddos" type="text" placeholder="" class="form-control" formControlName="apellidos" />
             </div>
             <div>
-                <label for="location">Género</label>
-                <input id="location" type="text" placeholder="" class="form-control" formControlName="genero" />
+                <label>Género</label>
+                <ng-select [items]="generos" bindLabel="name" bindValue="uuid" formControlName="genero"
+                    [virtualScroll]="true">
+                </ng-select>
             </div>
             <div>
-                <label for="phone">País</label>
-                <input id="phone" type="text" placeholder="" class="form-control" formControlName="ciudad"/>
+                <label>País</label>
+                <ng-select [items]="paises" bindLabel="name" bindValue="uuid" formControlName="pais"
+                    [virtualScroll]="true">
+                </ng-select>
             </div>
             <div>
-                <label for="email">Provincia</label>
-                <input id="email" type="email" placeholder="" class="form-control" formControlName="direccion"/>
+                <label>Provincia</label>
+                <ng-select [items]="provincias" bindLabel="name" bindValue="uuid" formControlName="provincia"
+                    [virtualScroll]="true">
+                </ng-select>
             </div>
             <div>
-                <label for="web">Ciudad</label>
-                <input id="web" type="text" placeholder="" class="form-control" formControlName="ciudad" />
+                <label>Ciudad</label>
+                <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid" formControlName="ciudad"
+                    [virtualScroll]="true">
+                </ng-select>
             </div>
             <div>
+                <label for="calle">Calle</label>
+                <input id="calle" type="text" placeholder="" class="form-control" formControlName="direccionCalle" />
+            </div>
+            <div>
+                <label for="numero">Número</label>
+                <input id="numero" type="text" placeholder="" class="form-control" formControlName="direccionNumero" />
+            </div>
+            <div>
+                <label for="numero">Detalle de la dirección</label>
+                <input id="numero" type="text" placeholder="" class="form-control" formControlName="direccionDetalle" />
+            </div>
+
+            <!-- <div>
                 <label class="inline-flex cursor-pointer">
                     <input type="checkbox" class="form-checkbox" />
                     <span class="relative text-white-dark checked:bg-none">Roles</span>
                 </label>
-            </div>
+            </div> -->
 
         </div>
     </div>
@@ -75,11 +96,17 @@
     @if (isEdicion) {
     <div class="row mt-3">
         <div class="col-12 d-flex justify-content-center">
-            <button type="button" class="btn btn-wd btn-primary mr-4">Confirmar</button>
-            <button id="back-button-with-border" type="button" class="btn btn-wd">Cancelar</button>
+            <button type="button" class="btn btn-wd btn-primary mr-4" (click)="confirmarEdicion()">Confirmar</button>
+            <button id="back-button-with-border" type="button" class="btn btn-wd"
+                (click)="cancelarEdicion()">Cancelar</button>
         </div>
     </div>
     }
 
 
 </form>
+}
+
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="large" color="#fff" type="ball-scale-multiple" [fullScreen]="true">
+    <p style="color: white"> Cargando... </p>
+</ngx-spinner>

@@ -8,6 +8,7 @@ import { AuthResponse } from '../models/response/authResponse';
 import { EmailDTO } from '../models/request/emailDTO';
 import { RegistroDTO } from '../models/request/registroDTO';
 import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
+import { Rol } from '../models/response/rol';
 // import { AuthResponse } from '../models/response/authResponse';
 // import { EmailDTO } from '../models/request/emailDTO';
 // import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
@@ -83,25 +84,25 @@ export class AuthService {
     return !!localStorage.getItem('token');
   }
 
-  // getUserRoles(): Rol[] {
-  //   let usuarioLogueado = JSON.parse(localStorage.getItem('usuarioLogueado') || '[]');
-  //   if (usuarioLogueado && usuarioLogueado.roles.length > 0) {
-  //     return usuarioLogueado.roles;
-  //   }
-  //   let rol:Rol = new Rol();
-  //   rol.name = 'NO_ROLE';
-  //   return [rol];
-  // }
+  getUserRoles(): Rol[] {
+    let usuarioLogueado = JSON.parse(localStorage.getItem('usuarioLogueado') || '[]');
+    if (usuarioLogueado && usuarioLogueado.roles.length > 0) {
+      return usuarioLogueado.roles;
+    }
+    // let rol: Rol = new Rol();
+    // rol.name = 'NO_ROLE';
+    return [];
+  }
 
   // hasRole(role: string): boolean {
   //   const roles = this.getUserRoles();
   //   return roles.some((r: Rol) => r.name === role);
   // }
 
-  // hasAnyRole(expectedRoles: string[]): boolean {
-  //   const roles = this.getUserRoles();
-  //   return expectedRoles.some(role => roles.some((r: Rol) => r.name === role));
-  // }
+  hasAnyRole(expectedRoles: string[]): boolean {
+    const roles = this.getUserRoles();
+    return expectedRoles.some(role => roles.some((r: Rol) => r.name === role));
+  }
 
   // changePassword(actual_role: string, changePasswordDTO: ChangePasswordDTO): Observable<any> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

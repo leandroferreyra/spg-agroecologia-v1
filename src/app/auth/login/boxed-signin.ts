@@ -17,6 +17,7 @@ import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { SwalService } from 'src/app/core/services/swal.service';
+import { Constantes } from 'src/Constantes';
 
 @Component({
     standalone: true,
@@ -44,12 +45,12 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     iconEyeSlash = faEyeSlash;
 
     // // Obtén la referencia al modal
-    // @ViewChild('modalRecuperoClave') modalRecuperoClave!: NgxCustomModalComponent;
-    // modalOptions: ModalOptions = {
-    //     closeOnOutsideClick: false,
-    //     hideCloseButton: true,
-    //     closeOnEscape: false
-    // };
+    @ViewChild('modalSeleccionRol') modalSeleccionRol!: NgxCustomModalComponent;
+    modalOptions: ModalOptions = {
+        closeOnOutsideClick: false,
+        hideCloseButton: true,
+        closeOnEscape: false
+    };
 
     constructor(
         public storeData: Store<any>,
@@ -105,9 +106,14 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                         this.usuarioLogueado = res.data;
                         this._tokenService.setToken(this.usuarioLogueado.token);
                         this._userLogged.setUsuarioLogueado(this.usuarioLogueado);
-                        this.storeData.dispatch({ type: 'setUserRole', payload: 'ADMIN' });
-                        //TODO: navegar según el rol.
-                        this.router.navigate(['/dashboard/user-profile']);
+                        if (this.tieneVariosRoles()) {
+                            this.modalSeleccionRol.options = this.modalOptions;
+                            this.modalSeleccionRol.open();
+                        } else {
+                            localStorage.setItem('userRole', this.usuarioLogueado.roles[0].name);
+                            this.storeData.dispatch({ type: 'setUserRole', payload: this.usuarioLogueado.roles[0].name });
+                            this.router.navigate(['/dashboard/user-profile']);
+                        }
                         this._spinner.hide();
                     },
                     error: error => {
@@ -119,6 +125,23 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
             )
         }
     }
+
+    ingresarAlDashboard(rol: any) {
+        console.log(rol);
+        localStorage.setItem('userRole', rol.name);
+        this.storeData.dispatch({ type: 'setUserRole', payload: rol.name });
+        if (rol.name === Constantes.ADMIN || rol.name === Constantes.ADMINISTRACION) {
+            this.router.navigate(['/dashboard/bancos']);
+        }
+        if (rol.name === Constantes.PRODUCCION) {
+            this.router.navigate(['/dashboard/produccion']);
+        }
+    }
+
+    cancelarSeleccionDashboard() {
+        this.closeModalSeleccionRol();
+    }
+
 
     isEmail(value: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -154,10 +177,9 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         }
     }
 
-    // closeModalRecuperoClave() {
-    //     this.modalRecuperoClave.close();
-    //     this.isSubmitRecuperoClave = false;
-    // }
+    closeModalSeleccionRol() {
+        this.modalSeleccionRol.close();
+    }
 
     showSwalFire(text: string) {
         Swal.fire({

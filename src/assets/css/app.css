@@ -28,3 +28,18 @@
     background-color: #6c757d;
     opacity: 0.5;
 }
+
+.ng-select.ng-select-disabled>.ng-select-container {
+    background-color: #e9ecef !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container .ng-arrow-wrapper {
+    background-color: #e9ecef !important;
+    border-left: 1px solid #ced4da !important;
+}
+
+.ng-select.ng-select-disabled>.ng-select-container .ng-clear-wrapper {
+    display: none !important;
+}

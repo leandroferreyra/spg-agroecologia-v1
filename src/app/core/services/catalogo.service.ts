@@ -88,6 +88,14 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias + '/' + provincia, { headers, params });
   }
 
+  getCiudadWithProvinciaAndPais(uuidCiudad: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    const params = new HttpParams()
+      .append('with[]', 'district')
+      .append('with[]', 'district');
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades + '/' + uuidCiudad, { headers, params });
+  }
+
   getCiudadesWithDistrictsAndPaging(paging: number, page?: number): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     let params = new HttpParams();

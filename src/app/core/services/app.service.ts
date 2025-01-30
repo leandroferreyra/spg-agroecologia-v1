@@ -4,7 +4,7 @@ import { $themeConfig } from '../../theme.config';
 
 @Injectable({
     providedIn: 'root'
-}) 
+})
 export class AppService {
     storeData: any;
 
@@ -47,6 +47,9 @@ export class AppService {
         val = localStorage.getItem('semidark');
         val = val === 'true' ? true : $themeConfig.semidark;
         this.store.dispatch({ type: 'toggleSemidark', payload: val });
+
+        val = localStorage.getItem('userRole');
+        this.store.dispatch({ type: 'setUserRole', payload: val });
     }
 
 

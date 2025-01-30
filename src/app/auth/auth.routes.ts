@@ -21,8 +21,8 @@ export const AUTH_ROUTES: Routes = [
         path: 'verify/:uuid/:token',
         loadComponent: () => import('./habilitar-usuario/habilitar-usuario.component').then((m) => m.HabilitarUsuarioComponent)
     },
-    // {
-    //     path: 'acceso-denegado',
-    //     loadComponent: () => import('./acceso-denegado/acceso-denegado.component').then((m) => m.AccesoDenegadoComponent)
-    // },
+    {
+        path: 'acceso-denegado',
+        loadComponent: () => import('./acceso-denegado/acceso-denegado.component').then((m) => m.AccesoDenegadoComponent)
+    },
 ]
