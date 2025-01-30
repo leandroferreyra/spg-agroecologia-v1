@@ -26,6 +26,18 @@ export class BancosService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
   }
 
+  getBancosWithNameFilter(rol: string, paging: number, filter: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams()
+      .append('paging', paging)
+      .append('actual_role', rol)
+      .append('with []', 'bank_accounts.currency')
+      .append('filters[0][]', 'name')
+      .append('filters[0][]', 'LIKE')
+      .append(`filters[0][]`, `%${filter}%`)
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
+  }
+
   saveBanco(banco: BancoDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiBancos, JSON.stringify(banco), { headers });

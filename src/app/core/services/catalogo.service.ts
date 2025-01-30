@@ -51,13 +51,13 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
   }
 
-  getPaisesWithFilter(paging: number, filter: string): Observable<AuthResponse> {
+  getPaisesWithNameFilter(paging: number, filter: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams();
-    const filterString = JSON.stringify(["name", "LIKE", `${filter}%`]);
-
-    params = params.append('paging', paging)
-      .append('filters []', filterString);
+    let params = new HttpParams()
+      .append('paging', paging)
+      .append('filters[0][]', 'name')
+      .append('filters[0][]', 'LIKE')
+      .append(`filters[0][]`, `%${filter}%`)
 
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
   }

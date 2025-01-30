@@ -80,7 +80,6 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._catalogoService.getPaisesWithPaging(paging, page).subscribe({
         next: res => {
-          console.log(res);
           this.paises = res.data;
           this.total_rows = res.meta.total;
           this.params.last_page = res.meta.last_page;
@@ -100,7 +99,6 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
 
 
   openSwalEliminar(pais: any) {
-    console.log(pais);
     Swal.fire({
       title: '',
       text: `¿Desea eliminar el país ${pais.name}?`,
@@ -150,7 +148,6 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
         nombre: new FormControl(null, [Validators.required]),
       });
     } else {
-      console.log(pais);
       this.isEdicion = true;
       this.tituloModal = 'Edición país';
       this.paisForm = new FormGroup({
@@ -221,7 +218,6 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
   }
 
   changeServer(data: any) {
-    console.log(data);
     this.params.current_page = data.current_page;
     this.params.pagesize = data.pagesize;
     if (data.change_type === 'search') {
@@ -233,9 +229,8 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
 
   obtenerPaisesConFiltro(paging: number, filter: string) {
     this.subscription.add(
-      this._catalogoService.getPaisesWithFilter(paging, filter).subscribe({
+      this._catalogoService.getPaisesWithNameFilter(paging, filter).subscribe({
         next: res => {
-          console.log(res);
           this.paises = res.data;
           this.total_rows = res.meta.total;
           this.params.last_page = res.meta.last_page;

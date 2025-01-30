@@ -82,11 +82,27 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
           this.bancos = res.data;
           this.total_rows = res.meta.total;
           this.params.last_page = res.meta.last_page;
-          console.log(res);
         },
         error: error => {
           this.spinner.hide();
-          console.log(error);
+          console.error(error);
+        }
+      })
+    )
+  }
+
+  obtenerBancosConFiltro(paging: number, filter: string) {
+    this.subscription.add(
+      this._bancosService.getBancosWithNameFilter(this.actual_role, paging, filter).subscribe({
+        next: res => {
+          this.spinner.hide();
+          this.bancos = res.data;
+          this.total_rows = res.meta.total;
+          this.params.last_page = res.meta.last_page;
+        },
+        error: error => {
+          this.spinner.hide();
+          console.error(error);
         }
       })
     )
@@ -97,11 +113,10 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   }
 
   changeServer(data: any) {
-    console.log(data);
     this.params.current_page = data.current_page;
     this.params.pagesize = data.pagesize;
     if (data.change_type === 'search') {
-      // this.obtenerPaisesConFiltro(data.pagesize, data.search);
+      this.obtenerBancosConFiltro(data.pagesize, data.search);
     } else {
       this.obtenerBancos(data.pagesize, data.current_page);
     }
