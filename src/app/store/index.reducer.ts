@@ -125,9 +125,13 @@ function getMenuByRole(role: string) {
                 { label: 'Mis datos', route: '/user-profile' },
             ];
         case 'PRODUCCION':
-        default:
             return [
                 { label: 'Producción', route: '/produccion' },
+                { label: 'Mis datos', route: '/user-profile' },
+            ];
+        case 'USUARIO':
+        default:
+            return [
                 { label: 'Mis datos', route: '/user-profile' },
             ];
     }

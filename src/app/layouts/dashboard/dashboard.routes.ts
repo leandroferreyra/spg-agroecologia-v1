@@ -12,7 +12,7 @@ export const DASHBOARD_ROUTES: Routes = [
             {
                 path: 'user-profile',
                 loadComponent: () => import('../dashboard/user-profile/user-profile.component').then(m => m.UserProfileComponent),
-                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'] }
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION', 'USUARIO'] }
             },
             {
                 path: 'bancos',

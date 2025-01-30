@@ -129,15 +129,15 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.userForm = new FormGroup({
       email: new FormControl({ value: this.usuarioLogueado.email, disabled: true }, [Validators.required, Validators.email]),
       usuario: new FormControl({ value: this.usuarioLogueado.user_name, disabled: true }, [Validators.required]),
-      nombres: new FormControl({ value: this.usuarioLogueado.human.firstname, disabled: true }, [Validators.required]),
-      apellidos: new FormControl({ value: this.usuarioLogueado.human.lastname, disabled: true }, [Validators.required]),
-      genero: new FormControl({ value: this.usuarioLogueado.human.gender.uuid, disabled: true }, []),
-      pais: new FormControl({ value: this.usuarioLogueado.human.person.city.district.country.uuid, disabled: true }, []),
-      provincia: new FormControl({ value: this.usuarioLogueado.human.person.city.district.uuid, disabled: true }, []),
-      ciudad: new FormControl({ value: this.usuarioLogueado.human.person.city.uuid, disabled: true }, []),
-      direccionCalle: new FormControl({ value: this.usuarioLogueado.human.person.street_name, disabled: true }, []),
-      direccionNumero: new FormControl({ value: this.usuarioLogueado.human.person.door_number, disabled: true }, []),
-      direccionDetalle: new FormControl({ value: this.usuarioLogueado.human.person.address_detail, disabled: true }, []),
+      nombres: new FormControl({ value: this.usuarioLogueado.human?.firstname, disabled: true }, [Validators.required]),
+      apellidos: new FormControl({ value: this.usuarioLogueado.human?.lastname, disabled: true }, [Validators.required]),
+      genero: new FormControl({ value: this.usuarioLogueado.human?.gender?.uuid, disabled: true }, []),
+      pais: new FormControl({ value: this.usuarioLogueado.human?.person?.city?.district?.country?.uuid, disabled: true }, []),
+      provincia: new FormControl({ value: this.usuarioLogueado.human?.person?.city?.district?.uuid, disabled: true }, []),
+      ciudad: new FormControl({ value: this.usuarioLogueado.human?.person?.city?.uuid, disabled: true }, []),
+      direccionCalle: new FormControl({ value: this.usuarioLogueado.human?.person?.street_name, disabled: true }, []),
+      direccionNumero: new FormControl({ value: this.usuarioLogueado.human?.person?.door_number, disabled: true }, []),
+      direccionDetalle: new FormControl({ value: this.usuarioLogueado.human?.person?.address_detail, disabled: true }, []),
     });
     this.onFormChange();
   }

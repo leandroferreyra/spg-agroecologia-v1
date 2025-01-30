@@ -128,6 +128,9 @@ export class AuthService {
     if (rol === Constantes.PRODUCCION) {
       this.router.navigate(['/dashboard/produccion']);
     }
+    if (rol === Constantes.USUARIO) {
+      this.router.navigate(['/dashboard/user-profile']);
+    }
   }
 
 
