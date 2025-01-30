@@ -1,4 +1,4 @@
-﻿import { Component, signal, ViewChild, WritableSignal } from '@angular/core';
+﻿import { Component, OnDestroy, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { Store } from '@ngrx/store';
 import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
@@ -10,6 +10,13 @@ import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { ChangePasswordDTO } from 'src/app/core/models/request/changePasswordDTO';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { Subscription } from 'rxjs';
+import { SwalService } from 'src/app/core/services/swal.service';
 
 @Component({
     selector: 'header',
@@ -18,7 +25,9 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
     templateUrl: './header.html',
     animations: [toggleAnimation],
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit, OnDestroy {
+
+    private subscription: Subscription = new Subscription();
     store: any;
     menuItems: any[] = [];
     usuarioLogueado: any;
@@ -27,15 +36,26 @@ export class HeaderComponent {
 
 
     @ViewChild('modalCambioRol') modalCambioRol!: NgxCustomModalComponent;
+    @ViewChild('modalCambioClave') modalCambioClave!: NgxCustomModalComponent;
     modalOptions: ModalOptions = {
         closeOnOutsideClick: false,
         hideCloseButton: true,
         closeOnEscape: false
     };
 
+    changePasswordForm!: FormGroup;
+    isSubmitChangePassword = false;
+    showPassword: boolean = false;
+    showNewPassword: boolean = false;
+    showNewConfirmPassword: boolean = false;
+
+    // Iconos
+    iconEye = faEye;
+    iconEyeSlash = faEyeSlash;
+
     constructor(
         public storeData: Store<any>,
-        public router: Router,
+        public router: Router, private spinner: NgxSpinnerService, private swalService: SwalService,
         public _authService: AuthService, public _tokenService: TokenService, public _userLogged: UserLoggedService
     ) {
         this.initStore();
@@ -55,7 +75,9 @@ export class HeaderComponent {
                 this.actual_role = this.store.userRole;
             });
     }
-
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
+    }
     ngOnInit() {
         this.setActiveDropdown();
         this.router.events.subscribe((event) => {
@@ -116,6 +138,63 @@ export class HeaderComponent {
     }
     closeModalCambioRol() {
         this.modalCambioRol.close();
+    }
+
+
+
+
+    // Modal cambio clave 
+    openModalCambiarClave() {
+        this.changePasswordForm = new FormGroup({
+            password: new FormControl(null, [Validators.required]),
+            newPassword: new FormControl(null, [Validators.required]),
+            confirmPassword: new FormControl(null, [Validators.required])
+        });;
+        this.modalCambioClave.options = this.modalOptions;
+        this.modalCambioClave.open();
+    }
+    confirmarCambioClave() {
+        this.isSubmitChangePassword = true;
+        if (this.changePasswordForm.valid) {
+            if (this.changePasswordForm.get('newPassword')?.value === this.changePasswordForm.get('confirmPassword')?.value) {
+                this.spinner.show();
+                let changePasswordDTO = new ChangePasswordDTO();
+                changePasswordDTO.password = this.changePasswordForm.get('password')?.value;
+                changePasswordDTO.new_password = this.changePasswordForm.get('newPassword')?.value;
+                changePasswordDTO.new_password_confirmation = this.changePasswordForm.get('confirmPassword')?.value;
+                this.subscription.add(
+                    this._authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
+                        next: res => {
+                            this.spinner.hide();
+                            this.closeModalCambioClave();
+                            this._tokenService.setToken(res.token);
+                            this.swalService.toastSuccess("top-right", "Contraseña actualizada.");
+                        },
+                        error: error => {
+                            this.spinner.hide();
+                            console.error(error);
+                            this.swalService.toastError("top-right", "Error en la actualización de contraseña.");
+                        }
+                    })
+                );
+            } else {
+                this.swalService.toastError('top-right', "Las contraseñas no coinciden.");
+            }
+        }
+    }
+    togglePassword() {
+        this.showPassword = !this.showPassword;
+    }
+    toggleNewPassword() {
+        this.showNewPassword = !this.showNewPassword;
+    }
+    toggleConfirmNewPassword() {
+        this.showNewConfirmPassword = !this.showNewConfirmPassword;
+    }
+
+    closeModalCambioClave() {
+        this.isSubmitChangePassword = false;
+        this.modalCambioClave.close();
     }
 
 }
