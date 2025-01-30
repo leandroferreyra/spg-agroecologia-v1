@@ -118,6 +118,17 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
   }
 
+  getProvinciasWithNameFilter(paging: number, filter: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams();
+    params = params.append('paging', paging)
+      .append('filters[0][]', 'name')
+      .append('filters[0][]', 'LIKE')
+      .append(`filters[0][]`, `%${filter}%`)
+      .append('with[]', 'country');
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
+  }
+
   getPermisos(actual_role: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
