@@ -100,7 +100,9 @@ export class HeaderComponent {
     }
 
     navigateTo(route: string) {
-        this.router.navigate([`dashboard/${route}`])
+        if (route) {
+            this.router.navigate([`dashboard/${route}`])
+        }
     }
 
     openModalCambiarRol() {

@@ -4,8 +4,9 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
-import { NgxSpinner, NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { forkJoin, Subscription } from 'rxjs';
+import { ChangePasswordDTO } from 'src/app/core/models/request/changePasswordDTO';
 import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
@@ -13,14 +14,14 @@ import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { UserService } from 'src/app/core/services/user.service';
-import { Constantes } from 'src/Constantes';
 import { SharedModule } from 'src/shared.module';
 import Swal from 'sweetalert2';
-
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, SharedModule, RouterModule],
+  imports: [CommonModule, SharedModule, RouterModule, FontAwesomeModule],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
 })
@@ -50,6 +51,16 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     hideCloseButton: true,
     closeOnEscape: false
   };
+
+  changePasswordForm!: FormGroup;
+  isSubmitChangePassword = false;
+  showPassword: boolean = false;
+  showNewPassword: boolean = false;
+  showNewConfirmPassword: boolean = false;
+
+  // Iconos
+  iconEye = faEye;
+  iconEyeSlash = faEyeSlash;
 
 
   constructor(public storeData: Store<any>, private _userLogged: UserLoggedService, private userService: UserService,
@@ -307,10 +318,61 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     return registro;
   }
 
+  // Modal cambio clave 
   openModalCambiarClave() {
-
+    this.changePasswordForm = new FormGroup({
+      password: new FormControl(null, [Validators.required]),
+      newPassword: new FormControl(null, [Validators.required]),
+      confirmPassword: new FormControl(null, [Validators.required])
+    });;
+    this.modalCambioClave.options = this.modalOptions;
+    this.modalCambioClave.open();
+  }
+  confirmarCambioClave() {
+    this.isSubmitChangePassword = true;
+    if (this.changePasswordForm.valid) {
+      if (this.changePasswordForm.get('newPassword')?.value === this.changePasswordForm.get('confirmPassword')?.value) {
+        this.spinner.show();
+        let changePasswordDTO = new ChangePasswordDTO();
+        changePasswordDTO.password = this.changePasswordForm.get('password')?.value;
+        changePasswordDTO.new_password = this.changePasswordForm.get('newPassword')?.value;
+        changePasswordDTO.new_password_confirmation = this.changePasswordForm.get('confirmPassword')?.value;
+        this.subscription.add(
+          this.authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
+            next: res => {
+              this.spinner.hide();
+              this.closeModalCambioClave();
+              this._tokenService.setToken(res.token);
+              this.swalService.toastSuccess("top-right", "Contraseña actualizada.");
+            },
+            error: error => {
+              this.spinner.hide();
+              console.error(error);
+              this.swalService.toastError("top-right", "Error en la actualización de contraseña.");
+            }
+          })
+        );
+      } else {
+        this.swalService.toastError('top-right', "Las contraseñas no coinciden.");
+      }
+    }
+  }
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+  toggleNewPassword() {
+    this.showNewPassword = !this.showNewPassword;
+  }
+  toggleConfirmNewPassword() {
+    this.showNewConfirmPassword = !this.showNewConfirmPassword;
   }
 
+  closeModalCambioClave() {
+    this.isSubmitChangePassword = false;
+    this.modalCambioClave.close();
+  }
+
+  // Modal cambio rol
   openModalCambiarRol() {
     this.modalCambioRol.options = this.modalOptions;
     this.modalCambioRol.open();

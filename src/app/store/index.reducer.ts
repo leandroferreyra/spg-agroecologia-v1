@@ -122,11 +122,13 @@ function getMenuByRole(role: string) {
                         { label: 'Monedas', route: 'monedas' },
                     ]
                 },
+                { label: 'Mis datos', route: '/user-profile' },
             ];
         case 'PRODUCCION':
         default:
             return [
                 { label: 'Producción', route: '/produccion' },
+                { label: 'Mis datos', route: '/user-profile' },
             ];
     }
 }

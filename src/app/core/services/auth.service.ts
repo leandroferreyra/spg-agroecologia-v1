@@ -11,6 +11,7 @@ import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
 import { Rol } from '../models/response/rol';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
+import { ChangePasswordDTO } from '../models/request/changePasswordDTO';
 // import { AuthResponse } from '../models/response/authResponse';
 // import { EmailDTO } from '../models/request/emailDTO';
 // import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
@@ -32,7 +33,7 @@ export class AuthService {
   // private apiResendMail = '/email/resend';
   private apiVerifyUser = '/email/verify/';
   private apiRegister = '/register';
-  // private apiChangePassword = '/change_password';
+  private apiChangePassword = '/change_password';
   // private apiUsers = '/users';
 
   constructor(private http: HttpClient, public storeData: Store<any>, private router: Router) { }
@@ -106,12 +107,12 @@ export class AuthService {
     return expectedRoles.some(role => roles.some((r: Rol) => r.name === role));
   }
 
-  // changePassword(actual_role: string, changePasswordDTO: ChangePasswordDTO): Observable<any> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   const params = new HttpParams()
-  //     .append('actual_role', actual_role)
-  //   return this.http.put<any>(environment.baseUrl + this.apiChangePassword, JSON.stringify(changePasswordDTO), { headers, params });
-  // }
+  changePassword(actual_role: string, changePasswordDTO: ChangePasswordDTO): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .append('actual_role', actual_role)
+    return this.http.put<any>(environment.baseUrl + this.apiChangePassword, JSON.stringify(changePasswordDTO), { headers, params });
+  }
 
   // getEmailInRegistro(uuid: string): Observable<AuthResponse> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });

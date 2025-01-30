@@ -94,7 +94,7 @@
             <a href="javascript:;" class="nav-link">
                 <div class="flex items-center">
                     <!-- <icon-menu-dashboard class="shrink-0" /> -->
-                    <span class="px-2">{{ menu.label }}</span>
+                    <span class="px-2" (click)="navigateTo(menu.route)">{{ menu.label }}</span>
                 </div>
                 @if(menu.submenu?.length > 0) {
                 <div class="right_arrow">
