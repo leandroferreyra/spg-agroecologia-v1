@@ -1,4 +1,4 @@
-﻿import { Component, signal, WritableSignal } from '@angular/core';
+﻿import { Component, signal, ViewChild, WritableSignal } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { Store } from '@ngrx/store';
 import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
@@ -9,6 +9,7 @@ import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 
 @Component({
     selector: 'header',
@@ -21,8 +22,16 @@ export class HeaderComponent {
     store: any;
     menuItems: any[] = [];
     usuarioLogueado: any;
-
+    actual_role: string = '';
     iconUser = faUser;
+
+
+    @ViewChild('modalCambioRol') modalCambioRol!: NgxCustomModalComponent;
+    modalOptions: ModalOptions = {
+        closeOnOutsideClick: false,
+        hideCloseButton: true,
+        closeOnEscape: false
+    };
 
     constructor(
         public storeData: Store<any>,
@@ -43,6 +52,7 @@ export class HeaderComponent {
             .subscribe((d) => {
                 this.store = d;
                 this.menuItems = this.store.menuItems;
+                this.actual_role = this.store.userRole;
             });
     }
 
@@ -91,6 +101,19 @@ export class HeaderComponent {
 
     navigateTo(route: string) {
         this.router.navigate([`dashboard/${route}`])
+    }
+
+    openModalCambiarRol() {
+        this.modalCambioRol.options = this.modalOptions;
+        this.modalCambioRol.open();
+    }
+    ingresarAlDashboard(rol: any) {
+        this.closeModalCambioRol();
+        this.actual_role = rol;
+        this._authService.cambioRol(rol.name);
+    }
+    closeModalCambioRol() {
+        this.modalCambioRol.close();
     }
 
 }

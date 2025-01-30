@@ -14,15 +14,18 @@
                 </button>
             </div>
             <div class="ltr:mr-4 rtl:ml-4">
-                <button type="button" ngxTippy="Cambiar clave" class="hover:text-primary">
+                <button type="button" ngxTippy="Cambiar clave" class="hover:text-primary"
+                    (click)="openModalCambiarClave()">
                     <icon-lock class="h-6 w-6" />
                 </button>
             </div>
+            @if (usuarioLogueado.roles.length > 1) {
             <div class="ltr:mr-4 rtl:ml-4">
-                <button type="button" ngxTippy="Cambiar rol" class="hover:text-primary">
+                <button type="button" ngxTippy="Cambiar rol" class="hover:text-primary" (click)="openModalCambiarRol()">
                     <icon-refresh class="h-6 w-6" />
                 </button>
             </div>
+            }
         </div>
     </div>
 
@@ -110,3 +113,42 @@
 <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="large" color="#fff" type="ball-scale-multiple" [fullScreen]="true">
     <p style="color: white"> Cargando... </p>
 </ngx-spinner>
+
+
+<div>
+    <ngx-custom-modal #modalCambioRol class="modal-top extra-large-modal animate animate-fade-in">
+
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">Cambiar de rol</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container d-flex flex-column justify-content-between">
+                <div class="row justify-content-center flex-grow-1 align-items-center mt-5 mb-5">
+
+                    <div class="col-md-12 flex flex-wrap justify-center text-center gap-3">
+                        @for(rol of usuarioLogueado.roles; track rol) {
+                        @if (rol != actual_role) {
+                        <div class="flex">
+                            <button class="btn btn-wd btn-primary m-2 text-xl" (click)="ingresarAlDashboard(rol)">
+                                {{ rol }}
+                            </button>
+                        </div>
+                        }
+                        }
+                    </div>
+
+
+
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12 d-flex justify-content-center">
+                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                            (click)="closeModalCambioRol()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>

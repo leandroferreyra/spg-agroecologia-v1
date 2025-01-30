@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinner, NgxSpinnerService } from 'ngx-spinner';
 import { forkJoin, Subscription } from 'rxjs';
 import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
@@ -12,6 +13,7 @@ import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { UserService } from 'src/app/core/services/user.service';
+import { Constantes } from 'src/Constantes';
 import { SharedModule } from 'src/shared.module';
 import Swal from 'sweetalert2';
 
@@ -39,6 +41,16 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   generos: any[] = [];
   tipoDocumentos: any[] = [];
   dataLoaded = false;
+
+  // Referencia al modal
+  @ViewChild('modalCambioRol') modalCambioRol!: NgxCustomModalComponent;
+  @ViewChild('modalCambioClave') modalCambioClave!: NgxCustomModalComponent;
+  modalOptions: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: false
+  };
+
 
   constructor(public storeData: Store<any>, private _userLogged: UserLoggedService, private userService: UserService,
     private _tokenService: TokenService, private spinner: NgxSpinnerService, private _catalogService: CatalogoService,
@@ -295,5 +307,21 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     return registro;
   }
 
+  openModalCambiarClave() {
+
+  }
+
+  openModalCambiarRol() {
+    this.modalCambioRol.options = this.modalOptions;
+    this.modalCambioRol.open();
+  }
+  ingresarAlDashboard(rol: any) {
+    this.closeModalCambioRol();
+    this.actual_role = rol;
+    this.authService.cambioRol(rol);
+  }
+  closeModalCambioRol() {
+    this.modalCambioRol.close();
+  }
 
 }

@@ -9,6 +9,8 @@ import { EmailDTO } from '../models/request/emailDTO';
 import { RegistroDTO } from '../models/request/registroDTO';
 import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
 import { Rol } from '../models/response/rol';
+import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
 // import { AuthResponse } from '../models/response/authResponse';
 // import { EmailDTO } from '../models/request/emailDTO';
 // import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
@@ -33,7 +35,7 @@ export class AuthService {
   // private apiChangePassword = '/change_password';
   // private apiUsers = '/users';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, public storeData: Store<any>, private router: Router) { }
 
   register(registro: RegistroDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
@@ -116,7 +118,16 @@ export class AuthService {
   //   return this.http.get<AuthResponse>(`${environment.baseUrl}${this.apiUsers}/${uuid}/email`, { headers });
   // }
 
-
+  cambioRol(rol: any) {
+    localStorage.setItem('userRole', rol);
+    this.storeData.dispatch({ type: 'setUserRole', payload: rol });
+    if (rol === Constantes.ADMIN || rol === Constantes.ADMINISTRACION) {
+      this.router.navigate(['/dashboard/bancos']);
+    }
+    if (rol === Constantes.PRODUCCION) {
+      this.router.navigate(['/dashboard/produccion']);
+    }
+  }
 
 
 

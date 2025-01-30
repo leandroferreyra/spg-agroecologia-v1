@@ -128,14 +128,15 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
 
     ingresarAlDashboard(rol: any) {
         console.log(rol);
-        localStorage.setItem('userRole', rol.name);
-        this.storeData.dispatch({ type: 'setUserRole', payload: rol.name });
-        if (rol.name === Constantes.ADMIN || rol.name === Constantes.ADMINISTRACION) {
-            this.router.navigate(['/dashboard/bancos']);
-        }
-        if (rol.name === Constantes.PRODUCCION) {
-            this.router.navigate(['/dashboard/produccion']);
-        }
+        this._authService.cambioRol(rol.name);
+        // localStorage.setItem('userRole', rol.name);
+        // this.storeData.dispatch({ type: 'setUserRole', payload: rol.name });
+        // if (rol.name === Constantes.ADMIN || rol.name === Constantes.ADMINISTRACION) {
+        //     this.router.navigate(['/dashboard/bancos']);
+        // }
+        // if (rol.name === Constantes.PRODUCCION) {
+        //     this.router.navigate(['/dashboard/produccion']);
+        // }
     }
 
     cancelarSeleccionDashboard() {

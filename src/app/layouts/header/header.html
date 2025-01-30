@@ -1,7 +1,7 @@
 ﻿<div class="z-40 shadow-sm" [ngClass]="{ 'dark text-white-dark': store.semidark && store.menu === 'horizontal'}">
     <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-[#0e1726]">
         <div class="horizontal-logo flex items-center justify-between lg:hidden ltr:mr-2 rtl:ml-2">
-            <a routerLink="/" class="main-logo flex shrink-0 items-center">
+            <a class="main-logo flex shrink-0 items-center">
                 <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="/assets/images/logo.svg" alt="" />
                 <span
                     class="hidden align-middle text-2xl font-semibold transition-all duration-300 dark:text-white-light md:inline ltr:ml-1.5 rtl:mr-1.5">
@@ -30,7 +30,7 @@
                         <!-- <img class="h-9 w-9 rounded-full object-cover saturate-50 group-hover:saturate-100"
                             src="/assets/images/user-profile.jpeg" alt="" />
                             <i class="fa-regular fa-user"></i> -->
-                            <icon-user class="h-6 w-6"/>
+                        <icon-user class="h-6 w-6" />
                         <!-- <fa-icon [icon]="iconUser" class="input-group-text" style="cursor: pointer;"></fa-icon> -->
                     </button>
                     <ul *hlMenuItems @toggleAnimation
@@ -65,12 +65,14 @@
                                 Cambiar clave
                             </a>
                         </li>
+                        @if (usuarioLogueado.roles.length > 1) {
                         <li>
-                            <a routerLink="/apps/mailbox" *hlMenuItem="let menuItem" class="dark:hover:text-white">
+                            <a (click)="openModalCambiarRol()" *hlMenuItem="let menuItem" class="dark:hover:text-white">
                                 <!-- <icon-mail class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2" /> -->
                                 Cambiar rol
                             </a>
                         </li>
+                        }
                         <li class="border-t border-white-light dark:border-white-light/10">
                             <a href="#" (click)="cerrarSesion()" *hlMenuItem="let menuItem" class="!py-3 text-danger">
                                 <!-- <icon-logout class="h-4.5 w-4.5 shrink-0 rotate-90 ltr:mr-2 rtl:ml-2" /> -->
@@ -113,4 +115,45 @@
         }
 
     </ul>
+</div>
+
+
+
+
+<div>
+    <ngx-custom-modal #modalCambioRol class="modal-top extra-large-modal animate animate-fade-in">
+
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">Cambiar de rol</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+
+            <div class="container d-flex flex-column justify-content-between">
+
+                <div class="row justify-content-center flex-grow-1 align-items-center mt-5 mb-5">
+
+                    <div class="col-md-12 flex flex-wrap justify-center text-center gap-3">
+                        @for(rol of usuarioLogueado.roles; track rol) {
+                        @if (rol.name != actual_role) {
+                        <div class="flex">
+                            <button class="btn btn-wd btn-primary m-2 text-xl" (click)="ingresarAlDashboard(rol)">
+                                {{ rol.name }}
+                            </button>
+                        </div>
+                        }
+                        }
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12 d-flex justify-content-center">
+                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                            (click)="closeModalCambioRol()">Cancelar</button>
+                    </div>
+                </div>
+
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
 </div>
