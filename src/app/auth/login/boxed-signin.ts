@@ -2,13 +2,12 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { SharedModule } from 'src/shared.module';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { LoginDTO } from '../../core/models/request/loginDTO';
 import { AuthService } from '../../core/services/auth.service';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { EmailDTO } from '../../core/models/request/emailDTO';
 import Swal from 'sweetalert2';
 import { TokenService } from 'src/app/core/services/token.service';
@@ -21,7 +20,7 @@ import { Constantes } from 'src/Constantes';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterModule, FontAwesomeModule],
+    imports: [CommonModule, RouterModule, FontAwesomeModule, NgxSpinnerModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule],
     templateUrl: './boxed-signin.html',
     styleUrl: './boxed-signin.component.css',
     animations: [toggleAnimation]

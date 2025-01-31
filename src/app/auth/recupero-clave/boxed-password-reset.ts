@@ -2,10 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppService } from 'src/app/core/services/app.service';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from 'src/shared.module';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -16,7 +14,7 @@ import Swal from 'sweetalert2';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterLink, FontAwesomeModule, NgxSpinnerModule],
+    imports: [CommonModule, RouterLink, FontAwesomeModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule],
     templateUrl: './boxed-password-reset.html',
     animations: [toggleAnimation],
 })

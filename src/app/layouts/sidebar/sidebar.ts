@@ -3,12 +3,13 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { slideDownUp } from '../../shared/animations';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from 'src/shared.module';
+import { IconModule } from 'src/app/shared/icon/icon.module';
+import { NgScrollbarModule } from 'ngx-scrollbar';
 
 @Component({
     selector: 'sidebar',
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterLink, RouterLinkActive],
+    imports: [CommonModule, RouterLink, RouterLinkActive, IconModule, NgScrollbarModule],
     templateUrl: './sidebar.html',
     animations: [slideDownUp],
 })

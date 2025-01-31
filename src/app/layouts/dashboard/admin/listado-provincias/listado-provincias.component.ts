@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { PaisDTO } from 'src/app/core/models/request/paisDTO';
 import { ProvinciaDTO } from 'src/app/core/models/request/provinciaDTO';
@@ -13,13 +15,15 @@ import { PaisesService } from 'src/app/core/services/paises.service';
 import { ProvinciaService } from 'src/app/core/services/provincia.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { SharedModule } from 'src/shared.module';
+import { IconModule } from 'src/app/shared/icon/icon.module';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-provincias',
   standalone: true,
-  imports: [CommonModule, SharedModule, DataTableModule, NgxSpinnerModule],
+  imports: [CommonModule, NgxTippyModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, NgSelectModule, FormsModule, ReactiveFormsModule,
+    IconModule
+  ],
   templateUrl: './listado-provincias.component.html',
   styleUrl: './listado-provincias.component.css'
 })

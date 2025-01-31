@@ -1,5 +1,5 @@
 import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, withHashLocation} from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.route';
@@ -13,6 +13,7 @@ import { indexReducer } from './store/index.reducer';
 import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
 registerLocaleData(localeEs);
 import { provideToastr } from 'ngx-toastr';
+import { provideScrollbarOptions } from 'ngx-scrollbar';
 // import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
 
 
@@ -26,5 +27,9 @@ export const appConfig: ApplicationConfig = {
   { provide: LOCALE_ID, useValue: 'es-ES' },
   // { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
   { provide: LocationStrategy, useClass: HashLocationStrategy },
+  provideScrollbarOptions({
+    visibility: 'hover',
+    appearance: 'compact',
+  })
   ]
 };

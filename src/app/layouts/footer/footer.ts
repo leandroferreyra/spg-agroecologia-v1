@@ -1,11 +1,10 @@
 ﻿import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { SharedModule } from 'src/shared.module';
 
 @Component({
     selector: 'footer',
     standalone: true,
-    imports: [CommonModule, SharedModule], 
+    imports: [CommonModule], 
     templateUrl: './footer.html',
 })
 export class FooterComponent {

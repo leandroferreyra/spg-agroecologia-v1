@@ -38,6 +38,17 @@ export class BancosService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
   }
 
+  getBancosWithOrder(rol: string, paging: number, column: string, direction: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams()
+      .append('paging', paging)
+      .append('actual_role', rol)
+      .append('with []', 'bank_accounts.currency')
+      .append('order_by[0][]', column)
+      .append('order_by[0][]', direction)
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
+  }
+
   saveBanco(banco: BancoDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiBancos, JSON.stringify(banco), { headers });

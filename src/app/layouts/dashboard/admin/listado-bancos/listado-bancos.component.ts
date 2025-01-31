@@ -1,22 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
+import { SortablejsModule } from '@dustfoundation/ngx-sortablejs';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { BancoDTO } from 'src/app/core/models/request/bancoDTO';
 import { BancosService } from 'src/app/core/services/bancos.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { SharedModule } from 'src/shared.module';
+import { IconModule } from 'src/app/shared/icon/icon.module';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-bancos',
   standalone: true,
-  imports: [CommonModule, SharedModule, DataTableModule, NgxSpinnerModule],
+  imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule, IconModule],
   templateUrl: './listado-bancos.component.html',
   styleUrl: './listado-bancos.component.css'
 })
@@ -91,6 +93,23 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
     )
   }
 
+  obtenerBancosConOrden(paging: number, column: string, direction: string) {
+    this.subscription.add(
+      this._bancosService.getBancosWithOrder(this.actual_role, paging, column, direction).subscribe({
+        next: res => {
+          this.spinner.hide();
+          this.bancos = res.data;
+          this.total_rows = res.meta.total;
+          this.params.last_page = res.meta.last_page;
+        },
+        error: error => {
+          this.spinner.hide();
+          console.error(error);
+        }
+      })
+    )
+  }
+
   obtenerBancosConFiltro(paging: number, filter: string) {
     this.subscription.add(
       this._bancosService.getBancosWithNameFilter(this.actual_role, paging, filter).subscribe({
@@ -117,6 +136,8 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
     this.params.pagesize = data.pagesize;
     if (data.change_type === 'search') {
       this.obtenerBancosConFiltro(data.pagesize, data.search);
+    } else if (data.change_type === 'sort') {
+      this.obtenerBancosConOrden(data.pagesize, data.sort_column, data.sort_direction);
     } else {
       this.obtenerBancos(data.pagesize, data.current_page);
     }

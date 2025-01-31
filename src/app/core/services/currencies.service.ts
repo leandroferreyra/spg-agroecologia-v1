@@ -26,6 +26,27 @@ export class CurrenciesService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
   }
 
+  getCurrenciesWithNameFilter(rol: string, paging: number, filter: string) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams()
+      .append('actual_role', rol)
+      .append('paging', paging)
+      .append('filters[0][]', 'name')
+      .append('filters[0][]', 'LIKE')
+      .append(`filters[0][]`, `%${filter}%`)
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
+  }
+
+  getCurrenciesWithOrder(rol: string, paging: number, column: string, direction: string) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams()
+      .append('actual_role', rol)
+      .append('paging', paging)
+      .append('order_by[0][]', column)
+      .append('order_by[0][]', direction)
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
+  }
+
   saveCurrency(currencyDTO: CurrencyDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiMonedas, JSON.stringify(currencyDTO), { headers });

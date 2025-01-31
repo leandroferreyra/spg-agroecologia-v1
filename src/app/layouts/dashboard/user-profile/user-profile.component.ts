@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { forkJoin, Subscription } from 'rxjs';
 import { ChangePasswordDTO } from 'src/app/core/models/request/changePasswordDTO';
 import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
@@ -14,14 +14,17 @@ import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { UserService } from 'src/app/core/services/user.service';
-import { SharedModule } from 'src/shared.module';
 import Swal from 'sweetalert2';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
+import { IconModule } from 'src/app/shared/icon/icon.module';
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, SharedModule, RouterModule, FontAwesomeModule],
+  imports: [CommonModule, NgxCustomModalComponent, RouterModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule, 
+    NgSelectModule, IconModule, NgxCustomModalComponent
+  ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
 })

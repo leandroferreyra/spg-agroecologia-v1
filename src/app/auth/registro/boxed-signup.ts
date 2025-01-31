@@ -3,8 +3,7 @@ import { toggleAnimation } from 'src/app/shared/animations';
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from 'src/shared.module';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { forkJoin, Subscription } from 'rxjs';
 import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
@@ -15,10 +14,11 @@ import { faArrowAltCircleLeft, faEye, faEyeSlash, faCalendar } from '@fortawesom
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { SwalService } from 'src/app/core/services/swal.service';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterModule, FontAwesomeModule, NgxSpinnerModule],
+    imports: [CommonModule, RouterModule, FontAwesomeModule, NgxSpinnerModule, NgSelectModule, FormsModule, ReactiveFormsModule],
     templateUrl: './boxed-signup.html',
     animations: [toggleAnimation],
 })

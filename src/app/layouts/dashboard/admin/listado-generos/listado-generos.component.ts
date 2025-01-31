@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { BancoDTO } from 'src/app/core/models/request/bancoDTO';
 import { GeneroDTO } from 'src/app/core/models/request/generoDTO';
@@ -13,13 +14,13 @@ import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { GenerosService } from 'src/app/core/services/generos.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { SharedModule } from 'src/shared.module';
+import { IconModule } from 'src/app/shared/icon/icon.module';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-generos',
   standalone: true,
-  imports: [CommonModule, SharedModule, DataTableModule, NgxSpinnerModule],
+  imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule, IconModule, NgxTippyModule],
   templateUrl: './listado-generos.component.html',
   styleUrl: './listado-generos.component.css'
 })
@@ -77,6 +78,40 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
     this.obtenerGeneros(this.params.pagesize);
   }
 
+  obtenerGenerosWithNameFilter(paging: number, filter: string) {
+    this.subscription.add(
+      this._catalogoService.getGenerosWithNameFilter(paging, filter).subscribe({
+        next: res => {
+          this.spinner.hide();
+          this.generos = res.data;
+          this.total_rows = res.meta.total;
+          this.params.last_page = res.meta.last_page;
+        },
+        error: error => {
+          this.spinner.hide();
+          console.error(error);
+        }
+      })
+    )
+  }
+
+  obtenerGenerosWithOrder(paging: number, column: string, direction: string) {
+    this.subscription.add(
+      this._catalogoService.getGenerosWithOrder(paging, column, direction).subscribe({
+        next: res => {
+          this.spinner.hide();
+          this.generos = res.data;
+          this.total_rows = res.meta.total;
+          this.params.last_page = res.meta.last_page;
+        },
+        error: error => {
+          this.spinner.hide();
+          console.error(error);
+        }
+      })
+    )
+  }
+
   obtenerGeneros(paging: number, page?: number) {
     this.subscription.add(
       this._catalogoService.getGenerosWithPaging(paging, page).subscribe({
@@ -85,11 +120,10 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
           this.generos = res.data;
           this.total_rows = res.meta.total;
           this.params.last_page = res.meta.last_page;
-          console.log(res);
         },
         error: error => {
           this.spinner.hide();
-          console.log(error);
+          console.error(error);
         }
       })
     )
@@ -100,11 +134,12 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
   }
 
   changeServer(data: any) {
-    console.log(data);
     this.params.current_page = data.current_page;
     this.params.pagesize = data.pagesize;
     if (data.change_type === 'search') {
-      // this.obtenerPaisesConFiltro(data.pagesize, data.search);
+      this.obtenerGenerosWithNameFilter(data.pagesize, data.search);
+    } else if (data.change_type === 'sort') {
+      this.obtenerGenerosWithOrder(data.pagesize, data.sort_column, data.sort_direction);
     } else {
       this.obtenerGeneros(data.pagesize, data.current_page);
     }

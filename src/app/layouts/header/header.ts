@@ -3,25 +3,28 @@ import { toggleAnimation } from 'src/app/shared/animations';
 import { Store } from '@ngrx/store';
 import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from 'src/shared.module';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { ChangePasswordDTO } from 'src/app/core/models/request/changePasswordDTO';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
 import { SwalService } from 'src/app/core/services/swal.service';
+import { IconModule } from 'src/app/shared/icon/icon.module';
+import { NgScrollbarModule } from 'ngx-scrollbar';
+import { MenuModule } from 'headlessui-angular';
 
 @Component({
     selector: 'header',
     standalone: true,
-    imports: [CommonModule, SharedModule, RouterLink, RouterLinkActive, FontAwesomeModule],
+    imports: [CommonModule, RouterLink, RouterLinkActive, FontAwesomeModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
+             NgxCustomModalComponent, IconModule, NgScrollbarModule, MenuModule],
     templateUrl: './header.html',
     animations: [toggleAnimation],
 })
