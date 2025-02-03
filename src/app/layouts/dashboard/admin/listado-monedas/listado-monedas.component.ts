@@ -8,19 +8,20 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { CurrencyDTO } from 'src/app/core/models/request/currencyDTO';
-import { PaisDTO } from 'src/app/core/models/request/paisDTO';
-import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { CurrenciesService } from 'src/app/core/services/currencies.service';
 import { PaisesService } from 'src/app/core/services/paises.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { IconModule } from 'src/app/shared/icon/icon.module';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-monedas',
   standalone: true,
-  imports: [CommonModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule, IconModule, DataTableModule, NgxSpinnerModule, NgxTippyModule],
+  imports: [CommonModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule, DataTableModule, 
+    NgxSpinnerModule, NgxTippyModule, IconPencilComponent, IconPlusComponent, IconTrashLinesComponent],
   templateUrl: './listado-monedas.component.html',
   styleUrl: './listado-monedas.component.css'
 })

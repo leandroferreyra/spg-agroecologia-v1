@@ -12,14 +12,16 @@ import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { PaisesService } from 'src/app/core/services/paises.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { IconModule } from 'src/app/shared/icon/icon.module';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-paises',
   standalone: true,
-  imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule, IconModule,
-    NgxTippyModule
+  imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
+    NgxTippyModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent
   ],
   templateUrl: './listado-paises.component.html',
   styleUrl: './listado-paises.component.css'

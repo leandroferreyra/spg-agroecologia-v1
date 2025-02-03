@@ -3,13 +3,14 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { slideDownUp } from '../../shared/animations';
 import { CommonModule } from '@angular/common';
-import { IconModule } from 'src/app/shared/icon/icon.module';
 import { NgScrollbarModule } from 'ngx-scrollbar';
+import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
+import { IconCaretsDownComponent } from 'src/app/shared/icon/icon-carets-down';
 
 @Component({
     selector: 'sidebar',
     standalone: true,
-    imports: [CommonModule, RouterLink, RouterLinkActive, IconModule, NgScrollbarModule],
+    imports: [CommonModule, RouterLink, RouterLinkActive, NgScrollbarModule, IconCaretDownComponent, IconCaretsDownComponent],
     templateUrl: './sidebar.html',
     animations: [slideDownUp],
 })

@@ -1,6 +1,9 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
 @Component({
     selector: 'icon-carets-down',
+    imports: [CommonModule],
+    standalone: true,
     template: `
         <ng-template #template>
             <svg *ngIf="!fill" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" [ngClass]="class">
@@ -29,7 +32,7 @@ export class IconCaretsDownComponent {
     @Input() fill: boolean = false;
     @Input() class: any = '';
     @ViewChild('template', { static: true }) template: any;
-    constructor(private viewContainerRef: ViewContainerRef) {}
+    constructor(private viewContainerRef: ViewContainerRef) { }
     ngOnInit() {
         this.viewContainerRef.createEmbeddedView(this.template);
         this.viewContainerRef.element.nativeElement.remove();

@@ -15,13 +15,16 @@ import { CiudadService } from 'src/app/core/services/ciudad.service';
 import { PaisesService } from 'src/app/core/services/paises.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { IconModule } from 'src/app/shared/icon/icon.module';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-ciudades',
   standalone: true,
-  imports: [CommonModule, NgxTippyModule, NgxCustomModalComponent, NgSelectModule, FormsModule, ReactiveFormsModule, IconModule, DataTableModule, NgxSpinnerModule],
+  imports: [CommonModule, NgxTippyModule, NgxCustomModalComponent, NgSelectModule, FormsModule, ReactiveFormsModule, 
+    DataTableModule, NgxSpinnerModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent],
   templateUrl: './listado-ciudades.component.html',
   styleUrl: './listado-ciudades.component.css'
 })

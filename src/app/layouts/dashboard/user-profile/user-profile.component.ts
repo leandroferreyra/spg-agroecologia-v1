@@ -18,12 +18,16 @@ import Swal from 'sweetalert2';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
-import { IconModule } from 'src/app/shared/icon/icon.module';
+import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
+import { IconLockComponent } from 'src/app/shared/icon/icon-lock';
+import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
+
+
 @Component({
   selector: 'app-user-profile',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, RouterModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule,
-    NgSelectModule, IconModule, NgxCustomModalComponent
+    NgSelectModule, NgxCustomModalComponent, IconRefreshComponent, IconLockComponent, IconEditComponent
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'

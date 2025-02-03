@@ -1,6 +1,9 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
 @Component({
-    selector: 'icon-caret-down                                                                                           ',
+    selector: 'icon-caret-down',
+    imports: [CommonModule], 
+    standalone: true,
     template: `
         <ng-template #template>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" [ngClass]="class">

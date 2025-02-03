@@ -1,6 +1,9 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
 @Component({
     selector: 'icon-trash-lines',
+    imports: [CommonModule],
+    standalone: true,
     template: `
         <ng-template #template>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" [ngClass]="class">

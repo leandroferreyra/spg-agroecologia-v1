@@ -15,14 +15,16 @@ import { PaisesService } from 'src/app/core/services/paises.service';
 import { ProvinciaService } from 'src/app/core/services/provincia.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { IconModule } from 'src/app/shared/icon/icon.module';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-provincias',
   standalone: true,
-  imports: [CommonModule, NgxTippyModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, NgSelectModule, FormsModule, ReactiveFormsModule,
-    IconModule
+  imports: [CommonModule, NgxTippyModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, NgSelectModule, 
+    FormsModule, ReactiveFormsModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent
   ],
   templateUrl: './listado-provincias.component.html',
   styleUrl: './listado-provincias.component.css'

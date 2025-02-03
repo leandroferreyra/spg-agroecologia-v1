@@ -1,6 +1,9 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
 @Component({
     selector: 'icon-pencil',
+    imports: [CommonModule],
+    standalone: true,
     template: `
         <ng-template #template>
             <svg *ngIf="fill" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" [ngClass]="class">
@@ -35,7 +38,7 @@ export class IconPencilComponent {
     @Input() fill: boolean = false;
     @Input() class: any = '';
     @ViewChild('template', { static: true }) template: any;
-    constructor(private viewContainerRef: ViewContainerRef) {}
+    constructor(private viewContainerRef: ViewContainerRef) { }
     ngOnInit() {
         this.viewContainerRef.createEmbeddedView(this.template);
         this.viewContainerRef.element.nativeElement.remove();

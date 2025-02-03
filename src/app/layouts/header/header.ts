@@ -16,15 +16,17 @@ import { ChangePasswordDTO } from 'src/app/core/models/request/changePasswordDTO
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
 import { SwalService } from 'src/app/core/services/swal.service';
-import { IconModule } from 'src/app/shared/icon/icon.module';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { MenuModule } from 'headlessui-angular';
+import { IconUserComponent } from 'src/app/shared/icon/icon-user';
+import { IconMenuComponent } from 'src/app/shared/icon/icon-menu';
+import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
 
 @Component({
     selector: 'header',
     standalone: true,
     imports: [CommonModule, RouterLink, RouterLinkActive, FontAwesomeModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
-             NgxCustomModalComponent, IconModule, NgScrollbarModule, MenuModule],
+             NgxCustomModalComponent, NgScrollbarModule, MenuModule, IconUserComponent, IconMenuComponent, IconCaretDownComponent],
     templateUrl: './header.html',
     animations: [toggleAnimation],
 })
@@ -66,7 +68,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         // console.log(this.usuarioLogueado);
         if (this.usuarioLogueado) {
             //TODO: Reemplazar ADMIN por el rol del usuario
-            this.storeData.dispatch({ type: 'setUserRole' });
+            this.storeData.dispatch({ type: 'setUserRole', payload: localStorage.getItem('userRole') });
         }
     }
     async initStore() {

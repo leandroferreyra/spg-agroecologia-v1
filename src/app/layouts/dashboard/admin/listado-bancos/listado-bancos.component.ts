@@ -12,13 +12,16 @@ import { BancoDTO } from 'src/app/core/models/request/bancoDTO';
 import { BancosService } from 'src/app/core/services/bancos.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { IconModule } from 'src/app/shared/icon/icon.module';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-bancos',
   standalone: true,
-  imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule, IconModule],
+  imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
+    IconPlusComponent, IconPencilComponent, IconTrashLinesComponent],
   templateUrl: './listado-bancos.component.html',
   styleUrl: './listado-bancos.component.css'
 })

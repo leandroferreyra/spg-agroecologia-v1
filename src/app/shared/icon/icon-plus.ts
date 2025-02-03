@@ -1,6 +1,9 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
 @Component({
     selector: 'icon-plus',
+    imports: [CommonModule],
+    standalone: true,
     template: `
         <ng-template #template>
             <svg

@@ -14,13 +14,16 @@ import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { GenerosService } from 'src/app/core/services/generos.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { IconModule } from 'src/app/shared/icon/icon.module';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-generos',
   standalone: true,
-  imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule, IconModule, NgxTippyModule],
+  imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
+    IconPencilComponent, IconPlusComponent, IconTrashLinesComponent, NgxTippyModule],
   templateUrl: './listado-generos.component.html',
   styleUrl: './listado-generos.component.css'
 })
