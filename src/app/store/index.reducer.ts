@@ -23,6 +23,7 @@ export interface MenuItem {
 }
 
 export function indexReducer(state = initialState, action: any) {
+    console.log('reducer');
     const type = action.type;
     let payload = action.payload;
     if (type === 'toggleDirection') {
@@ -31,32 +32,6 @@ export function indexReducer(state = initialState, action: any) {
         return { ...state, ...{ direction: payload } };
     } else if (type === 'toggleMainLoader') {
         return { ...state, ...{ isShowMainLoader: payload } };
-    }
-
-    if (type === 'setMainLayout') {
-        return { ...state, ...{ mainLayout: payload } }; //app , auth
-    } else if (type === 'toggleTheme') {
-        payload = payload || state.theme; // light|dark|system
-        localStorage.setItem('theme', payload);
-        let isDarkMode = state.isDarkMode || false;
-        if (payload == 'light') {
-            isDarkMode = false;
-        } else if (payload == 'dark') {
-            isDarkMode = true;
-        } else if (payload == 'system') {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                isDarkMode = true;
-            } else {
-                isDarkMode = false;
-            }
-        }
-
-        if (isDarkMode) {
-            document.querySelector('body')?.classList.add('dark');
-        } else {
-            document.querySelector('body')?.classList.remove('dark');
-        }
-        return { ...state, ...{ theme: payload, isDarkMode: isDarkMode } };
     } else if (type === 'toggleMenu') {
         payload = payload || state.menu; // vertical, collapsible-vertical, horizontal
         localStorage.setItem('menu', payload);
@@ -65,12 +40,6 @@ export function indexReducer(state = initialState, action: any) {
         payload = payload || state.layout; // full, boxed-layout
         localStorage.setItem('layout', payload);
         return { ...state, ...{ layout: payload } };
-    } else if (type === 'toggleRTL') {
-        payload = payload || state.rtlClass; // rtl, ltr
-        localStorage.setItem('rtlClass', payload);
-        const rtlClass = payload;
-        document.querySelector('html')?.setAttribute('dir', rtlClass || 'ltr');
-        return { ...state, ...{ rtlClass: rtlClass } };
     } else if (type === 'toggleAnimation') {
         payload = payload; // animate__fadeIn, animate__fadeInDown, animate__fadeInUp, animate__fadeInLeft, animate__fadeInRight, animate__slideInDown, animate__slideInLeft, animate__slideInRight, animate__zoomIn
         payload = payload?.trim();
@@ -85,13 +54,10 @@ export function indexReducer(state = initialState, action: any) {
         payload = payload || state.navbar; // navbar-sticky, navbar-floating, navbar-static
         localStorage.setItem('navbar', payload);
         return { ...state, ...{ navbar: payload } };
-    } else if (type === 'toggleSemidark') {
-        payload = payload || false;
-        localStorage.setItem('semidark', payload);
-        return { ...state, ...{ semidark: payload } };
     } else if (type === 'toggleSidebar') {
         return { ...state, ...{ sidebar: !state.sidebar } };
-    } else if (type === 'setUserRole') {
+    }
+    else if (type === 'setUserRole') {
         payload = payload || state.userRole;
         const menuItems = getMenuByRole(payload);
         return { ...state, userRole: payload, menuItems };

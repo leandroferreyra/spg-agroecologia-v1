@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { $themeConfig } from '../../theme.config';
+import { $themeConfig } from 'src/app/theme.config';
 
 @Injectable({
     providedIn: 'root'
-})
+}) 
 export class AppService {
     storeData: any;
 
@@ -47,9 +47,6 @@ export class AppService {
         val = localStorage.getItem('semidark');
         val = val === 'true' ? true : $themeConfig.semidark;
         this.store.dispatch({ type: 'toggleSemidark', payload: val });
-
-        val = localStorage.getItem('userRole');
-        this.store.dispatch({ type: 'setUserRole', payload: val });
     }
 
 

@@ -18,18 +18,19 @@ import { provideScrollbarOptions } from 'ngx-scrollbar';
 
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }),
-  provideRouter(routes, withHashLocation()),
-  provideAnimations(),
-  provideStore({ index: indexReducer }),
-  provideHttpClient(withInterceptors([tokenInterceptorInterceptor])),
-  provideToastr(),
-  { provide: LOCALE_ID, useValue: 'es-ES' },
-  // { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
-  { provide: LocationStrategy, useClass: HashLocationStrategy },
-  provideScrollbarOptions({
-    visibility: 'hover',
-    appearance: 'compact',
-  })
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes, withHashLocation()),
+    provideAnimations(),
+    provideStore({ index: indexReducer }),
+    provideHttpClient(withInterceptors([tokenInterceptorInterceptor])),
+    provideToastr(),
+    { provide: LOCALE_ID, useValue: 'es-ES' },
+    // { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
+    provideScrollbarOptions({
+      visibility: 'hover',
+      appearance: 'compact',
+    })
   ]
 };

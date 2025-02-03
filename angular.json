@@ -37,12 +37,6 @@
                         ],
                         "scripts": [
                             "node_modules/bootstrap/dist/js/bootstrap.min.js"
-                        ],
-                        "allowedCommonJsDependencies": [
-                            "sweetalert2",
-                            "file-saver",
-                            "quill",
-                            "quill-delta"
                         ]
                     },
                     "configurations": {

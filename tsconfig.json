@@ -20,7 +20,8 @@
         "module": "ES2022",
         "useDefineForClassFields": false,
         "lib": ["ES2022", "dom"],
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true
     },
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,

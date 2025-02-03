@@ -22,7 +22,7 @@ import { IconModule } from 'src/app/shared/icon/icon.module';
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, NgxCustomModalComponent, RouterModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule, 
+  imports: [CommonModule, NgxCustomModalComponent, RouterModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule,
     NgSelectModule, IconModule, NgxCustomModalComponent
   ],
   templateUrl: './user-profile.component.html',
@@ -84,12 +84,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.spinner.show();
     this.subscription.add(
       this.userService.getUser(this.actual_role, this.usuarioLogueado.uuid).subscribe({
         next: res => {
+          console.log(res);
           this.usuarioLogueado = res.data;
           this.dataLoaded = true;
           this.inicializarForm();
@@ -114,6 +114,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       // tiposDocumento: this._catalogService.getDocumentos(),
     }).subscribe({
       next: res => {
+        console.log(res);
         this.generos = res.generos.data;
         this.paises = res.paises.data;
         this.provincias = res.provincias.data.districts;
@@ -244,6 +245,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this.userService.updateUser(this.usuarioLogueado.uuid, registro).subscribe({
           next: res => {
+            console.log(res);
             this._tokenService.setToken(res.token);
             if (this.usuarioLogueado.email !== registro.email) {
               this.authService.logout().subscribe({
@@ -343,6 +345,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this.authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
             next: res => {
+              console.log(res);
               this.spinner.hide();
               this.closeModalCambioClave();
               this._tokenService.setToken(res.token);

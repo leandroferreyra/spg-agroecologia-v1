@@ -1,12 +1,3 @@
-/* animation */
-@import 'animate.css';
-
-/* quill editor */
-@import 'quill-editor.css';
-
-/* full calendar */
-@import 'fullcalendar.css';
-
 /* swiper */
 @import 'swiper.css';
 
@@ -16,32 +7,11 @@
 /* tippy */
 @import 'tippy.css';
 
-/* noui-slider */
-@import 'noui-slider.css';
-
-/* flatpickr */
-@import 'flatpickr.css';
-
-/* file upload with preview */
-@import 'file-upload-preview.css';
-
-/* markdown-editor */
-@import 'markdown-editor.css';
-
 /* select2 */
 @import 'select2.css';
 
 /* ng-datatable */
 @import 'datatable.css';
-
-/* lightbox */
-@import 'lightbox.css';
-
-/* scrumboard */
-@import 'scrumboard.css';
-
-/* dragndrop */
-@import 'dragndrop.css';
 
 /* form element*/
 @import 'form-elements.css';

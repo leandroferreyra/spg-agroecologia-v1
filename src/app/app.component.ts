@@ -20,29 +20,30 @@ export class AppComponent {
         private activatedRoute: ActivatedRoute,
         private titleService: Title,
     ) {
-        this.router.events
-            .pipe(
-                filter((event) => event instanceof NavigationEnd),
-                map(() => this.activatedRoute),
-                map((route) => {
-                    while (route.firstChild) route = route.firstChild;
-                    return route;
-                }),
-                filter((route) => route.outlet === 'primary'),
-                switchMap((route) => {
-                    return route.data.pipe(
-                        map((routeData: any) => {
-                            const title = routeData['title'];
-                            return { title };
-                        }),
-                    );
-                }),
-                tap((data: any) => {
-                    let title = data.title;
-                    title = (title ? title + ' | ' : '') + 'LADIE';
-                    this.titleService.setTitle(title);
-                }),
-            )
-            .subscribe();
+        console.log('APP COMPONENTE');
+        // this.router.events
+        //     .pipe(
+        //         filter((event) => event instanceof NavigationEnd),
+        //         map(() => this.activatedRoute),
+        //         map((route) => {
+        //             while (route.firstChild) route = route.firstChild;
+        //             return route;
+        //         }),
+        //         filter((route) => route.outlet === 'primary'),
+        //         switchMap((route) => {
+        //             return route.data.pipe(
+        //                 map((routeData: any) => {
+        //                     const title = routeData['title'];
+        //                     return { title };
+        //                 }),
+        //             );
+        //         }),
+        //         tap((data: any) => {
+        //             let title = data.title;
+        //             title = (title ? title + ' | ' : '') + 'LADIE';
+        //             this.titleService.setTitle(title);
+        //         }),
+        //     )
+        //     .subscribe();
     }
 }
