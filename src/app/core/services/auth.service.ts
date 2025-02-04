@@ -36,7 +36,9 @@ export class AuthService {
   private apiChangePassword = '/change_password';
   // private apiUsers = '/users';
 
-  constructor(private http: HttpClient, public storeData: Store<any>, private router: Router) { }
+  constructor(private http: HttpClient, public storeData: Store<any>, private router: Router) {
+    console.log('[AuthService] Constructor iniciado');
+  }
 
   register(registro: RegistroDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
@@ -49,6 +51,7 @@ export class AuthService {
   // }
 
   login(login: LoginDTO): Observable<AuthResponse> {
+    console.log('[AuthService] Iniciando petición de login');
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiLogin, JSON.stringify(login), { headers });
   }

@@ -1,4 +1,4 @@
-import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -31,6 +31,17 @@ export const appConfig: ApplicationConfig = {
     provideScrollbarOptions({
       visibility: 'hover',
       appearance: 'compact',
-    })
+    }),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => {
+        return () => {
+          console.log('[AppConfig] Inicializando aplicación');
+        };
+      },
+      multi: true
+    }
   ]
 };
+
+console.log('[AppConfig] Configuración cargada');
