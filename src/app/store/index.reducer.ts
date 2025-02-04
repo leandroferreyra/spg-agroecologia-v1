@@ -23,9 +23,12 @@ export interface MenuItem {
 }
 
 export function indexReducer(state = initialState, action: any) {
-    console.log('reducer');
+    console.log('[Reducer] Action recibida:', action.type, action.payload);
+    console.log('[Reducer] Estado actual:', state);
+
     const type = action.type;
     let payload = action.payload;
+
     if (type === 'toggleDirection') {
         localStorage.setItem('direction', payload);
         document.querySelector('html')?.setAttribute('dir', payload || 'ltr');
@@ -58,15 +61,19 @@ export function indexReducer(state = initialState, action: any) {
         return { ...state, ...{ sidebar: !state.sidebar } };
     }
     else if (type === 'setUserRole') {
+        console.log('[Reducer] Procesando setUserRole con payload:', payload);
         payload = payload || state.userRole;
         const menuItems = getMenuByRole(payload);
+        console.log('[Reducer] Nuevos menuItems:', menuItems);
         return { ...state, userRole: payload, menuItems };
     }
 
+    console.log('[Reducer] Estado final:', state);
     return state;
 }
 
 function getMenuByRole(role: string) {
+    console.log('[getMenuByRole] Obteniendo menú para rol:', role);
     switch (role) {
         case 'ADMIN':
         case 'ADMINISTRACION':
