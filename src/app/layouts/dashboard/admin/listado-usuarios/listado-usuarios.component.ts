@@ -4,12 +4,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
@@ -17,7 +19,7 @@ import Swal from 'sweetalert2';
   selector: 'app-listado-usuarios',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, NgbModule, NgbPaginationModule, FormsModule, ReactiveFormsModule,
-    IconPencilComponent, IconTrashLinesComponent, IconInfoCircleComponent, ArrayToStringPipe],
+    IconPencilComponent, IconTrashLinesComponent, IconInfoCircleComponent, IconSearchComponent, ArrayToStringPipe, NgxTippyModule],
   templateUrl: './listado-usuarios.component.html',
   styleUrl: './listado-usuarios.component.css'
 })
@@ -28,6 +30,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   actual_role: string = '';
 
   usuarios: any[] = [];
+  usuariosFiltrados: any[] = [];
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 10;
@@ -35,6 +38,11 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;
   itemsInPage = this.itemsPerPage;
   pageSize: number = 0;
+
+  // Orden y filtro
+  filtros: any = {};
+  MIN_FILTER_SIZE = 1;
+  showFilter: boolean = false;
 
   constructor(public storeData: Store<any>, private userService: UserService, private spinner: NgxSpinnerService,
     private tokenService: TokenService
@@ -64,6 +72,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
           this.spinner.hide();
           this.tokenService.setToken(res.token);
           this.usuarios = res.data;
+          this.usuariosFiltrados = this.usuarios;
           if (this.usuarios.length <= this.itemsPerPage) {
             this.itemsInPage = this.usuarios.length;
           }
@@ -136,6 +145,49 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   }
   cambiarPaginacion() {
     this.onPageChange(1);
+  }
+
+  toggleFilter() {
+    this.showFilter = !this.showFilter;
+    if (!this.showFilter) {
+      this.filtros = {};
+    }
+  }
+
+  filtrarDatos() {
+    let resultados = this.usuariosFiltrados;
+    if (this.filtros.email) {
+      resultados = resultados.filter(dato =>
+        dato.email.toLocaleLowerCase().includes(this.filtros.email.toLowerCase()))
+    }
+    if (this.filtros.name) {
+      resultados = resultados.filter(dato => {
+        let nombreCompleto = (dato.human.firstname + ' ' + dato.human.lastname).toLocaleLowerCase();
+        return nombreCompleto.includes(this.filtros.name.toLowerCase());
+      })
+    }
+
+    if (this.filtros.name || this.filtros.email) {
+      if (resultados.length <= this.itemsPerPage) {
+        this.itemsInPage = resultados.length;
+      } else {
+        this.itemsInPage = this.currentPage * this.itemsPerPage;
+        if (this.itemsInPage > resultados.length) {
+          this.itemsInPage = resultados.length;
+        }
+      }
+    } else {
+      if (resultados.length <= this.itemsPerPage) {
+        this.itemsInPage = resultados.length;
+      } else {
+        this.itemsInPage = this.currentPage * this.itemsPerPage;
+        if (this.itemsInPage > resultados.length) {
+          this.itemsInPage = resultados.length;
+        }
+      }
+    }
+
+    return resultados;
   }
 
 }

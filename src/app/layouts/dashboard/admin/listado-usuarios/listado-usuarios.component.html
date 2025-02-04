@@ -3,15 +3,12 @@
         <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
             <h5 class="text-lg font-semibold dark:text-white-light">Usuarios
             </h5>
-            <!-- <button type="button" ngxTippy="Agregar Usuario" (click)="openModalNuevaProvincia('NEW')">
-                <icon-plus />
-            </button> -->
-            <!-- <div class="ltr:ml-auto rtl:mr-auto">
-                <input [(ngModel)]="search" type="text" class="form-input w-auto" placeholder="Buscar provincia..." />
-            </div> -->
+            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+                <icon-search />
+            </button>
         </div>
 
-        <div class="row">
+        <div class="row mb-2">
             <div class="col-6">
                 <span *ngIf="usuarios && usuarios.length > 0" class="float-md-start color-gris">
                     Página: {{ currentPage}}/{{numPages.pageCount }}
@@ -19,7 +16,7 @@
             </div>
             <div class="col-6" style="text-align: right;">
                 <span *ngIf="usuarios && usuarios.length > 0" class="float-md-end color-gris">
-                    Ítems: {{itemsInPage}}/{{ usuarios.length }}
+                    Ítems: {{itemsInPage}}/{{ filtrarDatos().length }}
                 </span>
             </div>
         </div>
@@ -35,7 +32,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for(data of usuarios | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                    @if (showFilter) {
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name" />
+                        </td>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.email" />
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    }
+                    @for(data of filtrarDatos() | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                     <tr>
                         <td class="whitespace-nowrap">{{ data.human.firstname}} {{ data.human.lastname}} </td>
                         <td> {{data.email}} </td>
@@ -81,7 +91,7 @@
 
             <div class="row mt-4">
                 <div class="col">
-                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="usuarios.length || 0"
+                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="filtrarDatos().length || 0"
                         [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
                         [boundaryLinks]="true" (pageChange)="onPageChange(currentPage)" />
                 </div>
