@@ -264,7 +264,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                   }).then((result) => {
                     if (result.isConfirmed) {
                       // this.registroForm.get(formControl)!.setValue(true, { emitEvent: false });
-                      this.router.navigate(['auth/boxed-sigin'])
+                      this.router.navigate(['auth/boxed-signin'])
                     }
                   });
                 },
@@ -279,7 +279,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
             this.usuarioLogueado.user_name = res.data.user.user_name;
             // this.usuarioLogueado.document_number = registro.document_number;
             // this.usuarioLogueado.document_type.uuid = registro.document_type_uuid;
-            this.usuarioLogueado.human.gender.uuid = res.data.gender.uuid;
+            if (res.data.gender?.uuid) {
+              this.usuarioLogueado.human.gender.uuid = res.data.gender?.uuid;
+            }
             this.usuarioLogueado.human.person.city.uuid = res.data.person.city.uuid;;
             this.usuarioLogueado.human.person.address_detail = res.data.person.address_detail;
             this.usuarioLogueado.human.person.door_number = res.data.person.door_number;
@@ -311,7 +313,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   armarDTORegistro() {
     let registro = new RegistroDTO();
     registro.actual_role = this.actual_role;
-    registro.with = ['gender', 'person.city','person.city.district', 'person.city.district.country'];
+    registro.with = ['gender', 'person.city', 'person.city.district', 'person.city.district.country'];
     registro.email = this.userForm.get('email')?.value;
     registro.user_name = this.userForm.get('usuario')?.value;
     registro.firstname = this.userForm.get('nombres')?.value;

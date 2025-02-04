@@ -16,12 +16,15 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-listado-paises',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
-    NgxTippyModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent
+    NgxTippyModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, FontAwesomeModule, NgbPagination
   ],
   templateUrl: './listado-paises.component.html',
   styleUrl: './listado-paises.component.css'
@@ -30,24 +33,26 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
 
   store: any;
   private subscription: Subscription = new Subscription();
-
   actual_role: string = '';
-  search = '';
-  cols = [
-    { field: 'name', title: 'Nombre' },
-    { field: 'action', title: 'Acciones', sort: false }
-  ];
+
   paises: any[] = [];
 
-  // Paginacion
-  paginationInfo: string = 'Mostrando del {0} al {1} de un total de {2} elementos';
-  params = {
-    current_page: 1,
-    pagesize: 10,
-    last_page: 0
-  };
+  //Paginación
+  MAX_ITEMS_PER_PAGE = 10;
+  currentPage = 1;
+  last_page = 1;
+  itemsPerPage = this.MAX_ITEMS_PER_PAGE;
+  itemsInPage = this.itemsPerPage;
+  pageSize: number = 0;
   total_rows: number = 0;
-  pageSizeOptions = [5, 10, 20, 30, 50, 100];
+
+  // Orden y filtro
+  filtros: any = {};
+  MIN_FILTER_SIZE = 1;
+  showFilter: boolean = false;
+  sortDirection: 'asc' | 'desc' = 'asc';
+  iconArrowUp = faArrowUp;
+  iconArrowDown = faArrowDown;
 
   paisForm!: FormGroup;
   tituloModal: string = '';
@@ -78,7 +83,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerPaises(this.params.pagesize);
+    this.obtenerPaises(this.itemsPerPage);
   }
 
   obtenerPaises(paging: number, page?: number) {
@@ -86,8 +91,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
       this._catalogoService.getPaisesWithPaging(paging, page).subscribe({
         next: res => {
           this.paises = res.data;
-          this.total_rows = res.meta.total;
-          this.params.last_page = res.meta.last_page;
+          this.modificarPaginacion(res);
           this.spinner.hide();
         },
         error: error => {
@@ -96,6 +100,18 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  modificarPaginacion(res: any) {
+    this.total_rows = res.meta.total;
+    this.last_page = res.meta.last_page;
+    if (this.paises.length <= this.itemsPerPage) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage = this.total_rows;
+      } else {
+        this.itemsInPage = this.currentPage * this.itemsPerPage;
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -131,7 +147,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._paisService.eliminarPais(pais.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerPaises(this.params.pagesize, this.params.current_page);
+          this.obtenerPaises(this.itemsPerPage, this.currentPage);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -143,7 +159,6 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
       })
     )
   }
-
 
   openModalNuevoPais(type: string, pais?: any) {
     if (type === 'NEW') {
@@ -181,7 +196,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
           this._paisService.savePais(pais).subscribe({
             next: res => {
               // Esto es para evitar un llamado cada vez que agrega.
-              if (this.params.current_page === this.params.last_page) {
+              if (this.currentPage === this.last_page) {
                 this.paises = [...this.paises, res.data];
               }
               this.total_rows += 1;
@@ -222,15 +237,20 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
     }
   }
 
-  changeServer(data: any) {
-    this.params.current_page = data.current_page;
-    this.params.pagesize = data.pagesize;
-    if (data.change_type === 'search') {
-      this.obtenerPaisesConFiltro(data.pagesize, data.search);
-    } else if (data.change_type === 'sort') {
-      this.obtenerPaisesConOrden(data.pagesize, data.sort_column, data.sort_direction);
+  cambiarPaginacion(type: string, currentPage: number) {
+    this.currentPage = currentPage;
+    if (type === 'filter') {
+      this.obtenerPaisesConFiltro(this.itemsPerPage, this.filtros.name);
+    } else if (type === 'sort') {
+      if (this.sortDirection === 'asc') {
+        this.sortDirection = 'desc';
+        this.obtenerPaisesConOrden(this.itemsPerPage, 'name', this.sortDirection);
+      } else {
+        this.sortDirection = 'asc';
+        this.obtenerPaisesConOrden(this.itemsPerPage, 'name', this.sortDirection);
+      }
     } else {
-      this.obtenerPaises(data.pagesize, data.current_page);
+      this.obtenerPaises(this.itemsPerPage, currentPage);
     }
   }
 
@@ -239,8 +259,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
       this._catalogoService.getPaisesWithOrder(paging, column, direction).subscribe({
         next: res => {
           this.paises = res.data;
-          this.total_rows = res.meta.total;
-          this.params.last_page = res.meta.last_page;
+          this.modificarPaginacion(res);
           this.spinner.hide();
         },
         error: error => {
@@ -256,8 +275,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
       this._catalogoService.getPaisesWithNameFilter(paging, filter).subscribe({
         next: res => {
           this.paises = res.data;
-          this.total_rows = res.meta.total;
-          this.params.last_page = res.meta.last_page;
+          this.modificarPaginacion(res);
           this.spinner.hide();
         },
         error: error => {

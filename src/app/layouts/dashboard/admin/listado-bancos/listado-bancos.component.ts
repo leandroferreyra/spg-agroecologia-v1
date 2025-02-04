@@ -3,8 +3,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { Store } from '@ngrx/store';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { Store } from '@ngrx/store';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
@@ -36,7 +36,6 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   actual_role: string = '';
 
   bancos: any[] = [];
-
   bancoForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
@@ -78,6 +77,10 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
       .subscribe((d) => {
         this.actual_role = d.userRole;
       });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -143,10 +146,6 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
         }
       })
     )
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 
   openModalNuevoBanco(type: string, banco?: any) {
@@ -273,7 +272,6 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
       this.filtros = {};
     }
   }
-
 
   cambiarPaginacion(type: string, currentPage: number) {
     this.currentPage = currentPage;
