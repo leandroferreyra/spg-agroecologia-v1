@@ -124,8 +124,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
                 this._tokenService.logout();
                 this._userLogged.clearUsuarioLogueado();
                 this.router.navigate(['/auth/boxed-signin']);
+                this.spinner.hide();
             },
             error: error => {
+                this.spinner.hide();
                 console.error(error);
             }
         });

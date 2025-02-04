@@ -277,6 +277,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
             this.spinner.hide();
             this.usuarioLogueado.human.firstname = res.data.firstname;
             this.usuarioLogueado.human.lastname = res.data.lastname;
+            this.usuarioLogueado.user_name = res.data.user.user_name;
             // this.usuarioLogueado.document_number = registro.document_number;
             // this.usuarioLogueado.document_type.uuid = registro.document_type_uuid;
             this.usuarioLogueado.human.gender.uuid = res.data.gender.uuid;

@@ -16,7 +16,6 @@ import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { SwalService } from 'src/app/core/services/swal.service';
-import { Constantes } from 'src/Constantes';
 
 @Component({
     standalone: true,
