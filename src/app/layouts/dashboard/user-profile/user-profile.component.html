@@ -1,5 +1,5 @@
 @if (dataLoaded) {
-<form [formGroup]="userForm"
+<form [formGroup]="userForm" (keydown.enter)="confirmarEdicion()"
     class="mb-5 rounded-md border border-[#ebedf2] bg-white p-4 dark:border-[#191e3a] dark:bg-[#0e1726]">
 
     <div class="flex items-center justify-between mb-4">
