@@ -2,9 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
-import { SortablejsModule } from '@dustfoundation/ngx-sortablejs';
-import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Store } from '@ngrx/store';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
@@ -23,7 +24,7 @@ import Swal from 'sweetalert2';
   selector: 'app-listado-bancos',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
-    IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent],
+    IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule],
   templateUrl: './listado-bancos.component.html',
   styleUrl: './listado-bancos.component.css'
 })
@@ -33,10 +34,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   actual_role: string = '';
-  cols = [
-    { field: 'name', title: 'Nombre' },
-    { field: 'action', title: 'Acciones', sort: false, filter: false }
-  ];
+
   bancos: any[] = [];
 
   bancoForm!: FormGroup;
@@ -57,7 +55,9 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   filtros: any = {};
   MIN_FILTER_SIZE = 1;
   showFilter: boolean = false;
-  sortDirection: 'asc' | 'desc' = 'desc';
+  sortDirection: 'asc' | 'desc' = 'asc';
+  iconArrowUp = faArrowUp;
+  iconArrowDown = faArrowDown;
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalBanco') modalBanco!: NgxCustomModalComponent;
@@ -120,8 +120,6 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
           this.spinner.hide();
           this.bancos = res.data;
           this.modificarPaginacion(res);
-          // this.total_rows = res.meta.total;
-          // this.params.last_page = res.meta.last_page;
         },
         error: error => {
           this.spinner.hide();
@@ -150,19 +148,6 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
-
-  // changeServer(data: any) {
-    // console.log(data);
-    // this.params.current_page = data.current_page;
-    // this.params.pagesize = data.pagesize;
-    // if (data.change_type === 'filter') {
-    //   this.obtenerBancosConFiltro(data.pagesize, data.column_filters[0].value);
-    // } else if (data.change_type === 'sort') {
-    //   this.obtenerBancosConOrden(data.pagesize, data.sort_column, data.sort_direction);
-    // } else {
-    //   this.obtenerBancos(data.pagesize, data.current_page);
-    // }
-  // }
 
   openModalNuevoBanco(type: string, banco?: any) {
     if (type === 'NEW') {
@@ -291,9 +276,6 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
 
 
   cambiarPaginacion(type: string, currentPage: number) {
-    // console.log(data);
-    // this.params.current_page = data.current_page;
-    // this.params.pagesize = data.pagesize;
     this.currentPage = currentPage;
     if (type === 'filter') {
       this.obtenerBancosConFiltro(this.itemsPerPage, this.filtros.name);

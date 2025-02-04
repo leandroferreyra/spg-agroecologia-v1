@@ -234,7 +234,6 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
     }
   }
 
-
   obtenerPaisesConOrden(paging: number, column: string, direction: string) {
     this.subscription.add(
       this._catalogoService.getPaisesWithOrder(paging, column, direction).subscribe({

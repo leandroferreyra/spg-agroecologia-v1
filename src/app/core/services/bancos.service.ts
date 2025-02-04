@@ -19,9 +19,13 @@ export class BancosService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams();
     if (page) {
-      params = params.append('paging', paging).append('page', page).append('actual_role', rol).append('with []', 'bank_accounts.currency');
+      params = params.append('paging', paging).append('page', page).append('actual_role', rol).append('with []', 'bank_accounts.currency')
+        .append('order_by[0][]', 'name')
+        .append('order_by[0][]', 'ASC');
     } else {
-      params = params.append('paging', paging).append('actual_role', rol).append('with []', 'bank_accounts.currency');
+      params = params.append('paging', paging).append('actual_role', rol).append('with []', 'bank_accounts.currency')
+        .append('order_by[0][]', 'name')
+        .append('order_by[0][]', 'ASC');;
     }
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
   }
