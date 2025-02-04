@@ -94,12 +94,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.userService.getUser(this.actual_role, this.usuarioLogueado.uuid).subscribe({
         next: res => {
-          console.log(res);
+          // console.log(res);
           this.usuarioLogueado = res.data;
           this.dataLoaded = true;
           this.inicializarForm();
           this._tokenService.setToken(res.token);
-          console.log(this.usuarioLogueado);
           this.obtenerCatalogos();
         },
         error: error => {
@@ -119,7 +118,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       // tiposDocumento: this._catalogService.getDocumentos(),
     }).subscribe({
       next: res => {
-        console.log(res);
+        // console.log(res);
         this.generos = res.generos.data;
         this.paises = res.paises.data;
         this.provincias = res.provincias.data.districts;
@@ -351,7 +350,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this.authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
             next: res => {
-              console.log(res);
+              // console.log(res);
               this.spinner.hide();
               this.closeModalCambioClave();
               this._tokenService.setToken(res.token);

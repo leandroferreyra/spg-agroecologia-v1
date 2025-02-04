@@ -21,7 +21,6 @@ export class TokenService {
 
   public getToken() {
     const token = localStorage.getItem(TOKEN);
-    console.log('[TokenService] Obteniendo token:', token ? 'Existe' : 'No existe');
     return token;
   }
 
