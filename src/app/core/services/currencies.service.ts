@@ -19,21 +19,35 @@ export class CurrenciesService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams();
     if (page) {
-      params = params.append('paging', paging).append('page', page).append('actual_role', rol);
+      params = params.append('paging', paging).append('page', page).append('actual_role', rol).append('order_by[0][]', 'name')
+        .append('order_by[0][]', 'ASC');
     } else {
-      params = params.append('paging', paging).append('actual_role', rol);
+      params = params.append('paging', paging).append('actual_role', rol).append('order_by[0][]', 'name')
+        .append('order_by[0][]', 'ASC');
     }
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
   }
 
-  getCurrenciesWithNameFilter(rol: string, paging: number, filter: string) {
+  getCurrenciesWithFilter(rol: string, paging: number, filtros: any) {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams()
       .append('actual_role', rol)
-      .append('paging', paging)
-      .append('filters[0][]', 'name')
-      .append('filters[0][]', 'LIKE')
-      .append(`filters[0][]`, `%${filter}%`)
+      .append('paging', paging);
+
+    // Convertir los filtros dinámicamente en `filters[n][]`
+    let filterIndex = 0;
+    for (const key in filtros) {
+      if (filtros[key]) { // Solo agregar filtros con valores definidos
+        params = params
+          .append(`filters[${filterIndex}][]`, key) // Nombre del campo (name, symbol, etc.)
+          .append(`filters[${filterIndex}][]`, 'LIKE') // Condición de filtrado
+          .append(`filters[${filterIndex}][]`, `%${filtros[key]}%`); // Valor del filtro
+        filterIndex++;
+      }
+    }
+    // .append('filters[0][]', rowFilterName)
+    // .append('filters[0][]', 'LIKE')
+    // .append(`filters[0][]`, `%${filter}%`)
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
   }
 

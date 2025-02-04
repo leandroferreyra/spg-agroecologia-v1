@@ -16,12 +16,17 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-listado-monedas',
   standalone: true,
-  imports: [CommonModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule, DataTableModule, 
-    NgxSpinnerModule, NgxTippyModule, IconPencilComponent, IconPlusComponent, IconTrashLinesComponent],
+  imports: [CommonModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule, DataTableModule,
+    NgxSpinnerModule, NgxTippyModule, IconPencilComponent, IconPlusComponent, IconTrashLinesComponent,
+    FontAwesomeModule, IconSearchComponent, NgbPagination],
   templateUrl: './listado-monedas.component.html',
   styleUrl: './listado-monedas.component.css'
 })
@@ -31,23 +36,25 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   actual_role: string = '';
-  search = '';
-  cols = [
-    { field: 'name', title: 'Nombre' },
-    { field: 'symbol', title: 'Símbolo' },
-    { field: 'action', title: 'Acciones', sort: false }
-  ];
+
   monedas: any[] = [];
 
-  // Paginacion
-  paginationInfo: string = 'Mostrando del {0} al {1} de un total de {2} elementos';
-  params = {
-    current_page: 1,
-    pagesize: 10,
-    last_page: 0
-  };
+  //Paginación
+  MAX_ITEMS_PER_PAGE = 10;
+  currentPage = 1;
+  last_page = 1;
+  itemsPerPage = this.MAX_ITEMS_PER_PAGE;
+  itemsInPage = this.itemsPerPage;
+  pageSize: number = 0;
   total_rows: number = 0;
-  pageSizeOptions = [5, 10, 20, 30, 50, 100];
+
+  // Orden y filtro
+  filtros: any = {};
+  MIN_FILTER_SIZE = 1;
+  showFilter: boolean = false;
+  sortDirections: { [key: string]: 'asc' | 'desc' } = {}; // Estado de orden por columna
+  iconArrowUp = faArrowUp;
+  iconArrowDown = faArrowDown;
 
   monedaForm!: FormGroup;
   tituloModal: string = '';
@@ -78,7 +85,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerMonedas(this.params.pagesize);
+    this.obtenerMonedas(this.itemsPerPage);
   }
 
   obtenerMonedas(paging: number, page?: number) {
@@ -87,8 +94,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
         next: res => {
           console.log(res);
           this.monedas = res.data;
-          this.total_rows = res.meta.total;
-          this.params.last_page = res.meta.last_page;
+          this.modificarPaginacion(res);
           this.spinner.hide();
         },
         error: error => {
@@ -133,7 +139,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._currencyService.deleteCurrency(moneda.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerMonedas(this.params.pagesize, this.params.current_page);
+          this.obtenerMonedas(this.itemsPerPage, this.currentPage);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -187,7 +193,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
           this._currencyService.saveCurrency(moneda).subscribe({
             next: res => {
               // Esto es para evitar un llamado cada vez que agrega.
-              if (this.params.current_page === this.params.last_page) {
+              if (this.currentPage === this.last_page) {
                 this.monedas = [...this.monedas, res.data];
               }
               this.total_rows += 1;
@@ -232,26 +238,24 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
     }
   }
 
-  changeServer(data: any) {
-    console.log(data);
-    this.params.current_page = data.current_page;
-    this.params.pagesize = data.pagesize;
-    if (data.change_type === 'search') {
-      this.obtenerMonedasWithNameFilter(data.pagesize, data.search);
-    } else if (data.change_type === 'sort') {
-      this.obtenerMonedasWithOrder(data.pagesize, data.sort_column, data.sort_direction);
+  cambiarPaginacion(type: string, currentPage: number, sortColumn?: string) {
+    this.currentPage = currentPage;
+    if (type === 'filter') {
+      this.obtenerMonedasWithFilter(this.itemsPerPage, this.filtros);
+    } else if (type === 'sort') {
+      this.sortDirections[sortColumn!] = this.sortDirections[sortColumn!] === 'asc' ? 'desc' : 'asc';
+      this.obtenerMonedasWithOrder(this.itemsPerPage, sortColumn!, this.sortDirections[sortColumn!]);
     } else {
-      this.obtenerMonedas(data.pagesize, data.current_page);
+      this.obtenerMonedas(this.itemsPerPage, currentPage);
     }
   }
 
-  obtenerMonedasWithNameFilter(paging: number, filter: string) {
+  obtenerMonedasWithFilter(paging: number, filtros: any) {
     this.subscription.add(
-      this._currencyService.getCurrenciesWithNameFilter(this.actual_role, paging, filter).subscribe({
+      this._currencyService.getCurrenciesWithFilter(this.actual_role, paging, filtros).subscribe({
         next: res => {
           this.monedas = res.data;
-          this.total_rows = res.meta.total;
-          this.params.last_page = res.meta.last_page;
+          this.modificarPaginacion(res);
           this.spinner.hide();
         },
         error: error => {
@@ -267,8 +271,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
       this._currencyService.getCurrenciesWithOrder(this.actual_role, paging, column, direction).subscribe({
         next: res => {
           this.monedas = res.data;
-          this.total_rows = res.meta.total;
-          this.params.last_page = res.meta.last_page;
+          this.modificarPaginacion(res);
           this.spinner.hide();
         },
         error: error => {
@@ -277,6 +280,26 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  modificarPaginacion(res: any) {
+    this.total_rows = res.meta.total;
+    this.last_page = res.meta.last_page;
+    if (this.monedas.length <= this.itemsPerPage) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage = this.total_rows;
+      } else {
+        this.itemsInPage = this.currentPage * this.itemsPerPage;
+      }
+    }
+  }
+
+
+  toggleFilter() {
+    this.showFilter = !this.showFilter;
+    if (!this.showFilter) {
+      this.filtros = {};
+    }
   }
 
 }
