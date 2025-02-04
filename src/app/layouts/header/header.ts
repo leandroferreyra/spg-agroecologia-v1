@@ -119,14 +119,30 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     cerrarSesion() {
+        console.log('[HeaderComponent] Iniciando cierre de sesión');
+        this.spinner.show();  // Mostrar spinner al inicio
+        
         this._authService.logout().subscribe({
             next: res => {
+                console.log('[HeaderComponent] Logout exitoso, limpiando datos');
                 this._tokenService.logout();
                 this._userLogged.clearUsuarioLogueado();
-                this.router.navigate(['/auth/boxed-signin']);
+                this.storeData.dispatch({ type: 'setUserRole', payload: '' }); // Limpiar el rol en el store
+                
+                console.log('[HeaderComponent] Redirigiendo a login');
+                this.spinner.hide();  // Ocultar spinner antes de navegar
+                
+                // Usar timeout para asegurar que la navegación ocurra después de la limpieza
+                setTimeout(() => {
+                    this.router.navigate(['/auth/boxed-signin'], { 
+                        replaceUrl: true  // Reemplazar la entrada en el historial
+                    });
+                }, 100);
             },
             error: error => {
-                console.error(error);
+                console.error('[HeaderComponent] Error en logout:', error);
+                this.spinner.hide();  // Asegurar que el spinner se oculte en caso de error
+                this.swalService.toastError('top-right', 'Error al cerrar sesión');
             }
         });
     }
