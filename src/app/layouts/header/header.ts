@@ -119,6 +119,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     cerrarSesion() {
+        this.spinner.show();  // Mostrar spinner al inicio
         this._authService.logout().subscribe({
             next: res => {
                 this._tokenService.logout();

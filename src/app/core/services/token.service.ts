@@ -20,7 +20,9 @@ export class TokenService {
   }
 
   public getToken() {
-    return localStorage.getItem(TOKEN);
+    const token = localStorage.getItem(TOKEN);
+    console.log('[TokenService] Obteniendo token:', token ? 'Existe' : 'No existe');
+    return token;
   }
 
   public setUsuario(usuario: string) {
@@ -48,7 +50,9 @@ export class TokenService {
   }
 
   public logout() {
+    console.log('[TokenService] Limpiando localStorage');
     localStorage.clear();
+    console.log('[TokenService] Estado del token después de limpiar:', this.getToken());
   }
 
   public isTokenExpired(token: string): boolean {

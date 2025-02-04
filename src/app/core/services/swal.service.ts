@@ -17,7 +17,7 @@ export class SwalService {
       icon: "success",
       title: message,
       showConfirmButton: false,
-      timer: 1500
+      timer: 2000
     });
   }
 
@@ -29,7 +29,7 @@ export class SwalService {
       icon: "error",
       title: message,
       showConfirmButton: false,
-      timer: 1500
+      timer: 2000
     });
   }
 
