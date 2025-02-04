@@ -20,8 +20,8 @@ export class AppComponent {
         private activatedRoute: ActivatedRoute,
         private titleService: Title,
     ) {
-        console.log('[AppComponent] Constructor iniciado');
-        console.log('[AppComponent] Ruta actual:', this.router.url);
+        // console.log('[AppComponent] Constructor iniciado');
+        // console.log('[AppComponent] Ruta actual:', this.router.url);
         // this.router.events
         //     .pipe(
         //         filter((event) => event instanceof NavigationEnd),

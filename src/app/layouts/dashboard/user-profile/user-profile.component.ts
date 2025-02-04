@@ -21,6 +21,7 @@ import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
 import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
 import { IconLockComponent } from 'src/app/shared/icon/icon-lock';
 import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
+import { HumanService } from 'src/app/core/services/human.service';
 
 
 @Component({
@@ -72,7 +73,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private _userLogged: UserLoggedService, private userService: UserService,
     private _tokenService: TokenService, private spinner: NgxSpinnerService, private _catalogService: CatalogoService,
-    private authService: AuthService, private router: Router, private swalService: SwalService
+    private authService: AuthService, private router: Router, private swalService: SwalService, private humanService: HumanService
   ) {
     this.initStore();
   }
@@ -247,7 +248,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let registro = this.armarDTORegistro();
       this.subscription.add(
-        this.userService.updateUser(this.usuarioLogueado.uuid, registro).subscribe({
+        this.humanService.updateHuman(this.usuarioLogueado.uuid, registro).subscribe({
           next: res => {
             console.log(res);
             this._tokenService.setToken(res.token);
@@ -274,16 +275,16 @@ export class UserProfileComponent implements OnInit, OnDestroy {
               });
             }
             this.spinner.hide();
-            this.usuarioLogueado.human.firstname = registro.firstname;
-            this.usuarioLogueado.human.lastname = registro.lastname;
+            this.usuarioLogueado.human.firstname = res.data.human.firstname;
+            this.usuarioLogueado.human.lastname = res.data.human.lastname;
             // this.usuarioLogueado.document_number = registro.document_number;
             // this.usuarioLogueado.document_type.uuid = registro.document_type_uuid;
-            this.usuarioLogueado.human.gender.uuid = registro.gender_uuid;
-            this.usuarioLogueado.human.person.city.uuid = registro.city_uuid;
-            this.usuarioLogueado.human.person.address_detail = registro.address_detail;
-            this.usuarioLogueado.human.person.door_number = registro.door_number;
-            this.usuarioLogueado.human.person.street_name = registro.street_name;
-            this.usuarioLogueado.human.person.city.district.country.uuid = this.userForm.get('pais')?.value;
+            this.usuarioLogueado.human.gender.uuid = res.data.human.gender.uuid;
+            this.usuarioLogueado.human.person.city.uuid = res.data.human.person.city.uuid;;
+            this.usuarioLogueado.human.person.address_detail = res.data.human.person.address_detail;
+            this.usuarioLogueado.human.person.door_number = res.data.human.person.door_number;
+            this.usuarioLogueado.human.person.street_name = res.data.human.person.street_name;
+            this.usuarioLogueado.human.person.city.district.country.uuid = res.data.human.person.city.district.country.uuid;
             // let roles = res.data?.roles;
             // this.usuarioLogueado.roles = [];
             // roles.forEach((element: string) => {
@@ -310,7 +311,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   armarDTORegistro() {
     let registro = new RegistroDTO();
     registro.actual_role = this.actual_role;
-    registro.with = ["roles", "human.gender"]
+    registro.with = ["roles", "permissions", "human.gender", "human.person", 'human.person.city', 'human.person.city.district', 'human.person.city.district.country'];
     registro.email = this.userForm.get('email')?.value;
     registro.user_name = this.userForm.get('usuario')?.value;
     registro.firstname = this.userForm.get('nombres')?.value;

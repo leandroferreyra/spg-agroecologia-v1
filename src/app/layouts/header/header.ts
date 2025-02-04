@@ -63,23 +63,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
         public router: Router, private spinner: NgxSpinnerService, private swalService: SwalService,
         public _authService: AuthService, public _tokenService: TokenService, public _userLogged: UserLoggedService
     ) {
-        console.log('[HeaderComponent] Constructor iniciado');
+        // console.log('[HeaderComponent] Constructor iniciado');
         this.initStore();
         this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
-        console.log('[HeaderComponent] Usuario logueado:', this.usuarioLogueado);
+        // console.log('[HeaderComponent] Usuario logueado:', this.usuarioLogueado);
         
         if (this.usuarioLogueado) {
             const userRole = localStorage.getItem('userRole');
-            console.log('[HeaderComponent] Dispatching setUserRole with:', userRole);
+            // console.log('[HeaderComponent] Dispatching setUserRole with:', userRole);
             this.storeData.dispatch({ type: 'setUserRole', payload: userRole });
         }
     }
     async initStore() {
-        console.log('[HeaderComponent] initStore iniciado');
+        // console.log('[HeaderComponent] initStore iniciado');
         this.storeData
             .select((d) => d.index)
             .subscribe((d) => {
-                console.log('[HeaderComponent] Store actualizado:', d);
+                // console.log('[HeaderComponent] Store actualizado:', d);
                 this.store = d;
                 this.menuItems = this.store.menuItems;
                 this.actual_role = this.store.userRole;

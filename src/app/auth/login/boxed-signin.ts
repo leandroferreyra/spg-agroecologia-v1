@@ -59,7 +59,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         private _tokenService: TokenService,
         private _userLogged: UserLoggedService, private swalService: SwalService
     ) {
-        console.log('[BoxedSignin] Constructor iniciado');
+        // console.log('[BoxedSignin] Constructor iniciado');
         this.initStore();
     }
     async initStore() {
@@ -71,9 +71,9 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        console.log('[BoxedSignin] ngOnInit iniciado');
+        // console.log('[BoxedSignin] ngOnInit iniciado');
         if (this._tokenService.getToken()) {
-            console.log('[BoxedSignin] Token encontrado, redirigiendo a dashboard');
+            // console.log('[BoxedSignin] Token encontrado, redirigiendo a dashboard');
             this.router.navigate(['/dashboard/user-profile']);
         }
         this.inicializarForm();
@@ -91,7 +91,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     }
 
     iniciarSesion() {
-        console.log('[BoxedSignin] Iniciando submit del formulario');
+        // console.log('[BoxedSignin] Iniciando submit del formulario');
         this.isSubmitLogin = true;
         if (this.loginForm.valid) {
             this._spinner.show();

@@ -36,7 +36,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: () => {
         return () => {
-          console.log('[AppConfig] Inicializando aplicación');
+          // console.log('[AppConfig] Inicializando aplicación');
         };
       },
       multi: true
@@ -44,4 +44,4 @@ export const appConfig: ApplicationConfig = {
   ]
 };
 
-console.log('[AppConfig] Configuración cargada');
+// console.log('[AppConfig] Configuración cargada');

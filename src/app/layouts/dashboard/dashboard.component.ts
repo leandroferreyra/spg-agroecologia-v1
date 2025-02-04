@@ -22,7 +22,7 @@ export class DashboardComponent {
     }
     headerClass = '';
     ngOnInit() {
-        console.log('dashboard');
+        // console.log('dashboard');
         this.initAnimation();
         this.toggleLoader();
         window.addEventListener('scroll', () => {
@@ -35,7 +35,7 @@ export class DashboardComponent {
     }
 
     ngOnDestroy() {
-        console.log('dashboard destroy');
+        // console.log('dashboard destroy');
         window.removeEventListener('scroll', () => {});
     }
 
