@@ -19,12 +19,14 @@ import Swal from 'sweetalert2';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 
 @Component({
   selector: 'app-listado-paises',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
-    NgxTippyModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, FontAwesomeModule, NgbPagination
+    NgxTippyModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, FontAwesomeModule, NgbPagination,
+    IconSearchComponent
   ],
   templateUrl: './listado-paises.component.html',
   styleUrl: './listado-paises.component.css'
@@ -199,6 +201,9 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
               if (this.currentPage === this.last_page) {
                 this.paises = [...this.paises, res.data];
               }
+              if (this.itemsInPage < this.MAX_ITEMS_PER_PAGE) {
+                this.itemsInPage += 1;
+              }
               this.total_rows += 1;
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
@@ -285,5 +290,13 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
       })
     )
   }
+
+  toggleFilter() {
+    this.showFilter = !this.showFilter;
+    if (!this.showFilter) {
+      this.filtros = {};
+    }
+  }
+
 
 }

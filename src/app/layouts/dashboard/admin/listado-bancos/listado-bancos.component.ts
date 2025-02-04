@@ -182,6 +182,9 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
               if (this.currentPage === this.last_page) {
                 this.bancos = [...this.bancos, res.data];
               }
+              if (this.itemsInPage < this.MAX_ITEMS_PER_PAGE) {
+                this.itemsInPage += 1;
+              }
               this.total_rows += 1;
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
