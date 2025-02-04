@@ -10,10 +10,10 @@ export const routes: Routes = [
     {
         path: 'auth',
         loadChildren: () => import('./auth/auth.routes').then(m => m.AUTH_ROUTES),
-        canActivate: [LoginGuard]
     },
     {
         path: 'dashboard',
         loadChildren: () => import('./layouts/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES),
+        canActivate: [LoginGuard]
     }
 ];
