@@ -74,7 +74,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         console.log('[BoxedSignin] ngOnInit iniciado');
         if (this._tokenService.getToken()) {
             console.log('[BoxedSignin] Token encontrado, redirigiendo a dashboard');
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/dashboard/user-profile']);
         }
         this.inicializarForm();
     }

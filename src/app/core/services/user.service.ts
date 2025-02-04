@@ -14,6 +14,21 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
+
+  getUsers(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .append('actual_role', rol)
+      .append('with[]', 'human.person.city')
+      .append('with[]', 'human.person.city.district')
+      .append('with[]', 'human.person.city.district.country')
+      .append('with[]', 'human.gender')
+      .append('with[]', 'roles')
+      .append('with[]', 'permissions');
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiUser, { headers, params });
+  }
+
+
   getUser(rol: string, uuid: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
@@ -22,7 +37,8 @@ export class UserService {
       .append('with[]', 'human.person.city.district')
       .append('with[]', 'human.person.city.district.country')
       .append('with[]', 'human.gender')
-      .append('with[]', 'roles');
+      .append('with[]', 'roles')
+      .append('with[]', 'permissions');
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiUser + "/" + uuid, { headers, params });
   }
 

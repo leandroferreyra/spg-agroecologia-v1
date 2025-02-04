@@ -34,3 +34,7 @@
 .ng-select.ng-select-disabled>.ng-select-container .ng-clear-wrapper {
     display: none !important;
 }
+
+/* button.ng-star-inserted {
+    display: none !important;
+} */

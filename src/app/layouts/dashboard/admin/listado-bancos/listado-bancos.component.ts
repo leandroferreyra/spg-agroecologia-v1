@@ -31,10 +31,10 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   actual_role: string = '';
-  search = '';
+  // search = '';
   cols = [
     { field: 'name', title: 'Nombre' },
-    { field: 'action', title: 'Acciones', sort: false }
+    { field: 'action', title: 'Acciones', sort: false, filter: false }
   ];
   bancos: any[] = [];
 
@@ -135,10 +135,11 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   }
 
   changeServer(data: any) {
+    console.log(data);
     this.params.current_page = data.current_page;
     this.params.pagesize = data.pagesize;
-    if (data.change_type === 'search') {
-      this.obtenerBancosConFiltro(data.pagesize, data.search);
+    if (data.change_type === 'filter') {
+      this.obtenerBancosConFiltro(data.pagesize, data.column_filters[0].value);
     } else if (data.change_type === 'sort') {
       this.obtenerBancosConOrden(data.pagesize, data.sort_column, data.sort_direction);
     } else {

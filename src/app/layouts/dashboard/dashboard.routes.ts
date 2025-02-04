@@ -45,6 +45,11 @@ export const DASHBOARD_ROUTES: Routes = [
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
+                path: 'usuarios',
+                loadComponent: () => import('./admin/listado-usuarios/listado-usuarios.component').then(m => m.ListadoUsuariosComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['SUPER_ADMIN', 'ADMIN'] }
+            },
+            {
                 path: 'produccion',
                 loadComponent: () => import('../dashboard/produccion/produccion/produccion.component').then(m => m.ProduccionComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'] }

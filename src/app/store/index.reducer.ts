@@ -87,6 +87,7 @@ function getMenuByRole(role: string) {
                 { label: 'Equipos', route: '/settings' },
                 {
                     label: 'Configuraciones', route: '', submenu: [
+                        { label: 'Usuarios', route: 'usuarios' },
                         { label: 'Bancos', route: 'bancos' },
                         { label: 'Países', route: 'paises' },
                         { label: 'Provincias', route: 'provincias' },

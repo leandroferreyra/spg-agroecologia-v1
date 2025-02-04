@@ -274,8 +274,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
               });
             }
             this.spinner.hide();
-            this.usuarioLogueado.firstname = registro.firstname;
-            this.usuarioLogueado.lastname = registro.lastname;
+            this.usuarioLogueado.human.firstname = registro.firstname;
+            this.usuarioLogueado.human.lastname = registro.lastname;
             // this.usuarioLogueado.document_number = registro.document_number;
             // this.usuarioLogueado.document_type.uuid = registro.document_type_uuid;
             this.usuarioLogueado.human.gender.uuid = registro.gender_uuid;
