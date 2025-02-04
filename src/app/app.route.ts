@@ -3,12 +3,14 @@ import { LoginGuard } from './core/guards/loginGuard';
 
 export const routes: Routes = [
     {
-        path: '', redirectTo: 'auth/boxed-signin', pathMatch: 'full'
+        path: '',
+        redirectTo: 'auth/boxed-signin',
+        pathMatch: 'full'
     },
     {
         path: 'auth',
         loadChildren: () => import('./auth/auth.routes').then(m => m.AUTH_ROUTES),
-        canActivateChild: [LoginGuard]
+        canActivate: [LoginGuard]
     },
     {
         path: 'dashboard',

@@ -6,11 +6,11 @@ export const LoginGuard = () => {
     const router = inject(Router);
 
     if (localStorage.getItem('token')) {
-        console.log('[LoginGuard] Token encontrado, permitiendo acceso');
-        return true;
-    } else {
-        console.log('[LoginGuard] Token no encontrado, redirigiendo a login');
-        router.navigate(['auth/boxed-signin']);
+        console.log('[LoginGuard] Token encontrado, redirigiendo a dashboard');
+        router.navigate(['/dashboard']);
         return false;
+    } else {
+        console.log('[LoginGuard] Token no encontrado, permitiendo acceso a login');
+        return true;
     }
 }
