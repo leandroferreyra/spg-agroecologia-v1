@@ -34,20 +34,16 @@ export class CurrenciesService {
       .append('actual_role', rol)
       .append('paging', paging);
 
-    // Convertir los filtros dinámicamente en `filters[n][]`
     let filterIndex = 0;
     for (const key in filtros) {
-      if (filtros[key]) { // Solo agregar filtros con valores definidos
+      if (filtros[key]) { 
         params = params
           .append(`filters[${filterIndex}][]`, key) // Nombre del campo (name, symbol, etc.)
-          .append(`filters[${filterIndex}][]`, 'LIKE') // Condición de filtrado
+          .append(`filters[${filterIndex}][]`, 'LIKE')
           .append(`filters[${filterIndex}][]`, `%${filtros[key]}%`); // Valor del filtro
         filterIndex++;
       }
     }
-    // .append('filters[0][]', rowFilterName)
-    // .append('filters[0][]', 'LIKE')
-    // .append(`filters[0][]`, `%${filter}%`)
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
   }
 

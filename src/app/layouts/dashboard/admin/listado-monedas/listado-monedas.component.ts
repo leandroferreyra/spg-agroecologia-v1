@@ -52,7 +52,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   filtros: any = {};
   MIN_FILTER_SIZE = 1;
   showFilter: boolean = false;
-  sortDirections: { [key: string]: 'asc' | 'desc' } = {}; // Estado de orden por columna
+  sortDirections: { [key: string]: 'asc' | 'desc' } = {};
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
@@ -86,6 +86,14 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.obtenerMonedas(this.itemsPerPage);
+    this.initializeSortDirections(['name', 'symbol']);
+  }
+
+  initializeSortDirections(columns: string[]) {
+    this.sortDirections = columns.reduce((acc, column) => {
+      acc[column] = 'asc';
+      return acc;
+    }, {} as { [key: string]: 'asc' | 'desc' });
   }
 
   obtenerMonedas(paging: number, page?: number) {
@@ -299,6 +307,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {};
+      this.obtenerMonedas(this.itemsPerPage);
     }
   }
 

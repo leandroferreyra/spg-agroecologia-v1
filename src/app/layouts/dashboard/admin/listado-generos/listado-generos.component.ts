@@ -247,6 +247,7 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {};
+      this.obtenerGeneros(this.itemsPerPage);
     }
   }
 

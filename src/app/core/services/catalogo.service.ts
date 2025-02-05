@@ -57,7 +57,8 @@ export class CatalogoService {
 
   getPaises(): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers });
+    let params = new HttpParams().append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
   }
 
   getPaisesWithPaging(paging: number, page?: number): Observable<AuthResponse> {
@@ -105,6 +106,16 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
   }
 
+  getProvinciasWithOrder(paging: number, column: string, direction: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams()
+      .append('paging', paging)
+      .append('order_by[0][]', column)
+      .append('order_by[0][]', direction)
+      .append('with[]', 'country')
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
+  }
+
   getProvinciasByCountry(idPais: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     const params = new HttpParams()
@@ -143,23 +154,52 @@ export class CatalogoService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     let params = new HttpParams();
     if (page) {
-      params = params.append('paging', paging).append('page', page).append('with[]', 'country');
+      params = params.append('paging', paging).append('page', page).append('with[]', 'country').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
     } else {
-      params = params.append('paging', paging).append('with[]', 'country');
+      params = params.append('paging', paging).append('with[]', 'country').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
     }
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
   }
 
-  getProvinciasWithNameFilter(paging: number, filter: string): Observable<AuthResponse> {
+  // getProvinciasWithNameFilter(paging: number, filter: string): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams();
+  //   params = params.append('paging', paging)
+  //     .append('filters[0][]', 'name')
+  //     .append('filters[0][]', 'LIKE')
+  //     .append(`filters[0][]`, `%${filter}%`)
+  //     .append('with[]', 'country');
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
+  // }
+
+  getProvinciasWithFilter(paging: number, filtros: any) {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams();
-    params = params.append('paging', paging)
-      .append('filters[0][]', 'name')
-      .append('filters[0][]', 'LIKE')
-      .append(`filters[0][]`, `%${filter}%`)
-      .append('with[]', 'country');
+    let params = new HttpParams().append('paging', paging).append('with[]', 'country');
+
+    let filterIndex = 0;
+
+    // Función recursiva para aplanar los filtros anidados
+    const flattenFilters = (obj: any, prefix = '') => {
+      for (const key in obj) {
+        if (obj[key] && typeof obj[key] === 'object') {
+          // Si el valor es un objeto, concatenamos el prefijo y seguimos recursivamente
+          flattenFilters(obj[key], prefix ? `${prefix}.${key}` : key);
+        } else if (obj[key]) {
+          // Si es un valor, lo agregamos al filtro
+          params = params
+            .append(`filters[${filterIndex}][]`, prefix ? `${prefix}.${key}` : key) // Nombre del campo con el prefijo
+            .append(`filters[${filterIndex}][]`, 'LIKE')
+            .append(`filters[${filterIndex}][]`, `%${obj[key]}%`); // Valor del filtro
+          filterIndex++;
+        }
+      }
+    };
+
+    flattenFilters(filtros); // Llamamos a la función para aplanar los filtros
+
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
   }
+
 
   getPermisos(actual_role: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

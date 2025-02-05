@@ -273,6 +273,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {};
+      this.obtenerBancos(this.itemsPerPage);
     }
   }
 
