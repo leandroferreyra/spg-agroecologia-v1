@@ -47,5 +47,17 @@ export class UserService {
     return this.http.put<AuthResponse>(environment.baseUrl + this.apiUser + '/' + uuid, JSON.stringify(userUpdateDTO), { headers });
   }
 
+  cambiarEstadoUsuario(uuid: string, userUpdateDTO: any): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiUser + '/' + uuid, JSON.stringify(userUpdateDTO), { headers });
+  }
+
+  eliminarUsuario(uuid: string, actual_role: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .append('actual_role', actual_role)
+    return this.http.delete<AuthResponse>(environment.baseUrl + this.apiUser + '/' + uuid, { headers, params });
+  }
+
 
 }

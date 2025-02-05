@@ -30,7 +30,7 @@ export class AuthService {
   private apiLogout = '/logout';
   private apiResetMail = '/password/reset';
   private apiResetPass = '/password/new';
-  // private apiResendMail = '/email/resend';
+  private apiResendMail = '/email/resend';
   private apiVerifyUser = '/email/verify/';
   private apiRegister = '/register';
   private apiChangePassword = '/change_password';
@@ -61,20 +61,16 @@ export class AuthService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiLogout, { headers });
   }
 
-  // sendMail(email: EmailDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetMail, JSON.stringify(email), { headers });
-  // }
 
   sendMail(email: EmailDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetMail, JSON.stringify(email), { headers });
   }
 
-  // reSendMail(email: EmailDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiResendMail, JSON.stringify(email), { headers });
-  // }
+  reSendMail(email: EmailDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiResendMail, JSON.stringify(email), { headers });
+  }
 
   resetPassword(resetPassword: ResetPasswordDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });

@@ -49,9 +49,7 @@ export class TokenService {
   }
 
   public logout() {
-    console.log('[TokenService] Limpiando localStorage');
     localStorage.clear();
-    console.log('[TokenService] Estado del token después de limpiar:', this.getToken());
   }
 
   public isTokenExpired(token: string): boolean {

@@ -1,12 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
+import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
+import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
 import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
+import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
@@ -19,7 +22,8 @@ import Swal from 'sweetalert2';
   selector: 'app-listado-usuarios',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, NgbModule, NgbPaginationModule, FormsModule, ReactiveFormsModule,
-    IconPencilComponent, IconTrashLinesComponent, IconInfoCircleComponent, IconSearchComponent, ArrayToStringPipe, NgxTippyModule],
+    IconPencilComponent, IconTrashLinesComponent, IconInfoCircleComponent, IconSearchComponent, ArrayToStringPipe, NgxTippyModule,
+    NgxCustomModalComponent],
   templateUrl: './listado-usuarios.component.html',
   styleUrl: './listado-usuarios.component.css'
 })
@@ -31,6 +35,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
 
   usuarios: any[] = [];
   usuariosFiltrados: any[] = [];
+  originalCheckedState: boolean = false;
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 10;
@@ -44,8 +49,17 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   MIN_FILTER_SIZE = 1;
   showFilter: boolean = false;
 
+  // Referencia al modal para crear y editar países.
+  @ViewChild('modalUsuarioView') modalUsuarioView!: NgxCustomModalComponent;
+  modalOptions: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: true
+  };
+  usuarioView: any;
+
   constructor(public storeData: Store<any>, private userService: UserService, private spinner: NgxSpinnerService,
-    private tokenService: TokenService
+    private tokenService: TokenService, private swalService: SwalService
   ) {
     this.initStore();
   }
@@ -91,7 +105,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   }
 
   openSwalCambiarEstadoUsuario(user: any, checkboxId: string) {
-    const originalCheckedState = this.isVerified(user);
+    this.originalCheckedState = this.isVerified(user);
     Swal.fire({
       title: '',
       text: '¿Desea habilitar/deshabilitar al usuario?',
@@ -99,41 +113,60 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
       denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
     }).then((result) => {
       const checkbox = document.getElementById(checkboxId) as HTMLInputElement;
       if (result.isConfirmed) {
-        // this.cambiarEstadoUsuario(user);
+        this.cambiarEstadoUsuario(user, checkbox);
       } else if (result.isDenied) {
-        checkbox.checked = originalCheckedState;
+        checkbox.checked = this.originalCheckedState;
       }
     })
   }
 
-  // cambiarEstadoUsuario(user: any) {
-  //   let userUpdateDTO = new RegistroDTO();
-  //   userUpdateDTO.actual_role = this.rolActual.toUpperCase();
-  //   userUpdateDTO.email = user.email;
-  //   if (user.email_verified_at === null) {
-  //     userUpdateDTO.email_verified_at = this.formatDateToYmdHis(new Date());
-  //   } else {
-  //     userUpdateDTO.email_verified_at = null;
-  //   }
-  //   this.spinner.show();
-  //   this.subscription.add(
-  //     this._userService.cambiarEstadoUsuario(user.uuid, userUpdateDTO).subscribe({
-  //       next: res => {
-  //         // console.log(res);
-  //         this._toastr.toastrSuccess(res.message);
-  //         this._tokenService.setToken(res.token);
-  //         this.spinner.hide();
-  //       },
-  //       error: error => {
-  //         this.spinner.hide();
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
+  cambiarEstadoUsuario(user: any, checkbox: any) {
+    let userUpdateDTO = new RegistroDTO();
+    userUpdateDTO.actual_role = this.actual_role;
+    userUpdateDTO.email = user.email;
+    if (user.email_verified_at === null) {
+      userUpdateDTO.email_verified_at = this.formatDateToYmdHis(new Date());
+    } else {
+      userUpdateDTO.email_verified_at = null;
+    }
+    this.spinner.show();
+    this.subscription.add(
+      this.userService.cambiarEstadoUsuario(user.uuid, userUpdateDTO).subscribe({
+        next: res => {
+          console.log(res);
+          this.swalService.toastSuccess('top-right', res.message);
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          this.swalService.toastError('top-right', error.error.message);
+          checkbox.checked = this.originalCheckedState;
+          console.error(error);
+        }
+      })
+    )
+  }
+
+  // Función para formatear Date a Y-m-d H:i:s
+  formatDateToYmdHis(date: Date): string {
+    const pad = (n: number) => n < 10 ? '0' + n : n;
+    return date.getFullYear() + '-' +
+      pad(date.getMonth() + 1) + '-' +
+      pad(date.getDate()) + ' ' +
+      pad(date.getHours()) + ':' +
+      pad(date.getMinutes()) + ':' +
+      pad(date.getSeconds());
+  }
 
   public onPageChange(pageNum: number): void {
     this.currentPage = pageNum;
@@ -189,5 +222,65 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
 
     return resultados;
   }
+
+  openModalUsuarioView(usuario: any) {
+    console.log(usuario);
+    this.usuarioView = usuario;
+    this.modalUsuarioView.options = this.modalOptions;
+    this.modalUsuarioView.open();
+  }
+
+  cerrarModal() {
+    this.modalUsuarioView.close();
+  }
+
+  openSwalEliminar(user: any) {
+    Swal.fire({
+      title: '',
+      text: '¿Desea eliminar el usuario?',
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarUser(user);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+
+  eliminarUser(user: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this.userService.eliminarUsuario(user.uuid, this.actual_role).subscribe({
+        next: res => {
+          this.usuarios = this.usuarios.filter(u => u.uuid !== user.uuid);
+          this.usuariosFiltrados = this.usuarios;
+          this.itemsInPage -= 1;
+          if (this.itemsInPage > this.itemsPerPage * this.currentPage) {
+            this.itemsInPage = this.itemsPerPage * this.currentPage;
+          }
+          this.swalService.toastSuccess('top-right', res.message)
+          this.spinner.hide();
+          this.tokenService.setToken(res.token);
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message)
+          this.spinner.hide();
+          console.error(error);
+        }
+      })
+    )
+  }
+
 
 }

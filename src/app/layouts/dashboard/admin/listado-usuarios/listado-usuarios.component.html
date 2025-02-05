@@ -68,17 +68,13 @@
                         <td>
                             <div class="flex items-center">
                                 <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ver información">
+                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ver información"
+                                        (click)="openModalUsuarioView(data)">
                                         <icon-info-circle />
                                     </button>
                                 </div>
-                                <!-- <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
-                                        <icon-pencil />
-                                    </button>
-                                </div> -->
                                 <div>
-                                    <button type="button" ngxTippy="Eliminar">
+                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                         <icon-trash-lines />
                                     </button>
                                 </div>
@@ -120,6 +116,92 @@
 
 
     </div>
+</div>
+
+
+<div>
+    <ngx-custom-modal #modalUsuarioView class="modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">Datos del usuario</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-12">
+
+                        <form (keydown.enter)="cerrarModal()">
+                            <div class="row mb-3">
+                                <div class="col-6 pr-1">
+                                    <label>Nombre</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" [value]="usuarioView.human.firstname"
+                                            disabled />
+                                    </div>
+                                </div>
+                                <div class="col-6 pr-1">
+                                    <label>Apellido</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" [value]="usuarioView.human.lastname"
+                                            disabled />
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-6 pr-1">
+                                    <label>Email</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" [value]="usuarioView.email" disabled />
+                                    </div>
+                                </div>
+
+                                <div class="col-6 pr-1">
+                                    <label>Usuario</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" [value]="usuarioView.user_name"
+                                            disabled />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-4 pr-1">
+                                    <label>País</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                            [value]="usuarioView.human.person.city.district.country.name" disabled />
+                                    </div>
+                                </div>
+                                <div class="col-4 pr-1">
+                                    <label>Provincia</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                            [value]="usuarioView.human.person.city.district.name" disabled />
+                                    </div>
+                                </div>
+                                <div class="col-4 pr-1">
+                                    <label>Ciudad</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control"
+                                            [value]="usuarioView.human.person.city.name" disabled />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cerrar</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
 </div>
 
 

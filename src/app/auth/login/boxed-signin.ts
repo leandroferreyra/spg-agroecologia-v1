@@ -107,7 +107,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
             this.subscription.add(
                 this._authService.login(login).subscribe({
                     next: res => {
-                        console.log(res);
+                        // console.log(res);
                         this.usuarioLogueado = res.data;
                         this._tokenService.setToken(this.usuarioLogueado.token);
                         this._userLogged.setUsuarioLogueado(this.usuarioLogueado);
@@ -122,8 +122,12 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                         this._spinner.hide();
                     },
                     error: error => {
-                        console.log(error);
-                        this.swalService.toastError('top-right', error.error.message);
+                        if (error.error.message.includes('no fue verificado')) {
+                            this.openSwalResendMailVerificacion(error.error.message);
+                        } else {
+                            console.log(error);
+                            this.swalService.toastError('top-right', error.error.message);
+                        }
                         this._spinner.hide();
                     }
                 })
@@ -131,29 +135,57 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         }
     }
 
+    openSwalResendMailVerificacion(error: string) {
+        Swal.fire({
+            title: error,
+            text: '¿Desea que le reenviemos el email de habilitación de usuario?',
+            icon: 'info',
+            confirmButtonText: 'Enviar',
+            showDenyButton: true,
+            denyButtonText: 'Cancelar',
+            didRender: () => {
+                const cancelButton = Swal.getDenyButton();
+                if (cancelButton) {
+                    cancelButton.setAttribute('id', 'back-button-with-border');
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this._spinner.show();
+                let email = new EmailDTO();
+                if (this.isEmail(this.loginForm.get('usuario')?.value)) {
+                    email.email = this.loginForm.get('usuario')?.value;
+                } else {
+                    email.user_name = this.loginForm.get('usuario')?.value
+                }
+                this.subscription.add(
+                    this._authService.reSendMail(email).subscribe({
+                        next: res => {
+                            this._spinner.hide();
+                            this.showSwalFire("¡Genial!. Se te ha enviado un e-mail a tu casilla de correo electrónico para confirmar tu cuenta. Recordá revisar SPAM.");
+                        },
+                        error: error => {
+                            this._spinner.hide();
+                            console.error(error);
+                        }
+                    }
+                    ));
+            }
+        })
+    }
+
     ingresarAlDashboard(rol: any) {
-        console.log(rol);
         this._authService.cambioRol(rol.name);
-        // localStorage.setItem('userRole', rol.name);
-        // this.storeData.dispatch({ type: 'setUserRole', payload: rol.name });
-        // if (rol.name === Constantes.ADMIN || rol.name === Constantes.ADMINISTRACION) {
-        //     this.router.navigate(['/dashboard/bancos']);
-        // }
-        // if (rol.name === Constantes.PRODUCCION) {
-        //     this.router.navigate(['/dashboard/produccion']);
-        // }
     }
 
     cancelarSeleccionDashboard() {
         this.closeModalSeleccionRol();
     }
 
-
     isEmail(value: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(value);
     }
-
 
     tieneVariosRoles(): boolean {
         return (this.usuarioLogueado.roles.length > 1);
