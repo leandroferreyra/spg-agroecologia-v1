@@ -60,7 +60,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    country: { name: '' }, // Inicializamos para evitar el error
+    district: { name: '' }, // Inicializamos para evitar el error
     name: ''
   };
   MIN_FILTER_SIZE = 1;
@@ -125,6 +125,26 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._catalogoService.getCiudadesWithDistrictsAndPaging(paging, page).subscribe({
         next: res => {
+          console.log(res);
+          this.ciudades = res.data;
+          this.modificarPaginacion(res);
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          console.log(error);
+        }
+      })
+    )
+  }
+
+
+
+  obtenerCiudadesConFiltro(paging: number, filter: string) {
+    this.subscription.add(
+      this._catalogoService.getCiudadesWithFilter(paging, filter).subscribe({
+        next: res => {
+          console.log(res);
           this.ciudades = res.data;
           this.modificarPaginacion(res);
           this.spinner.hide();
@@ -271,13 +291,30 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     }
   }
 
+  obtenerCiudadesConOrden(paging: number, column: string, direction: string) {
+    this.subscription.add(
+      this._catalogoService.getCiudadesWithOrder(paging, column, direction).subscribe({
+        next: res => {
+          console.log(res);
+          this.ciudades = res.data;
+          this.modificarPaginacion(res);
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          console.log(error);
+        }
+      })
+    )
+  }
+
   cambiarPaginacion(type: string, currentPage: number, column?: string) {
     this.currentPage = currentPage;
     if (type === 'filter') {
-      // this.obtenerCiudadesConFiltro(this.itemsPerPage, this.filtros);
+      this.obtenerCiudadesConFiltro(this.itemsPerPage, this.filtros);
     } else if (type === 'sort') {
       this.sortDirections[column!] = this.sortDirections[column!] === 'asc' ? 'desc' : 'asc';
-      // this.obtenerCiudadesConOrden(this.itemsPerPage, column!, this.sortDirections[column!]);
+      this.obtenerCiudadesConOrden(this.itemsPerPage, column!, this.sortDirections[column!]);
     } else {
       this.obtenerCiudades(this.itemsPerPage, currentPage);
     }
@@ -300,7 +337,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        country: { name: '' },
+        district: { name: '' },
         name: ''
       };
       this.obtenerCiudades(this.itemsPerPage);

@@ -134,7 +134,6 @@ export class CatalogoService {
   getCiudadWithProvinciaAndPais(uuidCiudad: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     const params = new HttpParams()
-      .append('with[]', 'district')
       .append('with[]', 'district');
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades + '/' + uuidCiudad, { headers, params });
   }
@@ -147,6 +146,44 @@ export class CatalogoService {
     } else {
       params = params.append('paging', paging).append('with[]', 'district').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
     }
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
+  }
+
+  getCiudadesWithOrder(paging: number, column: string, direction: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams()
+      .append('paging', paging)
+      .append('order_by[0][]', column)
+      .append('order_by[0][]', direction)
+      .append('with[]', 'district')
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
+  }
+
+  getCiudadesWithFilter(paging: number, filtros: any) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams().append('paging', paging).append('with[]', 'district');
+
+    let filterIndex = 0;
+
+    // Función recursiva para aplanar los filtros anidados
+    const flattenFilters = (obj: any, prefix = '') => {
+      for (const key in obj) {
+        if (obj[key] && typeof obj[key] === 'object') {
+          // Si el valor es un objeto, concatenamos el prefijo y seguimos recursivamente
+          flattenFilters(obj[key], prefix ? `${prefix}.${key}` : key);
+        } else if (obj[key]) {
+          // Si es un valor, lo agregamos al filtro
+          params = params
+            .append(`filters[${filterIndex}][]`, prefix ? `${prefix}.${key}` : key) // Nombre del campo con el prefijo
+            .append(`filters[${filterIndex}][]`, 'LIKE')
+            .append(`filters[${filterIndex}][]`, `%${obj[key]}%`); // Valor del filtro
+          filterIndex++;
+        }
+      }
+    };
+
+    flattenFilters(filtros); // Llamamos a la función para aplanar los filtros
+
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
   }
 
@@ -199,6 +236,8 @@ export class CatalogoService {
 
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
   }
+
+
 
 
   getPermisos(actual_role: string): Observable<AuthResponse> {

@@ -28,11 +28,11 @@
             <table class="table-hover">
                 <thead>
                     <tr>
-                        <th style="cursor: pointer;" (click)="cambiarPaginacion('sort',1, 'country.name')">
+                        <th style="cursor: pointer;" (click)="cambiarPaginacion('sort',1, 'district.name')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Provincia
                                 <fa-icon
-                                    [icon]="sortDirections['country.name'] === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                                    [icon]="sortDirections['district.name'] === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
                             </span>
                         </th>
                         <th style="cursor: pointer;" (click)="cambiarPaginacion('sort',1, 'name')">
@@ -51,7 +51,7 @@
                     @if (showFilter) {
                     <tr>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.country.name"
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.district.name"
                                 (input)="cambiarPaginacion('filter',1)" />
                         </td>
                         <td>
