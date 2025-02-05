@@ -8,6 +8,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
+import { Rol } from 'src/app/core/models/response/rol';
 import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
@@ -48,6 +49,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   filtros: any = {};
   MIN_FILTER_SIZE = 1;
   showFilter: boolean = false;
+  selectedRol: string = 'ALL_ROLES';
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalUsuarioView') modalUsuarioView!: NgxCustomModalComponent;
@@ -280,6 +282,24 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  filteredItems() {
+    if (this.selectedRol === 'ALL_ROLES') {
+      this.usuariosFiltrados = this.usuarios;
+    } else if (this.selectedRol === 'NO_ROLE') {
+      this.usuariosFiltrados = this.usuarios.filter(user => user.roles.length === 0);
+    } else {
+      this.usuariosFiltrados = this.usuarios.filter(user =>
+        user.roles.some((role: Rol) => role.name === this.selectedRol)
+      );
+    }
+    this.itemsInPage = Math.min(this.itemsPerPage, this.usuariosFiltrados.length);
+    if (this.currentPage > Math.ceil(this.usuariosFiltrados.length / this.itemsPerPage)) {
+      this.currentPage = 1;
+    }
+
+    this.onPageChange(this.currentPage);
   }
 
 
