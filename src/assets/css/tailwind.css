@@ -358,6 +358,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
 
     .has-error .form-input,
+    .has-error .form-control,
     .has-error .form-textarea,
     .has-error .form-select,
     .has-error .form-multiselect,
@@ -379,6 +380,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
 
     .has-success .form-input,
+    .has-success .form-control,
     .has-success .form-textarea,
     .has-success .form-select,
     .has-success .form-multiselect,

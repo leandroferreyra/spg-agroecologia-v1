@@ -105,7 +105,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
           if (this.usuarios.length <= this.itemsPerPage) {
             this.itemsInPage = this.usuarios.length;
           }
-          console.log(res);
         },
         error: error => {
           this.spinner.hide();
@@ -121,7 +120,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
         next: res => {
           this.tokenService.setToken(res.token);
           this.roles = res.data;
-          console.log(res);
         },
         error: error => {
           console.error(error);
@@ -172,7 +170,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.userService.cambiarEstadoUsuario(user.uuid, userUpdateDTO).subscribe({
         next: res => {
-          console.log(res);
+          (res);
           this.swalService.toastSuccess('top-right', res.message);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
@@ -254,7 +252,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   }
 
   openModalUsuarioView(usuario: any) {
-    console.log(usuario);
     this.usuarioView = usuario;
     this.modalUsuarioView.options = this.modalOptions;
     this.modalUsuarioView.open();
@@ -350,7 +347,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   }
 
   confirmarRoles() {
-    console.log(this.rolesForm);
+    // console.log(this.rolesForm);
     let agregaEstosRoles: string[] = [];
     this.roles.forEach(element => {
       let value = this.rolesForm.get(element.name)?.value;
