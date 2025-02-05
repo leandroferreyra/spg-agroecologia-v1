@@ -143,9 +143,9 @@ export class CatalogoService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     let params = new HttpParams();
     if (page) {
-      params = params.append('paging', paging).append('page', page).append('with[]', 'district');;
+      params = params.append('paging', paging).append('page', page).append('with[]', 'district').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
     } else {
-      params = params.append('paging', paging).append('with[]', 'district');;
+      params = params.append('paging', paging).append('with[]', 'district').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
     }
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
   }

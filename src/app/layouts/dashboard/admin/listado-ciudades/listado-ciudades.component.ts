@@ -9,8 +9,8 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { CiudadDTO } from 'src/app/core/models/request/ciudadDTO';
-import { PaisDTO } from 'src/app/core/models/request/paisDTO';
-import { CatalogoService } from 'src/app/core/services/catalogo.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons'; import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { CiudadService } from 'src/app/core/services/ciudad.service';
 import { PaisesService } from 'src/app/core/services/paises.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -19,12 +19,15 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
+import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-listado-ciudades',
   standalone: true,
-  imports: [CommonModule, NgxTippyModule, NgxCustomModalComponent, NgSelectModule, FormsModule, ReactiveFormsModule, 
-    DataTableModule, NgxSpinnerModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent],
+  imports: [CommonModule, NgxTippyModule, NgxCustomModalComponent, NgSelectModule, FormsModule, ReactiveFormsModule,
+    DataTableModule, NgxSpinnerModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, FontAwesomeModule, IconSearchComponent,
+    NgbPaginationModule],
   templateUrl: './listado-ciudades.component.html',
   styleUrl: './listado-ciudades.component.css'
 })
@@ -34,24 +37,37 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   actual_role: string = '';
-  search = '';
-  cols = [
-    { field: 'district.name', title: 'Provincia' },
-    { field: 'name', title: 'Ciudad' },
-    { field: 'action', title: 'Acciones', sort: false }
-  ];
+  // search = '';
+  // cols = [
+  //   { field: 'district.name', title: 'Provincia' },
+  //   { field: 'name', title: 'Ciudad' },
+  //   { field: 'action', title: 'Acciones', sort: false }
+  // ];
+
+
+
   ciudades: any[] = [];
   provincias: any[] = [];
 
-  // Paginacion
-  paginationInfo: string = 'Mostrando del {0} al {1} de un total de {2} elementos';
-  params = {
-    current_page: 1,
-    pagesize: 10,
-    last_page: 0
-  };
+  //Paginación
+  MAX_ITEMS_PER_PAGE = 10;
+  currentPage = 1;
+  last_page = 1;
+  itemsPerPage = this.MAX_ITEMS_PER_PAGE;
+  itemsInPage = this.itemsPerPage;
+  pageSize: number = 0;
   total_rows: number = 0;
-  pageSizeOptions = [5, 10, 20, 30, 50, 100];
+
+  // Orden y filtro
+  filtros: any = {
+    country: { name: '' }, // Inicializamos para evitar el error
+    name: ''
+  };
+  MIN_FILTER_SIZE = 1;
+  showFilter: boolean = false;
+  sortDirections: { [key: string]: 'asc' | 'desc' } = {};
+  iconArrowUp = faArrowUp;
+  iconArrowDown = faArrowDown;
 
   ciudadForm!: FormGroup;
   tituloModal: string = '';
@@ -82,7 +98,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerCiudades(this.params.pagesize);
+    this.obtenerCiudades(this.itemsPerPage);
     this.subscription.add(
       this._catalogoService.getProvincias().subscribe({
         next: res => {
@@ -94,7 +110,15 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
           this.swalService.toastError('top-right', error.error.message);
         }
       })
-    )
+    );
+    this.initializeSortDirections(['name', 'district.name']);
+  }
+
+  initializeSortDirections(columns: string[]) {
+    this.sortDirections = columns.reduce((acc, column) => {
+      acc[column] = 'asc';
+      return acc;
+    }, {} as { [key: string]: 'asc' | 'desc' });
   }
 
   obtenerCiudades(paging: number, page?: number) {
@@ -102,8 +126,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
       this._catalogoService.getCiudadesWithDistrictsAndPaging(paging, page).subscribe({
         next: res => {
           this.ciudades = res.data;
-          this.total_rows = res.meta.total;
-          this.params.last_page = res.meta.last_page;
+          this.modificarPaginacion(res);
           this.spinner.hide();
         },
         error: error => {
@@ -147,7 +170,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._ciudadServiice.eliminarCiudad(ciudad.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerCiudades(this.params.pagesize, this.params.current_page);
+          this.obtenerCiudades(this.itemsPerPage, this.currentPage);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -203,7 +226,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
           this._ciudadServiice.saveCiudad(ciudad).subscribe({
             next: res => {
               // Esto es para evitar un llamado cada vez que agrega.
-              if (this.params.current_page === this.params.last_page) {
+              if (this.currentPage === this.last_page) {
                 this.ciudades = [...this.ciudades, res.data];
               }
               this.total_rows += 1;
@@ -248,32 +271,40 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     }
   }
 
-  changeServer(data: any) {
-    this.params.current_page = data.current_page;
-    this.params.pagesize = data.pagesize;
-    if (data.change_type === 'search') {
-      // this.obtenerPaisesConFiltro(data.pagesize, data.search);
+  cambiarPaginacion(type: string, currentPage: number, column?: string) {
+    this.currentPage = currentPage;
+    if (type === 'filter') {
+      // this.obtenerCiudadesConFiltro(this.itemsPerPage, this.filtros);
+    } else if (type === 'sort') {
+      this.sortDirections[column!] = this.sortDirections[column!] === 'asc' ? 'desc' : 'asc';
+      // this.obtenerCiudadesConOrden(this.itemsPerPage, column!, this.sortDirections[column!]);
     } else {
-      this.obtenerCiudades(data.pagesize, data.current_page);
+      this.obtenerCiudades(this.itemsPerPage, currentPage);
     }
   }
 
-  // obtenerPaisesConFiltro(paging: number, filter: string) {
-  //   this.subscription.add(
-  //     this._catalogoService.getPaisesWithFilter(paging, filter).subscribe({
-  //       next: res => {
-  //         console.log(res);
-  //         this.paises = res.data;
-  //         this.total_rows = res.meta.total;
-  //         this.params.last_page = res.meta.last_page;
-  //         this.spinner.hide();
-  //       },
-  //       error: error => {
-  //         this.spinner.hide();
-  //         console.log(error);
-  //       }
-  //     })
-  //   )
-  // }
+  modificarPaginacion(res: any) {
+    this.total_rows = res.meta.total;
+    this.last_page = res.meta.last_page;
+    if (this.ciudades.length <= this.itemsPerPage) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage = this.total_rows;
+      } else {
+        this.itemsInPage = this.currentPage * this.itemsPerPage;
+      }
+    }
+  }
+
+  toggleFilter() {
+    console.log(this.filtros);
+    this.showFilter = !this.showFilter;
+    if (!this.showFilter) {
+      this.filtros = {
+        country: { name: '' },
+        name: ''
+      };
+      this.obtenerCiudades(this.itemsPerPage);
+    }
+  }
 
 }

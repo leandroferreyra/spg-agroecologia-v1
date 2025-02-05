@@ -267,16 +267,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     }
   }
 
-  // changeServer(data: any) {
-  //   this.params.current_page = data.current_page;
-  //   this.params.pagesize = data.pagesize;
-  //   if (data.change_type === 'search') {
-  //     this.obtenerProvinciasConFiltro(data.pagesize, data.search);
-  //   } else {
-  //     this.obtenerProvincias(data.pagesize, data.current_page);
-  //   }
-  // }
-
   cambiarPaginacion(type: string, currentPage: number, column?: string) {
     this.currentPage = currentPage;
     if (type === 'filter') {
@@ -334,7 +324,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
       }
     }
   }
-
 
   toggleFilter() {
     console.log(this.filtros);
