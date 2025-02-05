@@ -124,7 +124,8 @@
                                     </button>
                                 </div>
                                 <div>
-                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)"
+                                        [disabled]="data.email === usuarioLogueado.email">
                                         <icon-trash-lines />
                                     </button>
                                 </div>

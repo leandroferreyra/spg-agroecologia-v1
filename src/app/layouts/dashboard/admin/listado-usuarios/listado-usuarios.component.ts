@@ -13,6 +13,7 @@ import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
 import { RolesService } from 'src/app/core/services/roles.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
@@ -39,6 +40,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   usuarios: any[] = [];
   usuariosFiltrados: any[] = [];
   originalCheckedState: boolean = false;
+  usuarioLogueado: any;
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 10;
@@ -73,7 +75,8 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   roles: any[] = [];
 
   constructor(public storeData: Store<any>, private userService: UserService, private spinner: NgxSpinnerService,
-    private tokenService: TokenService, private swalService: SwalService, private rolService: RolesService
+    private tokenService: TokenService, private swalService: SwalService, private rolService: RolesService,
+    private _userLogged: UserLoggedService
   ) {
     this.initStore();
   }
@@ -90,6 +93,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
+    this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.obtenerUsuarios();
     this.obtenerRoles();
   }
