@@ -120,6 +120,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
         next: res => {
           this.tokenService.setToken(res.token);
           this.roles = res.data;
+          console.log(this.roles);
         },
         error: error => {
           console.error(error);
@@ -162,9 +163,9 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     userUpdateDTO.actual_role = this.actual_role;
     userUpdateDTO.email = user.email;
     if (user.email_verified_at === null) {
-      userUpdateDTO.email_verified_at = this.formatDateToYmdHis(new Date());
+      userUpdateDTO.email_verified = true;
     } else {
-      userUpdateDTO.email_verified_at = null;
+      userUpdateDTO.email_verified = false;
     }
     this.spinner.show();
     this.subscription.add(
@@ -185,24 +186,9 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     )
   }
 
-  // Función para formatear Date a Y-m-d H:i:s
-  formatDateToYmdHis(date: Date): string {
-    const pad = (n: number) => n < 10 ? '0' + n : n;
-    return date.getFullYear() + '-' +
-      pad(date.getMonth() + 1) + '-' +
-      pad(date.getDate()) + ' ' +
-      pad(date.getHours()) + ':' +
-      pad(date.getMinutes()) + ':' +
-      pad(date.getSeconds());
-  }
-
   public onPageChange(pageNum: number): void {
     this.currentPage = pageNum;
     this.pageSize = this.itemsPerPage * (pageNum - 1);
-    // this.itemsInPage = pageNum * this.itemsPerPage;
-    // if (this.itemsInPage > this.usuariosFiltrados.length) {
-    //   this.itemsInPage = this.usuariosFiltrados.length;
-    // }
   }
   cambiarPaginacion() {
     this.onPageChange(1);
@@ -363,14 +349,14 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
         this.userService.syncRolesUsuario(this.usuarioInEdicion.uuid, this.actual_role, agregaEstosRoles).subscribe({
           next: res => {
             // console.log(res);
-            let roles = this.convertirRolesEnObject(res.data.roles);
+            let roles = this.convertirRolesEnObject(agregaEstosRoles);
             let usuario = this.usuarios.find(user => user.uuid === this.usuarioInEdicion.uuid);
             usuario.roles = roles; // Le asigno los nuevos roles para que se vea en pantalla.
             this.spinner.hide();
             this.swalService.toastSuccess('top-right', res.message);
             this.tokenService.setToken(res.token);
             this.usuarioInEdicion = null;
-            this.cerrarModal();
+            this.cerrarModalRoles();
           },
           error: error => {
             console.error(error);

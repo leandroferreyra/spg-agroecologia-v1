@@ -14,7 +14,7 @@ export class RegistroDTO {
     address_detail!: string;
     door_number?: string;
     street_name?: boolean;
-    email_verified_at?: any;
+    email_verified?: boolean;
     actual_role!: string;
     hash!: string;
     created_by_admin!: boolean;

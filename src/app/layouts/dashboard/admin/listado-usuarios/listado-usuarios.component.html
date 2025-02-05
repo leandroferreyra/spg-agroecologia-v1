@@ -185,14 +185,14 @@
                                 <div class="col-6 pr-1">
                                     <label>Nombre</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" [value]="usuarioView.human.firstname"
+                                        <input type="text" class="form-control" [value]="usuarioView.human?.firstname"
                                             disabled />
                                     </div>
                                 </div>
                                 <div class="col-6 pr-1">
                                     <label>Apellido</label>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" [value]="usuarioView.human.lastname"
+                                        <input type="text" class="form-control" [value]="usuarioView.human?.lastname"
                                             disabled />
                                     </div>
                                 </div>
@@ -220,21 +220,22 @@
                                     <label>País</label>
                                     <div class="input-group">
                                         <input type="text" class="form-control"
-                                            [value]="usuarioView.human.person.city.district.country.name" disabled />
+                                            [value]="usuarioView.human?.person?.city?.district?.country?.name"
+                                            disabled />
                                     </div>
                                 </div>
                                 <div class="col-4 pr-1">
                                     <label>Provincia</label>
                                     <div class="input-group">
                                         <input type="text" class="form-control"
-                                            [value]="usuarioView.human.person.city.district.name" disabled />
+                                            [value]="usuarioView.human?.person?.city?.district?.name" disabled />
                                     </div>
                                 </div>
                                 <div class="col-4 pr-1">
                                     <label>Ciudad</label>
                                     <div class="input-group">
                                         <input type="text" class="form-control"
-                                            [value]="usuarioView.human.person.city.name" disabled />
+                                            [value]="usuarioView.human?.person?.city?.name" disabled />
                                     </div>
                                 </div>
                             </div>
@@ -264,36 +265,29 @@
         <ng-template #modalBody>
 
             <div class="container">
-                <div class="row justify-content-center mt-5 mb-5">
+                <div class="row justify-content-center mt-5">
 
                     <div class="col-md-12">
-
-                        <h4 class="text-center mt-3">Administración de roles</h4>
 
                         <form [formGroup]="rolesForm">
                             <div class="row">
                                 <div class="col-12 pr-1">
                                     @for(rol of roles ; track rol.id) {
-                                    @if (rol.name !== 'NO_ROLE') {
                                     <div class="form-check form-check-inline" style="justify-content: space-evenly;">
-                                        <label class="form-check-label">{{rol.name}}
-                                            <input class="form-check-input" type="checkbox"
-                                                [formControlName]="rol.name">
-                                            <span class="form-check-sign"></span>
+                                        <label class="form-check-label">
+                                            <input class="form-checkbox" type="checkbox" [formControlName]="rol.name">
+                                            <span class="form-check-sign">{{rol.name}}</span>
                                         </label>
                                     </div>
-                                    }
                                     }
                                 </div>
                             </div>
 
                             <div class="row mt-3">
-                                <div class="col-6 text-end">
-                                    <button type="button" class="btn btn-wd btn-primary"
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
                                         (click)="confirmarRoles()">Confirmar</button>
-                                </div>
-                                <div class="col-6 text-start">
-                                    <button type="button" class="btn btn-wd" id="back-button-with-border"
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
                                         (click)="cerrarModalRoles()">Cancelar</button>
                                 </div>
                             </div>
