@@ -59,5 +59,15 @@ export class UserService {
     return this.http.delete<AuthResponse>(environment.baseUrl + this.apiUser + '/' + uuid, { headers, params });
   }
 
+  syncRolesUsuario(uuid: string, actual_role: string, roles: string[]): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let body = {
+      "roles": roles,
+      'actual_role': actual_role
+    }
+    const url = `${environment.baseUrl}${this.apiUser}/${uuid}/sync-roles`;
+    return this.http.put<AuthResponse>(url, JSON.stringify(body), { headers });
+  }
+
 
 }

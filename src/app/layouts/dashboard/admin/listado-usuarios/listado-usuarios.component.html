@@ -103,7 +103,7 @@
                         </td>
                         <td>
                             {{data.roles | arrayToString:'name' }}
-                            <button type="button" ngxTippy="Administrar roles">
+                            <button type="button" ngxTippy="Administrar roles" (click)="openModalRoles(data)">
                                 <icon-pencil />
                             </button>
                         </td>
@@ -245,6 +245,62 @@
         </ng-template>
     </ngx-custom-modal>
 </div>
+
+
+<div>
+    <ngx-custom-modal #modalRoles class="modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">Administración de roles</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+
+            <div class="container">
+                <div class="row justify-content-center mt-5 mb-5">
+
+                    <div class="col-md-12">
+
+                        <h4 class="text-center mt-3">Administración de roles</h4>
+
+                        <form [formGroup]="rolesForm">
+                            <div class="row">
+                                <div class="col-12 pr-1">
+                                    @for(rol of roles ; track rol.id) {
+                                    @if (rol.name !== 'NO_ROLE') {
+                                    <div class="form-check form-check-inline" style="justify-content: space-evenly;">
+                                        <label class="form-check-label">{{rol.name}}
+                                            <input class="form-check-input" type="checkbox"
+                                                [formControlName]="rol.name">
+                                            <span class="form-check-sign"></span>
+                                        </label>
+                                    </div>
+                                    }
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-6 text-end">
+                                    <button type="button" class="btn btn-wd btn-primary"
+                                        (click)="confirmarRoles()">Confirmar</button>
+                                </div>
+                                <div class="col-6 text-start">
+                                    <button type="button" class="btn btn-wd" id="back-button-with-border"
+                                        (click)="cerrarModalRoles()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+
 
 
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">

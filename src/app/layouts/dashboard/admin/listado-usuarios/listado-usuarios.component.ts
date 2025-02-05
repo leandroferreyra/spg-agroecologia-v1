@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
 import { Rol } from 'src/app/core/models/response/rol';
 import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
+import { RolesService } from 'src/app/core/services/roles.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserService } from 'src/app/core/services/user.service';
@@ -17,6 +18,7 @@ import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
+import { Constantes } from 'src/Constantes';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -60,8 +62,18 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   };
   usuarioView: any;
 
+  @ViewChild('modalRoles') modalRoles!: NgxCustomModalComponent;
+  modalOptionsRoles: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: true
+  };
+  rolesForm!: FormGroup;
+  usuarioInEdicion: any;
+  roles: any[] = [];
+
   constructor(public storeData: Store<any>, private userService: UserService, private spinner: NgxSpinnerService,
-    private tokenService: TokenService, private swalService: SwalService
+    private tokenService: TokenService, private swalService: SwalService, private rolService: RolesService
   ) {
     this.initStore();
   }
@@ -79,6 +91,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.obtenerUsuarios();
+    this.obtenerRoles();
   }
 
   obtenerUsuarios() {
@@ -96,6 +109,21 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
         },
         error: error => {
           this.spinner.hide();
+          console.error(error);
+        }
+      })
+    )
+  }
+
+  obtenerRoles() {
+    this.subscription.add(
+      this.rolService.getRolesWithoutPermissions(this.actual_role).subscribe({
+        next: res => {
+          this.tokenService.setToken(res.token);
+          this.roles = res.data;
+          console.log(res);
+        },
+        error: error => {
           console.error(error);
         }
       })
@@ -300,6 +328,69 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     }
 
     this.onPageChange(this.currentPage);
+  }
+
+  openModalRoles(usuario: any) {
+    // console.log(usuario);
+    this.usuarioInEdicion = usuario;
+    this.rolesForm = new FormGroup({});;
+    this.roles.forEach(rol => {
+      const tieneRol = this.usuarioTieneRol(rol.name, usuario);
+      this.rolesForm.addControl(rol.name, new FormControl(tieneRol));
+
+    });
+    this.modalRoles.options = this.modalOptionsRoles;
+    this.modalRoles.open();
+  }
+  usuarioTieneRol(rolName: string, usuario: any): boolean {
+    return usuario.roles.some((rol: Rol) => rol.name === rolName);
+  }
+  cerrarModalRoles() {
+    this.modalRoles.close();
+  }
+
+  confirmarRoles() {
+    console.log(this.rolesForm);
+    let agregaEstosRoles: string[] = [];
+    this.roles.forEach(element => {
+      let value = this.rolesForm.get(element.name)?.value;
+      if (value) {
+        agregaEstosRoles.push(element.name);
+      }
+    });
+    if (agregaEstosRoles.length === 0) {
+      this.swalService.toastError('top-right', "Tenes que elegir al menos un rol.")
+    } else {
+      this.spinner.show();
+      this.subscription.add(
+        this.userService.syncRolesUsuario(this.usuarioInEdicion.uuid, this.actual_role, agregaEstosRoles).subscribe({
+          next: res => {
+            // console.log(res);
+            let roles = this.convertirRolesEnObject(res.data.roles);
+            let usuario = this.usuarios.find(user => user.uuid === this.usuarioInEdicion.uuid);
+            usuario.roles = roles; // Le asigno los nuevos roles para que se vea en pantalla.
+            this.spinner.hide();
+            this.swalService.toastSuccess('top-right', res.message);
+            this.tokenService.setToken(res.token);
+            this.usuarioInEdicion = null;
+            this.cerrarModal();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
+  }
+  convertirRolesEnObject(roles: string[]) {
+    let rolesObject: Rol[] = [];
+    roles.forEach(element => {
+      let rol = new Rol();
+      rol.name = element;
+      rolesObject.push(rol);
+    });
+    return rolesObject;
   }
 
 
