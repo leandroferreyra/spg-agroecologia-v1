@@ -12,30 +12,45 @@
             <div class="col-lg-12">
                 <div class="text-center">
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="radioTodos"
-                            value="ALL_ROLES" [(ngModel)]="selectedRol" (change)="filteredItems()">
-                        <label class="form-check-label" for="radioTodos" style="padding-left: 0">Todos</label>
+                        <!-- <label class="inline-flex">
+                            <input type="checkbox" class="form-checkbox rounded-full" checked />
+                            <span>Primary</span>
+                        </label> -->
+                        <label class="inline-flex" for="radioTodos">
+                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
+                                id="radioTodos" value="ALL_ROLES" [(ngModel)]="selectedRol" (change)="filteredItems()">
+                            <span>Todos</span>
+                        </label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="radioAdministracion"
-                            value="ADMINISTRACION" [(ngModel)]="selectedRol" (change)="filteredItems()">
-                        <label class="form-check-label" for="radioAdministracion"
-                            style="padding-left: 0">Administración</label>
+                        <label class="inline-flex" for="radioAdministracion">
+                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
+                                id="radioAdministracion" value="ADMINISTRACION" [(ngModel)]="selectedRol"
+                                (change)="filteredItems()">
+                            <span>Administración</span>
+                        </label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="radioProduccion"
-                            value="PRODUCCION" [(ngModel)]="selectedRol" (change)="filteredItems()">
-                        <label class="form-check-label" for="radioProduccion" style="padding-left: 0">Producción</label>
+                        <label class="inline-flex" for="radioProduccion">
+                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
+                                id="radioProduccion" value="PRODUCCION" [(ngModel)]="selectedRol"
+                                (change)="filteredItems()">
+                            <span>Producción</span>
+                        </label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="radioAdmins"
-                            value="ADMIN" [(ngModel)]="selectedRol" (change)="filteredItems()">
-                        <label class="form-check-label" for="radioAdmins" style="padding-left: 0">Admin</label>
+                        <label class="inline-flex" for="radioAdmins">
+                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
+                                id="radioAdmins" value="ADMIN" [(ngModel)]="selectedRol" (change)="filteredItems()">
+                            <span>Admin</span>
+                        </label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="radioUsuario"
-                            value="USUARIO" [(ngModel)]="selectedRol" (change)="filteredItems()">
-                        <label class="form-check-label" for="radioUsuario" style="padding-left: 0">Usuario</label>
+                        <label class="inline-flex" for="radioUsuario">
+                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
+                                id="radioUsuario" value="USUARIO" [(ngModel)]="selectedRol" (change)="filteredItems()">
+                            <span>Usuario</span>
+                        </label>
                     </div>
                     <!-- <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="flexRadioDefault" id="radioNoRol"
@@ -94,7 +109,7 @@
                         <td>
                             <div class="form-check form-check-inline">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" [checked]="isVerified(data)"
+                                    <input class="form-checkbox" type="checkbox" [checked]="isVerified(data)"
                                         [id]="'checkbox' + data.uuid"
                                         (click)="openSwalCambiarEstadoUsuario(data, 'checkbox' + data.uuid)">
                                     <span class="form-check-sign"></span>
