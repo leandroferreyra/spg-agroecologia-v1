@@ -172,7 +172,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   }
 
 
-  obtenerCiudadesConFiltro(paging: number, filter: string) {
+  /* obtenerCiudadesConFiltro(paging: number, filter: string) {
     this.subscription.add(
       this._catalogoService.getCiudadesWithFilter(paging, filter).subscribe({
         next: res => {
@@ -187,7 +187,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
         }
       })
     )
-  }
+  } */
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
@@ -325,7 +325,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     }
   }
 
-  obtenerCiudadesConOrden(paging: number, column: string, direction: string) {
+  /* obtenerCiudadesConOrden(paging: number, column: string, direction: string) {
     this.subscription.add(
       this._catalogoService.getCiudadesWithOrder(paging, column, direction).subscribe({
         next: res => {
@@ -340,7 +340,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
         }
       })
     )
-  }
+  } */
 
   /* cambiarPaginacion(type: string, currentPage: number, column?: string) {
     this.currentPage = currentPage;
@@ -378,5 +378,4 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
       this.obtenerCiudades();
     }
   }
-
 }
