@@ -237,14 +237,45 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
   }
 
-
-
-
   getPermisos(actual_role: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .set('actual_role', actual_role)
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPermisos, { headers, params });
+  }
+
+  getProvinciasWithParams(paramsObj: any, page?: number): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    let params = new HttpParams();
+    paramsObj.paging && (params = params.append('paging', paramsObj.paging));
+    paramsObj.page && (params = params.append('page', paramsObj.page));
+    
+    // para cada elemento de paramsObj.with, agregar un with[]
+    paramsObj.with.forEach((element: any) => {
+      params = params.append('with[]', element);
+    });
+    // para cada elemento de paramsObj.order_by, agregar un order_by[]
+    if (paramsObj.order_by.country_name !== '') {
+      params = params.append('order_by[0][]', 'country.name');
+      params = params.append('order_by[0][]', paramsObj.order_by.country_name);
+    }
+    if (paramsObj.order_by.name !== '') {
+      params = params.append('order_by[1][]', 'name');
+      params = params.append('order_by[1][]', paramsObj.order_by.name);
+    }
+    // para cada elemento de paramsObj.filters, agregar un filters[]
+    if (paramsObj.filters.country_name !== '') {
+      params = params.append('filters[0][]', 'country.name');
+      params = params.append('filters[0][]', 'LIKE');
+      params = params.append('filters[0][]', `%${paramsObj.filters.country_name}%`);
+    }
+    if (paramsObj.filters.name !== '') {
+      params = params.append('filters[1][]', 'name');
+      params = params.append('filters[1][]', 'LIKE');
+      params = params.append('filters[1][]', `%${paramsObj.filters.name}%`);
+    }
+
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
   }
 
 }

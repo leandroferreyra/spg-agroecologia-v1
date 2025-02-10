@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowUp, faDove } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
@@ -52,17 +52,23 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   pageSize: number = 0;
   total_rows: number = 0;
 
-  // Orden y filtro
-  filtros: any = {
-    country: { name: '' }, // Inicializamos para evitar el error
-    name: ''
+  // Mantener el estado del ordenamiento
+  ordenamiento: any = {
+    country_name: 'asc',
+    name: 'asc'
   };
-  MIN_FILTER_SIZE = 1;
-  showFilter: boolean = false;
   sortDirections: { [key: string]: 'asc' | 'desc' } = {};
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
+  iconDove = faDove;
 
+  // Mantener el estado del filtro
+  showFilter: boolean = false;
+  filtros: any = {
+    country_name: '',
+    name: ''
+  };
+  
   provinciaForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
@@ -92,8 +98,8 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerProvincias(this.itemsPerPage);
-    this.subscription.add(
+    this.obtenerProvincias();
+    /* this.subscription.add(
       this._catalogoService.getPaises().subscribe({
         next: res => {
           // console.log(res);
@@ -104,23 +110,47 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
           this.swalService.toastError('top-right', error.error.message);
         }
       })
-    )
-    this.initializeSortDirections(['name', 'country.name']);
+    ) */
+    //this.initializeSortDirections(['country.name', 'name']);
   }
 
-  initializeSortDirections(columns: string[]) {
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  /* initializeSortDirections(columns: string[]) {
     this.sortDirections = columns.reduce((acc, column) => {
       acc[column] = 'asc';
       return acc;
     }, {} as { [key: string]: 'asc' | 'desc' });
-  }
+  } */
 
+  /* construirFiltros(): Array<[string, string, string]> {
+    const filtrosActivos: Array<[string, string, string]> = [];
+    // Solo agregamos los filtros que tengan contenido
+    if (this.filtros.country.name.trim()) {
+      filtrosActivos.push(['country.name', 'LIKE', `${this.filtros.country.name}%`]);
+    }
+    if (this.filtros.name.trim()) {
+      filtrosActivos.push(['name', 'LIKE', `${this.filtros.name}%`]);
+      }
+    return filtrosActivos;
+  } */
 
-  obtenerProvincias(paging: number, page?: number) {
+  obtenerProvincias(page?: number) {
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = ['country'];
+    // Solo incluimos paging si se especifica
+    params.paging = this.itemsPerPage;
+    page && (params.page = page);
+
+    params.order_by = this.ordenamiento;
+    params.filters = this.filtros;
+
     this.subscription.add(
-      this._catalogoService.getProvinciasWithCountryAndPaging(paging, page).subscribe({
+      this._catalogoService.getProvinciasWithParams(params, page).subscribe({
         next: res => {
-          // console.log(res);
           this.provincias = res.data;
           this.modificarPaginacion(res);
           this.spinner.hide();
@@ -130,16 +160,24 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
           console.log(error);
         }
       })
-    )
+    );
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  cambiarOrdenamiento(column: string) {
+    // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
+    if (this.ordenamiento[column] === 'asc') {
+      this.ordenamiento[column] = 'desc';
+    } else if (this.ordenamiento[column] === 'desc') {
+      this.ordenamiento[column] = '';
+    } else {
+      this.ordenamiento[column] = 'asc';
+    }
+    this.obtenerProvincias();
   }
-
 
   openSwalEliminar(provincia: any) {
     Swal.fire({
+
       title: '',
       text: `¿Desea eliminar la provincia ${provincia.name}?`,
       icon: 'info',
@@ -166,7 +204,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._provinciaService.eliminarProvincia(provincia.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerProvincias(this.itemsPerPage, this.currentPage);
+          this.obtenerProvincias(this.currentPage);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -178,7 +216,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
       })
     )
   }
-
 
   openModalNuevaProvincia(type: string, provincia?: any) {
     if (type === 'NEW') {
@@ -267,34 +304,28 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     }
   }
 
-  cambiarPaginacion(type: string, currentPage: number, column?: string) {
+  /* cambiarPaginacion(type: string, currentPage: number, column?: string) {
     this.currentPage = currentPage;
-    if (type === 'filter') {
-      this.obtenerProvinciasConFiltro(this.itemsPerPage, this.filtros);
-    } else if (type === 'sort') {
-      this.sortDirections[column!] = this.sortDirections[column!] === 'asc' ? 'desc' : 'asc';
-      this.obtenerProvinciasConOrden(this.itemsPerPage, column!, this.sortDirections[column!]);
-    } else {
-      this.obtenerProvincias(this.itemsPerPage, currentPage);
-    }
-  }
+    
 
-  obtenerProvinciasConOrden(paging: number, column: string, direction: string) {
-    this.subscription.add(
-      this._catalogoService.getProvinciasWithOrder(paging, column, direction).subscribe({
-        next: res => {
-          // console.log(res);
-          this.provincias = res.data;
-          this.modificarPaginacion(res);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.log(error);
+    if (type === 'sort' && column) {
+      // Actualizar el ordenamiento
+      const ordenIndex = this.ordenamiento.findIndex(([campo]) => campo === column);
+      if (ordenIndex >= 0) {
+        const direccionActual = this.ordenamiento[ordenIndex][1];
+        // Solo cambiamos el ordenamiento si es diferente al default
+        if (direccionActual === 'asc') {
+          this.ordenamiento[ordenIndex][1] = 'desc';
+        } else {
+          // Si estaba en desc, volvemos al estado default (no se incluirá en la petición)
+          this.ordenamiento[ordenIndex][1] = 'asc';
         }
-      })
-    )
-  }
+        this.sortDirections[column] = this.ordenamiento[ordenIndex][1];
+      }
+    }
+
+    this.obtenerProvincias(this.itemsPerPage, currentPage);
+  } */
 
   obtenerProvinciasConFiltro(paging: number, filter: string) {
     this.subscription.add(
@@ -330,10 +361,10 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        country: { name: '' }, 
+        country_name: '',
         name: ''
       };
-      this.obtenerProvincias(this.itemsPerPage);
+      this.obtenerProvincias();
     }
   }
 
