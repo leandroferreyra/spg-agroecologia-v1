@@ -57,7 +57,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     country_name: 'asc',
     name: 'asc'
   };
-  sortDirections: { [key: string]: 'asc' | 'desc' } = {};
+
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
   iconDove = faDove;
@@ -99,7 +99,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.obtenerProvincias();
-    /* this.subscription.add(
+    this.subscription.add(
       this._catalogoService.getPaises().subscribe({
         next: res => {
           // console.log(res);
@@ -110,7 +110,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
           this.swalService.toastError('top-right', error.error.message);
         }
       })
-    ) */
+    )
     //this.initializeSortDirections(['country.name', 'name']);
   }
 
@@ -137,19 +137,17 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     return filtrosActivos;
   } */
 
-  obtenerProvincias(page?: number) {
+  obtenerProvincias() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = ['country'];
-    // Solo incluimos paging si se especifica
     params.paging = this.itemsPerPage;
-    page && (params.page = page);
-
+    params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtros;
 
     this.subscription.add(
-      this._catalogoService.getProvinciasWithParams(params, page).subscribe({
+      this._catalogoService.getProvinciasWithParams(params).subscribe({
         next: res => {
           this.provincias = res.data;
           this.modificarPaginacion(res);
@@ -204,7 +202,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._provinciaService.eliminarProvincia(provincia.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerProvincias(this.currentPage);
+          this.obtenerProvincias();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -242,6 +240,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   cerrarModal() {
     this.isSubmit = false;
     this.modalProvincia.close();
+    this.obtenerProvincias();
   }
 
   confirmarProvincia() {
@@ -327,7 +326,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     this.obtenerProvincias(this.itemsPerPage, currentPage);
   } */
 
-  obtenerProvinciasConFiltro(paging: number, filter: string) {
+  /* obtenerProvinciasConFiltro(paging: number, filter: string) {
     this.subscription.add(
       this._catalogoService.getProvinciasWithFilter(paging, filter).subscribe({
         next: res => {
@@ -342,7 +341,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
         }
       })
     )
-  }
+  } */
 
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;

@@ -244,38 +244,41 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPermisos, { headers, params });
   }
 
-  getProvinciasWithParams(paramsObj: any, page?: number): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  getParams(paramsObj: any): HttpParams {
     let params = new HttpParams();
+    // Paging 
     paramsObj.paging && (params = params.append('paging', paramsObj.paging));
     paramsObj.page && (params = params.append('page', paramsObj.page));
-    
     // para cada elemento de paramsObj.with, agregar un with[]
     paramsObj.with.forEach((element: any) => {
       params = params.append('with[]', element);
     });
-    // para cada elemento de paramsObj.order_by, agregar un order_by[]
-    if (paramsObj.order_by.country_name !== '') {
-      params = params.append('order_by[0][]', 'country.name');
-      params = params.append('order_by[0][]', paramsObj.order_by.country_name);
-    }
-    if (paramsObj.order_by.name !== '') {
-      params = params.append('order_by[1][]', 'name');
-      params = params.append('order_by[1][]', paramsObj.order_by.name);
-    }
+    // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
+    Object.keys(paramsObj.order_by).forEach((key, index) => {
+      if (paramsObj.order_by[key] !== '') {
+        params = params.append(`order_by[${index}][]`, key.replace(/_/g, '.'));
+        params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+      }
+    });
     // para cada elemento de paramsObj.filters, agregar un filters[]
-    if (paramsObj.filters.country_name !== '') {
-      params = params.append('filters[0][]', 'country.name');
-      params = params.append('filters[0][]', 'LIKE');
-      params = params.append('filters[0][]', `%${paramsObj.filters.country_name}%`);
-    }
-    if (paramsObj.filters.name !== '') {
-      params = params.append('filters[1][]', 'name');
-      params = params.append('filters[1][]', 'LIKE');
-      params = params.append('filters[1][]', `%${paramsObj.filters.name}%`);
-    }
+    Object.keys(paramsObj.filters).forEach((key, index) => {
+      if (paramsObj.filters[key] !== '') {
+        params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
+        params = params.append(`filters[${index}][]`, 'LIKE');
+        params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
+      }
+    });
 
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
+    return params;
   }
 
+  getProvinciasWithParams(paramsObj: any): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params: this.getParams(paramsObj) });
+  }
+
+  getCiudadesWithParams(paramsObj: any): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params: this.getParams(paramsObj) });
+  }
 }

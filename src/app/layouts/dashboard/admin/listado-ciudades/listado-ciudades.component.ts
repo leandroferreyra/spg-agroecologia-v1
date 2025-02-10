@@ -10,7 +10,7 @@ import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { CiudadDTO } from 'src/app/core/models/request/ciudadDTO';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons'; import { CatalogoService } from 'src/app/core/services/catalogo.service';
+import { faArrowDown, faArrowUp, faDove } from '@fortawesome/free-solid-svg-icons'; import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { CiudadService } from 'src/app/core/services/ciudad.service';
 import { PaisesService } from 'src/app/core/services/paises.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -58,17 +58,29 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   pageSize: number = 0;
   total_rows: number = 0;
 
-  // Orden y filtro
-  filtros: any = {
-    district: { name: '' }, // Inicializamos para evitar el error
-    name: ''
+  // Mantener el estado del ordenamiento
+  ordenamiento: any = {
+    //country_name: 'asc',
+    district_name: 'asc',
+    name: 'asc'
   };
-  MIN_FILTER_SIZE = 1;
-  showFilter: boolean = false;
-  sortDirections: { [key: string]: 'asc' | 'desc' } = {};
+
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
+  iconDove = faDove;
 
+  // filtro
+  showFilter: boolean = false;
+  filtros: any = {
+    //country_name: '',
+    district_name: '',
+    name: ''
+  };
+
+
+  MIN_FILTER_SIZE = 1;
+  sortDirections: { [key: string]: 'asc' | 'desc' } = {};
+  
   ciudadForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
@@ -98,7 +110,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerCiudades(this.itemsPerPage);
+    this.obtenerCiudades();
     this.subscription.add(
       this._catalogoService.getProvincias().subscribe({
         next: res => {
@@ -121,14 +133,23 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     }, {} as { [key: string]: 'asc' | 'desc' });
   }
 
-  obtenerCiudades(paging: number, page?: number) {
+  obtenerCiudades() {
+    const params: any = {};
+    params.with = ['district'];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = this.ordenamiento;
+    params.filters = this.filtros;
+
     this.subscription.add(
-      this._catalogoService.getCiudadesWithDistrictsAndPaging(paging, page).subscribe({
+      //this._catalogoService.getCiudadesWithDistrictsAndPaging(paging, page).subscribe({
+      this._catalogoService.getCiudadesWithParams(params).subscribe({
         next: res => {
           // console.log(res);
           this.ciudades = res.data;
           this.modificarPaginacion(res);
           this.spinner.hide();
+
         },
         error: error => {
           this.spinner.hide();
@@ -138,6 +159,17 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     )
   }
 
+  cambiarOrdenamiento(column: string) {
+    // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
+    if (this.ordenamiento[column] === 'asc') {
+      this.ordenamiento[column] = 'desc';
+    } else if (this.ordenamiento[column] === 'desc') {
+      this.ordenamiento[column] = '';
+    } else {
+      this.ordenamiento[column] = 'asc';
+    }
+    this.obtenerCiudades();
+  }
 
 
   obtenerCiudadesConFiltro(paging: number, filter: string) {
@@ -190,7 +222,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._ciudadServiice.eliminarCiudad(ciudad.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerCiudades(this.itemsPerPage, this.currentPage);
+          this.obtenerCiudades();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -229,7 +261,9 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   cerrarModal() {
     this.isSubmit = false;
     this.modalCiudad.close();
+    this.obtenerCiudades();
   }
+
 
   confirmarCiudad() {
     this.isSubmit = true;
@@ -308,7 +342,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     )
   }
 
-  cambiarPaginacion(type: string, currentPage: number, column?: string) {
+  /* cambiarPaginacion(type: string, currentPage: number, column?: string) {
     this.currentPage = currentPage;
     if (type === 'filter') {
       this.obtenerCiudadesConFiltro(this.itemsPerPage, this.filtros);
@@ -318,7 +352,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     } else {
       this.obtenerCiudades(this.itemsPerPage, currentPage);
     }
-  }
+  } */
 
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
@@ -337,10 +371,11 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        district: { name: '' },
+        //country_name: '',
+        district_name: '',
         name: ''
       };
-      this.obtenerCiudades(this.itemsPerPage);
+      this.obtenerCiudades();
     }
   }
 
