@@ -76,24 +76,24 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
   }
 
-  getPaisesWithNameFilter(paging: number, filter: string): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams()
-      .append('paging', paging)
-      .append('filters[0][]', 'name')
-      .append('filters[0][]', 'LIKE')
-      .append(`filters[0][]`, `%${filter}%`)
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
-  }
+  // getPaisesWithNameFilter(paging: number, filter: string): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams()
+  //     .append('paging', paging)
+  //     .append('filters[0][]', 'name')
+  //     .append('filters[0][]', 'LIKE')
+  //     .append(`filters[0][]`, `%${filter}%`)
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
+  // }
 
-  getPaisesWithOrder(paging: number, column: string, direction: string): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams()
-      .append('paging', paging)
-      .append('order_by[0][]', column)
-      .append('order_by[0][]', direction)
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
-  }
+  // getPaisesWithOrder(paging: number, column: string, direction: string): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams()
+  //     .append('paging', paging)
+  //     .append('order_by[0][]', column)
+  //     .append('order_by[0][]', direction)
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
+  // }
 
   getDocumentos(): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });

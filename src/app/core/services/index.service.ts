@@ -13,7 +13,7 @@ export class IndexService {
   apiProvincias = '/districts';
   apiCiudades = '/cities';
   apiBancos = '/banks';
-
+  apiPaises = '/countries';
 
   constructor(private http: HttpClient) { }
 
@@ -61,5 +61,10 @@ export class IndexService {
   getBancosWithParams(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params: this.getParams(paramsObj, rol) });
+  }
+
+  getPaisesWithParams(paramsObj: any): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params: this.getParams(paramsObj) });
   }
 }
