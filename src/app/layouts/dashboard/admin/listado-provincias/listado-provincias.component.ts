@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 import { PaisDTO } from 'src/app/core/models/request/paisDTO';
 import { ProvinciaDTO } from 'src/app/core/models/request/provinciaDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
+import { IndexService } from 'src/app/core/services/index.service';
 import { PaisesService } from 'src/app/core/services/paises.service';
 import { ProvinciaService } from 'src/app/core/services/provincia.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -68,7 +69,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     country_name: '',
     name: ''
   };
-  
+
   provinciaForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
@@ -82,7 +83,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     closeOnEscape: false
   };
 
-  constructor(public storeData: Store<any>,
+  constructor(public storeData: Store<any>, private _indexService: IndexService,
     private _catalogoService: CatalogoService, private spinner: NgxSpinnerService, private _paisService: PaisesService,
     private _tokenService: TokenService, private swalService: SwalService, private _provinciaService: ProvinciaService) {
     this.initStore();
@@ -147,7 +148,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     params.filters = this.filtros;
 
     this.subscription.add(
-      this._catalogoService.getProvinciasWithParams(params).subscribe({
+      this._indexService.getProvinciasWithParams(params).subscribe({
         next: res => {
           this.provincias = res.data;
           this.modificarPaginacion(res);

@@ -21,6 +21,7 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { IndexService } from 'src/app/core/services/index.service';
 
 @Component({
   selector: 'app-listado-ciudades',
@@ -80,7 +81,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
   MIN_FILTER_SIZE = 1;
   sortDirections: { [key: string]: 'asc' | 'desc' } = {};
-  
+
   ciudadForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
@@ -94,8 +95,8 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     closeOnEscape: false
   };
 
-  constructor(public storeData: Store<any>,
-    private _catalogoService: CatalogoService, private spinner: NgxSpinnerService, private _paisService: PaisesService,
+  constructor(public storeData: Store<any>, private _indexService: IndexService,
+    private _catalogoService: CatalogoService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private swalService: SwalService, private _ciudadServiice: CiudadService) {
     this.initStore();
   }
@@ -143,7 +144,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       //this._catalogoService.getCiudadesWithDistrictsAndPaging(paging, page).subscribe({
-      this._catalogoService.getCiudadesWithParams(params).subscribe({
+      this._indexService.getCiudadesWithParams(params).subscribe({
         next: res => {
           // console.log(res);
           this.ciudades = res.data;

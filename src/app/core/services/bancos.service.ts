@@ -15,43 +15,43 @@ export class BancosService {
 
   constructor(private http: HttpClient) { }
 
-  getBancos(rol: string, paging: number, page?: number): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let params = new HttpParams();
-    if (page) {
-      params = params.append('paging', paging).append('page', page).append('actual_role', rol).append('with []', 'bank_accounts.currency')
-        .append('order_by[0][]', 'name')
-        .append('order_by[0][]', 'ASC');
-    } else {
-      params = params.append('paging', paging).append('actual_role', rol).append('with []', 'bank_accounts.currency')
-        .append('order_by[0][]', 'name')
-        .append('order_by[0][]', 'ASC');;
-    }
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
-  }
+  // getBancos(rol: string, paging: number, page?: number): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   let params = new HttpParams();
+  //   if (page) {
+  //     params = params.append('paging', paging).append('page', page).append('actual_role', rol).append('with []', 'bank_accounts.currency')
+  //       .append('order_by[0][]', 'name')
+  //       .append('order_by[0][]', 'ASC');
+  //   } else {
+  //     params = params.append('paging', paging).append('actual_role', rol).append('with []', 'bank_accounts.currency')
+  //       .append('order_by[0][]', 'name')
+  //       .append('order_by[0][]', 'ASC');;
+  //   }
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
+  // }
 
-  getBancosWithNameFilter(rol: string, paging: number, filter: string): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let params = new HttpParams()
-      .append('paging', paging)
-      .append('actual_role', rol)
-      .append('with []', 'bank_accounts.currency')
-      .append('filters[0][]', 'name')
-      .append('filters[0][]', 'LIKE')
-      .append(`filters[0][]`, `%${filter}%`)
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
-  }
+  // getBancosWithNameFilter(rol: string, paging: number, filter: string): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   let params = new HttpParams()
+  //     .append('paging', paging)
+  //     .append('actual_role', rol)
+  //     .append('with []', 'bank_accounts.currency')
+  //     .append('filters[0][]', 'name')
+  //     .append('filters[0][]', 'LIKE')
+  //     .append(`filters[0][]`, `%${filter}%`)
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
+  // }
 
-  getBancosWithOrder(rol: string, paging: number, column: string, direction: string): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let params = new HttpParams()
-      .append('paging', paging)
-      .append('actual_role', rol)
-      .append('with []', 'bank_accounts.currency')
-      .append('order_by[0][]', column)
-      .append('order_by[0][]', direction)
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
-  }
+  // getBancosWithOrder(rol: string, paging: number, column: string, direction: string): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   let params = new HttpParams()
+  //     .append('paging', paging)
+  //     .append('actual_role', rol)
+  //     .append('with []', 'bank_accounts.currency')
+  //     .append('order_by[0][]', column)
+  //     .append('order_by[0][]', direction)
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params });
+  // }
 
   saveBanco(banco: BancoDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

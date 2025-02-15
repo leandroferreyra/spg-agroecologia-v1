@@ -19,6 +19,7 @@ import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
+import { IndexService } from 'src/app/core/services/index.service';
 
 @Component({
   selector: 'app-listado-bancos',
@@ -51,10 +52,14 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   // Orden y filtro
-  filtros: any = {};
-  MIN_FILTER_SIZE = 1;
+  filtros: any = {
+    name: ''
+  };
   showFilter: boolean = false;
-  sortDirection: 'asc' | 'desc' = 'asc';
+  ordenamiento: any = {
+    name: 'asc'
+  };
+
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
@@ -66,7 +71,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
     closeOnEscape: false
   };
 
-  constructor(public storeData: Store<any>, private swalService: SwalService,
+  constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _bancosService: BancosService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
     this.initStore();
   }
@@ -85,12 +90,20 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerBancos(this.itemsPerPage);
+    this.obtenerBancos();
   }
 
-  obtenerBancos(paging: number, page?: number) {
+  obtenerBancos() {
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = [];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = this.ordenamiento;
+    params.filters = this.filtros;
+
     this.subscription.add(
-      this._bancosService.getBancos(this.actual_role, paging, page).subscribe({
+      this._indexService.getBancosWithParams(params, this.actual_role).subscribe({
         next: res => {
           this.spinner.hide();
           this.bancos = res.data;
@@ -114,38 +127,6 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
         this.itemsInPage = this.currentPage * this.itemsPerPage;
       }
     }
-  }
-
-  obtenerBancosConOrden(paging: number, column: string, direction: string) {
-    this.subscription.add(
-      this._bancosService.getBancosWithOrder(this.actual_role, paging, column, direction).subscribe({
-        next: res => {
-          this.spinner.hide();
-          this.bancos = res.data;
-          this.modificarPaginacion(res);
-        },
-        error: error => {
-          this.spinner.hide();
-          console.error(error);
-        }
-      })
-    )
-  }
-
-  obtenerBancosConFiltro(paging: number, filter: string) {
-    this.subscription.add(
-      this._bancosService.getBancosWithNameFilter(this.actual_role, paging, filter).subscribe({
-        next: res => {
-          this.spinner.hide();
-          this.bancos = res.data;
-          this.modificarPaginacion(res);
-        },
-        error: error => {
-          this.spinner.hide();
-          console.error(error);
-        }
-      })
-    )
   }
 
   openModalNuevoBanco(type: string, banco?: any) {
@@ -256,7 +237,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._bancosService.eliminarBanco(banco.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerBancos(this.itemsPerPage, this.currentPage);
+          this.obtenerBancos();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -272,26 +253,21 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
-      this.filtros = {};
-      this.obtenerBancos(this.itemsPerPage);
+      this.filtros = {
+        name: ''
+      };
+      this.obtenerBancos();
     }
   }
 
-  cambiarPaginacion(type: string, currentPage: number) {
-    this.currentPage = currentPage;
-    if (type === 'filter') {
-      this.obtenerBancosConFiltro(this.itemsPerPage, this.filtros.name);
-    } else if (type === 'sort') {
-      if (this.sortDirection === 'asc') {
-        this.sortDirection = 'desc';
-        this.obtenerBancosConOrden(this.itemsPerPage, 'name', this.sortDirection);
-      } else {
-        this.sortDirection = 'asc';
-        this.obtenerBancosConOrden(this.itemsPerPage, 'name', this.sortDirection);
-      }
-    } else {
-      this.obtenerBancos(this.itemsPerPage, currentPage);
+  cambiarOrdenamiento(column: string) {
+    // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
+    if (this.ordenamiento[column] === 'asc') {
+      this.ordenamiento[column] = 'desc';
+    } else if (this.ordenamiento[column] === 'desc') {
+      this.ordenamiento[column] = 'asc';
     }
+    this.obtenerBancos();
   }
 
 }

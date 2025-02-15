@@ -27,10 +27,11 @@
             <table class="table-hover">
                 <thead>
                     <tr>
-                        <th style="cursor: pointer;" (click)="cambiarPaginacion('sort',1)">
+                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Nombre
-                                <fa-icon [icon]="sortDirection === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                                <fa-icon
+                                    [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
                             </span>
                         </th>
                         <th>
@@ -43,7 +44,7 @@
                     <tr>
                         <td>
                             <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
-                                (input)="cambiarPaginacion('filter',1)" />
+                                (input)="obtenerBancos()" />
                         </td>
                         <td></td>
                     </tr>
@@ -75,7 +76,7 @@
                 <div class="col">
                     <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
                         [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="cambiarPaginacion('itemsPerPage',currentPage)" />
+                        [boundaryLinks]="true" (pageChange)="obtenerBancos()" />
                 </div>
 
                 <div class="col">
@@ -85,7 +86,7 @@
                         </div>
                         <div class="col-auto">
                             <select id="paginacion" class="form-control"
-                                (change)="cambiarPaginacion('itemsPerPage',1 );" [(ngModel)]="itemsPerPage">
+                                (change)="obtenerBancos()" [(ngModel)]="itemsPerPage">
                                 <option value=5>5</option>
                                 <option value=10>10</option>
                                 <option value=20>20</option>
