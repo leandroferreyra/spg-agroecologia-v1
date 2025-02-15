@@ -1,0 +1,153 @@
+<div>
+    <div class="panel mt-6 pb-0">
+        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
+            <h5 class="text-lg font-semibold dark:text-white-light">Ubicaciones</h5>
+            <button type="button" ngxTippy="Agregar ubicación" (click)="openModalNuevaUbicacion('NEW')">
+                <icon-plus />
+            </button>
+            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+                <icon-search />
+            </button>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-6">
+                <span *ngIf="ubicaciones && ubicaciones.length > 0" class="float-md-start color-gris">
+                    Página: {{ currentPage}}/{{numPages.pageCount }}
+                </span>
+            </div>
+            <div class="col-6" style="text-align: right;">
+                <span *ngIf="ubicaciones && ubicaciones.length > 0" class="float-md-end color-gris">
+                    Ítems: {{itemsInPage}}/{{ total_rows }}
+                </span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-hover">
+                <thead>
+                    <tr>
+                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                Nombre
+                                <fa-icon
+                                    [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                            </span>
+                        </th>
+                        <th>
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (showFilter) {
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
+                                (input)="obtenerUbicaciones()" />
+                        </td>
+                        <td></td>
+                    </tr>
+                    }
+                    @for(data of ubicaciones | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                    <tr>
+                        <td class="whitespace-nowrap">{{ data.name}} </td>
+                        <td>
+                            <div class="flex items-center">
+                                <div>
+                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                        (click)="openModalNuevaUbicacion('EDIT', data)">
+                                        <icon-pencil />
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                        <icon-trash-lines />
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="row mt-4">
+                <div class="col">
+                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                        [boundaryLinks]="true" (pageChange)="obtenerUbicaciones()" />
+                </div>
+
+                <div class="col">
+                    <div class="row align-items-center float-md-end">
+                        <div class="col-auto">
+                            <label for="paginacion">Ítems por página:</label>
+                        </div>
+                        <div class="col-auto">
+                            <select id="paginacion" class="form-control" (change)="obtenerUbicaciones()"
+                                [(ngModel)]="itemsPerPage">
+                                <option value=5>5</option>
+                                <option value=10>10</option>
+                                <option value=20>20</option>
+                                <option value=50>50</option>
+                                <option value=100>100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div>
+    <ngx-custom-modal #modalUbicacion class="modal-top animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="ubicacionForm" (keydown.enter)="confirmarUbicacion()">
+
+                            <div
+                                [ngClass]="isSubmit ? ubicacionForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Ubicación</label>
+                                <input type="text" class="form-control" formControlName="nombre">
+
+                                <ng-container *ngIf="isSubmit && !ubicacionForm.controls['nombre'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && ubicacionForm.controls['nombre'].errors">
+                                    <p class="mt-1 text-danger">Ingresa nombre de la ubicación</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarUbicacion()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+</ngx-spinner>

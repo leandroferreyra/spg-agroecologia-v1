@@ -26,7 +26,7 @@ import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
     selector: 'header',
     standalone: true,
     imports: [CommonModule, RouterLink, RouterLinkActive, FontAwesomeModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
-             NgxCustomModalComponent, NgScrollbarModule, MenuModule, IconUserComponent, IconMenuComponent, IconCaretDownComponent],
+        NgxCustomModalComponent, NgScrollbarModule, MenuModule, IconUserComponent, IconMenuComponent, IconCaretDownComponent],
     templateUrl: './header.html',
     animations: [toggleAnimation],
 })
@@ -67,7 +67,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.initStore();
         this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
         // console.log('[HeaderComponent] Usuario logueado:', this.usuarioLogueado);
-        
+
         if (this.usuarioLogueado) {
             const userRole = localStorage.getItem('userRole');
             // console.log('[HeaderComponent] Dispatching setUserRole with:', userRole);

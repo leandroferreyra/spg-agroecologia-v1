@@ -94,6 +94,8 @@ function getMenuByRole(role: string) {
                         { label: 'Ciudades', route: 'ciudades' },
                         { label: 'Géneros', route: 'generos' },
                         { label: 'Monedas', route: 'monedas' },
+                        { label: 'Ubicaciones', route: 'ubicaciones' },
+                        { label: 'Tipos de cambio', route: 'exchanges' },
                     ]
                 },
                 { label: 'Mis datos', route: '/user-profile' },

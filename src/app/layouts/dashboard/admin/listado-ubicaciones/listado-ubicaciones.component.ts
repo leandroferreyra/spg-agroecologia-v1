@@ -1,43 +1,43 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
-import { Store } from '@ngrx/store';
+import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { BancoDTO } from 'src/app/core/models/request/bancoDTO';
-import { BancosService } from 'src/app/core/services/bancos.service';
+import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { UbicacionesService } from 'src/app/core/services/ubicaciones.service';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
-import { IndexService } from 'src/app/core/services/index.service';
 
 @Component({
-  selector: 'app-listado-bancos',
+  selector: 'app-listado-ubicaciones',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule],
-  templateUrl: './listado-bancos.component.html',
-  styleUrl: './listado-bancos.component.css'
+  templateUrl: './listado-ubicaciones.component.html',
+  styleUrl: './listado-ubicaciones.component.css'
 })
-export class ListadoBancosComponent implements OnInit, OnDestroy {
+export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
 
   store: any;
   private subscription: Subscription = new Subscription();
 
   actual_role: string = '';
 
-  bancos: any[] = [];
-  bancoForm!: FormGroup;
+  ubicaciones: any[] = [];
+  ubicacionForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
@@ -64,7 +64,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   iconArrowDown = faArrowDown;
 
   // Referencia al modal para crear y editar países.
-  @ViewChild('modalBanco') modalBanco!: NgxCustomModalComponent;
+  @ViewChild('modalUbicacion') modalUbicacion!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -72,7 +72,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   };
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
-    private _bancosService: BancosService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
+    private _ubicacionService: UbicacionesService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
     this.initStore();
   }
 
@@ -90,10 +90,10 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerBancos();
+    this.obtenerUbicaciones();
   }
 
-  obtenerBancos() {
+  obtenerUbicaciones() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = [];
@@ -103,10 +103,10 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
     params.filters = this.filtros;
 
     this.subscription.add(
-      this._indexService.getBancosWithParams(params, this.actual_role).subscribe({
+      this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.spinner.hide();
-          this.bancos = res.data;
+          this.ubicaciones = res.data;
           this.modificarPaginacion(res);
         },
         error: error => {
@@ -120,7 +120,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
-    if (this.bancos.length <= this.itemsPerPage) {
+    if (this.ubicaciones.length <= this.itemsPerPage) {
       if (res.meta?.current_page === res.meta?.last_page) {
         this.itemsInPage = this.total_rows;
       } else {
@@ -129,37 +129,37 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
     }
   }
 
-  openModalNuevoBanco(type: string, banco?: any) {
+  openModalNuevaUbicacion(type: string, banco?: any) {
     if (type === 'NEW') {
       this.isEdicion = false;
       this.tituloModal = 'Nuevo banco';
-      this.bancoForm = new FormGroup({
+      this.ubicacionForm = new FormGroup({
         nombre: new FormControl(null, [Validators.required]),
       });
     } else {
       this.isEdicion = true;
       this.tituloModal = 'Edición banco';
-      this.bancoForm = new FormGroup({
+      this.ubicacionForm = new FormGroup({
         uuid: new FormControl(banco?.uuid, []),
         nombre: new FormControl(banco?.name, [Validators.required])
       });
     }
-    this.modalBanco.options = this.modalOptions;
-    this.modalBanco.open();
+    this.modalUbicacion.options = this.modalOptions;
+    this.modalUbicacion.open();
   }
 
-  confirmarBanco() {
+  confirmarUbicacion() {
     this.isSubmit = true;
-    if (this.bancoForm.valid) {
+    if (this.ubicacionForm.valid) {
       this.spinner.show();
       let banco = new BancoDTO();
-      banco.name = this.bancoForm.get('nombre')?.value;
+      banco.name = this.ubicacionForm.get('nombre')?.value;
       banco.actual_role = this.actual_role;
       if (!this.isEdicion) {
         this.subscription.add(
-          this._bancosService.saveBanco(banco).subscribe({
+          this._ubicacionService.saveUbicacion(banco).subscribe({
             next: res => {
-              this.obtenerBancos();
+              this.obtenerUbicaciones();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
               this.tokenService.setToken(res.token);
@@ -174,12 +174,12 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
         )
       } else {
         this.subscription.add(
-          this._bancosService.editBanco(this.bancoForm.get('uuid')?.value, banco).subscribe({
+          this._ubicacionService.editUbicacion(this.ubicacionForm.get('uuid')?.value, banco).subscribe({
             next: res => {
-              const index = this.bancos.findIndex(p => p.uuid === (this.bancoForm.get('uuid')?.value));
+              const index = this.ubicaciones.findIndex(p => p.uuid === (this.ubicacionForm.get('uuid')?.value));
               if (index !== -1) {
-                this.bancos[index] = { ...this.bancos[index], name: this.bancoForm.get('nombre')?.value };
-                this.bancos = [...this.bancos];
+                this.ubicaciones[index] = { ...this.ubicaciones[index], name: this.ubicacionForm.get('nombre')?.value };
+                this.ubicaciones = [...this.ubicaciones];
               }
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message)
@@ -199,13 +199,13 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
 
   cerrarModal() {
     this.isSubmit = false;
-    this.modalBanco.close();
+    this.modalUbicacion.close();
   }
 
-  openSwalEliminar(banco: any) {
+  openSwalEliminar(ubicacion: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el banco ${banco.name}?`,
+      text: `¿Desea eliminar la ubicacion ${ubicacion.name}?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -218,19 +218,19 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eliminarBanco(banco);
+        this.eliminarUbicacion(ubicacion);
       } else if (result.isDenied) {
 
       }
     })
   }
 
-  eliminarBanco(banco: any) {
+  eliminarUbicacion(ubicacion: any) {
     this.spinner.show();
     this.subscription.add(
-      this._bancosService.eliminarBanco(banco.uuid, this.actual_role.toUpperCase()).subscribe({
+      this._ubicacionService.eliminarUbicacion(ubicacion.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerBancos();
+          this.obtenerUbicaciones();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -249,7 +249,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
       this.filtros = {
         name: ''
       };
-      this.obtenerBancos();
+      this.obtenerUbicaciones();
     }
   }
 
@@ -260,7 +260,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
     } else if (this.ordenamiento[column] === 'desc') {
       this.ordenamiento[column] = 'asc';
     }
-    this.obtenerBancos();
+    this.obtenerUbicaciones();
   }
 
 }

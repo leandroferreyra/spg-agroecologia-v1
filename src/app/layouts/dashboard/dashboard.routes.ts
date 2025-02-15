@@ -45,6 +45,16 @@ export const DASHBOARD_ROUTES: Routes = [
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
+                path: 'ubicaciones',
+                loadComponent: () => import('../dashboard/admin/listado-ubicaciones/listado-ubicaciones.component').then(m => m.ListadoUbicacionesComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
+            },
+            {
+                path: 'exchanges',
+                loadComponent: () => import('../dashboard/admin/listado-tipos-de-cambio/listado-tipos-de-cambio.component').then(m => m.ListadoTiposDeCambioComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
+            },
+            {
                 path: 'usuarios',
                 loadComponent: () => import('./admin/listado-usuarios/listado-usuarios.component').then(m => m.ListadoUsuariosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['SUPER_ADMIN', 'ADMIN'] }
