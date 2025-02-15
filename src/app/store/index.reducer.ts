@@ -96,6 +96,8 @@ function getMenuByRole(role: string) {
                         { label: 'Monedas', route: 'monedas' },
                         { label: 'Ubicaciones', route: 'ubicaciones' },
                         { label: 'Tipos de cambio', route: 'exchanges' },
+                        { label: 'Cuentas bancarias de LADIE', route: 'cuentas-bancarias' },
+                        { label: 'Categorías de productos', route: 'categorias-productos' },
                     ]
                 },
                 { label: 'Mis datos', route: '/user-profile' },

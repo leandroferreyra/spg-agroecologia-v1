@@ -55,6 +55,16 @@ export const DASHBOARD_ROUTES: Routes = [
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
+                path: 'cuentas-bancarias',
+                loadComponent: () => import('../dashboard/admin/listado-cuentas-bancarias/listado-cuentas-bancarias.component').then(m => m.ListadoCuentasBancariasComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
+            },
+            {
+                path: 'categorias-productos',
+                loadComponent: () => import('../dashboard/admin/listado-categorias-productos/listado-categorias-productos.component').then(m => m.ListadoCategoriasProductosComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
+            },
+            {
                 path: 'usuarios',
                 loadComponent: () => import('./admin/listado-usuarios/listado-usuarios.component').then(m => m.ListadoUsuariosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['SUPER_ADMIN', 'ADMIN'] }

@@ -17,6 +17,7 @@ export class IndexService {
   apiGeneros = '/genders';
   apiMonedas = '/currencies';
   apiUbicaciones = '/locations';
+  apiTiposDeCampio = '/exchange_rates';
 
   constructor(private http: HttpClient) { }
 
@@ -84,5 +85,10 @@ export class IndexService {
   getUbicacionesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiUbicaciones, { headers, params: this.getParams(paramsObj, rol) });
+  }
+
+  getTiposCambioWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposDeCampio, { headers, params: this.getParams(paramsObj, rol) });
   }
 }
