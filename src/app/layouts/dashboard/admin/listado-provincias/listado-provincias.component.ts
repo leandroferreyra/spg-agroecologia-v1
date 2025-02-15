@@ -53,21 +53,19 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   pageSize: number = 0;
   total_rows: number = 0;
 
-  // Mantener el estado del ordenamiento
-  ordenamiento: any = {
-    country_name: 'asc',
-    name: 'asc'
-  };
-
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
   iconDove = faDove;
 
-  // Mantener el estado del filtro
+  // Mantener el estado del filtro y orden
   showFilter: boolean = false;
   filtros: any = {
     country_name: '',
     name: ''
+  };
+  ordenamiento: any = {
+    country_name: 'asc',
+    name: 'asc'
   };
 
   provinciaForm!: FormGroup;
@@ -259,10 +257,11 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
           this._provinciaService.saveProvincia(provincia).subscribe({
             next: res => {
               // Esto es para evitar un llamado cada vez que agrega.
-              if (this.currentPage === this.last_page) {
-                this.provincias = [...this.provincias, res.data];
-              }
-              this.total_rows += 1;
+              // if (this.currentPage === this.last_page) {
+              //   this.provincias = [...this.provincias, res.data];
+              // }
+              // this.total_rows += 1;
+              this.obtenerProvincias();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
               this._tokenService.setToken(res.token);
@@ -303,46 +302,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
       }
     }
   }
-
-  /* cambiarPaginacion(type: string, currentPage: number, column?: string) {
-    this.currentPage = currentPage;
-    
-
-    if (type === 'sort' && column) {
-      // Actualizar el ordenamiento
-      const ordenIndex = this.ordenamiento.findIndex(([campo]) => campo === column);
-      if (ordenIndex >= 0) {
-        const direccionActual = this.ordenamiento[ordenIndex][1];
-        // Solo cambiamos el ordenamiento si es diferente al default
-        if (direccionActual === 'asc') {
-          this.ordenamiento[ordenIndex][1] = 'desc';
-        } else {
-          // Si estaba en desc, volvemos al estado default (no se incluirá en la petición)
-          this.ordenamiento[ordenIndex][1] = 'asc';
-        }
-        this.sortDirections[column] = this.ordenamiento[ordenIndex][1];
-      }
-    }
-
-    this.obtenerProvincias(this.itemsPerPage, currentPage);
-  } */
-
-  /* obtenerProvinciasConFiltro(paging: number, filter: string) {
-    this.subscription.add(
-      this._catalogoService.getProvinciasWithFilter(paging, filter).subscribe({
-        next: res => {
-          // console.log(res);
-          this.provincias = res.data;
-          this.modificarPaginacion(res);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.log(error);
-        }
-      })
-    )
-  } */
 
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;

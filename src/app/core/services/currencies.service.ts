@@ -15,47 +15,47 @@ export class CurrenciesService {
 
   constructor(private http: HttpClient) { }
 
-  getCurrencies(rol: string, paging: number, page?: number): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let params = new HttpParams();
-    if (page) {
-      params = params.append('paging', paging).append('page', page).append('actual_role', rol).append('order_by[0][]', 'name')
-        .append('order_by[0][]', 'ASC');
-    } else {
-      params = params.append('paging', paging).append('actual_role', rol).append('order_by[0][]', 'name')
-        .append('order_by[0][]', 'ASC');
-    }
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
-  }
+  // getCurrencies(rol: string, paging: number, page?: number): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   let params = new HttpParams();
+  //   if (page) {
+  //     params = params.append('paging', paging).append('page', page).append('actual_role', rol).append('order_by[0][]', 'name')
+  //       .append('order_by[0][]', 'ASC');
+  //   } else {
+  //     params = params.append('paging', paging).append('actual_role', rol).append('order_by[0][]', 'name')
+  //       .append('order_by[0][]', 'ASC');
+  //   }
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
+  // }
 
-  getCurrenciesWithFilter(rol: string, paging: number, filtros: any) {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let params = new HttpParams()
-      .append('actual_role', rol)
-      .append('paging', paging);
+  // getCurrenciesWithFilter(rol: string, paging: number, filtros: any) {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   let params = new HttpParams()
+  //     .append('actual_role', rol)
+  //     .append('paging', paging);
 
-    let filterIndex = 0;
-    for (const key in filtros) {
-      if (filtros[key]) { 
-        params = params
-          .append(`filters[${filterIndex}][]`, key) // Nombre del campo (name, symbol, etc.)
-          .append(`filters[${filterIndex}][]`, 'LIKE')
-          .append(`filters[${filterIndex}][]`, `%${filtros[key]}%`); // Valor del filtro
-        filterIndex++;
-      }
-    }
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
-  }
+  //   let filterIndex = 0;
+  //   for (const key in filtros) {
+  //     if (filtros[key]) { 
+  //       params = params
+  //         .append(`filters[${filterIndex}][]`, key) // Nombre del campo (name, symbol, etc.)
+  //         .append(`filters[${filterIndex}][]`, 'LIKE')
+  //         .append(`filters[${filterIndex}][]`, `%${filtros[key]}%`); // Valor del filtro
+  //       filterIndex++;
+  //     }
+  //   }
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
+  // }
 
-  getCurrenciesWithOrder(rol: string, paging: number, column: string, direction: string) {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let params = new HttpParams()
-      .append('actual_role', rol)
-      .append('paging', paging)
-      .append('order_by[0][]', column)
-      .append('order_by[0][]', direction)
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
-  }
+  // getCurrenciesWithOrder(rol: string, paging: number, column: string, direction: string) {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   let params = new HttpParams()
+  //     .append('actual_role', rol)
+  //     .append('paging', paging)
+  //     .append('order_by[0][]', column)
+  //     .append('order_by[0][]', direction)
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params });
+  // }
 
   saveCurrency(currencyDTO: CurrencyDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

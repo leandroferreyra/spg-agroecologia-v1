@@ -20,6 +20,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { IndexService } from 'src/app/core/services/index.service';
 
 @Component({
   selector: 'app-listado-monedas',
@@ -49,10 +50,16 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   // Orden y filtro
-  filtros: any = {};
-  MIN_FILTER_SIZE = 1;
   showFilter: boolean = false;
-  sortDirections: { [key: string]: 'asc' | 'desc' } = {};
+  filtros: any = {
+    name: '',
+    symbol: ''
+  };
+  ordenamiento: any = {
+    name: 'asc',
+    symbol: 'asc'
+  };
+
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
@@ -69,8 +76,8 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
     closeOnEscape: false
   };
 
-  constructor(public storeData: Store<any>,
-    private _currencyService: CurrenciesService, private spinner: NgxSpinnerService, private _paisService: PaisesService,
+  constructor(public storeData: Store<any>, private _indexService: IndexService,
+    private _currencyService: CurrenciesService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private swalService: SwalService) {
     this.initStore();
   }
@@ -85,22 +92,21 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerMonedas(this.itemsPerPage);
-    this.initializeSortDirections(['name', 'symbol']);
+    this.obtenerMonedas();
   }
 
-  initializeSortDirections(columns: string[]) {
-    this.sortDirections = columns.reduce((acc, column) => {
-      acc[column] = 'asc';
-      return acc;
-    }, {} as { [key: string]: 'asc' | 'desc' });
-  }
+  obtenerMonedas() {
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = [];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = this.ordenamiento;
+    params.filters = this.filtros;
 
-  obtenerMonedas(paging: number, page?: number) {
     this.subscription.add(
-      this._currencyService.getCurrencies(this.actual_role, paging, page).subscribe({
+      this._indexService.getMonedasWithParam(params, this.actual_role).subscribe({
         next: res => {
-          console.log(res);
           this.monedas = res.data;
           this.modificarPaginacion(res);
           this.spinner.hide();
@@ -116,7 +122,6 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
-
 
   openSwalEliminar(moneda: any) {
     console.log(moneda);
@@ -147,7 +152,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._currencyService.deleteCurrency(moneda.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerMonedas(this.itemsPerPage, this.currentPage);
+          this.obtenerMonedas();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -200,11 +205,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._currencyService.saveCurrency(moneda).subscribe({
             next: res => {
-              // Esto es para evitar un llamado cada vez que agrega.
-              if (this.currentPage === this.last_page) {
-                this.monedas = [...this.monedas, res.data];
-              }
-              this.total_rows += 1;
+              this.obtenerMonedas();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
               this._tokenService.setToken(res.token);
@@ -246,48 +247,14 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
     }
   }
 
-  cambiarPaginacion(type: string, currentPage: number, sortColumn?: string) {
-    this.currentPage = currentPage;
-    if (type === 'filter') {
-      this.obtenerMonedasWithFilter(this.itemsPerPage, this.filtros);
-    } else if (type === 'sort') {
-      this.sortDirections[sortColumn!] = this.sortDirections[sortColumn!] === 'asc' ? 'desc' : 'asc';
-      this.obtenerMonedasWithOrder(this.itemsPerPage, sortColumn!, this.sortDirections[sortColumn!]);
-    } else {
-      this.obtenerMonedas(this.itemsPerPage, currentPage);
+  cambiarOrdenamiento(column: string) {
+    // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
+    if (this.ordenamiento[column] === 'asc') {
+      this.ordenamiento[column] = 'desc';
+    } else if (this.ordenamiento[column] === 'desc') {
+      this.ordenamiento[column] = 'asc';
     }
-  }
-
-  obtenerMonedasWithFilter(paging: number, filtros: any) {
-    this.subscription.add(
-      this._currencyService.getCurrenciesWithFilter(this.actual_role, paging, filtros).subscribe({
-        next: res => {
-          this.monedas = res.data;
-          this.modificarPaginacion(res);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.log(error);
-        }
-      })
-    )
-  }
-
-  obtenerMonedasWithOrder(paging: number, column: string, direction: string) {
-    this.subscription.add(
-      this._currencyService.getCurrenciesWithOrder(this.actual_role, paging, column, direction).subscribe({
-        next: res => {
-          this.monedas = res.data;
-          this.modificarPaginacion(res);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.log(error);
-        }
-      })
-    )
+    this.obtenerMonedas();
   }
 
   modificarPaginacion(res: any) {
@@ -306,8 +273,11 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
-      this.filtros = {};
-      this.obtenerMonedas(this.itemsPerPage);
+      this.filtros = {
+        name: '',
+        symbol: ''
+      };
+      this.obtenerMonedas();
     }
   }
 

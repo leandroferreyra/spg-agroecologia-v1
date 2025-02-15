@@ -24,35 +24,35 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers });
   }
 
-  getGenerosWithPaging(paging: number, page?: number) {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams();
-    if (page) {
-      params = params.append('paging', paging).append('page', page);
-    } else {
-      params = params.append('paging', paging);
-    }
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params });
-  }
+  // getGenerosWithPaging(paging: number, page?: number) {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams();
+  //   if (page) {
+  //     params = params.append('paging', paging).append('page', page);
+  //   } else {
+  //     params = params.append('paging', paging);
+  //   }
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params });
+  // }
 
-  getGenerosWithNameFilter(paging: number, filter: string) {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams()
-      .append('paging', paging)
-      .append('filters[0][]', 'name')
-      .append('filters[0][]', 'LIKE')
-      .append(`filters[0][]`, `%${filter}%`)
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params });
-  }
+  // getGenerosWithNameFilter(paging: number, filter: string) {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams()
+  //     .append('paging', paging)
+  //     .append('filters[0][]', 'name')
+  //     .append('filters[0][]', 'LIKE')
+  //     .append(`filters[0][]`, `%${filter}%`)
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params });
+  // }
 
-  getGenerosWithOrder(paging: number, column: string, direction: string) {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams()
-      .append('paging', paging)
-      .append('order_by[0][]', column)
-      .append('order_by[0][]', direction)
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params });
-  }
+  // getGenerosWithOrder(paging: number, column: string, direction: string) {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams()
+  //     .append('paging', paging)
+  //     .append('order_by[0][]', column)
+  //     .append('order_by[0][]', direction)
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params });
+  // }
 
 
   getPaises(): Observable<AuthResponse> {
@@ -61,20 +61,20 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
   }
 
-  getPaisesWithPaging(paging: number, page?: number): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams();
-    if (page) {
-      params = params.append('paging', paging).append('page', page)
-        .append('order_by[0][]', 'name')
-        .append('order_by[0][]', 'ASC');;
-    } else {
-      params = params.append('paging', paging)
-        .append('order_by[0][]', 'name')
-        .append('order_by[0][]', 'ASC');;
-    }
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
-  }
+  // getPaisesWithPaging(paging: number, page?: number): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams();
+  //   if (page) {
+  //     params = params.append('paging', paging).append('page', page)
+  //       .append('order_by[0][]', 'name')
+  //       .append('order_by[0][]', 'ASC');;
+  //   } else {
+  //     params = params.append('paging', paging)
+  //       .append('order_by[0][]', 'name')
+  //       .append('order_by[0][]', 'ASC');;
+  //   }
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
+  // }
 
   // getPaisesWithNameFilter(paging: number, filter: string): Observable<AuthResponse> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
@@ -138,16 +138,16 @@ export class CatalogoService {
   //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades + '/' + uuidCiudad, { headers, params });
   // }
 
-  getCiudadesWithDistrictsAndPaging(paging: number, page?: number): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams();
-    if (page) {
-      params = params.append('paging', paging).append('page', page).append('with[]', 'district').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
-    } else {
-      params = params.append('paging', paging).append('with[]', 'district').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
-    }
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
-  }
+  // getCiudadesWithDistrictsAndPaging(paging: number, page?: number): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams();
+  //   if (page) {
+  //     params = params.append('paging', paging).append('page', page).append('with[]', 'district').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
+  //   } else {
+  //     params = params.append('paging', paging).append('with[]', 'district').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
+  //   }
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
+  // }
 
   // getCiudadesWithOrder(paging: number, column: string, direction: string): Observable<AuthResponse> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
@@ -187,16 +187,16 @@ export class CatalogoService {
   //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params });
   // }
 
-  getProvinciasWithCountryAndPaging(paging: number, page?: number): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    let params = new HttpParams();
-    if (page) {
-      params = params.append('paging', paging).append('page', page).append('with[]', 'country').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
-    } else {
-      params = params.append('paging', paging).append('with[]', 'country').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
-    }
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
-  }
+  // getProvinciasWithCountryAndPaging(paging: number, page?: number): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+  //   let params = new HttpParams();
+  //   if (page) {
+  //     params = params.append('paging', paging).append('page', page).append('with[]', 'country').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
+  //   } else {
+  //     params = params.append('paging', paging).append('with[]', 'country').append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
+  //   }
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params });
+  // }
 
   // getProvinciasWithNameFilter(paging: number, filter: string): Observable<AuthResponse> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });

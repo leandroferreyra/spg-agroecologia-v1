@@ -1,6 +1,6 @@
 import { HttpClient, HttpEventType, HttpHeaders, HttpParams, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { filter, map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 
@@ -14,6 +14,8 @@ export class IndexService {
   apiCiudades = '/cities';
   apiBancos = '/banks';
   apiPaises = '/countries';
+  apiGeneros = '/genders';
+  apiMonedas = '/currencies';
 
   constructor(private http: HttpClient) { }
 
@@ -66,5 +68,15 @@ export class IndexService {
   getPaisesWithParams(paramsObj: any): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params: this.getParams(paramsObj) });
+  }
+
+  getGenerosWithParam(paramsObj: any): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params: this.getParams(paramsObj) });
+  }
+
+  getMonedasWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params: this.getParams(paramsObj, rol) });
   }
 }

@@ -22,6 +22,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { IndexService } from 'src/app/core/services/index.service';
 
 @Component({
   selector: 'app-listado-generos',
@@ -51,10 +52,14 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   // Orden y filtro
-  filtros: any = {};
-  MIN_FILTER_SIZE = 1;
+  filtros: any = {
+    name: ''
+  };
   showFilter: boolean = false;
-  sortDirection: 'asc' | 'desc' = 'asc';
+  ordenamiento: any = {
+    name: 'asc'
+  };
+
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
@@ -72,7 +77,8 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
   };
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _catalogoService: CatalogoService,
-    private _generoService: GenerosService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
+    private _generoService: GenerosService, private spinner: NgxSpinnerService, private tokenService: TokenService,
+    private _indexService: IndexService) {
     this.initStore();
   }
 
@@ -90,44 +96,52 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerGeneros(this.itemsPerPage);
+    this.obtenerGeneros();
   }
 
-  obtenerGenerosWithNameFilter(paging: number, filter: string) {
-    this.subscription.add(
-      this._catalogoService.getGenerosWithNameFilter(paging, filter).subscribe({
-        next: res => {
-          this.generos = res.data;
-          this.modificarPaginacion(res);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.error(error);
-        }
-      })
-    )
-  }
+  // obtenerGenerosWithNameFilter(paging: number, filter: string) {
+  //   this.subscription.add(
+  //     this._catalogoService.getGenerosWithNameFilter(paging, filter).subscribe({
+  //       next: res => {
+  //         this.generos = res.data;
+  //         this.modificarPaginacion(res);
+  //         this.spinner.hide();
+  //       },
+  //       error: error => {
+  //         this.spinner.hide();
+  //         console.error(error);
+  //       }
+  //     })
+  //   )
+  // }
 
-  obtenerGenerosWithOrder(paging: number, column: string, direction: string) {
-    this.subscription.add(
-      this._catalogoService.getGenerosWithOrder(paging, column, direction).subscribe({
-        next: res => {
-          this.generos = res.data;
-          this.modificarPaginacion(res);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.error(error);
-        }
-      })
-    )
-  }
+  // obtenerGenerosWithOrder(paging: number, column: string, direction: string) {
+  //   this.subscription.add(
+  //     this._catalogoService.getGenerosWithOrder(paging, column, direction).subscribe({
+  //       next: res => {
+  //         this.generos = res.data;
+  //         this.modificarPaginacion(res);
+  //         this.spinner.hide();
+  //       },
+  //       error: error => {
+  //         this.spinner.hide();
+  //         console.error(error);
+  //       }
+  //     })
+  //   )
+  // }
 
-  obtenerGeneros(paging: number, page?: number) {
+  obtenerGeneros() {
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = [];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = this.ordenamiento;
+    params.filters = this.filtros;
+
     this.subscription.add(
-      this._catalogoService.getGenerosWithPaging(paging, page).subscribe({
+      this._indexService.getGenerosWithParam(params).subscribe({
         next: res => {
           this.generos = res.data;
           this.modificarPaginacion(res);
@@ -154,21 +168,15 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
   }
 
 
-  cambiarPaginacion(type: string, currentPage: number) {
-    this.currentPage = currentPage;
-    if (type === 'filter') {
-      this.obtenerGenerosWithNameFilter(this.itemsPerPage, this.filtros.name);
-    } else if (type === 'sort') {
-      if (this.sortDirection === 'asc') {
-        this.sortDirection = 'desc';
-        this.obtenerGenerosWithOrder(this.itemsPerPage, 'name', this.sortDirection);
-      } else {
-        this.sortDirection = 'asc';
-        this.obtenerGenerosWithOrder(this.itemsPerPage, 'name', this.sortDirection);
-      }
-    } else {
-      this.obtenerGeneros(this.itemsPerPage, currentPage);
+
+  cambiarOrdenamiento(column: string) {
+    // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
+    if (this.ordenamiento[column] === 'asc') {
+      this.ordenamiento[column] = 'desc';
+    } else if (this.ordenamiento[column] === 'desc') {
+      this.ordenamiento[column] = 'asc';
     }
+    this.obtenerGeneros();
   }
 
   openModalNuevoGenero(type: string, genero?: any) {
@@ -201,11 +209,7 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._generoService.saveGenero(genero).subscribe({
             next: res => {
-              // Esto es para evitar un llamado cada vez que agrega.
-              if (this.currentPage === this.last_page) {
-                this.generos = [...this.generos, res.data];
-              }
-              this.total_rows += 1;
+              this.obtenerGeneros();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
               this.tokenService.setToken(res.token);
@@ -246,8 +250,10 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
-      this.filtros = {};
-      this.obtenerGeneros(this.itemsPerPage);
+      this.filtros = {
+        name: ''
+      };
+      this.obtenerGeneros();
     }
   }
 
@@ -284,7 +290,7 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._generoService.eliminarGenero(genero.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerGeneros(this.itemsPerPage, this.currentPage);
+          this.obtenerGeneros();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
