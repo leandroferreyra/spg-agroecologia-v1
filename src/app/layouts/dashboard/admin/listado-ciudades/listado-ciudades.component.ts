@@ -12,7 +12,6 @@ import { CiudadDTO } from 'src/app/core/models/request/ciudadDTO';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowDown, faArrowUp, faDove } from '@fortawesome/free-solid-svg-icons'; import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { CiudadService } from 'src/app/core/services/ciudad.service';
-import { PaisesService } from 'src/app/core/services/paises.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
@@ -38,14 +37,6 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   actual_role: string = '';
-  // search = '';
-  // cols = [
-  //   { field: 'district.name', title: 'Provincia' },
-  //   { field: 'name', title: 'Ciudad' },
-  //   { field: 'action', title: 'Acciones', sort: false }
-  // ];
-
-
 
   ciudades: any[] = [];
   provincias: any[] = [];
@@ -61,26 +52,21 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
   // Mantener el estado del ordenamiento
   ordenamiento: any = {
-    //country_name: 'asc',
+    country_name: 'asc',
     district_name: 'asc',
     name: 'asc'
   };
 
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
-  iconDove = faDove;
 
   // filtro
   showFilter: boolean = false;
   filtros: any = {
-    //country_name: '',
+    country_name: '',
     district_name: '',
     name: ''
   };
-
-
-  MIN_FILTER_SIZE = 1;
-  sortDirections: { [key: string]: 'asc' | 'desc' } = {};
 
   ciudadForm!: FormGroup;
   tituloModal: string = '';
@@ -112,6 +98,11 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.obtenerCiudades();
+    // Se obtienen las provincias acá para el modal cuando quiere agregar una nueva ciudad.
+    this.obtenerProvincias();
+  }
+
+  obtenerProvincias() {
     this.subscription.add(
       this._catalogoService.getProvincias().subscribe({
         next: res => {
@@ -124,26 +115,17 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
         }
       })
     );
-    this.initializeSortDirections(['name', 'district.name']);
-  }
-
-  initializeSortDirections(columns: string[]) {
-    this.sortDirections = columns.reduce((acc, column) => {
-      acc[column] = 'asc';
-      return acc;
-    }, {} as { [key: string]: 'asc' | 'desc' });
   }
 
   obtenerCiudades() {
     const params: any = {};
-    params.with = ['district'];
+    params.with = ['district', 'district.country'];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtros;
 
     this.subscription.add(
-      //this._catalogoService.getCiudadesWithDistrictsAndPaging(paging, page).subscribe({
       this._indexService.getCiudadesWithParams(params).subscribe({
         next: res => {
           // console.log(res);
@@ -165,35 +147,14 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     if (this.ordenamiento[column] === 'asc') {
       this.ordenamiento[column] = 'desc';
     } else if (this.ordenamiento[column] === 'desc') {
-      this.ordenamiento[column] = '';
-    } else {
       this.ordenamiento[column] = 'asc';
     }
     this.obtenerCiudades();
   }
 
-
-  /* obtenerCiudadesConFiltro(paging: number, filter: string) {
-    this.subscription.add(
-      this._catalogoService.getCiudadesWithFilter(paging, filter).subscribe({
-        next: res => {
-          // console.log(res);
-          this.ciudades = res.data;
-          this.modificarPaginacion(res);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.log(error);
-        }
-      })
-    )
-  } */
-
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
-
 
   openSwalEliminar(ciudad: any) {
     Swal.fire({
@@ -326,35 +287,6 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     }
   }
 
-  /* obtenerCiudadesConOrden(paging: number, column: string, direction: string) {
-    this.subscription.add(
-      this._catalogoService.getCiudadesWithOrder(paging, column, direction).subscribe({
-        next: res => {
-          // console.log(res);
-          this.ciudades = res.data;
-          this.modificarPaginacion(res);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.log(error);
-        }
-      })
-    )
-  } */
-
-  /* cambiarPaginacion(type: string, currentPage: number, column?: string) {
-    this.currentPage = currentPage;
-    if (type === 'filter') {
-      this.obtenerCiudadesConFiltro(this.itemsPerPage, this.filtros);
-    } else if (type === 'sort') {
-      this.sortDirections[column!] = this.sortDirections[column!] === 'asc' ? 'desc' : 'asc';
-      this.obtenerCiudadesConOrden(this.itemsPerPage, column!, this.sortDirections[column!]);
-    } else {
-      this.obtenerCiudades(this.itemsPerPage, currentPage);
-    }
-  } */
-
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
@@ -372,7 +304,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        //country_name: '',
+        country_name: '',
         district_name: '',
         name: ''
       };

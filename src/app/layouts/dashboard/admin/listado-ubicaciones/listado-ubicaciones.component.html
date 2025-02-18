@@ -1,5 +1,6 @@
 <div>
     <div class="panel mt-6 pb-0">
+
         <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
             <h5 class="text-lg font-semibold dark:text-white-light">Ubicaciones</h5>
             <button type="button" ngxTippy="Agregar ubicación" (click)="openModalNuevaUbicacion('NEW')">
@@ -8,7 +9,51 @@
             <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
                 <icon-search />
             </button>
+            <div class="form-check form-check-inline ml-auto">
+                <label class="form-check-label">
+                    <input class="form-checkbox" type="checkbox" [checked]="busqueda_global" [(ngModel)]="busqueda_global">
+                    <span class="form-check-sign">Búsqueda global</span>
+                </label>
+            </div>
         </div>
+
+
+        <ol class="mb-5 flex text-gray-500 font-semibold dark:text-white-dark">
+            <li><a href="javascript:;" class="hover:text-gray-500/70 dark:hover:text-white-dark/70"
+                    (click)="goToLocation(-1)">Raíz</a></li>
+            @for(bread of breadcrumbs; let last = $last; let index = $index ;track bread.uuid;) {
+            @if (last) {
+            <li (click)="goToLocation(index)"
+                class="before:w-1 before:h-1 before:rounded-full before:bg-primary before:inline-block before:relative before:-top-0.5 before:mx-4">
+                <a href="javascript:;" class="text-primary">{{bread.name}}</a>
+            </li>
+            }@else {
+            <li (click)="goToLocation(index)"
+                class="before:w-1 before:h-1 before:rounded-full before:bg-primary before:inline-block before:relative before:-top-0.5 before:mx-4">
+                <a href="javascript:;" class="hover:text-gray-500/70 dark:hover:text-white-dark/70">{{bread.name}}</a>
+            </li>
+            }
+            }
+
+        </ol>
+        <!-- 
+        <ol class="mb-5 flex text-gray-500 font-semibold dark:text-white-dark">
+            <li>
+                <a href="javascript:;" class="hover:text-gray-500/70 dark:hover:text-white-dark/70">
+                    Raíz </a>
+            </li>
+            @for(bread of breadcrumbs; let last = $last; track bread.uuid) {
+            @if (!last) {
+            <li class="before:content-['/'] before:px-1.5"><a href="javascript:;">{{bread.name}}</a></li>
+            } @else {
+            <li class="before:content-['/'] before:px-1.5"><a href="javascript:;"
+                    class="text-black dark:text-white-light hover:text-black/70 dark:hover:text-white-light/70">{{bread.name}}</a>
+            </li>
+            }
+            }
+        </ol> -->
+
+
 
         <div class="row mb-2">
             <div class="col-6">
@@ -23,6 +68,7 @@
             </div>
         </div>
 
+
         <div class="table-responsive">
             <table class="table-hover">
                 <thead>
@@ -33,6 +79,7 @@
                                 <fa-icon
                                     [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
                             </span>
+
                         </th>
                         <th>
                             Acciones
@@ -44,16 +91,31 @@
                     <tr>
                         <td>
                             <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
-                                (input)="obtenerUbicaciones()" />
+                                (input)="filtrarUbicaciones()" />
+
                         </td>
                         <td></td>
                     </tr>
                     }
                     @for(data of ubicaciones | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                     <tr>
+
                         <td class="whitespace-nowrap">{{ data.name}} </td>
+
                         <td>
                             <div class="flex items-center">
+                                <div>
+                                    <button type="button" ngxTippy="Mostrar sububicaciones" class="ltr:mr-3 rtl:ml-2"
+                                        (click)="obtenerUbicaciones(false, data)">
+                                        <icon-info-circle />
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" ngxTippy="Agregar sub-ubicación" class="ltr:mr-3 rtl:ml-2"
+                                        (click)="openModalNuevaUbicacion('NEW', data)">
+                                        <icon-plus />
+                                    </button>
+                                </div>
                                 <div>
                                     <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
                                         (click)="openModalNuevaUbicacion('EDIT', data)">
@@ -76,7 +138,7 @@
                 <div class="col">
                     <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
                         [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="obtenerUbicaciones()" />
+                        [boundaryLinks]="true" (pageChange)="obtenerUbicaciones(true)" />
                 </div>
 
                 <div class="col">
@@ -85,7 +147,7 @@
                             <label for="paginacion">Ítems por página:</label>
                         </div>
                         <div class="col-auto">
-                            <select id="paginacion" class="form-control" (change)="obtenerUbicaciones()"
+                            <select id="paginacion" class="form-control" (change)="obtenerUbicaciones(true)"
                                 [(ngModel)]="itemsPerPage">
                                 <option value=5>5</option>
                                 <option value=10>10</option>
@@ -99,7 +161,6 @@
 
             </div>
         </div>
-
     </div>
 </div>
 

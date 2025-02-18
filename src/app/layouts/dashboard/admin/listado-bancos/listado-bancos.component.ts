@@ -89,11 +89,11 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.spinner.show();
     this.obtenerBancos();
   }
 
   obtenerBancos() {
+    this.spinner.show();
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = [];

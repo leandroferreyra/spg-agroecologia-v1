@@ -28,19 +28,25 @@
             <table class="table-hover">
                 <thead>
                     <tr>
+                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('country_name')">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                País
+                                <fa-icon [icon]="ordenamiento['country_name'] === 'asc' ? iconArrowUp : iconArrowDown">
+                                </fa-icon>
+                            </span>
+                        </th>
                         <th style="cursor: pointer;" (click)="cambiarOrdenamiento('district_name')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Provincia
                                 <fa-icon
-                                    [icon]="ordenamiento['district_name'] === 'asc' ? iconArrowUp : ordenamiento['district_name'] === 'desc' ? iconArrowDown : iconDove">
+                                    [icon]="ordenamiento['district_name'] === 'asc' ? iconArrowUp :  iconArrowDown">
                                 </fa-icon>
                             </span>
                         </th>
                         <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Ciudad
-                                <fa-icon
-                                    [icon]="ordenamiento['name'] === 'asc' ? iconArrowUp : ordenamiento['name'] === 'desc' ? iconArrowDown : iconDove">
+                                <fa-icon [icon]="ordenamiento['name'] === 'asc' ? iconArrowUp : iconArrowDown ">
                                 </fa-icon>
                             </span>
                         </th>
@@ -52,6 +58,10 @@
                 <tbody>
                     @if (showFilter) {
                     <tr>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.country_name"
+                                (input)="obtenerCiudades()" />
+                        </td>F
                         <td>
                             <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.district_name"
                                 (input)="obtenerCiudades()" />
@@ -65,6 +75,8 @@
                     }
                     @for(data of ciudades | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                     <tr>
+                        <td class="whitespace-nowrap">{{ data.district.country.name}} </td>
+
                         <td class="whitespace-nowrap">{{ data.district.name}} </td>
                         <td class="whitespace-nowrap">{{ data.name}} </td>
                         <td>
@@ -100,8 +112,8 @@
                             <label for="paginacion">Ítems por página:</label>
                         </div>
                         <div class="col-auto">
-                            <select id="paginacion" class="form-control"
-                                (change)="obtenerCiudades()" [(ngModel)]="itemsPerPage">
+                            <select id="paginacion" class="form-control" (change)="obtenerCiudades()"
+                                [(ngModel)]="itemsPerPage">
                                 <option value=5>5</option>
                                 <option value=10>10</option>
                                 <option value=20>20</option>

@@ -40,9 +40,15 @@ export class IndexService {
     // para cada elemento de paramsObj.filters, agregar un filters[]
     Object.keys(paramsObj.filters).forEach((key, index) => {
       if (paramsObj.filters[key] !== '') {
-        params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
-        params = params.append(`filters[${index}][]`, 'LIKE');
-        params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
+        if (key === 'location_uuid') {
+          params = params.append(`filters[${index}][]`, key);
+          params = params.append(`filters[${index}][]`, '=');
+          params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
+        } else {
+          params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
+          params = params.append(`filters[${index}][]`, 'LIKE');
+          params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
+        }
       }
     });
     if (rol) {
@@ -51,6 +57,43 @@ export class IndexService {
 
     return params;
   }
+
+  // getParamsWithId(paramsObj: any, rol?: string): HttpParams {
+  //   let params = new HttpParams();
+  //   // Paging 
+  //   paramsObj.paging && (params = params.append('paging', paramsObj.paging));
+  //   paramsObj.page && (params = params.append('page', paramsObj.page));
+  //   // para cada elemento de paramsObj.with, agregar un with[]
+  //   paramsObj.with.forEach((element: any) => {
+  //     params = params.append('with[]', element);
+  //   });
+  //   // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
+  //   Object.keys(paramsObj.order_by).forEach((key, index) => {
+  //     if (paramsObj.order_by[key] !== '') {
+  //       params = params.append(`order_by[${index}][]`, key.replace(/_/g, '.'));
+  //       params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+  //     }
+  //   });
+  //   // para cada elemento de paramsObj.filters, agregar un filters[]
+  //   Object.keys(paramsObj.filters).forEach((key, index) => {
+  //     if (paramsObj.filters[key] !== '') {
+  //       if (key === 'location_uuid') {
+  //         params = params.append(`filters[${index}][]`, key);
+  //         params = params.append(`filters[${index}][]`, '=');
+  //         params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
+  //       } else {
+  //         params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
+  //         params = params.append(`filters[${index}][]`, 'LIKE');
+  //         params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
+  //       }
+  //     }
+  //   });
+  //   if (rol) {
+  //     params = params.append('actual_role', rol);
+  //   }
+
+  //   return params;
+  // }
 
   getProvinciasWithParams(paramsObj: any): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
@@ -86,6 +129,11 @@ export class IndexService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiUbicaciones, { headers, params: this.getParams(paramsObj, rol) });
   }
+
+  // getUbicacionesByIdWithParam(paramsObj: any, rol: string, uuid: string): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiUbicaciones + '/' + uuid, { headers, params: this.getParams(paramsObj, rol) });
+  // }
 
   getTiposCambioWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
