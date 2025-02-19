@@ -57,7 +57,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   };
   ordenamiento: any = {
     name: 'asc',
-    symbol: 'asc'
+    // symbol: 'asc'
   };
 
   iconArrowUp = faArrowUp;
