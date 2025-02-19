@@ -33,8 +33,13 @@ export class IndexService {
     // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
     Object.keys(paramsObj.order_by).forEach((key, index) => {
       if (paramsObj.order_by[key] !== '') {
-        params = params.append(`order_by[${index}][]`, key.replace(/_/g, '.'));
-        params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+        if (key === 'datetime_from') {
+          params = params.append(`order_by[${index}][]`, key);
+          params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+        } else {
+          params = params.append(`order_by[${index}][]`, key.replace(/_/g, '.'));
+          params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+        }
       }
     });
     // para cada elemento de paramsObj.filters, agregar un filters[]

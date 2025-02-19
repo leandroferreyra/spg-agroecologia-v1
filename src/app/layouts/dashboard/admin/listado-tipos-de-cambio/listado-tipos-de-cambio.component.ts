@@ -1,12 +1,265 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngrx/store';
+import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { Subscription } from 'rxjs';
+import { BancoDTO } from 'src/app/core/models/request/bancoDTO';
+import { BancosService } from 'src/app/core/services/bancos.service';
+import { IndexService } from 'src/app/core/services/index.service';
+import { SwalService } from 'src/app/core/services/swal.service';
+import { TokenService } from 'src/app/core/services/token.service';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-listado-tipos-de-cambio',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, NgxSpinnerModule, NgbPaginationModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxCustomModalComponent,
+    IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent
+  ],
   templateUrl: './listado-tipos-de-cambio.component.html',
   styleUrl: './listado-tipos-de-cambio.component.css'
 })
-export class ListadoTiposDeCambioComponent {
+export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
+
+  store: any;
+  private subscription: Subscription = new Subscription();
+
+  actual_role: string = '';
+
+  tiposCambio: any[] = [];
+  tipoCambioForm!: FormGroup;
+  tituloModal: string = '';
+  isSubmit = false;
+  isEdicion = false;
+
+  //Paginación
+  MAX_ITEMS_PER_PAGE = 10;
+  currentPage = 1;
+  last_page = 1;
+  itemsPerPage = this.MAX_ITEMS_PER_PAGE;
+  itemsInPage = this.itemsPerPage;
+  pageSize: number = 0;
+  total_rows: number = 0;
+
+  // Orden y filtro
+  filtros: any = {
+
+  };
+  showFilter: boolean = false;
+  ordenamiento: any = {
+    datetime_from: 'desc'
+  };
+
+  iconArrowUp = faArrowUp;
+  iconArrowDown = faArrowDown;
+
+  // Referencia al modal para crear y editar países.
+  @ViewChild('modalTipoCambio') modalTipoCambio!: NgxCustomModalComponent;
+  modalOptions: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: false
+  };
+
+  constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
+    private _bancosService: BancosService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
+    this.initStore();
+  }
+
+  async initStore() {
+    this.storeData
+      .select((d) => d.index)
+      .subscribe((d) => {
+        this.actual_role = d.userRole;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  ngOnInit(): void {
+    this.obtenerTiposCambio();
+  }
+  obtenerTiposCambio() {
+    this.spinner.show();
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = ["currency"];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = this.ordenamiento;
+    params.filters = this.filtros;
+
+    this.subscription.add(
+      this._indexService.getTiposCambioWithParam(params, this.actual_role).subscribe({
+        next: res => {
+          console.log(res);
+          this.spinner.hide();
+          this.tiposCambio = res.data;
+          this.modificarPaginacion(res);
+        },
+        error: error => {
+          this.spinner.hide();
+          console.error(error);
+        }
+      })
+    )
+  }
+
+  modificarPaginacion(res: any) {
+    this.total_rows = res.meta.total;
+    this.last_page = res.meta.last_page;
+    if (this.tiposCambio.length <= this.itemsPerPage) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage = this.total_rows;
+      } else {
+        this.itemsInPage = this.currentPage * this.itemsPerPage;
+      }
+    }
+  }
+
+  openModalNuevoTipo(type: string, banco?: any) {
+      if (type === 'NEW') {
+        this.isEdicion = false;
+        this.tituloModal = 'Nuevo banco';
+        this.tipoCambioForm = new FormGroup({
+          nombre: new FormControl(null, [Validators.required]),
+        });
+      } else {
+        this.isEdicion = true;
+        this.tituloModal = 'Edición banco';
+        this.tipoCambioForm = new FormGroup({
+          uuid: new FormControl(banco?.uuid, []),
+          nombre: new FormControl(banco?.name, [Validators.required])
+        });
+      }
+      this.modalTipoCambio.options = this.modalOptions;
+      this.modalTipoCambio.open();
+    }
+  
+    confirmarTipoCambio() {
+      this.isSubmit = true;
+      if (this.tipoCambioForm.valid) {
+        this.spinner.show();
+        let banco = new BancoDTO();
+        banco.name = this.tipoCambioForm.get('nombre')?.value;
+        banco.actual_role = this.actual_role;
+        if (!this.isEdicion) {
+          this.subscription.add(
+            this._bancosService.saveBanco(banco).subscribe({
+              next: res => {
+                this.obtenerTiposCambio();
+                this.cerrarModal();
+                this.swalService.toastSuccess('top-right', res.message);
+                this.tokenService.setToken(res.token);
+                this.spinner.hide();
+              },
+              error: error => {
+                this.swalService.toastError('top-right', error.error.message);
+                console.error(error);
+                this.spinner.hide();
+              }
+            })
+          )
+        } else {
+          this.subscription.add(
+            this._bancosService.editBanco(this.tipoCambioForm.get('uuid')?.value, banco).subscribe({
+              next: res => {
+                const index = this.tiposCambio.findIndex(p => p.uuid === (this.tipoCambioForm.get('uuid')?.value));
+                if (index !== -1) {
+                  this.tiposCambio[index] = { ...this.tiposCambio[index], name: this.tipoCambioForm.get('nombre')?.value };
+                  this.tiposCambio = [...this.tiposCambio];
+                }
+                this.cerrarModal();
+                this.swalService.toastSuccess('top-right', res.message)
+                this.tokenService.setToken(res.token);
+                this.spinner.hide();
+              },
+              error: error => {
+                console.error(error);
+                this.spinner.hide();
+                this.swalService.toastError('top-right', error.error.message);
+              }
+            })
+          )
+        }
+      }
+    }
+  
+    cerrarModal() {
+      this.isSubmit = false;
+      this.modalTipoCambio.close();
+    }
+  
+    openSwalEliminar(tipo: any) {
+      Swal.fire({
+        title: '',
+        text: `¿Desea eliminar el tipo de cambio ${tipo.name}?`,
+        icon: 'info',
+        confirmButtonText: 'Confirmar',
+        showDenyButton: true,
+        denyButtonText: 'Cancelar',
+        didRender: () => {
+          const cancelButton = Swal.getDenyButton();
+          if (cancelButton) {
+            cancelButton.setAttribute('id', 'back-button-with-border');
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.eliminarTipoCambio(tipo);
+        } else if (result.isDenied) {
+  
+        }
+      })
+    }
+  
+    eliminarTipoCambio(tipo: any) {
+      this.spinner.show();
+      this.subscription.add(
+        this._bancosService.eliminarBanco(tipo.uuid, this.actual_role.toUpperCase()).subscribe({
+          next: res => {
+            this.obtenerTiposCambio();
+            this.tokenService.setToken(res.token);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.swalService.toastError('top-right', error.error.message);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
+  
+    toggleFilter() {
+      this.showFilter = !this.showFilter;
+      if (!this.showFilter) {
+        this.filtros = {
+          name: ''
+        };
+        this.obtenerTiposCambio();
+      }
+    }
+  
+    cambiarOrdenamiento(column: string) {
+      // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
+      if (this.ordenamiento[column] === 'asc') {
+        this.ordenamiento[column] = 'desc';
+      } else if (this.ordenamiento[column] === 'desc') {
+        this.ordenamiento[column] = 'asc';
+      }
+      this.obtenerTiposCambio();
+    }
 
 }

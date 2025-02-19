@@ -108,6 +108,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     // Si tiene ubicación es porque ingreso por ícono de sub ubicaciones.
     if (ubicacion) {
       this.locationToGo = ubicacion;
+      this.busqueda_global = false;
       if (this.filtros.name) {
         // Si ingresa acá es porque entró desde "Mostrar sububicaciones" por lo que se borra el filtro nombre para traer todos los datos.
         this.filtros.name = '';
