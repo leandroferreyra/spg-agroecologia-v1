@@ -226,6 +226,10 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
       ubicacion.name = this.ubicacionForm.get('nombre')?.value;
       ubicacion.actual_role = this.actual_role;
       if (!this.isEdicion) {
+        // Chequear si está en raíz o en sububicación para saber donde guardar.
+        if (this.breadcrumbs.length > 0) {
+          ubicacion.location_uuid = this.breadcrumbs[this.breadcrumbs.length - 1].uuid;
+        }
         this.subscription.add(
           this._ubicacionService.saveUbicacion(ubicacion).subscribe({
             next: res => {
@@ -341,7 +345,6 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     } else {
       this.obtenerUbicaciones(true, null, true);
     }
-    // this.obtenerUbicaciones(true);
   }
 
 
@@ -360,13 +363,11 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
 
     this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
       next: res => {
-        if (res.data.length > 0) {
+      
           this.updateBreadcrumbs(ubicacion);
           this.ubicaciones = [...res.data];
           this.modificarPaginacion(res);
-        } else {
-          this.swalService.toastError('top-right', 'No existen ubicaciones para esta locación');
-        }
+        
         this.spinner.hide();
       },
       error: error => {
@@ -406,6 +407,12 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
           this.obtenerUbicaciones(false, selectedBreadcrumb);
         }
       }
+    }
+  }
+
+  cambiarTipoBusqueda() {
+    if (this.filtros.name) {
+      this.filtrarUbicaciones();
     }
   }
 
