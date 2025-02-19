@@ -97,7 +97,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.obtenerUbicaciones(true);
+    this.obtenerUbicaciones(true, null);
   }
 
   filtrarUbicaciones() {
@@ -108,7 +108,6 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     let ubicacionActual = this.breadcrumbs[this.breadcrumbs.length - 1];
-
     if (ubicacionActual) {
       this.filtros.location_uuid = ubicacionActual.uuid;
     } else {
@@ -117,18 +116,19 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     }
     if (this.busqueda_global) {
       if (!this.filtros.name) {
+        // Si entra acá es porque limpió el filtro 'name' y es búsqueda global, debe chequear si está en sububicación o raíz
         if (this.breadcrumbs.length > 0) {
           this.filtros.location_uuid = ubicacionActual.uuid;
         } else {
           this.filtros.location_uuid = null;
         }
       } else {
+        // Si filtra global por nombre, se elimina location_uuid
         delete this.filtros.location_uuid;
       }
+    } else {
+
     }
-    // else {
-    //   this.filtros.location_uuid = null;
-    // }
     params.filters = this.filtros;
     this.subscription.add(
       this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
@@ -147,7 +147,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
 
 
 
-  obtenerUbicaciones(isRoot: boolean, ubicacion?: any, isOrdenamiento: boolean = false) {
+  obtenerUbicaciones(isRoot: boolean, ubicacion: any, isOrdenamiento: boolean = false, isPaginamiento: boolean = false) {
     if (isRoot) {
       this.spinner.show();
       // Inicializamos un objeto vacío para los parámetros
@@ -156,12 +156,19 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
       params.paging = this.itemsPerPage;
       params.page = this.currentPage;
       params.order_by = this.ordenamiento;
+
       if (this.breadcrumbs.length > 0) {
-        this.filtros.location_uuid = this.breadcrumbs[this.breadcrumbs.length - 1].uuid;
+        // Acá ingresa cuando cambia paginación y no está en la raíz
+        if (this.busqueda_global && this.filtros.name) {
+          delete this.filtros.location_uuid;
+        } else {
+          this.filtros.location_uuid = this.breadcrumbs[this.breadcrumbs.length - 1].uuid;
+        }
       } else {
-        if (!isOrdenamiento) {
-          // Si está en la raiz y no está ordenando, se pone en null para obtener las ubicaciones raíz.
+        if (!isOrdenamiento && !isPaginamiento) {
+          // Si va a la raiz y no está ordenando, se pone en null para obtener las ubicaciones raíz.
           this.filtros.location_uuid = null;
+          this.filtros.name = '';
         }
       }
       params.filters = this.filtros;
@@ -197,26 +204,30 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   }
 
   openModalNuevaUbicacion(type: string, ubicacion?: any) {
-    if (type === 'NEW') {
-      this.isEdicion = false;
-      if (ubicacion) {
-        this.tituloModal = 'Nueva sub-ubicación';
+    if (this.breadcrumbs.length < 4) {
+      if (type === 'NEW') {
+        this.isEdicion = false;
+        if (ubicacion) {
+          this.tituloModal = 'Nueva sub-ubicación';
+        } else {
+          this.tituloModal = 'Nueva ubicación';
+        }
+        this.ubicacionForm = new FormGroup({
+          nombre: new FormControl(null, [Validators.required]),
+        });
       } else {
-        this.tituloModal = 'Nueva ubicación';
+        this.isEdicion = true;
+        this.tituloModal = 'Edición ubicación';
+        this.ubicacionForm = new FormGroup({
+          uuid: new FormControl(ubicacion?.uuid, []),
+          nombre: new FormControl(ubicacion?.name, [Validators.required])
+        });
       }
-      this.ubicacionForm = new FormGroup({
-        nombre: new FormControl(null, [Validators.required]),
-      });
+      this.modalUbicacion.options = this.modalOptions;
+      this.modalUbicacion.open();
     } else {
-      this.isEdicion = true;
-      this.tituloModal = 'Edición ubicación';
-      this.ubicacionForm = new FormGroup({
-        uuid: new FormControl(ubicacion?.uuid, []),
-        nombre: new FormControl(ubicacion?.name, [Validators.required])
-      });
+      this.swalService.toastError('top-right', 'No es posible agregar ubicación en este nivel.');
     }
-    this.modalUbicacion.options = this.modalOptions;
-    this.modalUbicacion.open();
   }
 
   confirmarUbicacion() {
@@ -234,7 +245,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._ubicacionService.saveUbicacion(ubicacion).subscribe({
             next: res => {
-              this.obtenerUbicaciones(true);
+              this.obtenerUbicaciones(true, null);
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
               this.tokenService.setToken(res.token);
@@ -305,7 +316,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._ubicacionService.eliminarUbicacion(ubicacion.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerUbicaciones(true);
+          this.obtenerUbicaciones(true, null);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -328,7 +339,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
         // Quiere decir que estamos en alguna sububicación
         this.obtenerUbicaciones(false, this.breadcrumbs[this.breadcrumbs.length - 1]);
       } else {
-        this.obtenerUbicaciones(true);
+        this.obtenerUbicaciones(true, null);
       }
     }
   }
@@ -351,6 +362,14 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
 
   mostrarSububicaciones(ubicacion: any, isOrdenamiento: boolean) {
     this.spinner.show();
+    let busquedaPorFiltro = false;
+
+    if (this.filtros.name && !isOrdenamiento) {
+      // Entró por elemento filtrado, se elimina el filtro previo al llamado para que traiga todos los elementos, 
+      // hay que chequear su breadcrumb.
+      busquedaPorFiltro = true;
+      this.filtros.name = '';
+    }
     const params: any = {};
     params.with = [];
     params.paging = this.itemsPerPage;
@@ -359,12 +378,25 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     if (!isOrdenamiento) {
       this.filtros.location_uuid = ubicacion.uuid;
     }
-    // delete this.filtros.name;
     params.filters = this.filtros;
 
     this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
       next: res => {
-        this.updateBreadcrumbs(ubicacion);
+        if (busquedaPorFiltro) {
+          this.subscription.add(
+            this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
+              next: res => {
+                console.log(res);
+                this.breadcrumbs = [...this.construirBreadcrumb(res.data)];
+              },
+              error: error => {
+                console.error(error);
+              }
+            })
+          )
+        } else {
+          this.updateBreadcrumbs(ubicacion);
+        }
         this.ubicaciones = [...res.data];
         this.modificarPaginacion(res);
         this.spinner.hide();
@@ -375,6 +407,21 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
         console.error(error);
       }
     })
+  }
+
+  construirBreadcrumb(ubicacion: any): any[] {
+    const breadcrumb = [];
+
+    // Recorremos el array y extraemos solo name y uuid
+    let actual = ubicacion; // Tomamos el primer elemento (ubicación actual)
+
+    while (actual) {
+      breadcrumb.unshift({ name: actual.name, uuid: actual.uuid }); // Agregamos al inicio
+      actual = actual.location; // Pasamos a su padre
+    }
+
+    // Eliminamos el último elemento
+    return breadcrumb;
   }
 
   updateBreadcrumbs(ubicacion: any): void {
@@ -393,7 +440,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   goToLocation(index: number): void {
     if (index === -1 && this.breadcrumbs.length > 0) {
       this.breadcrumbs = [];
-      this.obtenerUbicaciones(true);
+      this.obtenerUbicaciones(true, null);
     } else {
       if ((index + 1) === this.breadcrumbs.length) {
         //Está parado en el último elemento por lo que no hace nada.

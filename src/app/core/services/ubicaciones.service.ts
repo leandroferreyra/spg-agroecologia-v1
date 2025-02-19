@@ -19,6 +19,14 @@ export class UbicacionesService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiUbicaciones, JSON.stringify(ubicacion), { headers });
   }
 
+  showUbicacionWithParent(uuid: string, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .set('actual_role', rol)
+      .set('with[]', "location.location.location.location");
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiUbicaciones + '/' + uuid, { headers, params });
+  }
+
   editUbicacion(uuid: string, ubicacion: UbicacionDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.put<AuthResponse>(environment.baseUrl + this.apiUbicaciones + '/' + uuid, JSON.stringify(ubicacion), { headers });

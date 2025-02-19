@@ -132,7 +132,7 @@
                 <div class="col">
                     <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
                         [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="obtenerUbicaciones(true)" />
+                        [boundaryLinks]="true" (pageChange)="obtenerUbicaciones(true, null, false, true)" />
                 </div>
 
                 <div class="col">
@@ -141,8 +141,8 @@
                             <label for="paginacion">Ítems por página:</label>
                         </div>
                         <div class="col-auto">
-                            <select id="paginacion" class="form-control" (change)="obtenerUbicaciones(true)"
-                                [(ngModel)]="itemsPerPage">
+                            <select id="paginacion" class="form-control"
+                                (change)="obtenerUbicaciones(true, null, false, true)" [(ngModel)]="itemsPerPage">
                                 <option value=5>5</option>
                                 <option value=10>10</option>
                                 <option value=20>20</option>
