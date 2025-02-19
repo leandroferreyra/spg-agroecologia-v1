@@ -126,8 +126,6 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
         // Si filtra global por nombre, se elimina location_uuid
         delete this.filtros.location_uuid;
       }
-    } else {
-
     }
     params.filters = this.filtros;
     this.subscription.add(
@@ -144,8 +142,6 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
       })
     )
   }
-
-
 
   obtenerUbicaciones(isRoot: boolean, ubicacion: any, isOrdenamiento: boolean = false, isPaginamiento: boolean = false) {
     if (isRoot) {
