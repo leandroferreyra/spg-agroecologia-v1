@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faArrowDown, faGrinTongueSquint } from '@fortawesome/free-solid-svg-icons';
 import { NgbAccordionModule, NgbModule, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { defaultStateFn, Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
@@ -45,6 +45,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   isSubmit = false;
   isEdicion = false;
   busqueda_global: boolean = false;
+  locationToGo: any = null;
 
 
   //Paginación
@@ -59,12 +60,13 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   // Orden y filtro
   filtros: any = {
     name: '',
-    location_uuid: null,
+    // location_uuid: null,
   };
   showFilter: boolean = false;
   ordenamiento: any = {
     name: 'asc'
   };
+  // isFiltrando: boolean = false;
 
   breadcrumbs: any[] = [];
 
@@ -97,42 +99,45 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.obtenerUbicaciones(true, null);
+    this.spinner.show();
+    this.obtenerUbicaciones();
   }
 
-  filtrarUbicaciones() {
+  obtenerUbicaciones(ubicacion?: any) {
+    // Si tiene ubicación es porque ingreso por ícono de sub ubicaciones.
+    if (ubicacion) {
+      this.locationToGo = ubicacion;
+      if (this.filtros.name) {
+        // Si ingresa acá es porque entró desde "Mostrar sububicaciones" por lo que se borra el filtro nombre para traer todos los datos.
+        this.filtros.name = '';
+      }
+    }
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = [];
+    params.with = ["location.location.location.location"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
-    let ubicacionActual = this.breadcrumbs[this.breadcrumbs.length - 1];
-    if (ubicacionActual) {
-      this.filtros.location_uuid = ubicacionActual.uuid;
+
+    if (this.locationToGo) {
+      this.filtros.location_uuid = this.locationToGo.uuid;
     } else {
-      // Estoy en la raíz.
       this.filtros.location_uuid = null;
     }
-    if (this.busqueda_global) {
-      if (!this.filtros.name) {
-        // Si entra acá es porque limpió el filtro 'name' y es búsqueda global, debe chequear si está en sububicación o raíz
-        if (this.breadcrumbs.length > 0) {
-          this.filtros.location_uuid = ubicacionActual.uuid;
-        } else {
-          this.filtros.location_uuid = null;
-        }
-      } else {
-        // Si filtra global por nombre, se elimina location_uuid
-        delete this.filtros.location_uuid;
-      }
+    // Si filtra y es global eliminamos el uuid
+    if (this.filtros.name && this.busqueda_global) {
+      delete this.filtros.location_uuid;
     }
     params.filters = this.filtros;
+
     this.subscription.add(
       this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.ubicaciones = res.data;
           this.modificarPaginacion(res);
+          if (this.locationToGo) {
+            this.getParentsFromLocation(this.locationToGo);
+          }
           this.spinner.hide();
         },
         error: error => {
@@ -141,98 +146,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
         }
       })
     )
-  }
 
-  obtenerUbicaciones(isRoot: boolean, ubicacion: any, isOrdenamiento: boolean = false, isPaginamiento: boolean = false) {
-    if (isRoot) {
-      this.spinner.show();
-      // Inicializamos un objeto vacío para los parámetros
-      const params: any = {};
-      params.with = [];
-      params.paging = this.itemsPerPage;
-      params.page = this.currentPage;
-      params.order_by = this.ordenamiento;
-
-      if (this.breadcrumbs.length > 0) {
-        // Acá ingresa cuando cambia paginación y no está en la raíz
-        if (this.busqueda_global && this.filtros.name) {
-          delete this.filtros.location_uuid;
-        } else {
-          this.filtros.location_uuid = this.breadcrumbs[this.breadcrumbs.length - 1].uuid;
-        }
-      } else {
-        if (!isOrdenamiento && !isPaginamiento) {
-          // Si va a la raiz y no está ordenando, se pone en null para obtener las ubicaciones raíz.
-          this.filtros.location_uuid = null;
-          this.filtros.name = '';
-        }
-      }
-      params.filters = this.filtros;
-
-      this.subscription.add(
-        this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
-          next: res => {
-            this.ubicaciones = res.data;
-            this.modificarPaginacion(res);
-            this.spinner.hide();
-          },
-          error: error => {
-            this.spinner.hide();
-            console.error(error);
-          }
-        })
-      )
-    } else {
-      this.mostrarSububicaciones(ubicacion, isOrdenamiento);
-    }
-  }
-
-  mostrarSububicaciones(ubicacion: any, isOrdenamiento: boolean) {
-    this.spinner.show();
-    let busquedaPorFiltro = false;
-
-    if (this.filtros.name && !isOrdenamiento) {
-      // Entró por elemento filtrado, se elimina el filtro previo al llamado para que traiga todos los elementos, 
-      // hay que chequear su breadcrumb.
-      busquedaPorFiltro = true;
-      this.filtros.name = '';
-    }
-    const params: any = {};
-    params.with = [];
-    params.paging = this.itemsPerPage;
-    params.page = this.currentPage;
-    params.order_by = this.ordenamiento;
-    if (!isOrdenamiento) {
-      this.filtros.location_uuid = ubicacion.uuid;
-    }
-    params.filters = this.filtros;
-
-    this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
-      next: res => {
-        if (busquedaPorFiltro) {
-          this.subscription.add(
-            this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
-              next: res => {
-                this.breadcrumbs = [...this.construirBreadcrumb(res.data)];
-              },
-              error: error => {
-                console.error(error);
-              }
-            })
-          )
-        } else {
-          this.updateBreadcrumbs(ubicacion);
-        }
-        this.ubicaciones = [...res.data];
-        this.modificarPaginacion(res);
-        this.spinner.hide();
-      },
-      error: error => {
-        this.spinner.hide();
-        this.swalService.toastError('top-right', 'Ocurrió un error en las ubicaciones.');
-        console.error(error);
-      }
-    })
   }
 
   modificarPaginacion(res: any) {
@@ -285,7 +199,13 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._ubicacionService.saveUbicacion(ubicacion).subscribe({
             next: res => {
-              this.obtenerUbicaciones(true, null);
+              if (this.breadcrumbs.length > 0) {
+                this.locationToGo = this.breadcrumbs[this.breadcrumbs.length - 1];
+                this.obtenerUbicaciones();
+              } else {
+                this.locationToGo = null;
+                this.obtenerUbicaciones();
+              }
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
               this.tokenService.setToken(res.token);
@@ -356,7 +276,13 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._ubicacionService.eliminarUbicacion(ubicacion.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerUbicaciones(true, null);
+          if (this.breadcrumbs.length > 0) {
+            this.locationToGo = this.breadcrumbs[this.breadcrumbs.length - 1];
+            this.obtenerUbicaciones();
+          } else {
+            this.locationToGo = null;
+            this.obtenerUbicaciones();
+          }
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -378,9 +304,11 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
       this.busqueda_global = false;
       if (this.breadcrumbs.length > 0) {
         // Quiere decir que estamos en alguna sububicación
-        this.obtenerUbicaciones(false, this.breadcrumbs[this.breadcrumbs.length - 1]);
+        this.locationToGo = this.breadcrumbs[this.breadcrumbs.length - 1];
+        this.obtenerUbicaciones();
       } else {
-        this.obtenerUbicaciones(true, null);
+        this.locationToGo = null;
+        this.obtenerUbicaciones();
       }
     }
   }
@@ -394,15 +322,27 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     }
     if (this.breadcrumbs.length > 0) {
       // Quiere decir que estamos en alguna sububicación
-      this.obtenerUbicaciones(false, this.breadcrumbs[this.breadcrumbs.length - 1], true);
+      this.locationToGo = this.breadcrumbs[this.breadcrumbs.length - 1];
+      this.obtenerUbicaciones();
     } else {
-      this.obtenerUbicaciones(true, null, true);
+      this.locationToGo = null;
+      this.obtenerUbicaciones();
     }
   }
 
 
-
-
+  getParentsFromLocation(ubicacion: any) {
+    this.subscription.add(
+      this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
+        next: res => {
+          this.breadcrumbs = [...this.construirBreadcrumb(res.data)];
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    )
+  }
   construirBreadcrumb(ubicacion: any): any[] {
     const breadcrumb = [];
     let actual = ubicacion;
@@ -413,23 +353,11 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     return breadcrumb;
   }
 
-  updateBreadcrumbs(ubicacion: any): void {
-    // Busca si el breadcrumb ya existe en la lista
-    const existingIndex = this.breadcrumbs.findIndex(b => b.uuid === ubicacion.uuid);
-
-    if (existingIndex === -1) {
-      // Si no existe, lo agregamos
-      this.breadcrumbs.push({ name: ubicacion.name, uuid: ubicacion.uuid });
-    } else {
-      // Si ya existe, eliminamos los posteriores y lo mantenemos
-      this.breadcrumbs = this.breadcrumbs.slice(0, existingIndex + 1);
-    }
-  }
-
   goToLocation(index: number): void {
     if (index === -1 && this.breadcrumbs.length > 0) {
       this.breadcrumbs = [];
-      this.obtenerUbicaciones(true, null);
+      this.locationToGo = null;
+      this.obtenerUbicaciones();
     } else {
       if ((index + 1) === this.breadcrumbs.length) {
         //Está parado en el último elemento por lo que no hace nada.
@@ -439,7 +367,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
         // Llama al servicio para cargar las ubicaciones correspondientes al breadcrumb seleccionado
         const selectedBreadcrumb = this.breadcrumbs[index];
         if (selectedBreadcrumb) {
-          this.obtenerUbicaciones(false, selectedBreadcrumb);
+          this.obtenerUbicaciones(selectedBreadcrumb);
         }
       }
     }
@@ -447,8 +375,18 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
 
   cambiarTipoBusqueda() {
     if (this.filtros.name) {
-      this.filtrarUbicaciones();
+      // this.isFiltrando = true;
+      this.obtenerUbicaciones(null);
     }
+  }
+
+  getName(data: any) {
+    if (this.filtros.name && this.busqueda_global) {
+      let breadcrumb = this.construirBreadcrumb(data);
+      let name = breadcrumb.map(element => element.name).join(' -> ');
+      return name;
+    }
+    return data.name;
   }
 
 }

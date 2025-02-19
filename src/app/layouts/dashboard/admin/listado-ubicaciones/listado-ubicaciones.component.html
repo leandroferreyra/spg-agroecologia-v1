@@ -45,8 +45,6 @@
         </ol>
         }
 
-
-
         <div class="row mb-2">
             <div class="col-6">
                 <span *ngIf="ubicaciones && ubicaciones.length > 0" class="float-md-start color-gris">
@@ -91,7 +89,7 @@
                     <tr>
                         <td>
                             <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
-                                (input)="filtrarUbicaciones()" />
+                                (input)="obtenerUbicaciones(null)" />
 
                         </td>
                         <td></td>
@@ -100,13 +98,13 @@
                     @for(data of ubicaciones | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                     <tr>
 
-                        <td class="whitespace-nowrap">{{ data.name}} </td>
+                        <td class="whitespace-nowrap"> {{getName(data)}} </td>
 
                         <td>
                             <div class="flex items-center">
                                 <div>
                                     <button type="button" ngxTippy="Mostrar sububicaciones" class="ltr:mr-3 rtl:ml-2"
-                                        (click)="obtenerUbicaciones(false, data)">
+                                        (click)="obtenerUbicaciones(data)">
                                         <icon-info-circle />
                                     </button>
                                 </div>
@@ -132,7 +130,7 @@
                 <div class="col">
                     <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
                         [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="obtenerUbicaciones(true, null, false, true)" />
+                        [boundaryLinks]="true" (pageChange)="obtenerUbicaciones()" />
                 </div>
 
                 <div class="col">
@@ -142,7 +140,7 @@
                         </div>
                         <div class="col-auto">
                             <select id="paginacion" class="form-control"
-                                (change)="obtenerUbicaciones(true, null, false, true)" [(ngModel)]="itemsPerPage">
+                                (change)="obtenerUbicaciones()" [(ngModel)]="itemsPerPage">
                                 <option value=5>5</option>
                                 <option value=10>10</option>
                                 <option value=20>20</option>
