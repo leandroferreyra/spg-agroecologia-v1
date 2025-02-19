@@ -213,7 +213,6 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
           this.subscription.add(
             this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
               next: res => {
-                console.log(res);
                 this.breadcrumbs = [...this.construirBreadcrumb(res.data)];
               },
               error: error => {
