@@ -187,6 +187,55 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     }
   }
 
+  mostrarSububicaciones(ubicacion: any, isOrdenamiento: boolean) {
+    this.spinner.show();
+    let busquedaPorFiltro = false;
+
+    if (this.filtros.name && !isOrdenamiento) {
+      // Entró por elemento filtrado, se elimina el filtro previo al llamado para que traiga todos los elementos, 
+      // hay que chequear su breadcrumb.
+      busquedaPorFiltro = true;
+      this.filtros.name = '';
+    }
+    const params: any = {};
+    params.with = [];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = this.ordenamiento;
+    if (!isOrdenamiento) {
+      this.filtros.location_uuid = ubicacion.uuid;
+    }
+    params.filters = this.filtros;
+
+    this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
+      next: res => {
+        if (busquedaPorFiltro) {
+          this.subscription.add(
+            this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
+              next: res => {
+                console.log(res);
+                this.breadcrumbs = [...this.construirBreadcrumb(res.data)];
+              },
+              error: error => {
+                console.error(error);
+              }
+            })
+          )
+        } else {
+          this.updateBreadcrumbs(ubicacion);
+        }
+        this.ubicaciones = [...res.data];
+        this.modificarPaginacion(res);
+        this.spinner.hide();
+      },
+      error: error => {
+        this.spinner.hide();
+        this.swalService.toastError('top-right', 'Ocurrió un error en las ubicaciones.');
+        console.error(error);
+      }
+    })
+  }
+
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
@@ -356,54 +405,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   }
 
 
-  mostrarSububicaciones(ubicacion: any, isOrdenamiento: boolean) {
-    this.spinner.show();
-    let busquedaPorFiltro = false;
 
-    if (this.filtros.name && !isOrdenamiento) {
-      // Entró por elemento filtrado, se elimina el filtro previo al llamado para que traiga todos los elementos, 
-      // hay que chequear su breadcrumb.
-      busquedaPorFiltro = true;
-      this.filtros.name = '';
-    }
-    const params: any = {};
-    params.with = [];
-    params.paging = this.itemsPerPage;
-    params.page = this.currentPage;
-    params.order_by = this.ordenamiento;
-    if (!isOrdenamiento) {
-      this.filtros.location_uuid = ubicacion.uuid;
-    }
-    params.filters = this.filtros;
-
-    this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
-      next: res => {
-        if (busquedaPorFiltro) {
-          this.subscription.add(
-            this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
-              next: res => {
-                console.log(res);
-                this.breadcrumbs = [...this.construirBreadcrumb(res.data)];
-              },
-              error: error => {
-                console.error(error);
-              }
-            })
-          )
-        } else {
-          this.updateBreadcrumbs(ubicacion);
-        }
-        this.ubicaciones = [...res.data];
-        this.modificarPaginacion(res);
-        this.spinner.hide();
-      },
-      error: error => {
-        this.spinner.hide();
-        this.swalService.toastError('top-right', 'Ocurrió un error en las ubicaciones.');
-        console.error(error);
-      }
-    })
-  }
 
   construirBreadcrumb(ubicacion: any): any[] {
     const breadcrumb = [];

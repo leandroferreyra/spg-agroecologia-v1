@@ -28,10 +28,10 @@
             <table class="table-hover">
                 <thead>
                     <tr>
-                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('country_name')">
+                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('district_country_name')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 País
-                                <fa-icon [icon]="ordenamiento['country_name'] === 'asc' ? iconArrowUp : iconArrowDown">
+                                <fa-icon [icon]="ordenamiento['district_country_name'] === 'asc' ? iconArrowUp : iconArrowDown">
                                 </fa-icon>
                             </span>
                         </th>
@@ -59,7 +59,7 @@
                     @if (showFilter) {
                     <tr>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.country_name"
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.district_country_name"
                                 (input)="obtenerCiudades()" />
                         </td>F
                         <td>

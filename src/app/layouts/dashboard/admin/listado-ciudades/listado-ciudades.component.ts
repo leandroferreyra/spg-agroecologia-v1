@@ -52,7 +52,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
   // Mantener el estado del ordenamiento
   ordenamiento: any = {
-    country_name: 'asc',
+    district_country_name: 'asc',
     district_name: 'asc',
     name: 'asc'
   };
@@ -63,7 +63,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   // filtro
   showFilter: boolean = false;
   filtros: any = {
-    country_name: '',
+    district_country_name: '',
     district_name: '',
     name: ''
   };
@@ -304,7 +304,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        country_name: '',
+        district_country_name: '',
         district_name: '',
         name: ''
       };
