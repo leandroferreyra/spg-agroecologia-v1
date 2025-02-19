@@ -252,11 +252,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     if (this.breadcrumbs.length < 4) {
       if (type === 'NEW') {
         this.isEdicion = false;
-        if (ubicacion) {
-          this.tituloModal = 'Nueva sub-ubicación';
-        } else {
-          this.tituloModal = 'Nueva ubicación';
-        }
+        this.tituloModal = 'Nueva ubicación';
         this.ubicacionForm = new FormGroup({
           nombre: new FormControl(null, [Validators.required]),
         });
