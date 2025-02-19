@@ -103,7 +103,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   filtrarUbicaciones() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = [ ];
+    params.with = [];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -380,6 +380,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
       this.filtros = {
         name: '',
       };
+      this.busqueda_global = false;
       if (this.breadcrumbs.length > 0) {
         // Quiere decir que estamos en alguna sububicación
         this.obtenerUbicaciones(false, this.breadcrumbs[this.breadcrumbs.length - 1]);
@@ -409,16 +410,11 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
 
   construirBreadcrumb(ubicacion: any): any[] {
     const breadcrumb = [];
-
-    // Recorremos el array y extraemos solo name y uuid
-    let actual = ubicacion; // Tomamos el primer elemento (ubicación actual)
-
+    let actual = ubicacion;
     while (actual) {
       breadcrumb.unshift({ name: actual.name, uuid: actual.uuid }); // Agregamos al inicio
       actual = actual.location; // Pasamos a su padre
     }
-
-    // Eliminamos el último elemento
     return breadcrumb;
   }
 
