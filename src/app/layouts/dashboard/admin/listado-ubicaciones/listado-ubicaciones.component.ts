@@ -15,6 +15,7 @@ import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UbicacionesService } from 'src/app/core/services/ubicaciones.service';
+import { IconFolderComponent } from 'src/app/shared/icon/icon-folder';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
@@ -27,7 +28,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule,
-    IconInfoCircleComponent, NgbAccordionModule],
+    IconInfoCircleComponent, IconFolderComponent],
   templateUrl: './listado-ubicaciones.component.html',
   styleUrl: './listado-ubicaciones.component.css'
 })

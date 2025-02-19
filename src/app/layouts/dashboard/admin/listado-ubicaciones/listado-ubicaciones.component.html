@@ -13,7 +13,7 @@
                     <icon-search />
                 </button>
                 @if (showFilter) {
-                <div class="form-check form-check-inline flex items-center" style="margin-top:9px">
+                <div class="form-check form-check-inline flex items-center" style="margin-top:10px">
                     <label class="form-check-label flex items-center gap-1">
                         <input class="form-checkbox h-5 w-5" type="checkbox" [checked]="busqueda_global"
                             [(ngModel)]="busqueda_global" (change)="cambiarTipoBusqueda()">
@@ -105,7 +105,7 @@
                                 <div>
                                     <button type="button" ngxTippy="Mostrar sububicaciones" class="ltr:mr-3 rtl:ml-2"
                                         (click)="obtenerUbicaciones(data)">
-                                        <icon-info-circle />
+                                        <icon-folder />
                                     </button>
                                 </div>
                                 <div>
