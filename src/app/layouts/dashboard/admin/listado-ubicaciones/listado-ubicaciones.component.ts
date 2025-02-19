@@ -103,7 +103,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   filtrarUbicaciones() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = [];
+    params.with = [ ];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
