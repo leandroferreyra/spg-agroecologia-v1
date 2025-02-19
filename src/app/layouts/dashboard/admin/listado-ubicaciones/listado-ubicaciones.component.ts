@@ -160,6 +160,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
         this.filtros.location_uuid = this.breadcrumbs[this.breadcrumbs.length - 1].uuid;
       } else {
         if (!isOrdenamiento) {
+          // Si está en la raiz y no está ordenando, se pone en null para obtener las ubicaciones raíz.
           this.filtros.location_uuid = null;
         }
       }
@@ -363,11 +364,9 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
 
     this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
       next: res => {
-      
-          this.updateBreadcrumbs(ubicacion);
-          this.ubicaciones = [...res.data];
-          this.modificarPaginacion(res);
-        
+        this.updateBreadcrumbs(ubicacion);
+        this.ubicaciones = [...res.data];
+        this.modificarPaginacion(res);
         this.spinner.hide();
       },
       error: error => {
