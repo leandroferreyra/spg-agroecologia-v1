@@ -1,1 +1,265 @@
-<p>listado-cuentas-bancarias works!</p>
+<div>
+    <div class="panel mt-6 pb-0">
+        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
+            <h5 class="text-lg font-semibold dark:text-white-light">Cuentas bancarias LADIE
+            </h5>
+            <button type="button" ngxTippy="Agregar cuenta bancaria Ladie" (click)="openModalNuevaCuenta('NEW')">
+                <icon-plus />
+            </button>
+            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+                <icon-search />
+            </button>
+        </div>
+
+
+        <div class="row mb-2">
+            <div class="col-6">
+                <span *ngIf="cuentasBancarias && cuentasBancarias.length > 0" class="float-md-start color-gris">
+                    Página: {{ currentPage}}/{{numPages.pageCount }}
+                </span>
+            </div>
+            <div class="col-6" style="text-align: right;">
+                <span *ngIf="cuentasBancarias && cuentasBancarias.length > 0" class="float-md-end color-gris">
+                    Ítems: {{itemsInPage}}/{{ total_rows }}
+                </span>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-hover">
+                <thead>
+                    <tr>
+                        <th style="cursor: pointer;">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                Número de cuenta
+                            </span>
+                        </th>
+                        <th style="cursor: pointer;">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                Alias
+                            </span>
+                        </th>
+                        <th style="cursor: pointer;">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                CBU
+                            </span>
+                        </th>
+                        <th style="cursor: pointer;">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                Tipo de cuenta
+                            </span>
+                        </th>
+                        <th style="cursor: pointer;">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                Banco
+                            </span>
+                        </th>
+                        <th style="cursor: pointer;">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                Moneda
+                            </span>
+                        </th>
+                        <th>
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (showFilter) {
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.account_number"
+                                (input)="obtenerCuentas()" />
+                        </td>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.alias"
+                                (input)="obtenerCuentas()" />
+                        </td>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.cbu"
+                                (input)="obtenerCuentas()" />
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    }
+                    @for(data of cuentasBancarias | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                    <tr>
+                        <td class="whitespace-nowrap">{{ data.account_number}} </td>
+                        <td class="whitespace-nowrap">{{ data.alias}} </td>
+                        <td class="whitespace-nowrap">{{ data.cbu}} </td>
+                        <td class="whitespace-nowrap">{{ data.account_type.name}} </td>
+                        <td class="whitespace-nowrap">{{ data.bank.name}} </td>
+                        <td class="whitespace-nowrap">{{ data.currency.name}} </td>
+
+                        <td>
+                            <div class="flex items-center">
+                                <div>
+                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                        (click)="openModalNuevaCuenta('EDIT', data)">
+                                        <icon-pencil />
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                        <icon-trash-lines />
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="row mt-4">
+                <div class="col">
+                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                        [boundaryLinks]="true" (pageChange)="obtenerCuentas()" />
+                </div>
+
+                <div class="col">
+                    <div class="row align-items-center float-md-end">
+                        <div class="col-auto">
+                            <label for="paginacion">Ítems por página:</label>
+                        </div>
+                        <div class="col-auto">
+                            <select id="paginacion" class="form-control" (change)="obtenerCuentas()"
+                                [(ngModel)]="itemsPerPage">
+                                <option value=5>5</option>
+                                <option value=10>10</option>
+                                <option value=20>20</option>
+                                <option value=50>50</option>
+                                <option value=100>100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+    </div>
+</div>
+
+
+<div>
+    <ngx-custom-modal #modalCuenta class="modal-top animate extra-large-modal animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="cuentaForm" (keydown.enter)="confimarCuenta()">
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? cuentaForm.controls['account_number'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Número de cuenta</label>
+                                <input type="text" class="form-control" formControlName="account_number">
+
+                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['account_number'].errors">
+                                    <p class="text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && cuentaForm.controls['account_number'].errors">
+                                    <p class="text-danger">Ingrese número de la cuenta</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? cuentaForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Moneda</label>
+                                <ng-select [items]="monedas" bindLabel="name" bindValue="uuid"
+                                    formControlName="currency_uuid" [virtualScroll]="true" [appendTo]="'body'">
+                                </ng-select>
+                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['currency_uuid'].errors">
+                                    <p class="text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && cuentaForm.controls['currency_uuid'].errors">
+                                    <p class="text-danger">Selecciona una moneda</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? cuentaForm.controls['bank_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Banco</label>
+                                <ng-select [items]="bancos" bindLabel="name" bindValue="uuid"
+                                    formControlName="bank_uuid" [virtualScroll]="true" [appendTo]="'body'">
+                                </ng-select>
+                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['bank_uuid'].errors">
+                                    <p class="text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && cuentaForm.controls['bank_uuid'].errors">
+                                    <p class="text-danger">Selecciona un banco</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? cuentaForm.controls['account_type_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Tipo de cuenta</label>
+                                <ng-select [items]="tiposDeCuenta" bindLabel="name" bindValue="uuid"
+                                    formControlName="account_type_uuid" [virtualScroll]="true" [appendTo]="'body'">
+                                </ng-select>
+                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['account_type_uuid'].errors">
+                                    <p class="text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && cuentaForm.controls['account_type_uuid'].errors">
+                                    <p class="text-danger">Selecciona un tipo de cuenta</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? cuentaForm.controls['alias'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Alias</label>
+                                <input type="text" class="form-control" formControlName="alias">
+
+                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['alias'].errors">
+                                    <p class="text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && cuentaForm.controls['alias'].errors">
+                                    <p class="text-danger">Ingresa alias de la alias</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? cuentaForm.controls['cbu'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>CBU</label>
+                                <input type="text" class="form-control" formControlName="cbu">
+
+                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['cbu'].errors">
+                                    <p class="text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && cuentaForm.controls['cbu'].errors">
+                                    <p class="text-danger">Ingresa cbu de la cuenta</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confimarCuenta()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+</ngx-spinner>
