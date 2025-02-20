@@ -6,13 +6,12 @@ import { faArrowUp, faArrowDown, faCalendar } from '@fortawesome/free-solid-svg-
 import { NgbDateStruct, NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
-import { FlatpickrDefaults, FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
+import { FlatpickrDirective } from 'angularx-flatpickr';
+import { FlatpickrDefaultsInterface } from 'angularx-flatpickr';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
-import { BancoDTO } from 'src/app/core/models/request/bancoDTO';
 import { TipoCambioDTO } from 'src/app/core/models/request/tipoCambioDTO';
-import { BancosService } from 'src/app/core/services/bancos.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
@@ -22,15 +21,15 @@ import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
+import { Spanish } from "flatpickr/dist/l10n/es.js"
 
 @Component({
   selector: 'app-listado-tipos-de-cambio',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, NgbPaginationModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxCustomModalComponent,
-    IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, NgSelectComponent, NgbModule, FlatpickrDirective
+    IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, NgSelectComponent, NgbModule,
+    FlatpickrDirective
   ],
-  providers: [provideFlatpickrDefaults()],
-
   templateUrl: './listado-tipos-de-cambio.component.html',
   styleUrl: './listado-tipos-de-cambio.component.css'
 })
@@ -70,7 +69,8 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
   iconCalendar = faCalendar;
-  dateTime: FlatpickrDefaults | undefined;
+
+  dateTime: FlatpickrDefaultsInterface;
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalTipoCambio') modalTipoCambio!: NgxCustomModalComponent;
@@ -83,6 +83,17 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _tiposCambioService: TiposCambioService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
     this.initStore();
+    this.dateTime = {
+      enableTime: true,
+      enableSeconds: true,
+      defaultSeconds: 0,
+      defaultMinute: 0,
+      defaultHour: 0,
+      locale: Spanish,
+      allowInput: true,
+      convertModelValue: true,
+      dateFormat: 'Y-m-d H:i:S',
+    };
   }
 
   async initStore() {
@@ -160,7 +171,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
       this.tipoCambioForm = new FormGroup({
         moneda: new FormControl(null, [Validators.required]),
         valor: new FormControl(null, [Validators.required]),
-        datetime_from: new FormControl(null, []),
+        datetime_from: new FormControl(this.formatDate(new Date), []),
       });
     } else {
       this.isEdicion = true;
@@ -176,6 +187,16 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     this.modalTipoCambio.options = this.modalOptions;
     this.modalTipoCambio.open();
   }
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses van de 0 a 11
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
 
   confirmarTipoCambio() {
     this.isSubmit = true;
@@ -185,7 +206,8 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
       tipo.currency_uuid = this.tipoCambioForm.get('moneda')?.value;
       tipo.rate = this.tipoCambioForm.get('valor')?.value;
       let date_from: NgbDateStruct = this.tipoCambioForm.get('datetime_from')?.value;
-      tipo.datetime_from = date_from.year + '-' + date_from.month + '-' + date_from.day;
+      // tipo.datetime_from = date_from.year + '-' + date_from.month + '-' + date_from.day;
+      tipo.datetime_from = this.tipoCambioForm.get('datetime_from')?.value;
 
       tipo.actual_role = this.actual_role;
       if (!this.isEdicion) {

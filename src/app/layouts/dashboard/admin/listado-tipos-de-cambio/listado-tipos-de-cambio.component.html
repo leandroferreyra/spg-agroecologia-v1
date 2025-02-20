@@ -174,12 +174,19 @@
                                 </ng-container>
                             </div>
 
+                            <div class="col-md-12 pr-1 mb-3">
+                                <label>Fecha desde</label>
+                                <input type="text" mwlFlatpickr [options]="dateTime" formControlName="datetime_from"
+                                    class="form-input" />
+                            </div>
+
+                            @if (isEdicion) {
                             <div class="col-md-12 pr-1">
                                 <label>Fecha desde</label>
-                                <!-- <ng2-flatpickr [config]="dateTime" formControlName="datetime_from" addClass="form-input" ngDefaultControl></ng2-flatpickr> -->
-                                <input type="text" mwlFlatpickr formControlName="datetime_from" [altInput]="true"
-                                    [convertModelValue]="true" />
+                                <input type="text" mwlFlatpickr [options]="dateTime" formControlName="datetime_to"
+                                    class="form-input" />
                             </div>
+                            }
 
                             <div class="row mt-3">
                                 <div class="col-12 d-flex justify-content-center">

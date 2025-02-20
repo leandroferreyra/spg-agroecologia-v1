@@ -14,6 +14,8 @@ import { tokenInterceptorInterceptor } from './core/interceptors/token-intercept
 registerLocaleData(localeEs);
 import { provideScrollbarOptions } from 'ngx-scrollbar';
 import { provideFlatpickrDefaults } from 'angularx-flatpickr';
+import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateCustomParserFormatter } from './core/pipes/NgbDateCustomParserFormatter';
 // import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
 
 
@@ -24,8 +26,9 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideStore({ index: indexReducer }),
     provideHttpClient(withInterceptors([tokenInterceptorInterceptor])),
+    provideFlatpickrDefaults(),
     { provide: LOCALE_ID, useValue: 'es-ES' },
-    // { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
+    { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     provideScrollbarOptions({
       visibility: 'hover',
