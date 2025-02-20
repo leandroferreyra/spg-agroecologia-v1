@@ -58,7 +58,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-
+    currency_name: ''
   };
   showFilter: boolean = false;
   ordenamiento: any = {
@@ -126,7 +126,6 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getTiposCambioWithParam(params, this.actual_role).subscribe({
         next: res => {
-          console.log(res);
           this.spinner.hide();
           this.tiposCambio = res.data;
           this.modificarPaginacion(res);
@@ -233,7 +232,12 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
             next: res => {
               const index = this.tiposCambio.findIndex(p => p.uuid === (this.tipoCambioForm.get('uuid')?.value));
               if (index !== -1) {
-                this.tiposCambio[index] = { ...this.tiposCambio[index], name: this.tipoCambioForm.get('nombre')?.value };
+                this.tiposCambio[index] = {
+                  ...this.tiposCambio[index],
+                  name: this.tipoCambioForm.get('nombre')?.value,
+                  datetime_from: this.tipoCambioForm.get('datetime_from')?.value,
+                  datetime_to: this.tipoCambioForm.get('datetime_to')?.value
+                };
                 this.tiposCambio = [...this.tiposCambio];
               }
               this.cerrarModal();
@@ -261,7 +265,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        name: ''
+        currency_name: ''
       };
       this.obtenerTiposCambio();
     }
