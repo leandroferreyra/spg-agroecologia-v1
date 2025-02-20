@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp, faDove } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowsUpDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
@@ -55,7 +55,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
 
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
-  iconDove = faDove;
+  iconArrowsUpDown = faArrowsUpDown;
 
   // Mantener el estado del filtro y orden
   showFilter: boolean = false;
@@ -170,6 +170,10 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
       this.ordenamiento[column] = 'asc';
     }
     this.obtenerProvincias();
+  }
+
+  icono(orden: string) {
+    return orden === 'asc' ? this.iconArrowUp : (orden === 'desc' ? this.iconArrowDown : this.iconArrowsUpDown);
   }
 
   openSwalEliminar(provincia: any) {

@@ -31,18 +31,14 @@
                         <th style="cursor: pointer;" (click)="cambiarOrdenamiento('country_name')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 País
-                                <fa-icon
-                                    [icon]="ordenamiento['country_name'] === 'asc' ? iconArrowUp : ordenamiento['country_name'] === 'desc' ? iconArrowDown : iconDove">
-                                </fa-icon>
+                                <fa-icon [icon]="icono(ordenamiento['country_name'])"></fa-icon>
                             </span>
                         </th>
 
                         <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Provincia
-                                <fa-icon
-                                    [icon]="ordenamiento['name'] === 'asc' ? iconArrowUp : ordenamiento['name'] === 'desc' ? iconArrowDown : iconDove">
-                                </fa-icon>
+                                <fa-icon [icon]="icono(ordenamiento['name'])"></fa-icon>
                             </span>
                         </th>
                         <th>

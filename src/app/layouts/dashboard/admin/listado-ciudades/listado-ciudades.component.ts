@@ -10,7 +10,7 @@ import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { CiudadDTO } from 'src/app/core/models/request/ciudadDTO';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp, faDove } from '@fortawesome/free-solid-svg-icons'; import { CatalogoService } from 'src/app/core/services/catalogo.service';
+import { faArrowDown, faArrowDownUpLock, faArrows, faArrowsUpDown, faArrowUp } from '@fortawesome/free-solid-svg-icons'; import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { CiudadService } from 'src/app/core/services/ciudad.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
@@ -59,6 +59,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
+  iconArrowsUpDown = faArrowsUpDown;
 
   // filtro
   showFilter: boolean = false;
@@ -143,13 +144,18 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   }
 
   cambiarOrdenamiento(column: string) {
-    // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
     if (this.ordenamiento[column] === 'asc') {
       this.ordenamiento[column] = 'desc';
     } else if (this.ordenamiento[column] === 'desc') {
+      this.ordenamiento[column] = '';
+    } else {
       this.ordenamiento[column] = 'asc';
     }
     this.obtenerCiudades();
+  }
+
+  icono(orden: string) {
+    return orden === 'asc' ? this.iconArrowUp : (orden === 'desc' ? this.iconArrowDown : this.iconArrowsUpDown);
   }
 
   ngOnDestroy(): void {
