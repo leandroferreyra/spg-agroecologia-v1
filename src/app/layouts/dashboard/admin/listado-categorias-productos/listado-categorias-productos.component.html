@@ -1,1 +1,226 @@
-<p>listado-categorias-productos works!</p>
+<div>
+    <div class="panel mt-6 pb-0">
+
+        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
+            <h5 class="text-lg font-semibold dark:text-white-light min-w-0">Categorías</h5>
+
+            <div class="flex items-center gap-2">
+                <button type="button" ngxTippy="Agregar categoría" (click)="openModalNuevaCategoria('NEW')">
+                    <icon-plus />
+                </button>
+
+                <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+                    <icon-search />
+                </button>
+                @if (showFilter) {
+                <div class="form-check form-check-inline flex items-center" style="margin-top:10px">
+                    <label class="form-check-label flex items-center gap-1">
+                        <input class="form-checkbox h-5 w-5" type="checkbox" [checked]="busqueda_global"
+                            [(ngModel)]="busqueda_global" (change)="cambiarTipoBusqueda()">
+                        <span class="form-check-sign">Búsqueda global</span>
+                    </label>
+                </div>
+                }
+            </div>
+        </div>
+
+        @if(breadcrumbs.length > 0) {
+        <ol class="mb-5 flex text-gray-500 font-semibold dark:text-white-dark">
+            <li><a href="javascript:;" class="hover:text-gray-500/70 dark:hover:text-white-dark/70"
+                    (click)="goToLocation(-1)">Raíz</a></li>
+            @for(bread of breadcrumbs; let last = $last; let index = $index ;track bread.uuid;) {
+            @if (last) {
+            <li (click)="goToLocation(index)"
+                class="before:w-1 before:h-1 before:rounded-full before:bg-primary before:inline-block before:relative before:-top-0.5 before:mx-4">
+                <a href="javascript:;" class="text-primary">{{bread.name}}</a>
+            </li>
+            }@else {
+            <li (click)="goToLocation(index)"
+                class="before:w-1 before:h-1 before:rounded-full before:bg-primary before:inline-block before:relative before:-top-0.5 before:mx-4">
+                <a href="javascript:;" class="hover:text-gray-500/70 dark:hover:text-white-dark/70">{{bread.name}}</a>
+            </li>
+            }
+            }
+
+        </ol>
+        }
+
+        <div class="row mb-2">
+            <div class="col-6">
+                <span *ngIf="categorias && categorias.length > 0" class="float-md-start color-gris">
+                    Página: {{ currentPage}}/{{numPages.pageCount }}
+                </span>
+            </div>
+            <div class="col-6" style="text-align: right;">
+                <span *ngIf="categorias && categorias.length > 0" class="float-md-end color-gris">
+                    Ítems: {{itemsInPage}}/{{ total_rows }}
+                </span>
+            </div>
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="table-hover">
+                @if(categorias.length == 0) {
+                <div
+                    class="flex items-center p-3.5 rounded text-info bg-info-light dark:bg-info-dark-light justify-content-center">
+                    <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1">No existen
+                            categorias</strong></span>
+                </div>
+                }
+                <thead>
+                    <tr>
+                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
+                            <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                Nombre
+                                <fa-icon
+                                    [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                            </span>
+
+                        </th>
+                        <th>
+                            Abreviatura
+                        </th>
+                        <th>
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (showFilter) {
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
+                                (input)="obtenerCategorias(null)" />
+
+                        </td>
+                        <td></td>
+                    </tr>
+                    }
+                    @for(data of categorias | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                    <tr>
+
+                        <td class="whitespace-nowrap"> {{getName(data)}} </td>
+                        <td class="whitespace-nowrap"> {{data.abbreviation}} </td>
+
+                        <td>
+                            <div class="flex items-center">
+                                <div>
+                                    <button type="button" ngxTippy="Mostrar sub-categorias" class="ltr:mr-3 rtl:ml-2"
+                                        (click)="obtenerCategorias(data)">
+                                        <icon-folder />
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                        (click)="openModalNuevaCategoria('EDIT', data)">
+                                        <icon-pencil />
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                        <icon-trash-lines />
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="row mt-4">
+                <div class="col">
+                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                        [boundaryLinks]="true" (pageChange)="obtenerCategorias()" />
+                </div>
+
+                <div class="col">
+                    <div class="row align-items-center float-md-end">
+                        <div class="col-auto">
+                            <label for="paginacion">Ítems por página:</label>
+                        </div>
+                        <div class="col-auto">
+                            <select id="paginacion" class="form-control" (change)="obtenerCategorias()"
+                                [(ngModel)]="itemsPerPage">
+                                <option value=5>5</option>
+                                <option value=10>10</option>
+                                <option value=20>20</option>
+                                <option value=50>50</option>
+                                <option value=100>100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+
+<div>
+    <ngx-custom-modal #modalCategoria class="modal-top animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="categoriaForm" (keydown.enter)="confirmarCategoria()">
+
+                            <div class="mb-3"
+                                [ngClass]="isSubmit ? categoriaForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Categoria</label>
+                                <input type="text" class="form-control" formControlName="nombre">
+
+                                <ng-container *ngIf="isSubmit && !categoriaForm.controls['nombre'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && categoriaForm.controls['nombre'].errors">
+                                    <p class="mt-1 text-danger">Ingresa nombre de la categoría</p>
+                                </ng-container>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? categoriaForm.controls['abreviatura'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Abreviatura</label>
+                                <input type="text" class="form-control" formControlName="abreviatura">
+
+                                <ng-container *ngIf="isSubmit && !categoriaForm.controls['abreviatura'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && categoriaForm.controls['abreviatura'].errors">
+                                    <p class="mt-1 text-danger">Ingresa abreviatura de la categoría</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarCategoria()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+</ngx-spinner>

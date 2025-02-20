@@ -12,8 +12,8 @@ import { provideStore } from '@ngrx/store';
 import { indexReducer } from './store/index.reducer';
 import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
 registerLocaleData(localeEs);
-import { provideToastr } from 'ngx-toastr';
 import { provideScrollbarOptions } from 'ngx-scrollbar';
+import { provideFlatpickrDefaults } from 'angularx-flatpickr';
 // import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
 
 
@@ -24,7 +24,6 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideStore({ index: indexReducer }),
     provideHttpClient(withInterceptors([tokenInterceptorInterceptor])),
-    provideToastr(),
     { provide: LOCALE_ID, useValue: 'es-ES' },
     // { provide: NgbDateParserFormatter, useClass: NgbDateCustomParserFormatter },
     { provide: LocationStrategy, useClass: HashLocationStrategy },

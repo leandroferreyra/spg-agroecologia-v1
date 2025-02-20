@@ -117,27 +117,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  /* initializeSortDirections(columns: string[]) {
-    this.sortDirections = columns.reduce((acc, column) => {
-      acc[column] = 'asc';
-      return acc;
-    }, {} as { [key: string]: 'asc' | 'desc' });
-  } */
-
-  /* construirFiltros(): Array<[string, string, string]> {
-    const filtrosActivos: Array<[string, string, string]> = [];
-    // Solo agregamos los filtros que tengan contenido
-    if (this.filtros.country.name.trim()) {
-      filtrosActivos.push(['country.name', 'LIKE', `${this.filtros.country.name}%`]);
-    }
-    if (this.filtros.name.trim()) {
-      filtrosActivos.push(['name', 'LIKE', `${this.filtros.name}%`]);
-      }
-    return filtrosActivos;
-  } */
-
   obtenerProvincias() {
-    // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = ['country'];
     params.paging = this.itemsPerPage;
@@ -161,7 +141,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   }
 
   cambiarOrdenamiento(column: string) {
-    // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
     if (this.ordenamiento[column] === 'asc') {
       this.ordenamiento[column] = 'desc';
     } else if (this.ordenamiento[column] === 'desc') {
@@ -178,7 +157,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
 
   openSwalEliminar(provincia: any) {
     Swal.fire({
-
       title: '',
       text: `¿Desea eliminar la provincia ${provincia.name}?`,
       icon: 'info',
@@ -260,11 +238,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._provinciaService.saveProvincia(provincia).subscribe({
             next: res => {
-              // Esto es para evitar un llamado cada vez que agrega.
-              // if (this.currentPage === this.last_page) {
-              //   this.provincias = [...this.provincias, res.data];
-              // }
-              // this.total_rows += 1;
               this.obtenerProvincias();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
@@ -320,7 +293,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   }
 
   toggleFilter() {
-    // console.log(this.filtros);
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {

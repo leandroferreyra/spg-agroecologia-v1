@@ -25,34 +25,41 @@
 
         <div class="table-responsive">
             <table class="table-hover">
+                @if(tiposCambio.length == 0) {
+                <div
+                    class="flex items-center p-3.5 rounded text-info bg-info-light dark:bg-info-dark-light justify-content-center">
+                    <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1">No existen tipos de
+                            cambio</strong></span>
+                </div>
+                }
                 <thead>
                     <tr>
                         <th style="cursor: pointer;">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Moneda
-                                <fa-icon
-                                    [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                                <!-- <fa-icon
+                                    [icon]="ordenamiento['currency_name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon> -->
                             </span>
                         </th>
                         <th style="cursor: pointer;">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Valor
-                                <fa-icon
-                                    [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                                <!-- <fa-icon
+                                    [icon]="ordenamiento['rate']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon> -->
                             </span>
                         </th>
-                        <th style="cursor: pointer;">
+                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('datetime_from')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Desde
                                 <fa-icon
-                                    [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                                    [icon]="ordenamiento['datetime_from']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
                             </span>
                         </th>
                         <th style="cursor: pointer;">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Hasta
-                                <fa-icon
-                                    [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                                <!-- <fa-icon
+                                    [icon]="ordenamiento['datetime_to']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon> -->
                             </span>
                         </th>
                         <th>
@@ -76,7 +83,7 @@
                         <td class="whitespace-nowrap">{{ data.rate}} </td>
                         <td class="whitespace-nowrap">{{ data.datetime_from}} </td>
                         <td class="whitespace-nowrap">{{ data.datetime_to}} </td>
-                        
+
                         <td>
                             <div class="flex items-center">
                                 <div>
@@ -85,11 +92,11 @@
                                         <icon-pencil />
                                     </button>
                                 </div>
-                                <div>
+                                <!-- <div>
                                     <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                         <icon-trash-lines />
                                     </button>
-                                </div>
+                                </div> -->
                             </div>
                         </td>
                     </tr>
@@ -129,7 +136,7 @@
 </div>
 
 <div>
-    <ngx-custom-modal #modalTipoCambio class="modal-top animate animate-fade-in">
+    <ngx-custom-modal #modalTipoCambio class="modal-top extra-large-modal animate animate-fade-in">
         <ng-template #modalHeader>
             <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
         </ng-template>
@@ -141,17 +148,37 @@
                     <div class="col-md-12">
                         <form [formGroup]="tipoCambioForm" (keydown.enter)="confirmarTipoCambio()">
 
-                            <div
-                                [ngClass]="isSubmit ? tipoCambioForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>Tipo cambio</label>
-                                <input type="text" class="form-control" formControlName="nombre">
-
-                                <ng-container *ngIf="isSubmit && !tipoCambioForm.controls['nombre'].errors">
+                            <div class="mb-3"
+                                [ngClass]="isSubmit ? tipoCambioForm.controls['moneda'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Moneda</label>
+                                <ng-select [items]="monedas" bindLabel="name" bindValue="uuid" formControlName="moneda"
+                                    [virtualScroll]="true" [appendTo]="'body'">
+                                </ng-select>
+                                <ng-container *ngIf="isSubmit && !tipoCambioForm.controls['moneda'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
-                                <ng-container *ngIf="isSubmit && tipoCambioForm.controls['nombre'].errors">
-                                    <p class="mt-1 text-danger">Ingresa nombre del banco</p>
+                                <ng-container *ngIf="isSubmit && tipoCambioForm.controls['moneda'].errors">
+                                    <p class="mt-1 text-danger">Selecciona una moneda</p>
                                 </ng-container>
+                            </div>
+
+                            <div class="mb-3"
+                                [ngClass]="isSubmit ? tipoCambioForm.controls['valor'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Valor</label>
+                                <input type="text" class="form-control" formControlName="valor">
+                                <ng-container *ngIf="isSubmit && !tipoCambioForm.controls['valor'].errors">
+                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
+                                </ng-container>
+                                <ng-container *ngIf="isSubmit && tipoCambioForm.controls['valor'].errors">
+                                    <p class="mt-1 text-danger">Ingresa valor</p>
+                                </ng-container>
+                            </div>
+
+                            <div class="col-md-12 pr-1">
+                                <label>Fecha desde</label>
+                                <!-- <ng2-flatpickr [config]="dateTime" formControlName="datetime_from" addClass="form-input" ngDefaultControl></ng2-flatpickr> -->
+                                <input type="text" mwlFlatpickr formControlName="datetime_from" [altInput]="true"
+                                    [convertModelValue]="true" />
                             </div>
 
                             <div class="row mt-3">

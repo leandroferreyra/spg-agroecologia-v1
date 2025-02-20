@@ -16,6 +16,8 @@
 /* form element*/
 @import 'form-elements.css';
 
+@import 'flatpickr.css';
+
 /* modal popup */
 @import 'modal.css';
 

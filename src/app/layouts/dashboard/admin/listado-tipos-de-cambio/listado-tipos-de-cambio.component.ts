@@ -2,16 +2,20 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { faArrowUp, faArrowDown, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { NgbDateStruct, NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
+import { FlatpickrDefaults, FlatpickrDirective, provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
 import { BancoDTO } from 'src/app/core/models/request/bancoDTO';
+import { TipoCambioDTO } from 'src/app/core/models/request/tipoCambioDTO';
 import { BancosService } from 'src/app/core/services/bancos.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
+import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
@@ -23,8 +27,10 @@ import Swal from 'sweetalert2';
   selector: 'app-listado-tipos-de-cambio',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, NgbPaginationModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxCustomModalComponent,
-    IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent
+    IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, NgSelectComponent, NgbModule, FlatpickrDirective
   ],
+  providers: [provideFlatpickrDefaults()],
+
   templateUrl: './listado-tipos-de-cambio.component.html',
   styleUrl: './listado-tipos-de-cambio.component.css'
 })
@@ -40,6 +46,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
+  monedas: any[] = [];
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 10;
@@ -59,8 +66,11 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     datetime_from: 'desc'
   };
 
+  selectedDate: any;
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
+  iconCalendar = faCalendar;
+  dateTime: FlatpickrDefaults | undefined;
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalTipoCambio') modalTipoCambio!: NgxCustomModalComponent;
@@ -71,7 +81,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   };
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
-    private _bancosService: BancosService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
+    private _tiposCambioService: TiposCambioService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
     this.initStore();
   }
 
@@ -89,10 +99,12 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.obtenerTiposCambio();
+    this.obtenerMonedas();
   }
+
   obtenerTiposCambio() {
     this.spinner.show();
-    // Inicializamos un objeto vacío para los parámetros
+
     const params: any = {};
     params.with = ["currency"];
     params.paging = this.itemsPerPage;
@@ -116,6 +128,19 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     )
   }
 
+  obtenerMonedas() {
+    this.subscription.add(
+      this._indexService.getMonedas(this.actual_role).subscribe({
+        next: res => {
+          this.monedas = res.data;
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    )
+  }
+
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
@@ -128,138 +153,105 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     }
   }
 
-  openModalNuevoTipo(type: string, banco?: any) {
-      if (type === 'NEW') {
-        this.isEdicion = false;
-        this.tituloModal = 'Nuevo banco';
-        this.tipoCambioForm = new FormGroup({
-          nombre: new FormControl(null, [Validators.required]),
-        });
-      } else {
-        this.isEdicion = true;
-        this.tituloModal = 'Edición banco';
-        this.tipoCambioForm = new FormGroup({
-          uuid: new FormControl(banco?.uuid, []),
-          nombre: new FormControl(banco?.name, [Validators.required])
-        });
-      }
-      this.modalTipoCambio.options = this.modalOptions;
-      this.modalTipoCambio.open();
+  openModalNuevoTipo(type: string, tipo?: any) {
+    if (type === 'NEW') {
+      this.isEdicion = false;
+      this.tituloModal = 'Nuevo tipo de cambio';
+      this.tipoCambioForm = new FormGroup({
+        moneda: new FormControl(null, [Validators.required]),
+        valor: new FormControl(null, [Validators.required]),
+        datetime_from: new FormControl(null, []),
+      });
+    } else {
+      this.isEdicion = true;
+      this.tituloModal = 'Edición tipo de cambio';
+      this.tipoCambioForm = new FormGroup({
+        uuid: new FormControl(tipo?.uuid, []),
+        moneda: new FormControl(tipo?.currency?.uuid, [Validators.required]),
+        valor: new FormControl(tipo?.rate, [Validators.required]),
+        datetime_from: new FormControl(tipo?.datetime_from, []),
+        datetime_to: new FormControl(tipo?.datetime_to, []),
+      });
     }
-  
-    confirmarTipoCambio() {
-      this.isSubmit = true;
-      if (this.tipoCambioForm.valid) {
-        this.spinner.show();
-        let banco = new BancoDTO();
-        banco.name = this.tipoCambioForm.get('nombre')?.value;
-        banco.actual_role = this.actual_role;
-        if (!this.isEdicion) {
-          this.subscription.add(
-            this._bancosService.saveBanco(banco).subscribe({
-              next: res => {
-                this.obtenerTiposCambio();
-                this.cerrarModal();
-                this.swalService.toastSuccess('top-right', res.message);
-                this.tokenService.setToken(res.token);
-                this.spinner.hide();
-              },
-              error: error => {
-                this.swalService.toastError('top-right', error.error.message);
-                console.error(error);
-                this.spinner.hide();
-              }
-            })
-          )
-        } else {
-          this.subscription.add(
-            this._bancosService.editBanco(this.tipoCambioForm.get('uuid')?.value, banco).subscribe({
-              next: res => {
-                const index = this.tiposCambio.findIndex(p => p.uuid === (this.tipoCambioForm.get('uuid')?.value));
-                if (index !== -1) {
-                  this.tiposCambio[index] = { ...this.tiposCambio[index], name: this.tipoCambioForm.get('nombre')?.value };
-                  this.tiposCambio = [...this.tiposCambio];
-                }
-                this.cerrarModal();
-                this.swalService.toastSuccess('top-right', res.message)
-                this.tokenService.setToken(res.token);
-                this.spinner.hide();
-              },
-              error: error => {
-                console.error(error);
-                this.spinner.hide();
-                this.swalService.toastError('top-right', error.error.message);
-              }
-            })
-          )
-        }
-      }
-    }
-  
-    cerrarModal() {
-      this.isSubmit = false;
-      this.modalTipoCambio.close();
-    }
-  
-    openSwalEliminar(tipo: any) {
-      Swal.fire({
-        title: '',
-        text: `¿Desea eliminar el tipo de cambio ${tipo.name}?`,
-        icon: 'info',
-        confirmButtonText: 'Confirmar',
-        showDenyButton: true,
-        denyButtonText: 'Cancelar',
-        didRender: () => {
-          const cancelButton = Swal.getDenyButton();
-          if (cancelButton) {
-            cancelButton.setAttribute('id', 'back-button-with-border');
-          }
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.eliminarTipoCambio(tipo);
-        } else if (result.isDenied) {
-  
-        }
-      })
-    }
-  
-    eliminarTipoCambio(tipo: any) {
+    this.modalTipoCambio.options = this.modalOptions;
+    this.modalTipoCambio.open();
+  }
+
+  confirmarTipoCambio() {
+    this.isSubmit = true;
+    if (this.tipoCambioForm.valid) {
       this.spinner.show();
-      this.subscription.add(
-        this._bancosService.eliminarBanco(tipo.uuid, this.actual_role.toUpperCase()).subscribe({
-          next: res => {
-            this.obtenerTiposCambio();
-            this.tokenService.setToken(res.token);
-            this.spinner.hide();
-          },
-          error: error => {
-            console.error(error);
-            this.swalService.toastError('top-right', error.error.message);
-            this.spinner.hide();
-          }
-        })
-      )
-    }
-  
-    toggleFilter() {
-      this.showFilter = !this.showFilter;
-      if (!this.showFilter) {
-        this.filtros = {
-          name: ''
-        };
-        this.obtenerTiposCambio();
+      let tipo = new TipoCambioDTO();
+      tipo.currency_uuid = this.tipoCambioForm.get('moneda')?.value;
+      tipo.rate = this.tipoCambioForm.get('valor')?.value;
+      let date_from: NgbDateStruct = this.tipoCambioForm.get('datetime_from')?.value;
+      tipo.datetime_from = date_from.year + '-' + date_from.month + '-' + date_from.day;
+
+      tipo.actual_role = this.actual_role;
+      if (!this.isEdicion) {
+        this.subscription.add(
+          this._tiposCambioService.saveTipo(tipo).subscribe({
+            next: res => {
+              this.obtenerTiposCambio();
+              this.cerrarModal();
+              this.swalService.toastSuccess('top-right', res.message);
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._tiposCambioService.editTipo(this.tipoCambioForm.get('uuid')?.value, tipo).subscribe({
+            next: res => {
+              const index = this.tiposCambio.findIndex(p => p.uuid === (this.tipoCambioForm.get('uuid')?.value));
+              if (index !== -1) {
+                this.tiposCambio[index] = { ...this.tiposCambio[index], name: this.tipoCambioForm.get('nombre')?.value };
+                this.tiposCambio = [...this.tiposCambio];
+              }
+              this.cerrarModal();
+              this.swalService.toastSuccess('top-right', res.message)
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              console.error(error);
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+            }
+          })
+        )
       }
     }
-  
-    cambiarOrdenamiento(column: string) {
-      // si el ordenamiento es asc, lo cambiamos a desc y si es desc, lo cambiamos a sin ordenamiento
-      if (this.ordenamiento[column] === 'asc') {
-        this.ordenamiento[column] = 'desc';
-      } else if (this.ordenamiento[column] === 'desc') {
-        this.ordenamiento[column] = 'asc';
-      }
+  }
+
+  cerrarModal() {
+    this.isSubmit = false;
+    this.modalTipoCambio.close();
+  }
+
+  toggleFilter() {
+    this.showFilter = !this.showFilter;
+    if (!this.showFilter) {
+      this.filtros = {
+        name: ''
+      };
       this.obtenerTiposCambio();
     }
+  }
+
+  cambiarOrdenamiento(column: string) {
+    if (this.ordenamiento[column] === 'asc') {
+      this.ordenamiento[column] = 'desc';
+    } else if (this.ordenamiento[column] === 'desc') {
+      this.ordenamiento[column] = 'asc';
+    }
+    this.obtenerTiposCambio();
+  }
 
 }

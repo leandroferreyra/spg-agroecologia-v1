@@ -3,9 +3,9 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowUp, faArrowDown, faGrinTongueSquint } from '@fortawesome/free-solid-svg-icons';
-import { NgbAccordionModule, NgbModule, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
-import { defaultStateFn, Store } from '@ngrx/store';
+import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
@@ -40,14 +40,12 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   actual_role: string = '';
 
   ubicaciones: any[] = [];
-  subUbicaciones: any[] = [];
   ubicacionForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
   busqueda_global: boolean = false;
   locationToGo: any = null;
-
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 10;
