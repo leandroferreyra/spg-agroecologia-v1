@@ -58,7 +58,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    currency_name: ''
+    currency_name: 'Dólares'
   };
   showFilter: boolean = false;
   ordenamiento: any = {
@@ -71,6 +71,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   iconCalendar = faCalendar;
 
   dateTime: FlatpickrDefaultsInterface;
+  // selectedMoneda: string = 'Dólares';
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalTipoCambio') modalTipoCambio!: NgxCustomModalComponent;
@@ -114,8 +115,9 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   }
 
   obtenerTiposCambio() {
-    this.spinner.show();
+    console.log(this.filtros.currency_name);
 
+    this.spinner.show();
     const params: any = {};
     params.with = ["currency"];
     params.paging = this.itemsPerPage;
@@ -142,10 +144,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getMonedas(this.actual_role).subscribe({
         next: res => {
-          this.monedas = res.data.map((moneda: any) => ({
-            ...moneda,
-            disabled: moneda.name === 'Pesos'
-          }));
+          this.monedas = res.data.filter((moneda: any) => moneda.name !== 'Pesos');
         },
         error: error => {
           console.error(error);
@@ -172,7 +171,6 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
       this.isEdicion = false;
       this.tituloModal = 'Nuevo tipo de cambio';
       this.tipoCambioForm = new FormGroup({
-        moneda: new FormControl(null, [Validators.required]),
         valor: new FormControl(null, [Validators.required]),
         datetime_from: new FormControl(this.formatDate(new Date), []),
       });
@@ -181,7 +179,6 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Edición tipo de cambio';
       this.tipoCambioForm = new FormGroup({
         uuid: new FormControl(tipo?.uuid, []),
-        moneda: new FormControl(tipo?.currency?.uuid, [Validators.required]),
         valor: new FormControl(tipo?.rate, [Validators.required]),
         datetime_from: new FormControl(tipo?.datetime_from, []),
         datetime_to: new FormControl(tipo?.datetime_to, []),
@@ -209,7 +206,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     if (this.tipoCambioForm.valid) {
       this.spinner.show();
       let tipo = new TipoCambioDTO();
-      tipo.currency_uuid = this.tipoCambioForm.get('moneda')?.value;
+      tipo.currency_uuid = this.getUuidFromFilterCurrencyName();
       tipo.rate = this.tipoCambioForm.get('valor')?.value;
       tipo.datetime_from = this.tipoCambioForm.get('datetime_from')?.value;
       tipo.actual_role = this.actual_role;
@@ -235,16 +232,6 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._tiposCambioService.editTipo(this.tipoCambioForm.get('uuid')?.value, tipo).subscribe({
             next: res => {
-              // const index = this.tiposCambio.findIndex(p => p.uuid === (this.tipoCambioForm.get('uuid')?.value));
-              // if (index !== -1) {
-              //   this.tiposCambio[index] = {
-              //     ...this.tiposCambio[index],
-              //     name: this.tipoCambioForm.get('nombre')?.value,
-              //     datetime_from: this.tipoCambioForm.get('datetime_from')?.value,
-              //     datetime_to: this.tipoCambioForm.get('datetime_to')?.value
-              //   };
-              //   this.tiposCambio = [...this.tiposCambio];
-              // }
               this.obtenerTiposCambio();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message)
@@ -260,6 +247,11 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
         )
       }
     }
+  }
+
+  getUuidFromFilterCurrencyName() {
+    const monedaEncontrada = this.monedas.find(moneda => moneda.name === this.filtros.currency_name);
+    return monedaEncontrada?.uuid;
   }
 
   cerrarModal() {

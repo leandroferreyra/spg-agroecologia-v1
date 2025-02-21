@@ -10,6 +10,23 @@
             </button>
         </div>
 
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="text-center">
+                    @for(moneda of monedas ; track moneda.uuid) {
+                    <div class="form-check form-check-inline">
+                        <label class="inline-flex mr-3" [for]="'radio_' + moneda.uuid">
+                            <input class="form-radio" type="radio" name="radio_monedas" [id]="'radio_' + moneda.uuid"
+                                [value]="moneda.name" (change)="obtenerTiposCambio()"
+                                [(ngModel)]="filtros.currency_name">
+                            <span style="cursor: pointer;">{{ moneda.name }}</span>
+                        </label>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
         <div class="row mb-2">
             <div class="col-6">
                 <span *ngIf="tiposCambio && tiposCambio.length > 0" class="float-md-start color-gris">
@@ -148,18 +165,9 @@
                     <div class="col-md-12">
                         <form [formGroup]="tipoCambioForm" (keydown.enter)="confirmarTipoCambio()">
 
-                            <div class="mb-3"
-                                [ngClass]="isSubmit ? tipoCambioForm.controls['moneda'].errors ? 'has-error' : 'has-success' : ''">
+                            <div class="mb-3">
                                 <label>Moneda</label>
-                                <ng-select [items]="monedas" bindLabel="name" bindValue="uuid" formControlName="moneda"
-                                    [virtualScroll]="true" [appendTo]="'body'">
-                                </ng-select>
-                                <ng-container *ngIf="isSubmit && !tipoCambioForm.controls['moneda'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container *ngIf="isSubmit && tipoCambioForm.controls['moneda'].errors">
-                                    <p class="mt-1 text-danger">Selecciona una moneda</p>
-                                </ng-container>
+                                <input type="text" class="form-control" [value]="filtros.currency_name" disabled>
                             </div>
 
                             <div class="mb-3"

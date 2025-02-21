@@ -17,7 +17,7 @@ export class IndexService {
   apiGeneros = '/genders';
   apiMonedas = '/currencies';
   apiUbicaciones = '/locations';
-  apiTiposDeCampio = '/exchange_rates';
+  apiTiposDeCambio = '/exchange_rates';
   apiCategoriasProducto = '/product_categories';
   apiCuentas = "/ladie_bank_accounts";
   apiTipoDeCuentas = "/account_types";
@@ -53,16 +53,19 @@ export class IndexService {
           params = params.append(`filters[${index}][]`, key);
           params = params.append(`filters[${index}][]`, '=');
           params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
+        } else if (key === 'account_number') {
+          params = params.append(`filters[${index}][]`, key);
+          params = params.append(`filters[${index}][]`, 'LIKE');
+          params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
+        } else if (key === 'currency_name') {
+          // Si entró por currency_name es porque está trayendo los tipos de cambio.
+          params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
+          params = params.append(`filters[${index}][]`, '=');
+          params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
         } else {
-          if (key === 'account_number') {
-            params = params.append(`filters[${index}][]`, key);
-            params = params.append(`filters[${index}][]`, 'LIKE');
-            params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
-          } else {
-            params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
-            params = params.append(`filters[${index}][]`, 'LIKE');
-            params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
-          }
+          params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
+          params = params.append(`filters[${index}][]`, 'LIKE');
+          params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
         }
       }
     });
@@ -124,7 +127,7 @@ export class IndexService {
 
   getTiposCambioWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposDeCampio, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposDeCambio, { headers, params: this.getParams(paramsObj, rol) });
   }
 
   getCategoriasProductoWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
