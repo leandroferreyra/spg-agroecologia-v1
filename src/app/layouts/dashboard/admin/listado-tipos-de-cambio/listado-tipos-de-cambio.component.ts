@@ -142,14 +142,18 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getMonedas(this.actual_role).subscribe({
         next: res => {
-          this.monedas = res.data;
+          this.monedas = res.data.map((moneda: any) => ({
+            ...moneda,
+            disabled: moneda.name === 'Pesos'
+          }));
         },
         error: error => {
           console.error(error);
         }
       })
-    )
+    );
   }
+
 
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
