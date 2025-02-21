@@ -207,7 +207,6 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
       let date_from: NgbDateStruct = this.tipoCambioForm.get('datetime_from')?.value;
       // tipo.datetime_from = date_from.year + '-' + date_from.month + '-' + date_from.day;
       tipo.datetime_from = this.tipoCambioForm.get('datetime_from')?.value;
-
       tipo.actual_role = this.actual_role;
       if (!this.isEdicion) {
         this.subscription.add(
@@ -227,6 +226,8 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
           })
         )
       } else {
+        tipo.datetime_to = this.tipoCambioForm.get('datetime_to')?.value;
+
         this.subscription.add(
           this._tiposCambioService.editTipo(this.tipoCambioForm.get('uuid')?.value, tipo).subscribe({
             next: res => {
