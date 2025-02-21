@@ -60,7 +60,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   filtros: any = {
     currency_name: 'Dólares'
   };
-  showFilter: boolean = false;
+  //showFilter: boolean = false;
   ordenamiento: any = {
     datetime_from: 'desc'
   };
@@ -257,7 +257,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     this.modalTipoCambio.close();
   }
 
-  toggleFilter() {
+/*   toggleFilter() {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
@@ -265,7 +265,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
       };
       this.obtenerTiposCambio();
     }
-  }
+  } */
 
   cambiarOrdenamiento(column: string) {
     if (this.ordenamiento[column] === 'asc') {

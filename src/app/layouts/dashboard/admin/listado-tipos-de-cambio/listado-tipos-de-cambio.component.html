@@ -5,9 +5,9 @@
             <button type="button" ngxTippy="Agregar tipo de cambio" (click)="openModalNuevoTipo('NEW')">
                 <icon-plus />
             </button>
-            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+            <!-- <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
                 <icon-search />
-            </button>
+            </button> -->
         </div>
 
         <div class="row mb-4">
@@ -85,7 +85,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (showFilter) {
+                    <!-- @if (showFilter) {
                     <tr>
                         <td>
                             <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
@@ -93,7 +93,7 @@
                         </td>
                         <td></td>
                     </tr>
-                    }
+                    } -->
                     @for(data of tiposCambio | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                     <tr>
                         <td class="whitespace-nowrap">{{ data.currency.name}} </td>
@@ -184,14 +184,28 @@
 
                             <div class="col-md-12 pr-1 mb-3">
                                 <label>Fecha desde</label>
-                                <input type="text" mwlFlatpickr [options]="dateTime" formControlName="datetime_from"
+                                <input type="text" mwlFlatpickr 
+                                    [options]="{ 
+                                        enableTime: true, 
+                                        dateFormat: 'Y-m-d H:i:S',
+                                        time24hr: true,
+                                        enableSeconds: true
+                                    }" 
+                                    formControlName="datetime_from"
                                     class="form-input" />
                             </div>
 
                             @if (isEdicion) {
                             <div class="col-md-12 pr-1">
                                 <label>Fecha hasta</label>
-                                <input type="text" mwlFlatpickr [options]="dateTime" formControlName="datetime_to"
+                                <input type="text" mwlFlatpickr 
+                                    [options]="{ 
+                                        enableTime: true, 
+                                        dateFormat: 'Y-m-d H:i:S',
+                                        time24hr: true,
+                                        enableSeconds: true
+                                    }" 
+                                    formControlName="datetime_to"
                                     class="form-input" />
                             </div>
                             }
