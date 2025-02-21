@@ -182,6 +182,9 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
         datetime_from: new FormControl(tipo?.datetime_from, []),
         datetime_to: new FormControl(tipo?.datetime_to, []),
       });
+      if (!tipo.datetime_to) {
+        this.tipoCambioForm.get('datetime_to')?.disable();
+      }
     }
     this.modalTipoCambio.options = this.modalOptions;
     this.modalTipoCambio.open();
@@ -204,8 +207,6 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
       let tipo = new TipoCambioDTO();
       tipo.currency_uuid = this.tipoCambioForm.get('moneda')?.value;
       tipo.rate = this.tipoCambioForm.get('valor')?.value;
-      let date_from: NgbDateStruct = this.tipoCambioForm.get('datetime_from')?.value;
-      // tipo.datetime_from = date_from.year + '-' + date_from.month + '-' + date_from.day;
       tipo.datetime_from = this.tipoCambioForm.get('datetime_from')?.value;
       tipo.actual_role = this.actual_role;
       if (!this.isEdicion) {
@@ -227,7 +228,6 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
         )
       } else {
         tipo.datetime_to = this.tipoCambioForm.get('datetime_to')?.value;
-
         this.subscription.add(
           this._tiposCambioService.editTipo(this.tipoCambioForm.get('uuid')?.value, tipo).subscribe({
             next: res => {
