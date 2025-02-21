@@ -115,8 +115,6 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   }
 
   obtenerTiposCambio() {
-    console.log(this.filtros.currency_name);
-
     this.spinner.show();
     const params: any = {};
     params.with = ["currency"];
