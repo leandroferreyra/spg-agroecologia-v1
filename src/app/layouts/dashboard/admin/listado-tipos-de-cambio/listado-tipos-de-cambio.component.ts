@@ -230,16 +230,17 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._tiposCambioService.editTipo(this.tipoCambioForm.get('uuid')?.value, tipo).subscribe({
             next: res => {
-              const index = this.tiposCambio.findIndex(p => p.uuid === (this.tipoCambioForm.get('uuid')?.value));
-              if (index !== -1) {
-                this.tiposCambio[index] = {
-                  ...this.tiposCambio[index],
-                  name: this.tipoCambioForm.get('nombre')?.value,
-                  datetime_from: this.tipoCambioForm.get('datetime_from')?.value,
-                  datetime_to: this.tipoCambioForm.get('datetime_to')?.value
-                };
-                this.tiposCambio = [...this.tiposCambio];
-              }
+              // const index = this.tiposCambio.findIndex(p => p.uuid === (this.tipoCambioForm.get('uuid')?.value));
+              // if (index !== -1) {
+              //   this.tiposCambio[index] = {
+              //     ...this.tiposCambio[index],
+              //     name: this.tipoCambioForm.get('nombre')?.value,
+              //     datetime_from: this.tipoCambioForm.get('datetime_from')?.value,
+              //     datetime_to: this.tipoCambioForm.get('datetime_to')?.value
+              //   };
+              //   this.tiposCambio = [...this.tiposCambio];
+              // }
+              this.obtenerTiposCambio();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message)
               this.tokenService.setToken(res.token);

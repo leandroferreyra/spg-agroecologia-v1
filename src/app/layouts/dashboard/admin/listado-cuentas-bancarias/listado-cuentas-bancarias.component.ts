@@ -232,8 +232,8 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
         account_type_uuid: new FormControl(null, [Validators.required]),
         currency_uuid: new FormControl(null, [Validators.required]),
         account_number: new FormControl(null, [Validators.required]),
-        cbu: new FormControl(null, [Validators.required]),
-        alias: new FormControl(null, [Validators.required]),
+        cbu: new FormControl(null, []),
+        alias: new FormControl(null, []),
       });
     } else {
       // console.log(moneda);
@@ -245,8 +245,8 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
         account_type_uuid: new FormControl(cuenta?.account_type?.uuid, [Validators.required]),
         currency_uuid: new FormControl(cuenta?.currency?.uuid, [Validators.required]),
         account_number: new FormControl(cuenta?.account_number, [Validators.required]),
-        cbu: new FormControl(cuenta?.cbu, [Validators.required]),
-        alias: new FormControl(cuenta?.alias, [Validators.required]),
+        cbu: new FormControl(cuenta?.cbu, []),
+        alias: new FormControl(cuenta?.alias, []),
       });
     }
     this.modalCuenta.options = this.modalOptions;
