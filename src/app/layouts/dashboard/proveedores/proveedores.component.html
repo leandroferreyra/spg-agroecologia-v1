@@ -34,7 +34,7 @@
                     </div>
                 </ng-scrollbar>
 
-                <div class="absolute bottom-0 mp-2 w-full p-4 ltr:left-0 rtl:right-0">
+                <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
                     <div class="group relative">
                         <input type="text" placeholder="Buscar proveedor..." [(ngModel)]="filtros.name"
                             (input)="filtrarDatos()" class="peer form-input ltr:pr-8 rtl:pl-8" />
@@ -133,6 +133,13 @@
                                         <input id="documento" type="text" placeholder="" class="form-control"
                                             formControlName="documento" />
                                     </div>
+                                    <div>
+                                        <label for="genero">Genero</label>
+                                        <ng-select [items]="generos" bindLabel="name" bindValue="uuid"
+                                            formControlName="genero"
+                                            [ngClass]="isSubmit ? proveedorForm.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
                                     } @else {
                                     <div>
                                         <label for="razon">Razón social</label>
@@ -164,6 +171,30 @@
                                         <label for="detalledireccion">Detalle de dirección</label>
                                         <textarea class="form-control" id="detalledireccion"
                                             formControlName="detalleDireccion" rows="1"></textarea>
+                                    </div>
+                                    <div>
+                                        <label for="pais">País</label>
+                                        <ng-select [items]="paises" bindLabel="name" bindValue="uuid"
+                                            formControlName="pais" [virtualScroll]="true"
+                                            [ngClass]="isSubmit ? proveedorForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+
+                                    <div>
+                                        <label for="provincia">Provincia</label>
+                                        <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
+                                            formControlName="provincia"
+                                            [ngClass]="isSubmit ? proveedorForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+
+                                    <div
+                                        [ngClass]="isSubmit ? proveedorForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="ciudad">Ciudad</label>
+                                        <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid"
+                                            formControlName="ciudad" [virtualScroll]="true"
+                                            [ngClass]="isSubmit ? proveedorForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
                                     </div>
                                     <div>
                                         <label for="comentarios">Comentarios</label>
@@ -255,6 +286,13 @@
                                         [ngClass]="isSubmit ? newProveedorForm.controls['apellido'].errors ? 'has-error' : 'has-success' : ''">
                                         <label>Apellido</label>
                                         <input type="text" class="form-control" formControlName="apellido">
+                                    </div>
+                                    <div>
+                                        <label for="tipoDocumento">Tipo documento</label>
+                                        <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
+                                            formControlName="tipoDocumento"
+                                            [ngClass]="isSubmit ? newProveedorForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
                                     </div>
                                     <div
                                         [ngClass]="isSubmit ? newProveedorForm.controls['documento'].errors ? 'has-error' : 'has-success' : ''">

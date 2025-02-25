@@ -27,6 +27,7 @@ export class LegalEntity {
 }
 
 export class Human {
+    document_type_uuid!: string;
     document_number!: string;
     cuit!: string;
     gender_uuid!: string;
