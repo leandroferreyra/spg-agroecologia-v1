@@ -110,7 +110,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   obtenerProveedores() {
     const params: any = {};
-    params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender", "person.legal_entity"];
+    params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+      "person.human.document_type", "person.legal_entity"];
     params.paging = null;
     params.page = null;
     params.order_by = this.ordenamiento;
@@ -144,8 +145,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.proveedorForm = new FormGroup({
       nombre: new FormControl({ value: proveedor?.person?.human?.firstname, disabled: true }, [Validators.required]),
       apellido: new FormControl({ value: proveedor?.person?.human?.lastname, disabled: true }, [Validators.required]),
-      documento: new FormControl({ value: proveedor?.person?.human?.document_number, disabled: true }, [Validators.required]),
       genero: new FormControl({ value: proveedor?.person?.human?.gender?.uuid, disabled: true }, [Validators.required]),
+      documento: new FormControl({ value: proveedor?.person?.human?.document_number, disabled: true }, [Validators.required]),
+      tipoDocumento: new FormControl({ value: proveedor?.person?.human?.document_type?.uuid, disabled: true }, [Validators.required]),
       cuit: new FormControl({ value: this.isHuman ? proveedor?.person?.human?.cuit : proveedor?.person?.legal_entity?.cuit, disabled: true }, [Validators.required]),
       razon: new FormControl({ value: proveedor?.person?.legal_entity?.company_name, disabled: true }, [Validators.required]),
       sigla: new FormControl({ value: proveedor?.batch_prefix, disabled: true }, [Validators.required]),
@@ -169,10 +171,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
         next: res => {
           this.provincias = res.provincias.data.districts;
           this.ciudades = res.ciudades.data.cities;
-          // this.spinner.hide();
         },
         error: error => {
-          // this.spinner.hide();
           console.error('Error cargando catalogos para primer proveedor: ', error);
         }
       });
@@ -215,7 +215,27 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.proveedorForm.get('numero')?.enable();
     this.proveedorForm.get('cuit')?.enable();
     this.proveedorForm.get('documento')?.enable();
+    this.proveedorForm.get('tipoDocumento')?.enable();
     this.proveedorForm.get('detalleDireccion')?.enable();
+    this.proveedorForm.get('pais')?.enable();
+    this.proveedorForm.get('provincia')?.enable();
+    this.proveedorForm.get('ciudad')?.enable();
+    if (this.isHuman) {
+      this.proveedorForm.get('nombre')?.setValidators([Validators.required]);
+      this.proveedorForm.get('apellido')?.setValidators([Validators.required]);
+      this.proveedorForm.get('genero')?.setValidators([Validators.required]);
+      this.proveedorForm.get('documento')?.setValidators([Validators.required]);
+      this.proveedorForm.get('razon')?.clearValidators();
+    } else {
+      this.proveedorForm.get('razon')?.setValidators([Validators.required]);
+      this.proveedorForm.get('nombre')?.clearValidators();
+      this.proveedorForm.get('apellido')?.clearValidators();
+      this.proveedorForm.get('genero')?.clearValidators();
+      this.proveedorForm.get('documento')?.clearValidators();
+    }
+    ['nombre', 'apellido', 'genero', 'documento', 'razon'].forEach((field) => {
+      this.proveedorForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+    });
   }
 
   cancelarEdicion() {
@@ -224,7 +244,58 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   confirmarEdicion() {
-    console.log('Confirmar edicion');
+    if (this.proveedorForm.valid) {
+      this.spinner.show();
+      let proveedor = new ProveedorDTO();
+      this.armarDTOEdicion(proveedor);
+      this.subscription.add(
+        this._proveedoresService.editProveedor(this.selectedProveedor.uuid, proveedor).subscribe({
+          next: res => {
+            console.log(res);
+            this.inicializarForm(res.data);
+            this.isEdicion = false;
+            this.swalService.toastSuccess('top-right', "Usuario actualizado.");
+            this.spinner.hide();
+          },
+          error: error => {
+            this.spinner.hide();
+            console.error(error);
+          }
+        })
+      )
+    }
+  }
+  armarDTOEdicion(proveedor: ProveedorDTO) {
+    console.log(this.newProveedorForm);
+    proveedor.actual_role = this.actual_role;
+    proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+      "person.human.document_type", "person.legal_entity"];
+    proveedor.batch_prefix = this.proveedorForm.get('sigla')?.value;
+    proveedor.comments = this.proveedorForm.get('comentarios')?.value;
+    proveedor.perception = '1'; // TODO
+    proveedor.vat_percent = '1'; // TODO
+    proveedor.withholding = '1'; // TODO
+    let person = new Person();
+    person.street_name = this.proveedorForm.get('calle')?.value;
+    person.door_number = this.proveedorForm.get('numero')?.value;
+    person.address_detail = this.proveedorForm.get('detalleDireccion')?.value;
+    person.city_uuid = this.proveedorForm.get('ciudad')?.value;
+    if (this.isHuman) {
+      let human = new Human();
+      human.firstname = this.proveedorForm.get('nombre')?.value;
+      human.lastname = this.proveedorForm.get('apellido')?.value;
+      human.document_type_uuid = this.proveedorForm.get('tipoDocumento')?.value;
+      human.document_number = this.proveedorForm.get('documento')?.value;
+      human.cuit = this.proveedorForm.get('cuit')?.value;
+      human.gender_uuid = this.proveedorForm.get('genero')?.value;
+      person.human = human;
+    } else {
+      let legal_entity = new LegalEntity();
+      legal_entity.cuit = this.proveedorForm.get('cuit')?.value;
+      legal_entity.company_name = this.proveedorForm.get('razon')?.value;
+      person.legal_entity = legal_entity;
+    }
+    proveedor.person = person;
   }
 
   filtrarDatos() {
@@ -319,6 +390,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       provincia: new FormControl(null, [Validators.required]),
       ciudad: new FormControl(null, [Validators.required])
     });
+    this.provincias = [];
+    this.ciudades = [];
     this.onChange();
   }
 
@@ -453,6 +526,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
     proveedor.person = person;
   }
+
+
 
 
 

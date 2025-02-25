@@ -129,6 +129,13 @@
                                             formControlName="apellido" />
                                     </div>
                                     <div>
+                                        <label for="tipoDocumento">Tipo documento</label>
+                                        <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
+                                            formControlName="tipoDocumento" [virtualScroll]="true"
+                                            [ngClass]="isSubmit ? proveedorForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    <div>
                                         <label for="documento">Documento</label>
                                         <input id="documento" type="text" placeholder="" class="form-control"
                                             formControlName="documento" />
