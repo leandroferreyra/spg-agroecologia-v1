@@ -1,18 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { type } from 'os';
 import { forkJoin, Subscription } from 'rxjs';
 import { Human, LegalEntity, Person, ProveedorDTO } from 'src/app/core/models/request/proveedorDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
-import { CategoriasService } from 'src/app/core/services/categorias.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { ProveedoresService } from 'src/app/core/services/proveedores.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -47,11 +44,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   proveedorForm!: FormGroup;
 
   isHuman: boolean = false;
-  // newTipoPersona = 'fisica';
 
   busqueda_contiene: boolean = false;
   isEdicion: boolean = false;
-
 
   isShowMailMenu = false;
 
@@ -95,7 +90,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
         this.actual_role = d.userRole;
       });
   }
-
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
@@ -378,9 +372,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       apellido: new FormControl(null, [Validators.required]),
       tipoDocumento: new FormControl(null, [Validators.required]),
       documento: new FormControl(null, [Validators.required]),
-      cuit: new FormControl(null, [Validators.required]),
+      cuit: new FormControl(null, []),
       genero: new FormControl(null, [Validators.required]),
-      razon: new FormControl(null, [Validators.required]),
+      razon: new FormControl(null, []),
       sigla: new FormControl(null, [Validators.required]),
       calle: new FormControl(null, []),
       numero: new FormControl(null, []),

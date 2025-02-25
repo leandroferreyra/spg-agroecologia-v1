@@ -254,7 +254,7 @@
                 <div class="row justify-content-center">
 
                     <div class="col-md-12">
-                        <form [formGroup]="newProveedorForm" (keydown.enter)="confirmarNuevoProveedor()">
+                        <form [formGroup]="newProveedorForm" >
                             <div class="row mb-4">
                                 <div class="col-lg-12">
                                     <div class="text-center">
@@ -297,7 +297,7 @@
                                     <div>
                                         <label for="tipoDocumento">Tipo documento</label>
                                         <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
-                                            formControlName="tipoDocumento"
+                                            [selectOnTab]="true" formControlName="tipoDocumento"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -309,7 +309,7 @@
                                     <div>
                                         <label for="genero">Género</label>
                                         <ng-select [items]="generos" bindLabel="name" bindValue="uuid"
-                                            formControlName="genero"
+                                            formControlName="genero" [selectOnTab]="true"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -353,7 +353,7 @@
                                     <div>
                                         <label for="pais">País</label>
                                         <ng-select [items]="paises" bindLabel="name" bindValue="uuid"
-                                            formControlName="pais" [virtualScroll]="true"
+                                            formControlName="pais" [virtualScroll]="true" [selectOnTab]="true"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -361,7 +361,7 @@
                                     <div>
                                         <label for="provincia">Provincia</label>
                                         <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
-                                            formControlName="provincia"
+                                            formControlName="provincia" [selectOnTab]="true"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -370,7 +370,7 @@
                                         [ngClass]="isSubmit ? newProveedorForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
                                         <label for="ciudad">Ciudad</label>
                                         <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid"
-                                            formControlName="ciudad" [virtualScroll]="true"
+                                            formControlName="ciudad" [virtualScroll]="true" [selectOnTab]="true"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>

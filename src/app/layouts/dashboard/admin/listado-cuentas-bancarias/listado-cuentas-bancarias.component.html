@@ -166,54 +166,57 @@
                                 <label>Número de cuenta</label>
                                 <input type="text" class="form-control" formControlName="account_number">
 
-                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['account_number'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !cuentaForm.controls['account_number'].errors">
                                     <p class="text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && cuentaForm.controls['account_number'].errors">
                                     <p class="text-danger">Ingrese número de la cuenta</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="mb-2"
                                 [ngClass]="isSubmit ? cuentaForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Moneda</label>
                                 <ng-select [items]="monedas" bindLabel="name" bindValue="uuid"
-                                    formControlName="currency_uuid" [virtualScroll]="true" [appendTo]="'body'">
+                                    formControlName="currency_uuid" [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? cuentaForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
-                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['currency_uuid'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !cuentaForm.controls['currency_uuid'].errors">
                                     <p class="text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && cuentaForm.controls['currency_uuid'].errors">
                                     <p class="text-danger">Selecciona una moneda</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="mb-2"
                                 [ngClass]="isSubmit ? cuentaForm.controls['bank_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Banco</label>
                                 <ng-select [items]="bancos" bindLabel="name" bindValue="uuid"
-                                    formControlName="bank_uuid" [virtualScroll]="true" [appendTo]="'body'">
+                                    formControlName="bank_uuid" [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? cuentaForm.controls['bank_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
-                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['bank_uuid'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !cuentaForm.controls['bank_uuid'].errors">
                                     <p class="text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && cuentaForm.controls['bank_uuid'].errors">
                                     <p class="text-danger">Selecciona un banco</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="mb-2"
                                 [ngClass]="isSubmit ? cuentaForm.controls['account_type_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Tipo de cuenta</label>
                                 <ng-select [items]="tiposDeCuenta" bindLabel="name" bindValue="uuid"
-                                    formControlName="account_type_uuid" [virtualScroll]="true" [appendTo]="'body'">
+                                    formControlName="account_type_uuid" [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? cuentaForm.controls['account_type_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
-                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['account_type_uuid'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !cuentaForm.controls['account_type_uuid'].errors">
                                     <p class="text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && cuentaForm.controls['account_type_uuid'].errors">
                                     <p class="text-danger">Selecciona un tipo de cuenta</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="mb-2"
@@ -221,12 +224,12 @@
                                 <label>Alias</label>
                                 <input type="text" class="form-control" formControlName="alias">
 
-                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['alias'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !cuentaForm.controls['alias'].errors">
                                     <p class="text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && cuentaForm.controls['alias'].errors">
                                     <p class="text-danger">Ingresa alias de la cuenta</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="mb-2"
@@ -234,12 +237,12 @@
                                 <label>CBU</label>
                                 <input type="text" class="form-control" formControlName="cbu">
 
-                                <ng-container *ngIf="isSubmit && !cuentaForm.controls['cbu'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !cuentaForm.controls['cbu'].errors">
                                     <p class="text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && cuentaForm.controls['cbu'].errors">
                                     <p class="text-danger">Ingresa cbu de la cuenta</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="row mt-2">

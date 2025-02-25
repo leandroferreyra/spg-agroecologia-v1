@@ -55,8 +55,8 @@
                     @if (showFilter) {
                     <tr>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.district_country_name"
-                                (input)="obtenerCiudades()" />
+                            <input type="text" class="form-control campo-busqueda"
+                                [(ngModel)]="filtros.district_country_name" (input)="obtenerCiudades()" />
                         </td>
                         <td>
                             <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.district_name"
@@ -146,26 +146,27 @@
                                 <label>Ciudad</label>
                                 <input type="text" class="form-control" formControlName="nombre">
 
-                                <ng-container *ngIf="isSubmit && !ciudadForm.controls['nombre'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !ciudadForm.controls['nombre'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && ciudadForm.controls['nombre'].errors">
                                     <p class="mt-1 text-danger">Ingresa nombre de la ciudad</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div
                                 [ngClass]="isSubmit ? ciudadForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Provincia</label>
                                 <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
-                                    formControlName="provincia" [virtualScroll]="true" [appendTo]="'body'">
+                                    formControlName="provincia" [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? ciudadForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
-                                <ng-container *ngIf="isSubmit && !ciudadForm.controls['provincia'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !ciudadForm.controls['provincia'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && ciudadForm.controls['provincia'].errors">
                                     <p class="mt-1 text-danger">Selecciona una provincia</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="row mt-3">

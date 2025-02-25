@@ -30,12 +30,12 @@
                             <label for=" usuario">Nombre de usuario o Email</label>
                             <input id="usuario" type="text" placeholder="" class="form-control"
                                 formControlName="usuario" />
-                            <ng-container *ngIf="isSubmitLogin && !loginForm.controls['usuario'].errors">
+                            <!-- <ng-container *ngIf="isSubmitLogin && !loginForm.controls['usuario'].errors">
                                 <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                             </ng-container>
                             <ng-container *ngIf="isSubmitLogin && loginForm.controls['usuario'].errors">
                                 <p class="mt-1 text-danger">Ingresa usuario</p>
-                            </ng-container>
+                            </ng-container> -->
                         </div>
 
                         <div
@@ -47,12 +47,12 @@
                                 <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
                                     style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
                             </div>
-                            <ng-container *ngIf="isSubmitLogin && !loginForm.controls['password'].errors">
+                            <!-- <ng-container *ngIf="isSubmitLogin && !loginForm.controls['password'].errors">
                                 <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                             </ng-container>
                             <ng-container *ngIf="isSubmitLogin && loginForm.controls['password'].errors">
                                 <p class="mt-1 text-danger">Ingresa contraseña</p>
-                            </ng-container>
+                            </ng-container> -->
                         </div>
 
                         <div class="row">
