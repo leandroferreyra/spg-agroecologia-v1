@@ -185,7 +185,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   showDataProveedor(proveedor: any) {
-    // console.log(proveedor);
+    this.isEdicion = false; 
     this.inicializarForm(proveedor);
   }
 

@@ -19,8 +19,8 @@
                         <table class="table-hover">
                             <tbody>
                                 @for(data of filtrarDatos() ; track data.uuid) {
-                                <tr>
-                                    <td style="cursor: pointer;" (click)="showDataProveedor(data)">{{ getName(data) }}
+                                <tr style="cursor: pointer;">
+                                    <td (click)="showDataProveedor(data)">{{ getName(data) }}
                                     </td>
                                     <td>
                                         <button ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
@@ -116,7 +116,7 @@
                         <!-- <h4 class="mb-4 text-2xl font-semibold"></h4> -->
                         <form [formGroup]="proveedorForm" class="p-4">
                             <div class="flex flex-col sm:flex-row">
-                                <div class="grid flex-1 grid-cols-1 gap-5 sm:grid-cols-2">
+                                <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
                                     @if (isHuman) {
                                     <div>
                                         <label for="nombre">Nombre</label>
@@ -254,7 +254,7 @@
                 <div class="row justify-content-center">
 
                     <div class="col-md-12">
-                        <form [formGroup]="newProveedorForm" >
+                        <form [formGroup]="newProveedorForm">
                             <div class="row mb-4">
                                 <div class="col-lg-12">
                                     <div class="text-center">
