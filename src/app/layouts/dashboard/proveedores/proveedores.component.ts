@@ -10,7 +10,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { type } from 'os';
 import { forkJoin, Subscription } from 'rxjs';
-import { ProveedorDTO } from 'src/app/core/models/request/proveedorDTO';
+import { Human, LegalEntity, Person, ProveedorDTO } from 'src/app/core/models/request/proveedorDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { CategoriasService } from 'src/app/core/services/categorias.service';
 import { IndexService } from 'src/app/core/services/index.service';
@@ -331,8 +331,25 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
     this.newProveedorForm.get('tipoPersona')!.valueChanges.subscribe(
       (tipo: string) => {
-        this.modificarValidacionesForm
+        this.modificarValidacionesNuevoProveedor(tipo);
       });
+  }
+
+  modificarValidacionesNuevoProveedor(tipo: string) {
+    if (tipo === 'fisica') {
+      this.proveedorForm.get('nombre')?.setValidators([Validators.required]);
+      this.proveedorForm.get('apellido')?.setValidators([Validators.required]);
+      this.proveedorForm.get('genero')?.setValidators([Validators.required]);
+      this.proveedorForm.get('documento')?.setValidators([Validators.required]);
+      this.proveedorForm.get('razon')?.setValidators([]);
+    } else {
+      this.proveedorForm.get('razon')?.setValidators([Validators.required]);
+      this.proveedorForm.get('nombre')?.setValidators([]);
+      this.proveedorForm.get('apellido')?.setValidators([]);
+      this.proveedorForm.get('genero')?.setValidators([]);
+      this.proveedorForm.get('documento')?.setValidators([]);
+    }
+    this.proveedorForm.updateValueAndValidity();
   }
 
   obtenerCatalogos() {
@@ -353,7 +370,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     });
   }
 
-  confirmarProveedor() {
+  confirmarNuevoProveedor() {
     this.isSubmit = true;
     if (this.newProveedorForm.valid) {
       let proveedor = new ProveedorDTO();
@@ -371,8 +388,34 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
   }
 
-  armarDtoNuevoProveedor(proveedor: any) {
+  armarDtoNuevoProveedor(proveedor: ProveedorDTO) {
     console.log(this.newProveedorForm);
+    proveedor.actual_role = this.actual_role;
+    proveedor.batch_prefix = this.newProveedorForm.get('sigla')?.value;
+    proveedor.comments = this.newProveedorForm.get('comentarios')?.value;
+    proveedor.perception = ''; // TODO
+    proveedor.vat_percent = ''; // TODO
+    proveedor.withholding = ''; // TODO
+    let person = new Person();
+    person.street_name = this.newProveedorForm.get('calle')?.value;
+    person.door_number = this.newProveedorForm.get('numero')?.value;
+    person.address_detail = this.newProveedorForm.get('detalleDireccion')?.value;
+    person.city_uuid = this.newProveedorForm.get('ciudad')?.value;
+    if (this.newProveedorForm.get('tipoPersona')?.value === 'fisica') {
+      let human = new Human();
+      human.firstname = this.newProveedorForm.get('nombre')?.value;
+      human.lastname = this.newProveedorForm.get('apellido')?.value;
+      human.document_number = this.newProveedorForm.get('documento')?.value;
+      human.cuit = this.newProveedorForm.get('cuit')?.value;
+      human.gender_uuid = this.newProveedorForm.get('genero')?.value;
+      person.human = human;
+    } else {
+      let legal_entity = new LegalEntity();
+      legal_entity.cuit = this.newProveedorForm.get('cuit')?.value;
+      legal_entity.company_name = this.newProveedorForm.get('razon')?.value;
+      person.legal_entity = legal_entity;
+    }
+    proveedor.person = person;
   }
 
 

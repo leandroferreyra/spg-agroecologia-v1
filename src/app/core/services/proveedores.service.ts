@@ -21,10 +21,10 @@ export class ProveedoresService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiProveedores, JSON.stringify(proveedor), { headers });
   }
 
-  // editBanco(uuid: string, banco: BancoDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.put<AuthResponse>(environment.baseUrl + this.apiBancos + '/' + uuid, JSON.stringify(banco), { headers });
-  // }
+  editProveedor(uuid: string, proveedor: ProveedorDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiProveedores + '/' + uuid, JSON.stringify(proveedor), { headers });
+  }
 
   eliminarProveedor(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

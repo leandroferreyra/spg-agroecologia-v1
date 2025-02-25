@@ -12,24 +12,24 @@ export class ProveedorDTO {
     }
 }
 
-export interface Person {
-    street_name: string;
-    door_number: string;
-    address_detail: string;
-    city_uuid: string;
-    legal_entity: LegalEntity;
-    human: Human
+export class Person {
+    street_name!: string;
+    door_number!: string;
+    address_detail!: string;
+    city_uuid!: string;
+    legal_entity!: LegalEntity;
+    human!: Human
 }
 
-export interface LegalEntity {
-    company_name: string;
-    cuit: string;
+export class LegalEntity {
+    company_name!: string;
+    cuit!: string;
 }
 
-export interface Human {
-    document_number: string;
-    cuit: string;
-    gender_uuid: string;
-    firstname: string;
-    lastname: string;
+export class Human {
+    document_number!: string;
+    cuit!: string;
+    gender_uuid!: string;
+    firstname!: string;
+    lastname!: string;
 }
