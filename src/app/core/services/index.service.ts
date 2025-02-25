@@ -147,9 +147,18 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiTipoDeCuentas, { headers, params });
   }
 
-  getProveedoresWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+  getProveedoresWithParam(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProveedores, { headers, params: this.getParams(paramsObj, rol) });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol)
+      .append("with[]", "person.city")
+      .append("with[]", "person.city.district")
+      .append("with[]", "person.city.district.country")
+      .append("with[]", "person.human")
+      .append("with[]", "person.human.gender")
+      .append("with[]", "person.human.document_type")
+      .append("with[]", "person.legal_entity");
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProveedores, { headers, params: params });
   }
 
 }

@@ -52,9 +52,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    name: ''
+    tipoPersona: 'todos'
   };
-  showFilter: boolean = false;
+  showFilter: boolean = true;
   ordenamiento: any = {
   };
   isSubmit = false;
@@ -105,16 +105,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   obtenerProveedores(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
-    const params: any = {};
-    params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.document_type", "person.legal_entity"];
-    params.paging = null;
-    params.page = null;
-    params.order_by = this.ordenamiento;
-    params.filters = this.filtros;
+
 
     this.subscription.add(
-      this._indexService.getProveedoresWithParam(params, this.actual_role).subscribe({
+      this._indexService.getProveedoresWithParam(this.actual_role).subscribe({
         next: res => {
           console.log(res);
           this.proveedores = res.data;
@@ -530,7 +524,12 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
 
 
-
+  toggleFilter() {
+    this.showFilter = !this.showFilter;
+    if (!this.showFilter) {
+      this.filtros = {};
+    }
+  }
 
 
 
