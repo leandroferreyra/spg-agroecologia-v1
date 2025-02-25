@@ -359,6 +359,8 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         background-position: left 0.5rem center;
     }
 
+    
+    
     .has-error .form-input,
     .has-error .form-control,
     .has-error .form-textarea,
