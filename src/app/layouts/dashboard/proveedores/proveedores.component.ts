@@ -102,7 +102,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.obtenerCatalogos();
   }
 
-  obtenerProveedores() {
+  obtenerProveedores(alta: boolean = false) {
+    // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
+    // la lista y no el que acabo de agregar.
     const params: any = {};
     params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.document_type", "person.legal_entity"];
@@ -117,7 +119,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
           console.log(res);
           this.proveedores = res.data;
           this.proveedoresFiltrados = this.proveedores;
-          if (this.proveedores.length > 0) {
+          if (!alta && this.proveedores.length > 0) {
             this.inicializarForm(this.proveedores[0]);
           }
           this.spinner.hide();
@@ -185,7 +187,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   showDataProveedor(proveedor: any) {
-    this.isEdicion = false; 
+    this.isEdicion = false;
     this.inicializarForm(proveedor);
   }
 
@@ -433,6 +435,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.newProveedorForm.get('apellido')?.setValidators([Validators.required]);
       this.newProveedorForm.get('genero')?.setValidators([Validators.required]);
       this.newProveedorForm.get('documento')?.setValidators([Validators.required]);
+      this.newProveedorForm.get('tipoDocumento')?.setValidators([Validators.required]);
       this.newProveedorForm.get('razon')?.clearValidators();
     } else {
       this.newProveedorForm.get('razon')?.setValidators([Validators.required]);
@@ -440,9 +443,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.newProveedorForm.get('apellido')?.clearValidators();
       this.newProveedorForm.get('genero')?.clearValidators();
       this.newProveedorForm.get('documento')?.clearValidators();
+      this.newProveedorForm.get('tipoDocumento')?.clearValidators();
     }
 
-    ['nombre', 'apellido', 'genero', 'documento', 'razon'].forEach((field) => {
+    ['nombre', 'apellido', 'genero', 'documento', 'tipoDocumento', 'razon'].forEach((field) => {
       this.newProveedorForm.get(field)?.updateValueAndValidity({ emitEvent: false });
     });
   }
@@ -475,10 +479,11 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._proveedoresService.saveProveedor(proveedor).subscribe({
           next: res => {
-            console.log(res);
+            // console.log(res);
             this.spinner.hide();
-            this.obtenerProveedores();
+            this.obtenerProveedores(true);
             this.cerrarModal();
+            this.showDataProveedor(res.data);
           },
           error: error => {
             this.spinner.hide();
@@ -493,6 +498,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   armarDtoNuevoProveedor(proveedor: ProveedorDTO) {
     console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
+    proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+      "person.human.document_type", "person.legal_entity"];
     proveedor.batch_prefix = this.newProveedorForm.get('sigla')?.value;
     proveedor.comments = this.newProveedorForm.get('comentarios')?.value;
     proveedor.perception = '1'; // TODO
