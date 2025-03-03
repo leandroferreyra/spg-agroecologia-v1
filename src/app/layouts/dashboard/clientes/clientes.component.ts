@@ -106,10 +106,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
     this.subscription.add(
-      this._indexService.getProveedoresWithParam(this.actual_role).subscribe({
+      this._indexService.getClientesWithParam(this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
-          this.clientes = res.data;
+          console.log(res);
+          this.clientes = this.filtrarClientes(res.data);
           this.clientesFiltrados = this.clientes;
           if (!alta && this.clientes.length > 0) {
             this.inicializarForm(this.clientes[0]);
@@ -124,37 +124,51 @@ export class ClientesComponent implements OnInit, OnDestroy {
     )
   }
 
-  inicializarForm(proveedor?: any) {
-    if (proveedor) {
-      this.selectedCliente = proveedor;
-      this.isHuman = proveedor.person?.human ? true : false;
-      this.obtenerProvinciaCiudadProveedor(proveedor);
+  filtrarClientes(clientes: any) {
+    return clientes.filter((dato: any) => {
+      // Caso 1: Si es humano, lo devolvemos solo si user es null y supplier es null
+      if (dato.human) {
+        return dato.human.user === null && dato.supplier === null;
+      }
+      // Caso 2: Si no es humano pero tiene legal_entity, lo devolvemos solo si supplier es null
+      if (dato.legal_entity) {
+        return dato.supplier === null;
+      }
+      return false;
+    });
+  }
+
+  inicializarForm(cliente?: any) {
+    if (cliente) {
+      this.selectedCliente = cliente;
+      this.isHuman = (cliente.human);
+      this.obtenerProvinciaCiudadCliente(cliente);
     }
     this.clienteForm = new FormGroup({
-      nombre: new FormControl({ value: proveedor?.person?.human?.firstname, disabled: true }, [Validators.required]),
-      apellido: new FormControl({ value: proveedor?.person?.human?.lastname, disabled: true }, [Validators.required]),
-      genero: new FormControl({ value: proveedor?.person?.human?.gender?.uuid, disabled: true }, [Validators.required]),
-      documento: new FormControl({ value: proveedor?.person?.human?.document_number, disabled: true }, [Validators.required]),
-      tipoDocumento: new FormControl({ value: proveedor?.person?.human?.document_type?.uuid, disabled: true }, [Validators.required]),
-      cuit: new FormControl({ value: this.isHuman ? proveedor?.person?.human?.cuit : proveedor?.person?.legal_entity?.cuit, disabled: true }, [Validators.required]),
-      razon: new FormControl({ value: proveedor?.person?.legal_entity?.company_name, disabled: true }, [Validators.required]),
-      sigla: new FormControl({ value: proveedor?.batch_prefix, disabled: true }, [Validators.required]),
-      comentarios: new FormControl({ value: proveedor?.comments, disabled: true }, [Validators.required]),
-      calle: new FormControl({ value: proveedor?.person?.street_name, disabled: true }, [Validators.required]),
-      numero: new FormControl({ value: proveedor?.person?.door_number, disabled: true }, [Validators.required]),
-      detalleDireccion: new FormControl({ value: proveedor?.person?.address_detail, disabled: true }, [Validators.required]),
-      pais: new FormControl({ value: proveedor?.person?.city?.district?.country?.uuid, disabled: true }, [Validators.required]),
-      provincia: new FormControl({ value: proveedor?.person?.city?.district?.uuid, disabled: true }, [Validators.required]),
-      ciudad: new FormControl({ value: proveedor?.person?.city?.uuid, disabled: true }, [Validators.required]),
+      nombre: new FormControl({ value: cliente?.human?.firstname, disabled: true }, [Validators.required]),
+      apellido: new FormControl({ value: cliente?.human?.lastname, disabled: true }, [Validators.required]),
+      genero: new FormControl({ value: cliente?.human?.gender?.uuid, disabled: true }, [Validators.required]),
+      documento: new FormControl({ value: cliente?.human?.document_number, disabled: true }, [Validators.required]),
+      tipoDocumento: new FormControl({ value: cliente?.human?.document_type?.uuid, disabled: true }, [Validators.required]),
+      cuit: new FormControl({ value: this.isHuman ? cliente?.human?.cuit : cliente?.legal_entity?.cuit, disabled: true }, [Validators.required]),
+      razon: new FormControl({ value: cliente?.legal_entity?.company_name, disabled: true }, [Validators.required]),
+      sigla: new FormControl({ value: cliente?.batch_prefix, disabled: true }, [Validators.required]),
+      comentarios: new FormControl({ value: cliente?.comments, disabled: true }, [Validators.required]),
+      calle: new FormControl({ value: cliente?.street_name, disabled: true }, [Validators.required]),
+      numero: new FormControl({ value: cliente?.door_number, disabled: true }, [Validators.required]),
+      detalleDireccion: new FormControl({ value: cliente?.address_detail, disabled: true }, [Validators.required]),
+      pais: new FormControl({ value: cliente?.city?.district?.country?.uuid, disabled: true }, [Validators.required]),
+      provincia: new FormControl({ value: cliente?.city?.district?.uuid, disabled: true }, [Validators.required]),
+      ciudad: new FormControl({ value: cliente?.city?.uuid, disabled: true }, [Validators.required]),
     });
 
   }
 
-  obtenerProvinciaCiudadProveedor(proveedor: any) {
-    if (proveedor.person?.city?.district?.country) {
+  obtenerProvinciaCiudadCliente(proveedor: any) {
+    if (proveedor.city?.district?.country) {
       forkJoin({
-        provincias: this._catalogoService.getProvinciasByCountry(proveedor.person?.city?.district?.country.uuid),
-        ciudades: this._catalogoService.getCiudadesByProvincia(proveedor.person?.city?.district?.uuid),
+        provincias: this._catalogoService.getProvinciasByCountry(proveedor.city?.district?.country.uuid),
+        ciudades: this._catalogoService.getCiudadesByProvincia(proveedor.city?.district?.uuid),
       }).subscribe({
         next: res => {
           this.provincias = res.provincias.data.districts;
@@ -168,19 +182,19 @@ export class ClientesComponent implements OnInit, OnDestroy {
   }
 
 
-  getName(proveedor: any) {
-    if (proveedor.person?.human) {
-      return proveedor.person.human.firstname + ' ' + proveedor.person.human.lastname
-    } else if (proveedor.person?.legal_entity) {
-      return proveedor.person.legal_entity.company_name
+  getName(cliente: any) {
+    if (cliente.human) {
+      return cliente.human.firstname + ' ' + cliente.human.lastname
+    } else if (cliente.legal_entity) {
+      return cliente.legal_entity.company_name
     } else {
       return ' ';
     }
   }
 
-  showDataCliente(proveedor: any) {
+  showDataCliente(cliente: any) {
     this.isEdicion = false;
-    this.inicializarForm(proveedor);
+    this.inicializarForm(cliente);
   }
 
   toggleEdicion() {
@@ -292,12 +306,12 @@ export class ClientesComponent implements OnInit, OnDestroy {
       // Es búsqueda avanzada
       if (this.filtros.tipoPersona === 'fisica') {
         resultados = this.clientesFiltrados.filter(dato => {
-          return dato.person?.human
+          return dato.human
         })
 
       } else if (this.filtros.tipoPersona === 'juridica') {
         resultados = this.clientesFiltrados.filter(dato => {
-          return dato.person?.legal_entity
+          return dato.legal_entity
         })
       } else {
         // todos
@@ -305,22 +319,17 @@ export class ClientesComponent implements OnInit, OnDestroy {
       }
       if (this.filtros.nombre) {
         resultados = resultados.filter(dato => {
-          return dato.person?.human?.firstname?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
+          return dato.human?.firstname?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
         })
       }
       if (this.filtros.apellido) {
         resultados = resultados.filter(dato => {
-          return dato.person?.human?.lastname?.toLowerCase().includes(this.filtros.apellido.toLowerCase());
+          return dato.human?.lastname?.toLowerCase().includes(this.filtros.apellido.toLowerCase());
         })
       }
       if (this.filtros.razon) {
         resultados = resultados.filter(dato => {
-          return dato.person?.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
-        })
-      }
-      if (this.filtros.sigla) {
-        resultados = resultados.filter(dato => {
-          return dato.batch_prefix?.toLowerCase().includes(this.filtros.sigla.toLowerCase());
+          return dato.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
         })
       }
       if (this.filtros.cuit) {
@@ -328,19 +337,19 @@ export class ClientesComponent implements OnInit, OnDestroy {
         // y luego, en caso de ser 'todos', chequear si es fisica o jurídica para poder saber de donde sacar la info.
         resultados = resultados.filter(dato => {
           if (this.filtros.tipoPersona === 'todos') {
-            if (dato.person?.human) {
-              return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-                dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            if (dato.human) {
+              return dato.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
+                dato.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
             } else {
               // Es juridica
-              return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+              return dato.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
             }
           } else if (this.filtros.tipoPersona === 'fisica') {
-            return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-              dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            return dato.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
+              dato.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
           } else {
             // Filtrado por jurídica
-            return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            return dato.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
           }
         })
       }
@@ -349,10 +358,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
       if (this.filtros.name) {
         resultados = this.clientesFiltrados.filter(dato => {
           let nombreCompleto;
-          if (dato.person?.human) {
-            nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
+          if (dato.human) {
+            nombreCompleto = (dato.human?.firstname + ' ' + dato.human?.lastname).toLocaleLowerCase();
           } else {
-            nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
+            nombreCompleto = dato.legal_entity?.company_name.toLocaleLowerCase();
           }
           if (this.busqueda_contiene) {
             return nombreCompleto.includes(this.filtros.name.toLowerCase());
@@ -594,7 +603,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.filtros.nombre = '';
     this.filtros.apellido = '';
     this.filtros.razon = '';
-    this.filtros.sigla = '';
     this.filtros.cuit = '';
   }
 

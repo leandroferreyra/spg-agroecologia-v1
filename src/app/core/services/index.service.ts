@@ -22,6 +22,7 @@ export class IndexService {
   apiCuentas = "/ladie_bank_accounts";
   apiTipoDeCuentas = "/account_types";
   apiProveedores = '/suppliers';
+  apiClientes = '/people';
 
   constructor(private http: HttpClient) { }
 
@@ -161,4 +162,20 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProveedores, { headers, params: params });
   }
 
+  getClientesWithParam(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol)
+      .append("with[]", "city")
+      .append("with[]", "city.district")
+      .append("with[]", "city.district.country")
+      .append("with[]", "human")
+      .append("with[]", "human.gender")
+      .append("with[]", "human.document_type")
+      .append("with[]", "human.user")
+      .append("with[]", "supplier")
+      .append("with[]", "legal_entity");
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
+  }
+  
 }
