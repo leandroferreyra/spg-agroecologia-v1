@@ -110,7 +110,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProveedoresWithParam(this.actual_role).subscribe({
         next: res => {
-          console.log(res);
+          // console.log(res);
           this.proveedores = res.data;
           this.proveedoresFiltrados = this.proveedores;
           if (!alta && this.proveedores.length > 0) {
@@ -241,7 +241,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._proveedoresService.editProveedor(this.selectedProveedor.uuid, proveedor).subscribe({
           next: res => {
-            console.log(res);
+            // console.log(res);
             this.inicializarForm(res.data);
             this.isEdicion = false;
             this.swalService.toastSuccess('top-right', "Usuario actualizado.");
@@ -256,7 +256,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
   }
   armarDTOEdicion(proveedor: ProveedorDTO) {
-    console.log(this.newProveedorForm);
+    // console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.document_type", "person.legal_entity"];
@@ -290,20 +290,79 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   filtrarDatos() {
     let resultados = this.proveedoresFiltrados;
-    if (this.filtros.name) {
-      resultados = this.proveedoresFiltrados.filter(dato => {
-        let nombreCompleto;
-        if (dato.person?.human) {
-          nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
-        } else {
-          nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
-        }
-        if (this.busqueda_contiene) {
-          return nombreCompleto.includes(this.filtros.name.toLowerCase());
-        } else {
-          return nombreCompleto.startsWith(this.filtros.name.toLowerCase());
-        }
-      })
+    if (this.showFilter) {
+      // Es búsqueda avanzada
+      if (this.filtros.tipoPersona === 'fisica') {
+        resultados = this.proveedoresFiltrados.filter(dato => {
+          return dato.person?.human
+        })
+
+      } else if (this.filtros.tipoPersona === 'juridica') {
+        resultados = this.proveedoresFiltrados.filter(dato => {
+          return dato.person?.legal_entity
+        })
+      } else {
+        // todos
+        resultados = this.proveedores;
+      }
+      if (this.filtros.nombre) {
+        resultados = resultados.filter(dato => {
+          return dato.person?.human?.firstname?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
+        })
+      }
+      if (this.filtros.apellido) {
+        resultados = resultados.filter(dato => {
+          return dato.person?.human?.lastname?.toLowerCase().includes(this.filtros.apellido.toLowerCase());
+        })
+      }
+      if (this.filtros.razon) {
+        resultados = resultados.filter(dato => {
+          return dato.person?.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
+        })
+      }
+      if (this.filtros.sigla) {
+        resultados = resultados.filter(dato => {
+          return dato.batch_prefix?.toLowerCase().includes(this.filtros.sigla.toLowerCase());
+        })
+      }
+      if (this.filtros.cuit) {
+        // Acá filtra por cuit o dni, por lo que debe chequear dos cosas, primero con que filtro se está aplicando (todos, fisica o jurídica)
+        // y luego, en caso de ser 'todos', chequear si es fisica o jurídica para poder saber de donde sacar la info.
+        resultados = resultados.filter(dato => {
+          if (this.filtros.tipoPersona === 'todos') {
+            if (dato.person?.human) {
+              return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
+                dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            } else {
+              // Es juridica
+              return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            }
+          } else if (this.filtros.tipoPersona === 'fisica') {
+            return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
+              dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+          } else {
+            // Filtrado por jurídica
+            return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+          }
+        })
+      }
+    } else {
+      // Busca solo por proveedor en la búsqueda simple
+      if (this.filtros.name) {
+        resultados = this.proveedoresFiltrados.filter(dato => {
+          let nombreCompleto;
+          if (dato.person?.human) {
+            nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
+          } else {
+            nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
+          }
+          if (this.busqueda_contiene) {
+            return nombreCompleto.includes(this.filtros.name.toLowerCase());
+          } else {
+            return nombreCompleto.startsWith(this.filtros.name.toLowerCase());
+          }
+        })
+      }
     }
     return resultados;
   }
@@ -490,7 +549,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   armarDtoNuevoProveedor(proveedor: ProveedorDTO) {
-    console.log(this.newProveedorForm);
+    // console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.document_type", "person.legal_entity"];
@@ -527,8 +586,18 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
-      this.filtros = {};
+      this.filtros = {
+        tipoPersona: 'todos'
+      };
     }
+  }
+
+  cleanFilters() {
+    this.filtros.nombre = '';
+    this.filtros.apellido = '';
+    this.filtros.razon = '';
+    this.filtros.sigla = '';
+    this.filtros.cuit = '';
   }
 
 

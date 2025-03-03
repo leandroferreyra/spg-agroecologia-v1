@@ -69,7 +69,7 @@
                         (click)="toggleEdicion()">
                         <icon-edit class="h-6 w-6" />
                     </button>
-                    <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+                    <button type="button" ngxTippy="Activar filtros avanzados" (click)="toggleFilter()">
                         <icon-search class="h-6 w-6" />
                     </button>
                 </h5>
@@ -107,7 +107,7 @@
                                         <label class="inline-flex items-center" for="radioTodos">
                                             <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                                 id="radioTodos" value="todos" [(ngModel)]="filtros.tipoPersona"
-                                                (change)="filtrarDatos()">
+                                                (change)="cleanFilters()">
                                             <span class="ml-2 cursor-pointer">Todos</span>
                                         </label>
                                     </div>
@@ -115,7 +115,7 @@
                                         <label class="inline-flex items-center" for="radioFisica">
                                             <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                                 id="radioFisica" value="fisica" [(ngModel)]="filtros.tipoPersona"
-                                                (change)="filtrarDatos()">
+                                                (change)="cleanFilters()">
                                             <span class="ml-2 cursor-pointer">Física</span>
                                         </label>
                                     </div>
@@ -123,7 +123,7 @@
                                         <label class="inline-flex items-center" for="radioJuridica">
                                             <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                                 id="radioJuridica" value="juridica" [(ngModel)]="filtros.tipoPersona"
-                                                (change)="filtrarDatos()">
+                                                (change)="cleanFilters()">
                                             <span class="ml-2 cursor-pointer">Jurídica</span>
                                         </label>
                                     </div>
@@ -135,21 +135,27 @@
                                 @if(this.filtros.tipoPersona === 'fisica' || this.filtros.tipoPersona === 'todos') {
                                 <div class="w-100">
                                     <label for="nombre">Nombre</label>
-                                    <input type="text" id="nombre" class="form-control" placeholder="Buscar por Nombre"
-                                        [(ngModel)]="filtros.nombre">
+                                    <input type="text" id="nombre" class="form-control" [(ngModel)]="filtros.nombre">
+                                </div>
+                                <div class="w-100">
+                                    <label for="apellido">Apellido</label>
+                                    <input type="text" id="apellido" class="form-control"
+                                        [(ngModel)]="filtros.apellido">
                                 </div>
                                 }
-                                @if(this.filtros.tipoPersona === 'juridica' ||  this.filtros.tipoPersona === 'todos') {
+                                @if(this.filtros.tipoPersona === 'juridica' || this.filtros.tipoPersona === 'todos') {
                                 <div class="w-100">
                                     <label for="razon">Razón Social</label>
-                                    <input type="text" id="razon" class="form-control"
-                                        placeholder="Buscar por Razón Social" [(ngModel)]="filtros.razon">
+                                    <input type="text" id="razon" class="form-control" [(ngModel)]="filtros.razon">
                                 </div>
                                 }
                                 <div class="w-100">
                                     <label for="sigla">Sigla</label>
-                                    <input type="text" id="sigla" class="form-control" placeholder="Buscar por Sigla"
-                                        [(ngModel)]="filtros.sigla">
+                                    <input type="text" id="sigla" class="form-control" [(ngModel)]="filtros.sigla">
+                                </div>
+                                <div class="w-100">
+                                    <label for="cuit">Cuit / Dni</label>
+                                    <input type="text" id="cuit" class="form-control" [(ngModel)]="filtros.cuit">
                                 </div>
                             </div>
 
