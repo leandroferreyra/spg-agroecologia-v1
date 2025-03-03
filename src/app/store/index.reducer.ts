@@ -83,7 +83,7 @@ function getMenuByRole(role: string) {
                 { label: 'Compras', route: '/users' },
                 { label: 'Ventas', route: '/settings' },
                 { label: 'Proveedores', route: '/proveedores' },
-                { label: 'Clientes', route: '/settings' },
+                { label: 'Clientes', route: '/clientes' },
                 { label: 'Equipos', route: '/settings' },
                 {
                     label: 'Configuraciones', route: '', submenu: [

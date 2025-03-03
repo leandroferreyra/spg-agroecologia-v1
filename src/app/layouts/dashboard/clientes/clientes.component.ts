@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { forkJoin, Subscription } from 'rxjs';
-import { Human, LegalEntity, Person, ProveedorDTO } from 'src/app/core/models/request/proveedorDTO';
+import { Subscription, forkJoin } from 'rxjs';
+import { ProveedorDTO, Person, Human, LegalEntity } from 'src/app/core/models/request/proveedorDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { ProveedoresService } from 'src/app/core/services/proveedores.service';
@@ -23,25 +23,25 @@ import { IconUserComponent } from 'src/app/shared/icon/icon-user';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-proveedores',
+  selector: 'app-clientes',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule
   ],
-  templateUrl: './proveedores.component.html',
-  styleUrl: './proveedores.component.css'
+  templateUrl: './clientes.component.html',
+  styleUrl: './clientes.component.css'
 })
-export class ProveedoresComponent implements OnInit, OnDestroy {
+export class ClientesComponent implements OnInit, OnDestroy {
 
   store: any;
   private subscription: Subscription = new Subscription();
   actual_role: string = '';
-  proveedores: any[] = [];
-  proveedoresFiltrados: any[] = [];
-  selectedProveedor: any;
-  newProveedorForm!: FormGroup;
-  proveedorForm!: FormGroup;
+  clientes: any[] = [];
+  clientesFiltrados: any[] = [];
+  selectedCliente: any;
+  newClienteForm!: FormGroup;
+  clienteForm!: FormGroup;
 
   isHuman: boolean = false;
 
@@ -62,7 +62,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   tab1: string = 'Datos generales';
 
   // Referencia al modal para crear y editar países.
-  @ViewChild('modalProveedor') modalProveedor!: NgxCustomModalComponent;
+  @ViewChild('modalCliente') modalCliente!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -98,23 +98,21 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.inicializarForm();
-    this.obtenerProveedores();
+    this.obtenerClientes();
     this.obtenerCatalogos();
   }
 
-  obtenerProveedores(alta: boolean = false) {
+  obtenerClientes(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
-
-
     this.subscription.add(
       this._indexService.getProveedoresWithParam(this.actual_role).subscribe({
         next: res => {
           // console.log(res);
-          this.proveedores = res.data;
-          this.proveedoresFiltrados = this.proveedores;
-          if (!alta && this.proveedores.length > 0) {
-            this.inicializarForm(this.proveedores[0]);
+          this.clientes = res.data;
+          this.clientesFiltrados = this.clientes;
+          if (!alta && this.clientes.length > 0) {
+            this.inicializarForm(this.clientes[0]);
           }
           this.spinner.hide();
         },
@@ -128,11 +126,11 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   inicializarForm(proveedor?: any) {
     if (proveedor) {
-      this.selectedProveedor = proveedor;
+      this.selectedCliente = proveedor;
       this.isHuman = proveedor.person?.human ? true : false;
       this.obtenerProvinciaCiudadProveedor(proveedor);
     }
-    this.proveedorForm = new FormGroup({
+    this.clienteForm = new FormGroup({
       nombre: new FormControl({ value: proveedor?.person?.human?.firstname, disabled: true }, [Validators.required]),
       apellido: new FormControl({ value: proveedor?.person?.human?.lastname, disabled: true }, [Validators.required]),
       genero: new FormControl({ value: proveedor?.person?.human?.gender?.uuid, disabled: true }, [Validators.required]),
@@ -180,7 +178,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
   }
 
-  showDataProveedor(proveedor: any) {
+  showDataCliente(proveedor: any) {
     this.isEdicion = false;
     this.inicializarForm(proveedor);
   }
@@ -195,51 +193,51 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   modificarValidacionesForm() {
-    this.proveedorForm.get('nombre')?.enable();
-    this.proveedorForm.get('apellido')?.enable();
-    this.proveedorForm.get('genero')?.enable();
-    this.proveedorForm.get('razon')?.enable();
-    this.proveedorForm.get('sigla')?.enable();
-    this.proveedorForm.get('comentarios')?.enable();
-    this.proveedorForm.get('calle')?.enable();
-    this.proveedorForm.get('numero')?.enable();
-    this.proveedorForm.get('cuit')?.enable();
-    this.proveedorForm.get('documento')?.enable();
-    this.proveedorForm.get('tipoDocumento')?.enable();
-    this.proveedorForm.get('detalleDireccion')?.enable();
-    this.proveedorForm.get('pais')?.enable();
-    this.proveedorForm.get('provincia')?.enable();
-    this.proveedorForm.get('ciudad')?.enable();
+    this.clienteForm.get('nombre')?.enable();
+    this.clienteForm.get('apellido')?.enable();
+    this.clienteForm.get('genero')?.enable();
+    this.clienteForm.get('razon')?.enable();
+    this.clienteForm.get('sigla')?.enable();
+    this.clienteForm.get('comentarios')?.enable();
+    this.clienteForm.get('calle')?.enable();
+    this.clienteForm.get('numero')?.enable();
+    this.clienteForm.get('cuit')?.enable();
+    this.clienteForm.get('documento')?.enable();
+    this.clienteForm.get('tipoDocumento')?.enable();
+    this.clienteForm.get('detalleDireccion')?.enable();
+    this.clienteForm.get('pais')?.enable();
+    this.clienteForm.get('provincia')?.enable();
+    this.clienteForm.get('ciudad')?.enable();
     if (this.isHuman) {
-      this.proveedorForm.get('nombre')?.setValidators([Validators.required]);
-      this.proveedorForm.get('apellido')?.setValidators([Validators.required]);
-      this.proveedorForm.get('genero')?.setValidators([Validators.required]);
-      this.proveedorForm.get('documento')?.setValidators([Validators.required]);
-      this.proveedorForm.get('razon')?.clearValidators();
+      this.clienteForm.get('nombre')?.setValidators([Validators.required]);
+      this.clienteForm.get('apellido')?.setValidators([Validators.required]);
+      this.clienteForm.get('genero')?.setValidators([Validators.required]);
+      this.clienteForm.get('documento')?.setValidators([Validators.required]);
+      this.clienteForm.get('razon')?.clearValidators();
     } else {
-      this.proveedorForm.get('razon')?.setValidators([Validators.required]);
-      this.proveedorForm.get('nombre')?.clearValidators();
-      this.proveedorForm.get('apellido')?.clearValidators();
-      this.proveedorForm.get('genero')?.clearValidators();
-      this.proveedorForm.get('documento')?.clearValidators();
+      this.clienteForm.get('razon')?.setValidators([Validators.required]);
+      this.clienteForm.get('nombre')?.clearValidators();
+      this.clienteForm.get('apellido')?.clearValidators();
+      this.clienteForm.get('genero')?.clearValidators();
+      this.clienteForm.get('documento')?.clearValidators();
     }
     ['nombre', 'apellido', 'genero', 'documento', 'razon'].forEach((field) => {
-      this.proveedorForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+      this.clienteForm.get(field)?.updateValueAndValidity({ emitEvent: false });
     });
   }
 
   cancelarEdicion() {
     this.isEdicion = false;
-    this.inicializarForm(this.selectedProveedor);
+    this.inicializarForm(this.selectedCliente);
   }
 
   confirmarEdicion() {
-    if (this.proveedorForm.valid) {
+    if (this.clienteForm.valid) {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDTOEdicion(proveedor);
       this.subscription.add(
-        this._proveedoresService.editProveedor(this.selectedProveedor.uuid, proveedor).subscribe({
+        this._proveedoresService.editProveedor(this.selectedCliente.uuid, proveedor).subscribe({
           next: res => {
             // console.log(res);
             this.inicializarForm(res.data);
@@ -260,50 +258,50 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.document_type", "person.legal_entity"];
-    proveedor.batch_prefix = this.proveedorForm.get('sigla')?.value;
-    proveedor.comments = this.proveedorForm.get('comentarios')?.value;
+    proveedor.batch_prefix = this.clienteForm.get('sigla')?.value;
+    proveedor.comments = this.clienteForm.get('comentarios')?.value;
     proveedor.perception = '1'; // TODO
     proveedor.vat_percent = '1'; // TODO
     proveedor.withholding = '1'; // TODO
     let person = new Person();
-    person.street_name = this.proveedorForm.get('calle')?.value;
-    person.door_number = this.proveedorForm.get('numero')?.value;
-    person.address_detail = this.proveedorForm.get('detalleDireccion')?.value;
-    person.city_uuid = this.proveedorForm.get('ciudad')?.value;
+    person.street_name = this.clienteForm.get('calle')?.value;
+    person.door_number = this.clienteForm.get('numero')?.value;
+    person.address_detail = this.clienteForm.get('detalleDireccion')?.value;
+    person.city_uuid = this.clienteForm.get('ciudad')?.value;
     if (this.isHuman) {
       let human = new Human();
-      human.firstname = this.proveedorForm.get('nombre')?.value;
-      human.lastname = this.proveedorForm.get('apellido')?.value;
-      human.document_type_uuid = this.proveedorForm.get('tipoDocumento')?.value;
-      human.document_number = this.proveedorForm.get('documento')?.value;
-      human.cuit = this.proveedorForm.get('cuit')?.value;
-      human.gender_uuid = this.proveedorForm.get('genero')?.value;
+      human.firstname = this.clienteForm.get('nombre')?.value;
+      human.lastname = this.clienteForm.get('apellido')?.value;
+      human.document_type_uuid = this.clienteForm.get('tipoDocumento')?.value;
+      human.document_number = this.clienteForm.get('documento')?.value;
+      human.cuit = this.clienteForm.get('cuit')?.value;
+      human.gender_uuid = this.clienteForm.get('genero')?.value;
       person.human = human;
     } else {
       let legal_entity = new LegalEntity();
-      legal_entity.cuit = this.proveedorForm.get('cuit')?.value;
-      legal_entity.company_name = this.proveedorForm.get('razon')?.value;
+      legal_entity.cuit = this.clienteForm.get('cuit')?.value;
+      legal_entity.company_name = this.clienteForm.get('razon')?.value;
       person.legal_entity = legal_entity;
     }
     proveedor.person = person;
   }
 
   filtrarDatos() {
-    let resultados = this.proveedoresFiltrados;
+    let resultados = this.clientesFiltrados;
     if (this.showFilter) {
       // Es búsqueda avanzada
       if (this.filtros.tipoPersona === 'fisica') {
-        resultados = this.proveedoresFiltrados.filter(dato => {
+        resultados = this.clientesFiltrados.filter(dato => {
           return dato.person?.human
         })
 
       } else if (this.filtros.tipoPersona === 'juridica') {
-        resultados = this.proveedoresFiltrados.filter(dato => {
+        resultados = this.clientesFiltrados.filter(dato => {
           return dato.person?.legal_entity
         })
       } else {
         // todos
-        resultados = this.proveedores;
+        resultados = this.clientes;
       }
       if (this.filtros.nombre) {
         resultados = resultados.filter(dato => {
@@ -349,7 +347,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     } else {
       // Busca solo por proveedor en la búsqueda simple
       if (this.filtros.name) {
-        resultados = this.proveedoresFiltrados.filter(dato => {
+        resultados = this.clientesFiltrados.filter(dato => {
           let nombreCompleto;
           if (dato.person?.human) {
             nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
@@ -395,7 +393,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._proveedoresService.eliminarProveedor(proveedor.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerProveedores();
+          this.obtenerClientes();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -410,18 +408,18 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   cerrarModal() {
     this.isSubmit = false;
-    this.modalProveedor.close();
+    this.modalCliente.close();
   }
 
-  openModalNuevoProveedor() {
-    this.tituloModal = 'Nuevo proveedor';
+  openModalNuevoCliente() {
+    this.tituloModal = 'Nuevo cliente';
     this.inicializarNuevoFormularioProveedor();
-    this.modalProveedor.options = this.modalOptions;
-    this.modalProveedor.open();
+    this.modalCliente.options = this.modalOptions;
+    this.modalCliente.open();
   }
 
   inicializarNuevoFormularioProveedor() {
-    this.newProveedorForm = new FormGroup({
+    this.newClienteForm = new FormGroup({
       tipoPersona: new FormControl('fisica', [Validators.required]),
       nombre: new FormControl(null, [Validators.required]),
       apellido: new FormControl(null, [Validators.required]),
@@ -445,11 +443,11 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   onChange() {
-    this.newProveedorForm.get('pais')!.valueChanges.subscribe(
+    this.newClienteForm.get('pais')!.valueChanges.subscribe(
       (uuid: string) => {
         this._catalogoService.getProvinciasByCountry(uuid).subscribe({
           next: res => {
-            this.newProveedorForm.get('provincia')?.setValue(null);
+            this.newClienteForm.get('provincia')?.setValue(null);
             this.provincias = res.data.districts;
           },
           error: error => {
@@ -459,12 +457,12 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
         });
       });
 
-    this.newProveedorForm.get('provincia')!.valueChanges.subscribe(
+    this.newClienteForm.get('provincia')!.valueChanges.subscribe(
       (uuid: string) => {
         if (uuid) {
           this._catalogoService.getCiudadesByProvincia(uuid).subscribe({
             next: res => {
-              this.newProveedorForm.get('ciudad')?.setValue(null);
+              this.newClienteForm.get('ciudad')?.setValue(null);
               this.ciudades = res.data.cities;
             },
             error: error => {
@@ -476,7 +474,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       });
 
 
-    this.newProveedorForm.get('tipoPersona')!.valueChanges.subscribe(
+    this.newClienteForm.get('tipoPersona')!.valueChanges.subscribe(
       (tipo: string) => {
         this.modificarValidacionesNuevoProveedor(tipo);
       });
@@ -484,23 +482,23 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   modificarValidacionesNuevoProveedor(tipo: string) {
     if (tipo === 'fisica') {
-      this.newProveedorForm.get('nombre')?.setValidators([Validators.required]);
-      this.newProveedorForm.get('apellido')?.setValidators([Validators.required]);
-      this.newProveedorForm.get('genero')?.setValidators([Validators.required]);
-      this.newProveedorForm.get('documento')?.setValidators([Validators.required]);
-      this.newProveedorForm.get('tipoDocumento')?.setValidators([Validators.required]);
-      this.newProveedorForm.get('razon')?.clearValidators();
+      this.newClienteForm.get('nombre')?.setValidators([Validators.required]);
+      this.newClienteForm.get('apellido')?.setValidators([Validators.required]);
+      this.newClienteForm.get('genero')?.setValidators([Validators.required]);
+      this.newClienteForm.get('documento')?.setValidators([Validators.required]);
+      this.newClienteForm.get('tipoDocumento')?.setValidators([Validators.required]);
+      this.newClienteForm.get('razon')?.clearValidators();
     } else {
-      this.newProveedorForm.get('razon')?.setValidators([Validators.required]);
-      this.newProveedorForm.get('nombre')?.clearValidators();
-      this.newProveedorForm.get('apellido')?.clearValidators();
-      this.newProveedorForm.get('genero')?.clearValidators();
-      this.newProveedorForm.get('documento')?.clearValidators();
-      this.newProveedorForm.get('tipoDocumento')?.clearValidators();
+      this.newClienteForm.get('razon')?.setValidators([Validators.required]);
+      this.newClienteForm.get('nombre')?.clearValidators();
+      this.newClienteForm.get('apellido')?.clearValidators();
+      this.newClienteForm.get('genero')?.clearValidators();
+      this.newClienteForm.get('documento')?.clearValidators();
+      this.newClienteForm.get('tipoDocumento')?.clearValidators();
     }
 
     ['nombre', 'apellido', 'genero', 'documento', 'tipoDocumento', 'razon'].forEach((field) => {
-      this.newProveedorForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+      this.newClienteForm.get(field)?.updateValueAndValidity({ emitEvent: false });
     });
   }
 
@@ -525,7 +523,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   confirmarNuevoProveedor() {
     this.isSubmit = true;
-    if (this.newProveedorForm.valid) {
+    if (this.newClienteForm.valid) {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDtoNuevoProveedor(proveedor);
@@ -534,9 +532,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
           next: res => {
             // console.log(res);
             this.spinner.hide();
-            this.obtenerProveedores(true);
+            this.obtenerClientes(true);
             this.cerrarModal();
-            this.showDataProveedor(res.data);
+            this.showDataCliente(res.data);
           },
           error: error => {
             this.spinner.hide();
@@ -553,29 +551,29 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.document_type", "person.legal_entity"];
-    proveedor.batch_prefix = this.newProveedorForm.get('sigla')?.value;
-    proveedor.comments = this.newProveedorForm.get('comentarios')?.value;
+    proveedor.batch_prefix = this.newClienteForm.get('sigla')?.value;
+    proveedor.comments = this.newClienteForm.get('comentarios')?.value;
     proveedor.perception = '1'; // TODO
     proveedor.vat_percent = '1'; // TODO
     proveedor.withholding = '1'; // TODO
     let person = new Person();
-    person.street_name = this.newProveedorForm.get('calle')?.value;
-    person.door_number = this.newProveedorForm.get('numero')?.value;
-    person.address_detail = this.newProveedorForm.get('detalleDireccion')?.value;
-    person.city_uuid = this.newProveedorForm.get('ciudad')?.value;
-    if (this.newProveedorForm.get('tipoPersona')?.value === 'fisica') {
+    person.street_name = this.newClienteForm.get('calle')?.value;
+    person.door_number = this.newClienteForm.get('numero')?.value;
+    person.address_detail = this.newClienteForm.get('detalleDireccion')?.value;
+    person.city_uuid = this.newClienteForm.get('ciudad')?.value;
+    if (this.newClienteForm.get('tipoPersona')?.value === 'fisica') {
       let human = new Human();
-      human.firstname = this.newProveedorForm.get('nombre')?.value;
-      human.lastname = this.newProveedorForm.get('apellido')?.value;
-      human.document_type_uuid = this.newProveedorForm.get('tipoDocumento')?.value;
-      human.document_number = this.newProveedorForm.get('documento')?.value;
-      human.cuit = this.newProveedorForm.get('cuit')?.value;
-      human.gender_uuid = this.newProveedorForm.get('genero')?.value;
+      human.firstname = this.newClienteForm.get('nombre')?.value;
+      human.lastname = this.newClienteForm.get('apellido')?.value;
+      human.document_type_uuid = this.newClienteForm.get('tipoDocumento')?.value;
+      human.document_number = this.newClienteForm.get('documento')?.value;
+      human.cuit = this.newClienteForm.get('cuit')?.value;
+      human.gender_uuid = this.newClienteForm.get('genero')?.value;
       person.human = human;
     } else {
       let legal_entity = new LegalEntity();
-      legal_entity.cuit = this.newProveedorForm.get('cuit')?.value;
-      legal_entity.company_name = this.newProveedorForm.get('razon')?.value;
+      legal_entity.cuit = this.newClienteForm.get('cuit')?.value;
+      legal_entity.company_name = this.newClienteForm.get('razon')?.value;
       person.legal_entity = legal_entity;
     }
     proveedor.person = person;
