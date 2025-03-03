@@ -164,18 +164,18 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   }
 
-  obtenerProvinciaCiudadCliente(proveedor: any) {
-    if (proveedor.city?.district?.country) {
+  obtenerProvinciaCiudadCliente(cliente: any) {
+    if (cliente.city?.district?.country) {
       forkJoin({
-        provincias: this._catalogoService.getProvinciasByCountry(proveedor.city?.district?.country.uuid),
-        ciudades: this._catalogoService.getCiudadesByProvincia(proveedor.city?.district?.uuid),
+        provincias: this._catalogoService.getProvinciasByCountry(cliente.city?.district?.country.uuid),
+        ciudades: this._catalogoService.getCiudadesByProvincia(cliente.city?.district?.uuid),
       }).subscribe({
         next: res => {
           this.provincias = res.provincias.data.districts;
           this.ciudades = res.ciudades.data.cities;
         },
         error: error => {
-          console.error('Error cargando catalogos para primer proveedor: ', error);
+          console.error('Error cargando catalogos para primer cliente: ', error);
         }
       });
     }
