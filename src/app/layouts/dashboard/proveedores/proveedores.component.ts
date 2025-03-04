@@ -259,7 +259,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     // console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.document_type", "person.legal_entity"];
+      "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.proveedorForm.get('sigla')?.value;
     proveedor.comments = this.proveedorForm.get('comentarios')?.value;
     proveedor.perception = '1'; // TODO
@@ -552,7 +552,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     // console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.document_type", "person.legal_entity"];
+      "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.newProveedorForm.get('sigla')?.value;
     proveedor.comments = this.newProveedorForm.get('comentarios')?.value;
     proveedor.perception = '1'; // TODO

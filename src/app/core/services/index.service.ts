@@ -157,8 +157,8 @@ export class IndexService {
       .append("with[]", "person.city.district.country")
       .append("with[]", "person.human")
       .append("with[]", "person.human.gender")
-      .append("with[]", "person.human.document_type")
-      .append("with[]", "person.legal_entity");
+      .append("with[]", "person.human.documentType")
+      .append("with[]", "person.legalEntity");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProveedores, { headers, params: params });
   }
 
@@ -171,10 +171,10 @@ export class IndexService {
       .append("with[]", "city.district.country")
       .append("with[]", "human")
       .append("with[]", "human.gender")
-      .append("with[]", "human.document_type")
+      .append("with[]", "human.documentType")
       .append("with[]", "human.user")
       .append("with[]", "supplier")
-      .append("with[]", "legal_entity");
+      .append("with[]", "legalEntity");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
   }
   

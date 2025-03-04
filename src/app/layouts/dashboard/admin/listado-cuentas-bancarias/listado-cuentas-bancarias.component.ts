@@ -152,7 +152,7 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
   obtenerCuentas() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["bank", "currency", "account_type"];
+    params.with = ["bank", "currency", "accountType"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;

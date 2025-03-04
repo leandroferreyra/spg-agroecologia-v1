@@ -271,7 +271,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     // console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.document_type", "person.legal_entity"];
+      "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.clienteForm.get('sigla')?.value;
     proveedor.comments = this.clienteForm.get('comentarios')?.value;
     proveedor.perception = '1'; // TODO
@@ -559,7 +559,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     // console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.document_type", "person.legal_entity"];
+      "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.newClienteForm.get('sigla')?.value;
     proveedor.comments = this.newClienteForm.get('comentarios')?.value;
     proveedor.perception = '1'; // TODO

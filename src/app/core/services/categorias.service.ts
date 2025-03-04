@@ -23,7 +23,7 @@ export class CategoriasService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .set('actual_role', rol)
-      .set('with[]', "product_category.product_category.product_category.product_category");
+      .set('with[]', "productCategory.productCategory.productCategory.productCategory");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCategorias + '/' + uuid, { headers, params });
   }
 

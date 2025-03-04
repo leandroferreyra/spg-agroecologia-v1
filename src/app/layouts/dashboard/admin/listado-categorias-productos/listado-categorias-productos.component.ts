@@ -114,7 +114,7 @@ export class ListadoCategoriasProductosComponent implements OnInit, OnDestroy {
     }
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["product_category", "product_categories"];
+    params.with = ["productCategory", "productCategories"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -122,11 +122,11 @@ export class ListadoCategoriasProductosComponent implements OnInit, OnDestroy {
     if (this.locationToGo) {
       this.filtros.product_category_uuid = this.locationToGo.uuid;
     } else {
-      this.filtros.product_category_uuid = null;
+      this.filtros.productCategory_uuid = null;
     }
     // Si filtra y es global eliminamos el uuid
     if (this.filtros.name && this.busqueda_global) {
-      delete this.filtros.product_category_uuid;
+      delete this.filtros.productCategory_uuid;
     }
     params.filters = this.filtros;
 
