@@ -113,8 +113,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     forkJoin({
       generos: this._catalogService.getGeneros(),
       paises: this._catalogService.getPaises(),
-      provincias: this._catalogService.getProvinciasByCountry(this.usuarioLogueado.human.person.city.district.country.uuid),
-      ciudades: this._catalogService.getCiudadesByProvincia(this.usuarioLogueado.human.person.city.district.uuid),
+      provincias: this._catalogService.getProvinciasByCountry(this.usuarioLogueado.human?.person?.city?.district?.country.uuid),
+      ciudades: this._catalogService.getCiudadesByProvincia(this.usuarioLogueado.human?.person?.city?.district.uuid),
       // tiposDocumento: this._catalogService.getDocumentos(),
     }).subscribe({
       next: res => {

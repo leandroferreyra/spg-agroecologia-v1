@@ -1,0 +1,499 @@
+<div>
+    <div class="relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
+        <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
+            [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
+
+        <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[250px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
+            [ngClass]="{ '!block': isShowMailMenu }">
+
+            <!-- PANEL IZQUIERDO -->
+
+            <div class="flex h-full flex-col pb-16">
+                <div class="pb-5">
+                    <button class="btn btn-primary w-full" type="button" (click)="openModalNuevoCliente()">Agregar
+                        cliente</button>
+                </div>
+
+
+                <ng-scrollbar class="relative h-full grow" appearance="compact">
+                    <div class="table-responsive">
+                        <table class="table-hover">
+                            <tbody>
+                                @for(data of filtrarDatos() ; track data.uuid) {
+                                <tr style="cursor: pointer;">
+                                    <td (click)="showDataCliente(data)">{{ getName(data) }}
+                                    </td>
+                                    <td>
+                                        <button ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                            <icon-trash-lines />
+                                        </button>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-scrollbar>
+
+                <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
+                    <div class="group relative">
+                        <input type="text" placeholder="Buscar cliente..." [(ngModel)]="filtros.name"
+                            class="peer form-input ltr:pr-8 rtl:pl-8" />
+                        <div
+                            class="absolute top-1/2 -translate-y-1/2 peer-focus:text-primary ltr:right-[11px] rtl:left-[11px]">
+                            <icon-search />
+                        </div>
+                    </div>
+                    <div class="form-check form-check-inline flex" style="margin-top:10px">
+                        <label class="form-check-label flex gap-1">
+                            <input class="form-checkbox h-5 w-5" type="checkbox" [checked]="busqueda_contiene"
+                                [(ngModel)]="busqueda_contiene" (change)="filtrarDatos()">
+                            <span class="form-check-sign">Contiene</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO -->
+        <div class="panel h-full flex-1 overflow-x-hidden p-0">
+
+            <!-- <h5 class="mt-3 text-lg font-semibold dark:text-white-light min-w-0">Proveedores</h5> -->
+
+            <!-- MENU ICONO OCULTO RESPONSIVE -->
+            <div class="flex flex-wrap-reverse items-center justify-between gap-4 p-4">
+                <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
+                    Clientes
+                    <button type="button" ngxTippy="Editar datos" class="hover:text-primary flex items-center"
+                        (click)="toggleEdicion()">
+                        <icon-edit class="h-6 w-6" />
+                    </button>
+                    <button type="button" ngxTippy="Activar filtros avanzados" (click)="toggleFilter()">
+                        <icon-search class="h-6 w-6" />
+                    </button>
+                </h5>
+
+                <div class="flex w-full items-center justify-between sm:w-auto">
+                    <div class="flex items-center ltr:mr-4 rtl:ml-4">
+                        <button type="button" class="block hover:text-primary ltr:mr-3 rtl:ml-3 xl:hidden"
+                            (click)="isShowMailMenu = !isShowMailMenu">
+                            <icon-menu />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- BORDER -->
+            <div class="h-px border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
+
+            @if (showFilter) {
+            <!-- FILTROS -->
+            <div class="row d-flex justify-content-center">
+                <div class="col-12 d-flex justify-content-center">
+                    <div
+                        class="max-w-[50rem] mt-3 w-full shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-[#e0e6ed] dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none mx-auto">
+                        <div class="py-7 px-6">
+                            <!-- <h5 class="text-[#3b3f5c] text-center text-xl font-semibold mb-4 dark:text-white-light">
+                                Filtros
+                            </h5> -->
+
+                            <!-- Tipo de Persona -->
+                            <div class="mb-3 text-center">
+                                <label class="font-semibold text-gray-700 d-block">Tipo de Persona:</label>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioTodos">
+                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                                id="radioTodos" value="todos" [(ngModel)]="filtros.tipoPersona"
+                                                (change)="cleanFilters()">
+                                            <span class="ml-2 cursor-pointer">Todos</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioFisica">
+                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                                id="radioFisica" value="fisica" [(ngModel)]="filtros.tipoPersona"
+                                                (change)="cleanFilters()">
+                                            <span class="ml-2 cursor-pointer">Física</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioJuridica">
+                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                                id="radioJuridica" value="juridica" [(ngModel)]="filtros.tipoPersona"
+                                                (change)="cleanFilters()">
+                                            <span class="ml-2 cursor-pointer">Jurídica</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Inputs de Filtros -->
+                            <div class="d-flex flex-column flex-md-row gap-2">
+                                @if(this.filtros.tipoPersona === 'fisica' || this.filtros.tipoPersona === 'todos') {
+                                <div class="w-100">
+                                    <label for="nombre">Nombre</label>
+                                    <input type="text" id="nombre" class="form-control" [(ngModel)]="filtros.nombre">
+                                </div>
+                                <div class="w-100">
+                                    <label for="apellido">Apellido</label>
+                                    <input type="text" id="apellido" class="form-control"
+                                        [(ngModel)]="filtros.apellido">
+                                </div>
+                                }
+                                @if(this.filtros.tipoPersona === 'juridica' || this.filtros.tipoPersona === 'todos') {
+                                <div class="w-100">
+                                    <label for="razon">Razón Social</label>
+                                    <input type="text" id="razon" class="form-control" [(ngModel)]="filtros.razon">
+                                </div>
+                                }
+                                <div class="w-100">
+                                    <label for="cuit">Cuit / Dni</label>
+                                    <input type="text" id="cuit" class="form-control" [(ngModel)]="filtros.cuit">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            }
+
+
+            <!-- TABS -->
+            <div class="mb-5">
+                <div class="mt-3 mb-5 flex flex-wrap">
+                    <a href="javascript:;"
+                        class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos generales' }"
+                        (click)="tab1 = 'datos generales'">
+                        <icon-user class="mr-3" />
+                        Datos generales
+                    </a>
+
+                    <a href="javascript:;"
+                        class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'compras' }"
+                        (click)="tab1 = 'compras'">
+                        Compras
+                    </a>
+
+                    <a href="javascript:;"
+                        class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'productos-adquiridos' }"
+                        (click)="tab1 = 'productos-adquiridos'">
+                        Productos adquiridos
+                    </a>
+
+                    <a href="javascript:;"
+                        class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'productos-en-posesion' }"
+                        (click)="tab1 = 'productos-en-posesion'">
+                        Productos en posesión
+                    </a>
+                </div>
+
+                <div class="flex-1 text-sm">
+                    <div *ngIf="tab1.toLowerCase() === 'datos generales'">
+                        <!-- <h4 class="mb-4 text-2xl font-semibold"></h4> -->
+                        <form [formGroup]="clienteForm" class="p-4">
+                            <div class="flex flex-col sm:flex-row">
+                                <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+                                    @if (isHuman) {
+                                    <div>
+                                        <label for="nombre">Nombre</label>
+                                        <input id="nombre" type="text" placeholder="" class="form-control"
+                                            formControlName="nombre" />
+                                    </div>
+                                    <div>
+                                        <label for="apellido">Apellido</label>
+                                        <input id="apellido" type="text" placeholder="" class="form-control"
+                                            formControlName="apellido" />
+                                    </div>
+                                    <div>
+                                        <label for="tipoDocumento">Tipo documento</label>
+                                        <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
+                                            formControlName="tipoDocumento" [virtualScroll]="true"
+                                            [ngClass]="isSubmit ? clienteForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    <div>
+                                        <label for="documento">Documento</label>
+                                        <input id="documento" type="text" placeholder="" class="form-control"
+                                            formControlName="documento" />
+                                    </div>
+                                    <div>
+                                        <label for="genero">Genero</label>
+                                        <ng-select [items]="generos" bindLabel="name" bindValue="uuid"
+                                            formControlName="genero"
+                                            [ngClass]="isSubmit ? clienteForm.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    } @else {
+                                    <div>
+                                        <label for="razon">Razón social</label>
+                                        <input id="razon" type="text" placeholder="" class="form-control"
+                                            formControlName="razon" />
+                                    </div>
+                                    }
+                                    <div>
+                                        <label for="cuit">Cuit</label>
+                                        <input id="cuit" type="text" placeholder="" class="form-control"
+                                            formControlName="cuit" />
+                                    </div>
+                                    <div>
+                                        <label for="sigla">Sigla</label>
+                                        <input id="sigla" type="text" placeholder="" class="form-control"
+                                            formControlName="sigla" />
+                                    </div>
+                                    <div>
+                                        <label for="calle">Calle</label>
+                                        <input id="calle" type="text" placeholder="" class="form-control"
+                                            formControlName="calle" />
+                                    </div>
+                                    <div>
+                                        <label for="numero">Número</label>
+                                        <input id="numero" type="text" placeholder="" class="form-control"
+                                            formControlName="numero" />
+                                    </div>
+                                    <div>
+                                        <label for="detalledireccion">Detalle de dirección</label>
+                                        <textarea class="form-control" id="detalledireccion"
+                                            formControlName="detalleDireccion" rows="1"></textarea>
+                                    </div>
+                                    <div>
+                                        <label for="pais">País</label>
+                                        <ng-select [items]="paises" bindLabel="name" bindValue="uuid"
+                                            formControlName="pais" [virtualScroll]="true"
+                                            [ngClass]="isSubmit ? clienteForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+
+                                    <div>
+                                        <label for="provincia">Provincia</label>
+                                        <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
+                                            formControlName="provincia"
+                                            [ngClass]="isSubmit ? clienteForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+
+                                    <div
+                                        [ngClass]="isSubmit ? clienteForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="ciudad">Ciudad</label>
+                                        <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid"
+                                            formControlName="ciudad" [virtualScroll]="true"
+                                            [ngClass]="isSubmit ? clienteForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    <div>
+                                        <label for="comentarios">Comentarios</label>
+                                        <textarea class="form-control" id="comentarios" formControlName="comentarios"
+                                            rows="1"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (isEdicion) {
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarEdicion()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cancelarEdicion()">Cancelar</button>
+                                </div>
+                            </div>
+                            }
+
+                        </form>
+
+                    </div>
+
+                    <div *ngIf="tab1.toLowerCase() === 'compras'">
+
+                    </div>
+
+                    <div *ngIf="tab1.toLowerCase() === 'productos-adquiridos'">
+
+                    </div>
+
+                    <div *ngIf="tab1.toLowerCase() === 'productos-en-posesion'">
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div>
+    <ngx-custom-modal #modalCliente class="modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="newClienteForm">
+                            <div class="row mb-4">
+                                <div class="col-lg-12">
+                                    <div class="text-center">
+
+                                        <div class="form-check form-check-inline">
+                                            <label class="inline-flex mr-3" for="personafisica">
+                                                <input class="form-radio" type="radio" name="tipoPersona"
+                                                    id="personafisica" value="fisica" formControlName="tipoPersona">
+                                                <span style="cursor: pointer;">Persona física</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="inline-flex mr-3" for="personajuridica">
+                                                <input class="form-radio" type="radio" name="tipoPersona"
+                                                    id="personajuridica" value="juridica" formControlName="tipoPersona">
+                                                <span style="cursor: pointer;">Persona jurídica</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row">
+                                <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+
+                                    <!-- FORMULARIO -->
+                                    @if (newClienteForm.controls['tipoPersona'].value === 'fisica') {
+                                    <!-- FISICA -->
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label>Nombre</label>
+                                        <input type="text" class="form-control" formControlName="nombre">
+                                    </div>
+
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['apellido'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label>Apellido</label>
+                                        <input type="text" class="form-control" formControlName="apellido">
+                                    </div>
+                                    <div>
+                                        <label for="tipoDocumento">Tipo documento</label>
+                                        <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
+                                            [selectOnTab]="true" formControlName="tipoDocumento"
+                                            [ngClass]="isSubmit ? newClienteForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['documento'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label>Documento</label>
+                                        <input type="text" class="form-control" formControlName="documento">
+                                    </div>
+                                    <div>
+                                        <label for="genero">Género</label>
+                                        <ng-select [items]="generos" bindLabel="name" bindValue="uuid"
+                                            formControlName="genero" [selectOnTab]="true"
+                                            [ngClass]="isSubmit ? newClienteForm.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    }@else {
+                                    <!-- JURIDICA -->
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['razon'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label>Razón</label>
+                                        <input type="text" class="form-control" formControlName="razon">
+                                    </div>
+                                    }
+                                    <!-- DATOS COMUNES  -->
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['cuit'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label>Cuit</label>
+                                        <input type="text" class="form-control" formControlName="cuit">
+                                    </div>
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['sigla'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label>Sigla</label>
+                                        <input type="text" class="form-control" formControlName="sigla">
+                                    </div>
+
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['calle'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label>Calle</label>
+                                        <input type="text" class="form-control" formControlName="calle">
+                                    </div>
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['numero'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label>Número</label>
+                                        <input type="text" class="form-control" formControlName="numero">
+                                    </div>
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['detalleDireccion'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="detalleDireccion">Detalle de la dirección</label>
+                                        <textarea class="form-control" id="detalleDireccion"
+                                            formControlName="detalleDireccion" rows="1"></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label for="pais">País</label>
+                                        <ng-select [items]="paises" bindLabel="name" bindValue="uuid"
+                                            formControlName="pais" [virtualScroll]="true" [selectOnTab]="true"
+                                            [ngClass]="isSubmit ? newClienteForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+
+                                    <div>
+                                        <label for="provincia">Provincia</label>
+                                        <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
+                                            formControlName="provincia" [selectOnTab]="true"
+                                            [ngClass]="isSubmit ? newClienteForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="ciudad">Ciudad</label>
+                                        <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid"
+                                            formControlName="ciudad" [virtualScroll]="true" [selectOnTab]="true"
+                                            [ngClass]="isSubmit ? newClienteForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['comentarios'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="comentarios">Comentarios</label>
+                                        <textarea class="form-control" id="comentarios" formControlName="comentarios"
+                                            rows="1"></textarea>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarNuevoProveedor()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+</ngx-spinner>

@@ -97,7 +97,8 @@
                             <label for="paginacion">Ítems por página:</label>
                         </div>
                         <div class="col-auto">
-                            <select id="paginacion" class="form-control" [(ngModel)]="itemsPerPage" (change)="obtenerProvincias();">
+                            <select id="paginacion" class="form-control" [(ngModel)]="itemsPerPage"
+                                (change)="obtenerProvincias();">
                                 <option value=5>5</option>
                                 <option value=10>10</option>
                                 <option value=20>20</option>
@@ -137,26 +138,27 @@
                                 <label>Provincia</label>
                                 <input type="text" class="form-control" formControlName="nombre">
 
-                                <ng-container *ngIf="isSubmit && !provinciaForm.controls['nombre'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !provinciaForm.controls['nombre'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && provinciaForm.controls['nombre'].errors">
                                     <p class="mt-1 text-danger">Ingresa nombre de la provincia</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div
                                 [ngClass]="isSubmit ? provinciaForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>País</label>
                                 <ng-select [items]="paises" bindLabel="name" bindValue="uuid" formControlName="pais"
-                                    [virtualScroll]="true" [appendTo]="'body'">
+                                    [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? provinciaForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
-                                <ng-container *ngIf="isSubmit && !provinciaForm.controls['pais'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !provinciaForm.controls['pais'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && provinciaForm.controls['pais'].errors">
                                     <p class="mt-1 text-danger">Selecciona un país</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="row mt-3">

@@ -124,7 +124,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
         next: res => {
           this.tokenService.setToken(res.token);
           this.roles = res.data;
-          console.log(this.roles);
+          // console.log(this.roles);
         },
         error: error => {
           console.error(error);

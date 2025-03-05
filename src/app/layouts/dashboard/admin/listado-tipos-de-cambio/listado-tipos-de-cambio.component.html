@@ -5,9 +5,26 @@
             <button type="button" ngxTippy="Agregar tipo de cambio" (click)="openModalNuevoTipo('NEW')">
                 <icon-plus />
             </button>
-            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+            <!-- <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
                 <icon-search />
-            </button>
+            </button> -->
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="text-center">
+                    @for(moneda of monedas ; track moneda.uuid) {
+                    <div class="form-check form-check-inline">
+                        <label class="inline-flex mr-3" [for]="'radio_' + moneda.uuid">
+                            <input class="form-radio" type="radio" name="radio_monedas" [id]="'radio_' + moneda.uuid"
+                                [value]="moneda.name" (change)="obtenerTiposCambio()"
+                                [(ngModel)]="filtros.currency_name">
+                            <span style="cursor: pointer;">{{ moneda.name }}</span>
+                        </label>
+                    </div>
+                    }
+                </div>
+            </div>
         </div>
 
         <div class="row mb-2">
@@ -68,7 +85,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (showFilter) {
+                    <!-- @if (showFilter) {
                     <tr>
                         <td>
                             <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
@@ -76,7 +93,7 @@
                         </td>
                         <td></td>
                     </tr>
-                    }
+                    } -->
                     @for(data of tiposCambio | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                     <tr>
                         <td class="whitespace-nowrap">{{ data.currency.name}} </td>
@@ -148,43 +165,42 @@
                     <div class="col-md-12">
                         <form [formGroup]="tipoCambioForm" (keydown.enter)="confirmarTipoCambio()">
 
-                            <div class="mb-3"
-                                [ngClass]="isSubmit ? tipoCambioForm.controls['moneda'].errors ? 'has-error' : 'has-success' : ''">
+                            <div class="mb-3">
                                 <label>Moneda</label>
-                                <ng-select [items]="monedas" bindLabel="name" bindValue="uuid" formControlName="moneda"
-                                    [virtualScroll]="true" [appendTo]="'body'">
-                                </ng-select>
-                                <ng-container *ngIf="isSubmit && !tipoCambioForm.controls['moneda'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container *ngIf="isSubmit && tipoCambioForm.controls['moneda'].errors">
-                                    <p class="mt-1 text-danger">Selecciona una moneda</p>
-                                </ng-container>
+                                <input type="text" class="form-control" [value]="filtros.currency_name" disabled>
                             </div>
 
                             <div class="mb-3"
                                 [ngClass]="isSubmit ? tipoCambioForm.controls['valor'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Valor</label>
                                 <input type="text" class="form-control" formControlName="valor">
-                                <ng-container *ngIf="isSubmit && !tipoCambioForm.controls['valor'].errors">
+                                <!-- <ng-container *ngIf="isSubmit && !tipoCambioForm.controls['valor'].errors">
                                     <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
                                 </ng-container>
                                 <ng-container *ngIf="isSubmit && tipoCambioForm.controls['valor'].errors">
                                     <p class="mt-1 text-danger">Ingresa valor</p>
-                                </ng-container>
+                                </ng-container> -->
                             </div>
 
                             <div class="col-md-12 pr-1 mb-3">
                                 <label>Fecha desde</label>
-                                <input type="text" mwlFlatpickr [options]="dateTime" formControlName="datetime_from"
-                                    class="form-input" />
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: true, 
+                                        dateFormat: 'Y-m-d H:i:S',
+                                        time24hr: true,
+                                        enableSeconds: true
+                                    }" formControlName="datetime_from" class="form-input" />
                             </div>
 
                             @if (isEdicion) {
                             <div class="col-md-12 pr-1">
                                 <label>Fecha hasta</label>
-                                <input type="text" mwlFlatpickr [options]="dateTime" formControlName="datetime_to"
-                                    class="form-input" />
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: true, 
+                                        dateFormat: 'Y-m-d H:i:S',
+                                        time24hr: true,
+                                        enableSeconds: true
+                                    }" formControlName="datetime_to" class="form-input" />
                             </div>
                             }
 
