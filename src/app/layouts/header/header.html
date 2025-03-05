@@ -108,7 +108,9 @@
             <ul class="sub-menu">
                 @for(sub of menu.submenu; track sub) {
                 <li>
-                    <a (click)="navigateTo(sub.route)">{{sub.label}}</a>
+                    <a (click)="navigateTo(sub.route)" class="cursor-pointer">
+                        {{sub.label}}
+                    </a>
                 </li>
                 }
             </ul>
