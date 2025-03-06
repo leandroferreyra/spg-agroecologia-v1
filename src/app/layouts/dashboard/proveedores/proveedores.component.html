@@ -319,6 +319,8 @@
                                         <textarea class="form-control" id="comentarios" formControlName="comentarios"
                                             rows="1"></textarea>
                                     </div>
+
+
                                     <div>
                                         <label for="percepcionIVA">IVA (%)</label>
                                         <input id="percepcionIVA" type="text" placeholder="" class="form-control"
@@ -340,8 +342,6 @@
                                             </label>
                                         </div>
                                     </div>
-
-
                                 </div>
                             </div>
 
@@ -529,10 +529,28 @@
                                         <label for="comentarios">Comentarios</label>
                                         <textarea class="form-control" id="comentarios" formControlName="comentarios"
                                             rows="1"></textarea>
-
                                     </div>
-
-
+                                    <div>
+                                        <label for="percepcionIVA">IVA (%)</label>
+                                        <input id="percepcionIVA" type="text" placeholder="" class="form-control"
+                                            formControlName="percepcionIVA" />
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label flex items-center gap-2">
+                                                <input class="form-checkbox" type="checkbox"
+                                                    formControlName="percepcionRG3337">
+                                                <span class="form-check-sign">Percepción R.G. 3337</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label flex items-center gap-2">
+                                                <input class="form-checkbox" type="checkbox"
+                                                    formControlName="percepcionIIBB">
+                                                <span class="form-check-sign">Percepción IIBB</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

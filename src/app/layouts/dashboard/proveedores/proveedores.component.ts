@@ -116,8 +116,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   obtenerProveedores(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
-
-
     this.subscription.add(
       this._indexService.getProveedoresWithParam(this.actual_role).subscribe({
         next: res => {
@@ -138,6 +136,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   inicializarForm(proveedor?: any) {
+    // console.log(this.posiblesEstados);
+    // console.log(proveedor?.person?.current_state?.uuid);
     if (proveedor) {
       if (proveedor.person.uuid != this.selectedProveedor?.person.uuid) {
         // Esto es para no llamar cuando hace el show y tambien hacerlo al editar. 
@@ -519,7 +519,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       comentarios: new FormControl(null, []),
       pais: new FormControl(null, []),
       provincia: new FormControl(null, []),
-      ciudad: new FormControl(null, [])
+      ciudad: new FormControl(null, []),
+      percepcionRG3337: new FormControl(null, []),
+      percepcionIIBB: new FormControl(null, []),
+      percepcionIVA: new FormControl(null, []),
     });
     this.provincias = [];
     this.ciudades = [];
@@ -613,6 +616,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDtoNuevoProveedor(proveedor);
+      console.log(proveedor);
       this.subscription.add(
         this._proveedoresService.saveProveedor(proveedor).subscribe({
           next: res => {
@@ -639,9 +643,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.newProveedorForm.get('sigla')?.value;
     proveedor.comments = this.newProveedorForm.get('comentarios')?.value;
-    proveedor.perception = '1'; // TODO
-    proveedor.vat_percent = '1'; // TODO
-    proveedor.withholding = '1'; // TODO
+    proveedor.perception = this.newProveedorForm.get('percepcionRG3337')?.value;
+    proveedor.vat_percent = this.newProveedorForm.get('percepcionIVA')?.value;
+    proveedor.withholding = this.newProveedorForm.get('percepcionIIBB')?.value;
     let person = new Person();
     person.street_name = this.newProveedorForm.get('calle')?.value;
     person.door_number = this.newProveedorForm.get('numero')?.value;
