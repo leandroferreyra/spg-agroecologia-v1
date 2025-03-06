@@ -5,6 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
+import { error } from 'console';
 import { MenuModule } from 'headlessui-angular';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
@@ -68,8 +69,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   };
   isSubmit = false;
 
-  tab1: string = 'Datos generales';
-  tab13: string = 'Datos generales';
+  tab1: string = 'Datos-generales';
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalProveedor') modalProveedor!: NgxCustomModalComponent;
@@ -86,6 +86,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   ciudades: any[] = [];
   generos: any[] = [];
   documentos: any[] = [];
+  posiblesEstados: any[] = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -154,16 +155,17 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       cuit: new FormControl({ value: this.isHuman ? proveedor?.person?.human?.cuit : proveedor?.person?.legal_entity?.cuit, disabled: true }, [Validators.required]),
       razon: new FormControl({ value: proveedor?.person?.legal_entity?.company_name, disabled: true }, [Validators.required]),
       sigla: new FormControl({ value: proveedor?.batch_prefix, disabled: true }, [Validators.required]),
+      estado: new FormControl({ value: proveedor?.person?.current_state?.uuid, disabled: true }, []),
       comentarios: new FormControl({ value: proveedor?.comments, disabled: true }, [Validators.required]),
-      calle: new FormControl({ value: proveedor?.person?.street_name, disabled: true }, [Validators.required]),
-      numero: new FormControl({ value: proveedor?.person?.door_number, disabled: true }, [Validators.required]),
-      detalleDireccion: new FormControl({ value: proveedor?.person?.address_detail, disabled: true }, [Validators.required]),
-      pais: new FormControl({ value: proveedor?.person?.city?.district?.country?.uuid, disabled: true }, [Validators.required]),
-      provincia: new FormControl({ value: proveedor?.person?.city?.district?.uuid, disabled: true }, [Validators.required]),
-      ciudad: new FormControl({ value: proveedor?.person?.city?.uuid, disabled: true }, [Validators.required]),
-      percepcionRG3337: new FormControl({ value: proveedor?.perception, disabled: true }, [Validators.required]),
-      percepcionIIBB: new FormControl({ value: proveedor?.withholding, disabled: true }, [Validators.required]),
-      percepcionIVA: new FormControl({ value: proveedor?.vat_percent, disabled: true }, [Validators.required]),
+      calle: new FormControl({ value: proveedor?.person?.street_name, disabled: true }, []),
+      numero: new FormControl({ value: proveedor?.person?.door_number, disabled: true }, []),
+      detalleDireccion: new FormControl({ value: proveedor?.person?.address_detail, disabled: true }, []),
+      pais: new FormControl({ value: proveedor?.person?.city?.district?.country?.uuid, disabled: true }, []),
+      provincia: new FormControl({ value: proveedor?.person?.city?.district?.uuid, disabled: true }, []),
+      ciudad: new FormControl({ value: proveedor?.person?.city?.uuid, disabled: true }, []),
+      percepcionRG3337: new FormControl({ value: proveedor?.perception, disabled: true }, []),
+      percepcionIIBB: new FormControl({ value: proveedor?.withholding, disabled: true }, []),
+      percepcionIVA: new FormControl({ value: proveedor?.vat_percent, disabled: true }, []),
     });
     this.lastSelectedPaisUuid = proveedor?.person?.city?.district?.country?.uuid;
     this.lastSelectedProvinciaUuid = proveedor?.person?.city?.district?.uuid;
@@ -272,6 +274,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.proveedorForm.get('genero')?.enable();
     this.proveedorForm.get('razon')?.enable();
     this.proveedorForm.get('sigla')?.enable();
+    this.proveedorForm.get('estado')?.enable();
     this.proveedorForm.get('comentarios')?.enable();
     this.proveedorForm.get('calle')?.enable();
     this.proveedorForm.get('numero')?.enable();
@@ -289,6 +292,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.proveedorForm.get('nombre')?.setValidators([Validators.required]);
       this.proveedorForm.get('apellido')?.setValidators([Validators.required]);
       this.proveedorForm.get('genero')?.setValidators([Validators.required]);
+      this.proveedorForm.get('tipoDocumento')?.setValidators([Validators.required]);
       this.proveedorForm.get('documento')?.setValidators([Validators.required]);
       this.proveedorForm.get('razon')?.clearValidators();
     } else {
@@ -296,9 +300,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.proveedorForm.get('nombre')?.clearValidators();
       this.proveedorForm.get('apellido')?.clearValidators();
       this.proveedorForm.get('genero')?.clearValidators();
+      this.proveedorForm.get('tipoDocumento')?.clearValidators();
       this.proveedorForm.get('documento')?.clearValidators();
     }
-    ['nombre', 'apellido', 'genero', 'documento', 'razon'].forEach((field) => {
+    ['nombre', 'apellido', 'genero', 'tipoDocumento', 'documento', 'razon'].forEach((field) => {
       this.proveedorForm.get(field)?.updateValueAndValidity({ emitEvent: false });
     });
   }
@@ -324,6 +329,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
           },
           error: error => {
             this.spinner.hide();
+            this.swalService.toastError('top-right', error.error.message);
             console.error(error);
           }
         })
@@ -506,13 +512,14 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       genero: new FormControl(null, [Validators.required]),
       razon: new FormControl(null, []),
       sigla: new FormControl(null, [Validators.required]),
+      estado: new FormControl(null, [Validators.required]),
       calle: new FormControl(null, []),
       numero: new FormControl(null, []),
       detalleDireccion: new FormControl(null, []),
       comentarios: new FormControl(null, []),
-      pais: new FormControl(null, [Validators.required]),
-      provincia: new FormControl(null, [Validators.required]),
-      ciudad: new FormControl(null, [Validators.required])
+      pais: new FormControl(null, []),
+      provincia: new FormControl(null, []),
+      ciudad: new FormControl(null, [])
     });
     this.provincias = [];
     this.ciudades = [];
@@ -584,13 +591,15 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     forkJoin({
       generos: this._catalogoService.getGeneros(),
       paises: this._catalogoService.getPaises(),
-      documentos: this._catalogoService.getDocumentos()
+      documentos: this._catalogoService.getDocumentos(),
+      posiblesEstados: this._catalogoService.getPosiblesEstados(this.actual_role)
     }).subscribe({
       next: res => {
         // console.log(res);
         this.generos = res.generos.data;
         this.paises = res.paises.data;
         this.documentos = res.documentos.data;
+        this.posiblesEstados = res.posiblesEstados.data;
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -638,6 +647,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     person.door_number = this.newProveedorForm.get('numero')?.value;
     person.address_detail = this.newProveedorForm.get('detalleDireccion')?.value;
     person.city_uuid = this.newProveedorForm.get('ciudad')?.value;
+    person.possible_person_state_uuid = this.newProveedorForm.get('estado')?.value;
     if (this.newProveedorForm.get('tipoPersona')?.value === 'fisica') {
       let human = new Human();
       human.firstname = this.newProveedorForm.get('nombre')?.value;
@@ -674,7 +684,5 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.filtros.sigla = '';
     this.filtros.cuit = '';
   }
-
-
 
 }

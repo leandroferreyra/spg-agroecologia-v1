@@ -7,6 +7,7 @@ export class ProveedorDTO {
     person!: Person;
     with: string[] = [];
     actual_role!: string;
+    possible_person_state_uuid!: string;
     constructor() {
 
     }
@@ -17,6 +18,7 @@ export class Person {
     door_number!: string;
     address_detail!: string;
     city_uuid!: string;
+    possible_person_state_uuid!: string
     legal_entity!: LegalEntity;
     human!: Human
 }

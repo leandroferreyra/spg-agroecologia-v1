@@ -150,7 +150,7 @@
                                 [ngClass]="isSubmit ? provinciaForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>País</label>
                                 <ng-select [items]="paises" bindLabel="name" bindValue="uuid" formControlName="pais"
-                                    [virtualScroll]="true" [appendTo]="'body'"
+                                    [virtualScroll]="true" [appendTo]="'body'" clearAllText="Limpiar"
                                     [ngClass]="isSubmit ? provinciaForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
                                 <!-- <ng-container *ngIf="isSubmit && !provinciaForm.controls['pais'].errors">

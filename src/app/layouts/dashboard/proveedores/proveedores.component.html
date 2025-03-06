@@ -1,5 +1,5 @@
 <div>
-    <div class="relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
+    <div class=" mt-4 relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
         <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
             [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
 
@@ -79,7 +79,7 @@
         <div class="panel h-full flex-1 overflow-x-hidden p-0">
 
             <!-- MENU ICONO OCULTO RESPONSIVE -->
-            <div class="flex flex-wrap-reverse items-center justify-between gap-2 p-2">
+            <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
                 <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                     Proveedores
                 </h5>
@@ -184,16 +184,24 @@
                 <div class="mt-3 flex flex-wrap">
                     <a href="javascript:;"
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos generales' }"
-                        (click)="tab1 = 'datos generales'">
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales' }"
+                        (click)="tab1 = 'datos-generales'">
                         <icon-user class="mr-3" />
                         Datos generales
                     </a>
 
                     <a href="javascript:;"
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'cuentas bancarias' }"
-                        (click)="tab1 = 'cuentas bancarias'">
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-de-contacto' }"
+                        (click)="tab1 = 'datos-de-contacto'">
+                        <icon-user class="mr-3" />
+                        Datos de contacto
+                    </a>
+
+                    <a href="javascript:;"
+                        class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'cuentas-bancarias' }"
+                        (click)="tab1 = 'cuentas-bancarias'">
 
                         Cuentas bancarias
                     </a>
@@ -207,7 +215,7 @@
                 </div>
 
                 <div class="flex-1 text-sm">
-                    <div *ngIf="tab1.toLowerCase() === 'datos generales'">
+                    <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
                         <!-- <h4 class="mb-4 text-2xl font-semibold"></h4> -->
                         <form [formGroup]="proveedorForm" class="p-4">
                             <div class="flex flex-col sm:flex-row">
@@ -227,6 +235,7 @@
                                         <label for="tipoDocumento">Tipo documento</label>
                                         <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
                                             formControlName="tipoDocumento" [virtualScroll]="true"
+                                            clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? proveedorForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -238,7 +247,7 @@
                                     <div>
                                         <label for="genero">Genero</label>
                                         <ng-select [items]="generos" bindLabel="name" bindValue="uuid"
-                                            formControlName="genero"
+                                            formControlName="genero" clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? proveedorForm.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -260,6 +269,13 @@
                                             formControlName="sigla" />
                                     </div>
                                     <div>
+                                        <label for="estado">Estado</label>
+                                        <ng-select [items]="posiblesEstados" bindLabel="name" bindValue="uuid"
+                                            formControlName="estado" clearAllText="Limpiar"
+                                            [ngClass]="isSubmit ? proveedorForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    <div>
                                         <label for="calle">Calle</label>
                                         <input id="calle" type="text" placeholder="" class="form-control"
                                             formControlName="calle" />
@@ -277,7 +293,7 @@
                                     <div>
                                         <label for="pais">País</label>
                                         <ng-select [items]="paises" bindLabel="name" bindValue="uuid"
-                                            formControlName="pais" [virtualScroll]="true"
+                                            formControlName="pais" [virtualScroll]="true" clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? proveedorForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -285,7 +301,7 @@
                                     <div>
                                         <label for="provincia">Provincia</label>
                                         <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
-                                            formControlName="provincia"
+                                            formControlName="provincia" clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? proveedorForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -294,7 +310,7 @@
                                         [ngClass]="isSubmit ? proveedorForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
                                         <label for="ciudad">Ciudad</label>
                                         <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid"
-                                            formControlName="ciudad" [virtualScroll]="true"
+                                            formControlName="ciudad" [virtualScroll]="true" clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? proveedorForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -344,7 +360,11 @@
 
                     </div>
 
-                    <div *ngIf="tab1.toLowerCase() === 'cuentas bancarias'">
+                    <div *ngIf="tab1.toLowerCase() === 'datos-de-contacto'">
+
+                    </div>
+
+                    <div *ngIf="tab1.toLowerCase() === 'cuentas-bancarias'">
 
                     </div>
 
@@ -415,7 +435,7 @@
                                     <div>
                                         <label for="tipoDocumento">Tipo documento</label>
                                         <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
-                                            [selectOnTab]="true" formControlName="tipoDocumento"
+                                            [selectOnTab]="true" formControlName="tipoDocumento" clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -427,7 +447,7 @@
                                     <div>
                                         <label for="genero">Género</label>
                                         <ng-select [items]="generos" bindLabel="name" bindValue="uuid"
-                                            formControlName="genero" [selectOnTab]="true"
+                                            formControlName="genero" [selectOnTab]="true" clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -451,6 +471,15 @@
                                         <input type="text" class="form-control" formControlName="sigla">
                                     </div>
 
+                                    <div>
+                                        <label for="estado">Estado</label>
+                                        <ng-select [items]="posiblesEstados" bindLabel="name" bindValue="uuid"
+                                            formControlName="estado" [virtualScroll]="true" [selectOnTab]="true"
+                                            clearAllText="Limpiar"
+                                            [ngClass]="isSubmit ? newProveedorForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+
                                     <div
                                         [ngClass]="isSubmit ? newProveedorForm.controls['calle'].errors ? 'has-error' : 'has-success' : ''">
                                         <label>Calle</label>
@@ -472,6 +501,7 @@
                                         <label for="pais">País</label>
                                         <ng-select [items]="paises" bindLabel="name" bindValue="uuid"
                                             formControlName="pais" [virtualScroll]="true" [selectOnTab]="true"
+                                            clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -479,7 +509,7 @@
                                     <div>
                                         <label for="provincia">Provincia</label>
                                         <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
-                                            formControlName="provincia" [selectOnTab]="true"
+                                            formControlName="provincia" [selectOnTab]="true" clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
@@ -488,7 +518,8 @@
                                         [ngClass]="isSubmit ? newProveedorForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
                                         <label for="ciudad">Ciudad</label>
                                         <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid"
-                                            formControlName="ciudad" [virtualScroll]="true" [selectOnTab]="true"
+                                            clearAllText="Limpiar" formControlName="ciudad" [virtualScroll]="true"
+                                            [selectOnTab]="true"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>

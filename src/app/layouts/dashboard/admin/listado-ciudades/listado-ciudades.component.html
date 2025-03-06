@@ -157,7 +157,7 @@
                             <div
                                 [ngClass]="isSubmit ? ciudadForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Provincia</label>
-                                <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
+                                <ng-select [items]="provincias" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                     formControlName="provincia" [virtualScroll]="true" [appendTo]="'body'"
                                     [ngClass]="isSubmit ? ciudadForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>

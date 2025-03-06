@@ -177,5 +177,7 @@ export class IndexService {
       .append("with[]", "legalEntity");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
   }
-  
+
+
+
 }

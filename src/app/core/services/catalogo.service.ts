@@ -16,6 +16,7 @@ export class CatalogoService {
   apiCiudades = '/cities';
   apiPermisos = '/permissions';
   apiDocumentos = '/document_types';
+  apiPosiblesEstados = '/possible_person_states';
 
   constructor(private http: HttpClient) { }
 
@@ -61,6 +62,13 @@ export class CatalogoService {
     const params = new HttpParams()
       .set('actual_role', actual_role)
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPermisos, { headers, params });
+  }
+
+  getPosiblesEstados(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPosiblesEstados, { headers, params: params });
   }
 
 }
