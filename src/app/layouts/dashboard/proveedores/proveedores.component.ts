@@ -1,8 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
+import { MenuModule } from 'headlessui-angular';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
@@ -14,7 +17,9 @@ import { IndexService } from 'src/app/core/services/index.service';
 import { ProveedoresService } from 'src/app/core/services/proveedores.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { toggleAnimation } from 'src/app/shared/animations';
 import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
+import { IconHorizontalDotsComponent } from 'src/app/shared/icon/icon-horizontal-dots';
 import { IconMenuComponent } from 'src/app/shared/icon/icon-menu';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
@@ -27,12 +32,14 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule
   ],
   templateUrl: './proveedores.component.html',
-  styleUrl: './proveedores.component.css'
+  styleUrl: './proveedores.component.css',
+  animations: [toggleAnimation]
 })
 export class ProveedoresComponent implements OnInit, OnDestroy {
+  toggleDropdown = false;
 
   store: any;
   private subscription: Subscription = new Subscription();
@@ -47,6 +54,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   busqueda_contiene: boolean = false;
   isEdicion: boolean = false;
+  lastSelectedPaisUuid: any = null;
+  lastSelectedProvinciaUuid: any = null;
 
   isShowMailMenu = false;
 
@@ -60,6 +69,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   isSubmit = false;
 
   tab1: string = 'Datos generales';
+  tab13: string = 'Datos generales';
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalProveedor') modalProveedor!: NgxCustomModalComponent;
@@ -110,7 +120,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProveedoresWithParam(this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
+          console.log(res);
           this.proveedores = res.data;
           this.proveedoresFiltrados = this.proveedores;
           if (!alta && this.proveedores.length > 0) {
@@ -128,9 +138,12 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   inicializarForm(proveedor?: any) {
     if (proveedor) {
+      if (proveedor.person.uuid != this.selectedProveedor?.person.uuid) {
+        // Esto es para no llamar cuando hace el show y tambien hacerlo al editar. 
+        this.obtenerProvinciaCiudadProveedor(proveedor);
+      }
       this.selectedProveedor = proveedor;
       this.isHuman = proveedor.person?.human ? true : false;
-      this.obtenerProvinciaCiudadProveedor(proveedor);
     }
     this.proveedorForm = new FormGroup({
       nombre: new FormControl({ value: proveedor?.person?.human?.firstname, disabled: true }, [Validators.required]),
@@ -148,7 +161,14 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       pais: new FormControl({ value: proveedor?.person?.city?.district?.country?.uuid, disabled: true }, [Validators.required]),
       provincia: new FormControl({ value: proveedor?.person?.city?.district?.uuid, disabled: true }, [Validators.required]),
       ciudad: new FormControl({ value: proveedor?.person?.city?.uuid, disabled: true }, [Validators.required]),
+      percepcionRG3337: new FormControl({ value: proveedor?.perception, disabled: true }, [Validators.required]),
+      percepcionIIBB: new FormControl({ value: proveedor?.withholding, disabled: true }, [Validators.required]),
+      percepcionIVA: new FormControl({ value: proveedor?.vat_percent, disabled: true }, [Validators.required]),
     });
+    this.lastSelectedPaisUuid = proveedor?.person?.city?.district?.country?.uuid;
+    this.lastSelectedProvinciaUuid = proveedor?.person?.city?.district?.uuid;
+
+    this.onChangeEdicion();
 
   }
 
@@ -169,6 +189,61 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
   }
 
+  onChangeEdicion() {
+    this.proveedorForm.get('pais')!.valueChanges.subscribe(
+      (uuid: string) => {
+        // if ((uuid && uuid !== this.selectedProveedor.person.city.district.country.uuid) || (uuid && uuid !== this.lastSelectedPaisUuid)) {
+        if ((uuid && uuid !== this.lastSelectedPaisUuid)) {
+
+          this.lastSelectedPaisUuid = uuid;
+          this._catalogoService.getProvinciasByCountry(uuid).subscribe({
+            next: res => {
+              this.proveedorForm.get('provincia')?.setValue(null);
+              this.proveedorForm.get('provincia')?.enable();
+              this.provincias = res.data.districts;
+            },
+            error: error => {
+              this.swalService.toastError('center', 'Error al traer provincias del servidor.');
+              console.error(error);
+            }
+          });
+        } else if (!uuid) {
+          this.lastSelectedPaisUuid = null;
+          this.proveedorForm.get('provincia')?.setValue(null);
+          this.proveedorForm.get('provincia')?.disable();
+          this.proveedorForm.get('ciudad')?.setValue(null);
+          this.proveedorForm.get('ciudad')?.disable();
+          this.provincias = [];
+          this.ciudades = [];
+        }
+      });
+
+    this.proveedorForm.get('provincia')!.valueChanges.subscribe(
+      (uuid: string) => {
+        // if ((uuid && uuid !== this.selectedProveedor.person.city.district.uuid)) {
+        if (uuid && uuid !== this.lastSelectedProvinciaUuid) {
+          this.lastSelectedProvinciaUuid = uuid;
+          this._catalogoService.getCiudadesByProvincia(uuid).subscribe({
+            next: res => {
+              this.proveedorForm.get('ciudad')?.setValue(null);
+              this.proveedorForm.get('ciudad')?.enable();
+              this.ciudades = res.data.cities;
+            },
+            error: error => {
+              this.swalService.toastError('center', 'Error al traer provincias del servidor.');
+              console.error(error);
+            }
+          });
+        } else if (!uuid) {
+          this.lastSelectedProvinciaUuid = null;
+          this.proveedorForm.get('ciudad')?.setValue(null);
+          this.proveedorForm.get('ciudad')?.disable();
+          this.ciudades = [];
+        }
+      });
+
+  }
+
 
   getName(proveedor: any) {
     if (proveedor.person?.human) {
@@ -185,13 +260,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.inicializarForm(proveedor);
   }
 
-  toggleEdicion() {
-    this.isEdicion = !this.isEdicion;
-    if (this.isEdicion) {
-      this.modificarValidacionesForm();
-    } else {
-      this.cancelarEdicion();
-    }
+  editarUsuario(proveedor: any) {
+    this.isEdicion = true;
+    this.inicializarForm(proveedor);
+    this.modificarValidacionesForm();
   }
 
   modificarValidacionesForm() {
@@ -210,6 +282,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.proveedorForm.get('pais')?.enable();
     this.proveedorForm.get('provincia')?.enable();
     this.proveedorForm.get('ciudad')?.enable();
+    this.proveedorForm.get('percepcionRG3337')?.enable();
+    this.proveedorForm.get('percepcionIIBB')?.enable();
+    this.proveedorForm.get('percepcionIVA')?.enable();
     if (this.isHuman) {
       this.proveedorForm.get('nombre')?.setValidators([Validators.required]);
       this.proveedorForm.get('apellido')?.setValidators([Validators.required]);
@@ -262,9 +337,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.proveedorForm.get('sigla')?.value;
     proveedor.comments = this.proveedorForm.get('comentarios')?.value;
-    proveedor.perception = '1'; // TODO
-    proveedor.vat_percent = '1'; // TODO
-    proveedor.withholding = '1'; // TODO
+    proveedor.perception = this.proveedorForm.get('percepcionRG3337')?.value;
+    proveedor.vat_percent = this.proveedorForm.get('percepcionIVA')?.value; // TODO
+    proveedor.withholding = this.proveedorForm.get('percepcionIIBB')?.value;
     let person = new Person();
     person.street_name = this.proveedorForm.get('calle')?.value;
     person.door_number = this.proveedorForm.get('numero')?.value;

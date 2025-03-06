@@ -24,9 +24,21 @@
                                     <td (click)="showDataProveedor(data)">{{ getName(data) }}
                                     </td>
                                     <td>
-                                        <button ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                            <icon-trash-lines />
-                                        </button>
+                                        <div hlMenu class="dropdown">
+                                            <button type="button" hlMenuButton>
+                                                <icon-horizontal-dots class="rotate-90 opacity-70" />
+                                            </button>
+                                            <ul *hlMenuItems @toggleAnimation class="ltr:right-0 rtl:left-0">
+                                                <li>
+                                                    <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                        (click)="editarUsuario(data)">Editar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                        (click)="openSwalEliminar(data)">Eliminar</a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 }
@@ -51,6 +63,13 @@
                             <span class="form-check-sign">Contiene</span>
                         </label>
                     </div>
+                    <div class="form-check form-check-inline flex" style="margin-top:10px">
+                        <label class="form-check-label flex gap-1">
+                            <input class="form-checkbox h-5 w-5" type="checkbox" [checked]="showFilter"
+                                (change)="toggleFilter()">
+                            <span class="form-check-sign">Filtros avanzados</span>
+                        </label>
+                    </div>
                 </div>
 
             </div>
@@ -59,19 +78,10 @@
         <!-- PANEL DERECHO -->
         <div class="panel h-full flex-1 overflow-x-hidden p-0">
 
-            <!-- <h5 class="mt-3 text-lg font-semibold dark:text-white-light min-w-0">Proveedores</h5> -->
-
             <!-- MENU ICONO OCULTO RESPONSIVE -->
-            <div class="flex flex-wrap-reverse items-center justify-between gap-4 p-4">
+            <div class="flex flex-wrap-reverse items-center justify-between gap-2 p-2">
                 <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                     Proveedores
-                    <button type="button" ngxTippy="Editar datos" class="hover:text-primary flex items-center"
-                        (click)="toggleEdicion()">
-                        <icon-edit class="h-6 w-6" />
-                    </button>
-                    <button type="button" ngxTippy="Activar filtros avanzados" (click)="toggleFilter()">
-                        <icon-search class="h-6 w-6" />
-                    </button>
                 </h5>
 
                 <div class="flex w-full items-center justify-between sm:w-auto">
@@ -86,7 +96,7 @@
 
 
             <!-- BORDER -->
-            <div class="h-px border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
+            <!-- <div class="h-px border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div> -->
 
             @if (showFilter) {
             <!-- FILTROS -->
@@ -166,10 +176,12 @@
 
             }
 
-
             <!-- TABS -->
-            <div class="mb-5">
-                <div class="mt-3 mb-5 flex flex-wrap">
+            <div class="">
+                <!-- <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
+                    Proveedores
+                </h5> -->
+                <div class="mt-3 flex flex-wrap">
                     <a href="javascript:;"
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos generales' }"
@@ -291,6 +303,29 @@
                                         <textarea class="form-control" id="comentarios" formControlName="comentarios"
                                             rows="1"></textarea>
                                     </div>
+                                    <div>
+                                        <label for="percepcionIVA">IVA (%)</label>
+                                        <input id="percepcionIVA" type="text" placeholder="" class="form-control"
+                                            formControlName="percepcionIVA" />
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label flex items-center gap-2">
+                                                <input class="form-checkbox" type="checkbox"
+                                                    formControlName="percepcionRG3337">
+                                                <span class="form-check-sign">Percepción R.G. 3337</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <label class="form-check-label flex items-center gap-2">
+                                                <input class="form-checkbox" type="checkbox"
+                                                    formControlName="percepcionIIBB">
+                                                <span class="form-check-sign">Percepción IIBB</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+
                                 </div>
                             </div>
 
