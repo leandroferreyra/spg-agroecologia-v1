@@ -166,7 +166,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       cuit: new FormControl({ value: this.isHuman ? proveedor?.person?.human?.cuit : proveedor?.person?.legal_entity?.cuit, disabled: true }, [Validators.required]),
       razon: new FormControl({ value: proveedor?.person?.legal_entity?.company_name, disabled: true }, [Validators.required]),
       sigla: new FormControl({ value: proveedor?.batch_prefix, disabled: true }, [Validators.required]),
-      estado: new FormControl({ value: proveedor?.person?.current_state?.uuid, disabled: true }, []),
+      estado: new FormControl({ value: proveedor?.person?.current_state?.state?.uuid, disabled: true }, []),
       estadoComentario: new FormControl({ value: proveedor?.person?.current_state?.comments, disabled: true }, []),
       comentarios: new FormControl({ value: proveedor?.comments, disabled: true }, []),
       calle: new FormControl({ value: proveedor?.person?.street_name, disabled: true }, []),

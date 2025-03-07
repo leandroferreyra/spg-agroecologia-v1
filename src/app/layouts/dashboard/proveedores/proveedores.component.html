@@ -371,10 +371,6 @@
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'cuentas-bancarias'">
-                        <!-- <app-cuentas-bancarias [cuentas]="cuentasBancarias" (agregarCuenta)="agregarCuentaBancaria()"
-                            (editarCuenta)="editarCuentaBancaria($event)" (eliminarCuenta)="eliminarCuentaBancaria($event)">
-                        </app-cuentas-bancarias> -->
-
                         <app-cuentas-bancarias [proveedor]="selectedProveedor" [rol]="actual_role">
                         </app-cuentas-bancarias>
                     </div>
