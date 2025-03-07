@@ -159,7 +159,7 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
     params.filters = this.filtros;
 
     this.subscription.add(
-      this._indexService.getCuentasProductoWithParam(params, this.actual_role).subscribe({
+      this._indexService.getCuentasBancariasLadieWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.cuentasBancarias = res.data;
           // console.log(this.cuentasBancarias);

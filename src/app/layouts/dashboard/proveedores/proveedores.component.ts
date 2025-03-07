@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { error } from 'console';
@@ -27,13 +27,14 @@ import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import { IconUserComponent } from 'src/app/shared/icon/icon-user';
 import Swal from 'sweetalert2';
+import { CuentasBancariasComponent } from './cuentas-bancarias/cuentas-bancarias.component';
 
 @Component({
   selector: 'app-proveedores',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule, IconHorizontalDotsComponent, MenuModule
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent
   ],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.css',
@@ -60,14 +61,19 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   isShowMailMenu = false;
 
-  // Orden y filtro
+  // Orden y filtro para datos listado proveedores.
   filtros: any = {
     tipoPersona: 'todos'
   };
   showFilter: boolean = false;
-  ordenamiento: any = {
-  };
   isSubmit = false;
+
+
+  // 
+
+  iconArrowUp = faArrowUp;
+  iconArrowDown = faArrowDown;
+
 
   tab1: string = 'Datos-generales';
 
@@ -87,6 +93,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   generos: any[] = [];
   documentos: any[] = [];
   posiblesEstados: any[] = [];
+
+  cuentasBancarias: any[] = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -135,6 +143,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     )
   }
 
+
   inicializarForm(proveedor?: any) {
     // console.log(this.posiblesEstados);
     // console.log(proveedor?.person?.current_state?.uuid);
@@ -142,6 +151,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       if (proveedor.person.uuid != this.selectedProveedor?.person.uuid) {
         // Esto es para no llamar cuando hace el show y tambien hacerlo al editar. 
         this.obtenerProvinciaCiudadProveedor(proveedor);
+        // this.filtrosCuentasBancarias.supplier_uuid = proveedor.uuid;
+        // this.obtenerCuentasBancariasDeProveedor();
       }
       this.selectedProveedor = proveedor;
       this.isHuman = proveedor.person?.human ? true : false;
@@ -156,7 +167,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       razon: new FormControl({ value: proveedor?.person?.legal_entity?.company_name, disabled: true }, [Validators.required]),
       sigla: new FormControl({ value: proveedor?.batch_prefix, disabled: true }, [Validators.required]),
       estado: new FormControl({ value: proveedor?.person?.current_state?.uuid, disabled: true }, []),
-      comentarios: new FormControl({ value: proveedor?.comments, disabled: true }, [Validators.required]),
+      estadoComentario: new FormControl({ value: proveedor?.person?.current_state?.comments, disabled: true }, []),
+      comentarios: new FormControl({ value: proveedor?.comments, disabled: true }, []),
       calle: new FormControl({ value: proveedor?.person?.street_name, disabled: true }, []),
       numero: new FormControl({ value: proveedor?.person?.door_number, disabled: true }, []),
       detalleDireccion: new FormControl({ value: proveedor?.person?.address_detail, disabled: true }, []),
@@ -275,6 +287,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.proveedorForm.get('razon')?.enable();
     this.proveedorForm.get('sigla')?.enable();
     this.proveedorForm.get('estado')?.enable();
+    this.proveedorForm.get('estadoComentario')?.enable();
     this.proveedorForm.get('comentarios')?.enable();
     this.proveedorForm.get('calle')?.enable();
     this.proveedorForm.get('numero')?.enable();
@@ -343,9 +356,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.proveedorForm.get('sigla')?.value;
     proveedor.comments = this.proveedorForm.get('comentarios')?.value;
-    proveedor.perception = this.proveedorForm.get('percepcionRG3337')?.value;
-    proveedor.vat_percent = this.proveedorForm.get('percepcionIVA')?.value; // TODO
-    proveedor.withholding = this.proveedorForm.get('percepcionIIBB')?.value;
+    proveedor.perception = this.proveedorForm.get('percepcionRG3337')?.value ? true : false;
+    proveedor.vat_percent = this.proveedorForm.get('percepcionIVA')?.value;
+    proveedor.withholding = this.proveedorForm.get('percepcionIIBB')?.value ? true : false;
     let person = new Person();
     person.street_name = this.proveedorForm.get('calle')?.value;
     person.door_number = this.proveedorForm.get('numero')?.value;
@@ -513,6 +526,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       razon: new FormControl(null, []),
       sigla: new FormControl(null, [Validators.required]),
       estado: new FormControl(null, [Validators.required]),
+      estadoComentario: new FormControl(null, []),
       calle: new FormControl(null, []),
       numero: new FormControl(null, []),
       detalleDireccion: new FormControl(null, []),
@@ -522,7 +536,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       ciudad: new FormControl(null, []),
       percepcionRG3337: new FormControl(null, []),
       percepcionIIBB: new FormControl(null, []),
-      percepcionIVA: new FormControl(null, []),
+      percepcionIVA: new FormControl(0, []),
     });
     this.provincias = [];
     this.ciudades = [];
@@ -620,7 +634,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._proveedoresService.saveProveedor(proveedor).subscribe({
           next: res => {
-            // console.log(res);
             this.spinner.hide();
             this.obtenerProveedores(true);
             this.cerrarModal();
@@ -637,21 +650,21 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   armarDtoNuevoProveedor(proveedor: ProveedorDTO) {
-    // console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.newProveedorForm.get('sigla')?.value;
     proveedor.comments = this.newProveedorForm.get('comentarios')?.value;
-    proveedor.perception = this.newProveedorForm.get('percepcionRG3337')?.value;
+    proveedor.perception = !!this.newProveedorForm.get('percepcionRG3337')?.value;
     proveedor.vat_percent = this.newProveedorForm.get('percepcionIVA')?.value;
-    proveedor.withholding = this.newProveedorForm.get('percepcionIIBB')?.value;
+    proveedor.withholding = !!this.newProveedorForm.get('percepcionIIBB')?.value;
     let person = new Person();
     person.street_name = this.newProveedorForm.get('calle')?.value;
     person.door_number = this.newProveedorForm.get('numero')?.value;
     person.address_detail = this.newProveedorForm.get('detalleDireccion')?.value;
     person.city_uuid = this.newProveedorForm.get('ciudad')?.value;
     person.possible_person_state_uuid = this.newProveedorForm.get('estado')?.value;
+    person.state_comments = this.newProveedorForm.get('estadoComentario')?.value;
     if (this.newProveedorForm.get('tipoPersona')?.value === 'fisica') {
       let human = new Human();
       human.firstname = this.newProveedorForm.get('nombre')?.value;
@@ -668,9 +681,21 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       person.legal_entity = legal_entity;
     }
     proveedor.person = person;
+    this.cleanObject(proveedor);
+
   }
 
-
+  // Se eliminan los nulos.
+  private cleanObject(obj: any): void {
+    Object.keys(obj).forEach(key => {
+      if (obj[key] && typeof obj[key] === 'object') {
+        this.cleanObject(obj[key]); // Limpiar objetos anidados
+      }
+      if (obj[key] == null) {
+        delete obj[key]; // Eliminar propiedades nulas o undefined
+      }
+    });
+  }
 
   toggleFilter() {
     this.showFilter = !this.showFilter;
@@ -688,5 +713,57 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.filtros.sigla = '';
     this.filtros.cuit = '';
   }
+
+
+
+
+  // obtenerCuentasBancariasDeProveedor() {
+  //   // Inicializamos un objeto vacío para los parámetros
+  //   const params: any = {};
+  //   params.with = [];
+  //   params.paging = this.itemsPerPage;
+  //   params.page = this.currentPage;
+  //   params.order_by = this.ordenamiento;
+  //   params.filters = this.filtrosCuentasBancarias;
+
+  //   this.subscription.add(
+  //     this._indexService.getCuentasProveedorWithParam(params, this.actual_role).subscribe({
+  //       next: res => {
+  //         this.cuentasBancarias = res.data;
+  //         this.modificarPaginacion(res);
+  //       },
+  //       error: error => {
+  //         this.swalService.toastError('top-right', error.error.message);
+  //         console.error(error);
+  //       }
+  //     })
+  //   )
+  // }
+
+  // modificarPaginacion(res: any) {
+  //   this.total_rows = res.meta.total;
+  //   this.last_page = res.meta.last_page;
+  //   if (this.cuentasBancarias.length <= this.itemsPerPage) {
+  //     if (res.meta?.current_page === res.meta?.last_page) {
+  //       this.itemsInPage = this.total_rows;
+  //     } else {
+  //       this.itemsInPage = this.currentPage * this.itemsPerPage;
+  //     }
+  //   }
+  // }
+
+  agregarCuentaBancaria() {
+
+  }
+
+  editarCuentaBancaria(id: any) {
+
+  }
+
+  eliminarCuentaBancaria(id: any) {
+
+  }
+
+
 
 }

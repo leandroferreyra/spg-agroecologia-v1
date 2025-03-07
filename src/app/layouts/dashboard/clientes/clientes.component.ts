@@ -274,9 +274,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
       "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.clienteForm.get('sigla')?.value;
     proveedor.comments = this.clienteForm.get('comentarios')?.value;
-    proveedor.perception = '1'; // TODO
+    proveedor.perception = true; // TODO
     proveedor.vat_percent = '1'; // TODO
-    proveedor.withholding = '1'; // TODO
+    proveedor.withholding = true; // TODO
     let person = new Person();
     person.street_name = this.clienteForm.get('calle')?.value;
     person.door_number = this.clienteForm.get('numero')?.value;
@@ -562,9 +562,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
       "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.newClienteForm.get('sigla')?.value;
     proveedor.comments = this.newClienteForm.get('comentarios')?.value;
-    proveedor.perception = '1'; // TODO
-    proveedor.vat_percent = '1'; // TODO
-    proveedor.withholding = '1'; // TODO
+    proveedor.perception = true; // TODO
+    proveedor.vat_percent = "1"; // TODO
+    proveedor.withholding = true; // TODO
     let person = new Person();
     person.street_name = this.newClienteForm.get('calle')?.value;
     person.door_number = this.newClienteForm.get('numero')?.value;

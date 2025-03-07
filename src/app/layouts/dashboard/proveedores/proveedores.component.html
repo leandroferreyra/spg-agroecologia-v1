@@ -15,37 +15,37 @@
                 </div>
 
 
-                <ng-scrollbar class="relative h-full grow" appearance="compact">
-                    <div class="table-responsive">
-                        <table class="table-hover">
-                            <tbody>
-                                @for(data of filtrarDatos() ; track data.uuid) {
-                                <tr style="cursor: pointer;">
-                                    <td (click)="showDataProveedor(data)">{{ getName(data) }}
-                                    </td>
-                                    <td>
-                                        <div hlMenu class="dropdown">
-                                            <button type="button" hlMenuButton>
-                                                <icon-horizontal-dots class="rotate-90 opacity-70" />
-                                            </button>
-                                            <ul *hlMenuItems @toggleAnimation class="ltr:right-0 rtl:left-0">
-                                                <li>
-                                                    <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                        (click)="editarUsuario(data)">Editar</a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                        (click)="openSwalEliminar(data)">Eliminar</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </ng-scrollbar>
+                <!-- <ng-scrollbar class="relative h-full grow" appearance="compact"> -->
+                <div class="table-responsive">
+                    <table class="table-hover">
+                        <tbody>
+                            @for(data of filtrarDatos() ; track data.uuid) {
+                            <tr style="cursor: pointer;">
+                                <td (click)="showDataProveedor(data)">{{ getName(data) }}
+                                </td>
+                                <td>
+                                    <div hlMenu class="dropdown">
+                                        <button type="button" hlMenuButton>
+                                            <icon-horizontal-dots class="rotate-90 opacity-70" />
+                                        </button>
+                                        <ul *hlMenuItems @toggleAnimation class="ltr:right-0 rtl:left-0">
+                                            <li>
+                                                <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                    (click)="editarUsuario(data)">Editar</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                    (click)="openSwalEliminar(data)">Eliminar</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- </ng-scrollbar> -->
 
                 <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
                     <div class="group relative">
@@ -275,6 +275,12 @@
                                             [ngClass]="isSubmit ? proveedorForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
                                     </div>
+                                    <div
+                                        [ngClass]="isSubmit ? proveedorForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="estadoComentario">Comentario sobre el estado</label>
+                                        <textarea class="form-control" id="estadoComentario"
+                                            formControlName="estadoComentario" rows="1"></textarea>
+                                    </div>
                                     <div>
                                         <label for="calle">Calle</label>
                                         <input id="calle" type="text" placeholder="" class="form-control"
@@ -365,7 +371,12 @@
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'cuentas-bancarias'">
+                        <!-- <app-cuentas-bancarias [cuentas]="cuentasBancarias" (agregarCuenta)="agregarCuentaBancaria()"
+                            (editarCuenta)="editarCuentaBancaria($event)" (eliminarCuenta)="eliminarCuentaBancaria($event)">
+                        </app-cuentas-bancarias> -->
 
+                        <app-cuentas-bancarias [proveedor]="selectedProveedor" [rol]="actual_role">
+                        </app-cuentas-bancarias>
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'compras'">
@@ -478,6 +489,13 @@
                                             clearAllText="Limpiar"
                                             [ngClass]="isSubmit ? newProveedorForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''">
                                         </ng-select>
+                                    </div>
+
+                                    <div
+                                        [ngClass]="isSubmit ? newProveedorForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="estadoComentario">Comentario sobre el estado</label>
+                                        <textarea class="form-control" id="estadoComentario"
+                                            formControlName="estadoComentario" rows="1"></textarea>
                                     </div>
 
                                     <div

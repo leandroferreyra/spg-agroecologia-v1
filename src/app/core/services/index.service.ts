@@ -23,6 +23,7 @@ export class IndexService {
   apiTipoDeCuentas = "/account_types";
   apiProveedores = '/suppliers';
   apiClientes = '/people';
+  apiCuentasProveedor = '/bank_accounts';
 
   constructor(private http: HttpClient) { }
 
@@ -58,8 +59,9 @@ export class IndexService {
           params = params.append(`filters[${index}][]`, key);
           params = params.append(`filters[${index}][]`, 'LIKE');
           params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
-        } else if (key === 'currency_name') {
+        } else if (key === 'currency_name' || key === 'supplier_uuid') {
           // Si entró por currency_name es porque está trayendo los tipos de cambio.
+          // Si entró por supplier_uuid es porque está trayendo las cuentas bancarias de un proveedor (proveedor.component)
           params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
           params = params.append(`filters[${index}][]`, '=');
           params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
@@ -136,7 +138,7 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCategoriasProducto, { headers, params: this.getParams(paramsObj, rol) });
   }
 
-  getCuentasProductoWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+  getCuentasBancariasLadieWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCuentas, { headers, params: this.getParams(paramsObj, rol) });
   }
@@ -179,5 +181,9 @@ export class IndexService {
   }
 
 
+  getCuentasProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCuentasProveedor, { headers, params: this.getParams(paramsObj, rol) });
+  }
 
 }

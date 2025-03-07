@@ -1,8 +1,8 @@
 export class ProveedorDTO {
     batch_prefix!: string;
     vat_percent!: string;
-    withholding!: string;
-    perception!: string;
+    withholding!: boolean;
+    perception!: boolean;
     comments!: string;
     person!: Person;
     with: string[] = [];
@@ -18,7 +18,8 @@ export class Person {
     door_number!: string;
     address_detail!: string;
     city_uuid!: string;
-    possible_person_state_uuid!: string
+    possible_person_state_uuid!: string;
+    state_comments!: string;
     legal_entity!: LegalEntity;
     human!: Human
 }
