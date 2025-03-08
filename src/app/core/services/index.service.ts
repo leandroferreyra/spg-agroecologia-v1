@@ -22,7 +22,7 @@ export class IndexService {
   apiCuentas = "/ladie_bank_accounts";
   apiTipoDeCuentas = "/account_types";
   apiProveedores = '/suppliers';
-  apiClientes = '/people';
+  apiClientes = '/customers';
   apiCuentasProveedor = '/bank_accounts';
 
   constructor(private http: HttpClient) { }
@@ -168,15 +168,14 @@ export class IndexService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams();
     params = params.append('actual_role', rol)
-      .append("with[]", "city")
-      .append("with[]", "city.district")
-      .append("with[]", "city.district.country")
-      .append("with[]", "human")
-      .append("with[]", "human.gender")
-      .append("with[]", "human.documentType")
-      .append("with[]", "human.user")
-      .append("with[]", "supplier")
-      .append("with[]", "legalEntity");
+      .append("with[]", "person.city")
+      .append("with[]", "person.city.district")
+      .append("with[]", "person.city.district.country")
+      .append("with[]", "person.human")
+      .append("with[]", "person.human.gender")
+      .append("with[]", "person.human.documentType")
+      .append("with[]", "person.human.user")
+      .append("with[]", "person.legalEntity");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
   }
 
@@ -186,4 +185,5 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCuentasProveedor, { headers, params: this.getParams(paramsObj, rol) });
   }
 
+ 
 }

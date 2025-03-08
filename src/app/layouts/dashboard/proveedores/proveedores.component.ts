@@ -151,8 +151,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       if (proveedor.person.uuid != this.selectedProveedor?.person.uuid) {
         // Esto es para no llamar cuando hace el show y tambien hacerlo al editar. 
         this.obtenerProvinciaCiudadProveedor(proveedor);
-        // this.filtrosCuentasBancarias.supplier_uuid = proveedor.uuid;
-        // this.obtenerCuentasBancariasDeProveedor();
       }
       this.selectedProveedor = proveedor;
       this.isHuman = proveedor.person?.human ? true : false;
@@ -356,9 +354,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       "person.human.documentType", "person.legalEntity"];
     proveedor.batch_prefix = this.proveedorForm.get('sigla')?.value;
     proveedor.comments = this.proveedorForm.get('comentarios')?.value;
-    proveedor.perception = this.proveedorForm.get('percepcionRG3337')?.value ? true : false;
+    proveedor.perception = !!this.proveedorForm.get('percepcionRG3337')?.value;
     proveedor.vat_percent = this.proveedorForm.get('percepcionIVA')?.value;
-    proveedor.withholding = this.proveedorForm.get('percepcionIIBB')?.value ? true : false;
+    proveedor.withholding =!! this.proveedorForm.get('percepcionIIBB')?.value;
     let person = new Person();
     person.street_name = this.proveedorForm.get('calle')?.value;
     person.door_number = this.proveedorForm.get('numero')?.value;
@@ -713,57 +711,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.filtros.sigla = '';
     this.filtros.cuit = '';
   }
-
-
-
-
-  // obtenerCuentasBancariasDeProveedor() {
-  //   // Inicializamos un objeto vacío para los parámetros
-  //   const params: any = {};
-  //   params.with = [];
-  //   params.paging = this.itemsPerPage;
-  //   params.page = this.currentPage;
-  //   params.order_by = this.ordenamiento;
-  //   params.filters = this.filtrosCuentasBancarias;
-
-  //   this.subscription.add(
-  //     this._indexService.getCuentasProveedorWithParam(params, this.actual_role).subscribe({
-  //       next: res => {
-  //         this.cuentasBancarias = res.data;
-  //         this.modificarPaginacion(res);
-  //       },
-  //       error: error => {
-  //         this.swalService.toastError('top-right', error.error.message);
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
-
-  // modificarPaginacion(res: any) {
-  //   this.total_rows = res.meta.total;
-  //   this.last_page = res.meta.last_page;
-  //   if (this.cuentasBancarias.length <= this.itemsPerPage) {
-  //     if (res.meta?.current_page === res.meta?.last_page) {
-  //       this.itemsInPage = this.total_rows;
-  //     } else {
-  //       this.itemsInPage = this.currentPage * this.itemsPerPage;
-  //     }
-  //   }
-  // }
-
-  agregarCuentaBancaria() {
-
-  }
-
-  editarCuentaBancaria(id: any) {
-
-  }
-
-  eliminarCuentaBancaria(id: any) {
-
-  }
-
 
 
 }

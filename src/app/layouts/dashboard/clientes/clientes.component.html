@@ -15,25 +15,37 @@
                 </div>
 
 
-                <ng-scrollbar class="relative h-full grow" appearance="compact">
-                    <div class="table-responsive">
-                        <table class="table-hover">
-                            <tbody>
-                                @for(data of filtrarDatos() ; track data.uuid) {
-                                <tr style="cursor: pointer;">
-                                    <td (click)="showDataCliente(data)">{{ getName(data) }}
-                                    </td>
-                                    <td>
-                                        <button ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                            <icon-trash-lines />
+                <!-- <ng-scrollbar class="relative h-full grow" appearance="compact"> -->
+                <div class="table-responsive">
+                    <table class="table-hover">
+                        <tbody>
+                            @for(data of filtrarDatos() ; track data.uuid) {
+                            <tr style="cursor: pointer;">
+                                <td (click)="showDataCliente(data)">{{ getName(data) }}
+                                </td>
+                                <td>
+                                    <div hlMenu class="dropdown">
+                                        <button type="button" hlMenuButton>
+                                            <icon-horizontal-dots class="rotate-90 opacity-70" />
                                         </button>
-                                    </td>
-                                </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </ng-scrollbar>
+                                        <ul *hlMenuItems @toggleAnimation class="ltr:right-0 rtl:left-0">
+                                            <li>
+                                                <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                    (click)="editarUsuario(data)">Editar</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                    (click)="openSwalEliminar(data)">Eliminar</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <!-- </ng-scrollbar> -->
 
                 <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
                     <div class="group relative">
@@ -51,6 +63,13 @@
                             <span class="form-check-sign">Contiene</span>
                         </label>
                     </div>
+                    <div class="form-check form-check-inline flex" style="margin-top:10px">
+                        <label class="form-check-label flex gap-1">
+                            <input class="form-checkbox h-5 w-5" type="checkbox" [checked]="showFilter"
+                                (change)="toggleFilter()">
+                            <span class="form-check-sign">Filtros avanzados</span>
+                        </label>
+                    </div>
                 </div>
 
             </div>
@@ -59,19 +78,19 @@
         <!-- PANEL DERECHO -->
         <div class="panel h-full flex-1 overflow-x-hidden p-0">
 
-            <!-- <h5 class="mt-3 text-lg font-semibold dark:text-white-light min-w-0">Proveedores</h5> -->
+            <!-- <h5 class="mt-3 text-lg font-semibold dark:text-white-light min-w-0">Clientes</h5> -->
 
             <!-- MENU ICONO OCULTO RESPONSIVE -->
             <div class="flex flex-wrap-reverse items-center justify-between gap-4 p-4">
                 <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                     Clientes
-                    <button type="button" ngxTippy="Editar datos" class="hover:text-primary flex items-center"
+                    <!-- <button type="button" ngxTippy="Editar datos" class="hover:text-primary flex items-center"
                         (click)="toggleEdicion()">
                         <icon-edit class="h-6 w-6" />
                     </button>
                     <button type="button" ngxTippy="Activar filtros avanzados" (click)="toggleFilter()">
                         <icon-search class="h-6 w-6" />
-                    </button>
+                    </button> -->
                 </h5>
 
                 <div class="flex w-full items-center justify-between sm:w-auto">
@@ -245,9 +264,17 @@
                                             formControlName="cuit" />
                                     </div>
                                     <div>
-                                        <label for="sigla">Sigla</label>
-                                        <input id="sigla" type="text" placeholder="" class="form-control"
-                                            formControlName="sigla" />
+                                        <label for="estado">Estado</label>
+                                        <ng-select [items]="posiblesEstados" bindLabel="name" bindValue="uuid"
+                                            formControlName="estado" clearAllText="Limpiar"
+                                            [ngClass]="isSubmit ? clienteForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    <div
+                                        [ngClass]="isSubmit ? clienteForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="estadoComentario">Comentario sobre el estado</label>
+                                        <textarea class="form-control" id="estadoComentario"
+                                            formControlName="estadoComentario" rows="1"></textarea>
                                     </div>
                                     <div>
                                         <label for="calle">Calle</label>
@@ -416,12 +443,28 @@
                                         <label>Cuit</label>
                                         <input type="text" class="form-control" formControlName="cuit">
                                     </div>
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['sigla'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label>Sigla</label>
-                                        <input type="text" class="form-control" formControlName="sigla">
+                                    <div>
+                                        <label for="condicion">Condición</label>
+                                        <ng-select [items]="condicionesIva" bindLabel="name" bindValue="uuid"
+                                            formControlName="condicion" [virtualScroll]="true" [selectOnTab]="true"
+                                            [ngClass]="isSubmit ? newClienteForm.controls['condicion'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
+                                    </div>
+                                    <div>
+                                        <label for="estado">Estado</label>
+                                        <ng-select [items]="posiblesEstados" bindLabel="name" bindValue="uuid"
+                                            formControlName="estado" [virtualScroll]="true" [selectOnTab]="true"
+                                            clearAllText="Limpiar"
+                                            [ngClass]="isSubmit ? newClienteForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''">
+                                        </ng-select>
                                     </div>
 
+                                    <div
+                                        [ngClass]="isSubmit ? newClienteForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
+                                        <label for="estadoComentario">Comentario sobre el estado</label>
+                                        <textarea class="form-control" id="estadoComentario"
+                                            formControlName="estadoComentario" rows="1"></textarea>
+                                    </div>
                                     <div
                                         [ngClass]="isSubmit ? newClienteForm.controls['calle'].errors ? 'has-error' : 'has-success' : ''">
                                         <label>Calle</label>
@@ -471,7 +514,11 @@
                                             rows="1"></textarea>
 
                                     </div>
-
+                                    <div>
+                                        <label for="percepcionIVA">IVA (%)</label>
+                                        <input id="percepcionIVA" type="text" placeholder="" class="form-control"
+                                            formControlName="percepcionIVA" />
+                                    </div>
 
                                 </div>
                             </div>
@@ -479,7 +526,7 @@
                             <div class="row mt-3">
                                 <div class="col-12 d-flex justify-content-center">
                                     <button type="button" class="btn btn-wd btn-primary mr-4"
-                                        (click)="confirmarNuevoProveedor()">Confirmar</button>
+                                        (click)="confirmarNuevoCliente()">Confirmar</button>
                                     <button id="back-button-with-border" type="button" class="btn btn-wd"
                                         (click)="cerrarModal()">Cancelar</button>
                                 </div>

@@ -17,6 +17,7 @@ export class CatalogoService {
   apiPermisos = '/permissions';
   apiDocumentos = '/document_types';
   apiPosiblesEstados = '/possible_person_states';
+  apiCondicionIva = '/vat_conditions';
 
   constructor(private http: HttpClient) { }
 
@@ -69,6 +70,13 @@ export class CatalogoService {
     let params = new HttpParams();
     params = params.append('actual_role', rol);
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPosiblesEstados, { headers, params: params });
+  }
+
+  getCondicionIva(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCondicionIva, { headers, params: params });
   }
 
 }

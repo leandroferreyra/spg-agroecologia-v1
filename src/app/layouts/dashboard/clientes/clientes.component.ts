@@ -3,18 +3,20 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
+import { MenuModule } from 'headlessui-angular';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription, forkJoin } from 'rxjs';
-import { ProveedorDTO, Person, Human, LegalEntity } from 'src/app/core/models/request/proveedorDTO';
+import { ClienteDTO, Human, LegalEntity, Person } from 'src/app/core/models/request/clienteDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
+import { ClientesService } from 'src/app/core/services/clientes.service';
 import { IndexService } from 'src/app/core/services/index.service';
-import { ProveedoresService } from 'src/app/core/services/proveedores.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
+import { IconHorizontalDotsComponent } from 'src/app/shared/icon/icon-horizontal-dots';
 import { IconMenuComponent } from 'src/app/shared/icon/icon-menu';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
@@ -27,7 +29,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.css'
@@ -47,6 +49,8 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   busqueda_contiene: boolean = false;
   isEdicion: boolean = false;
+  lastSelectedPaisUuid: any = null;
+  lastSelectedProvinciaUuid: any = null;
 
   isShowMailMenu = false;
 
@@ -76,9 +80,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
   ciudades: any[] = [];
   generos: any[] = [];
   documentos: any[] = [];
+  posiblesEstados: any[] = [];
+  condicionesIva: any[] = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
-    private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
+    private _clienteService: ClientesService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService) {
     this.initStore();
   }
@@ -109,7 +115,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this._indexService.getClientesWithParam(this.actual_role).subscribe({
         next: res => {
           console.log(res);
-          this.clientes = this.filtrarClientes(res.data);
+          this.clientes = res.data;
           this.clientesFiltrados = this.clientes;
           if (!alta && this.clientes.length > 0) {
             this.inicializarForm(this.clientes[0]);
@@ -124,43 +130,107 @@ export class ClientesComponent implements OnInit, OnDestroy {
     )
   }
 
-  filtrarClientes(clientes: any) {
-    return clientes.filter((dato: any) => {
-      // Caso 1: Si es humano, lo devolvemos solo si user es null y supplier es null
-      if (dato.human) {
-        return dato.human.user === null && dato.supplier === null;
-      }
-      // Caso 2: Si no es humano pero tiene legal_entity, lo devolvemos solo si supplier es null
-      if (dato.legal_entity) {
-        return dato.supplier === null;
-      }
-      return false;
-    });
-  }
+  // filtrarClientes(clientes: any) {
+  //   return clientes.filter((dato: any) => {
+  //     // Caso 1: Si es humano, lo devolvemos solo si user es null y supplier es null
+  //     if (dato.human) {
+  //       return dato.human.user === null && dato.supplier === null;
+  //     }
+  //     // Caso 2: Si no es humano pero tiene legal_entity, lo devolvemos solo si supplier es null
+  //     if (dato.legal_entity) {
+  //       return dato.supplier === null;
+  //     }
+  //     return false;
+  //   });
+  // }
 
   inicializarForm(cliente?: any) {
     if (cliente) {
       this.selectedCliente = cliente;
-      this.isHuman = (cliente.human);
-      this.obtenerProvinciaCiudadCliente(cliente);
+      this.isHuman = (cliente.person?.human);
+      if (cliente.person.uuid != this.selectedCliente?.person.uuid) {
+        // Esto es para no llamar cuando hace el show y tambien hacerlo al editar. 
+        this.obtenerProvinciaCiudadCliente(cliente);
+      }
     }
     this.clienteForm = new FormGroup({
-      nombre: new FormControl({ value: cliente?.human?.firstname, disabled: true }, [Validators.required]),
-      apellido: new FormControl({ value: cliente?.human?.lastname, disabled: true }, [Validators.required]),
-      genero: new FormControl({ value: cliente?.human?.gender?.uuid, disabled: true }, [Validators.required]),
-      documento: new FormControl({ value: cliente?.human?.document_number, disabled: true }, [Validators.required]),
-      tipoDocumento: new FormControl({ value: cliente?.human?.document_type?.uuid, disabled: true }, [Validators.required]),
-      cuit: new FormControl({ value: this.isHuman ? cliente?.human?.cuit : cliente?.legal_entity?.cuit, disabled: true }, [Validators.required]),
-      razon: new FormControl({ value: cliente?.legal_entity?.company_name, disabled: true }, [Validators.required]),
-      sigla: new FormControl({ value: cliente?.batch_prefix, disabled: true }, [Validators.required]),
-      comentarios: new FormControl({ value: cliente?.comments, disabled: true }, [Validators.required]),
-      calle: new FormControl({ value: cliente?.street_name, disabled: true }, [Validators.required]),
-      numero: new FormControl({ value: cliente?.door_number, disabled: true }, [Validators.required]),
-      detalleDireccion: new FormControl({ value: cliente?.address_detail, disabled: true }, [Validators.required]),
-      pais: new FormControl({ value: cliente?.city?.district?.country?.uuid, disabled: true }, [Validators.required]),
-      provincia: new FormControl({ value: cliente?.city?.district?.uuid, disabled: true }, [Validators.required]),
-      ciudad: new FormControl({ value: cliente?.city?.uuid, disabled: true }, [Validators.required]),
+      nombre: new FormControl({ value: cliente?.person?.human?.firstname, disabled: true }, [Validators.required]),
+      apellido: new FormControl({ value: cliente?.person?.human?.lastname, disabled: true }, [Validators.required]),
+      genero: new FormControl({ value: cliente?.person?.human?.gender?.uuid, disabled: true }, [Validators.required]),
+      documento: new FormControl({ value: cliente?.person?.human?.document_number, disabled: true }, [Validators.required]),
+      tipoDocumento: new FormControl({ value: cliente?.person?.human?.document_type?.uuid, disabled: true }, [Validators.required]),
+      cuit: new FormControl({ value: this.isHuman ? cliente?.person?.human?.cuit : cliente?.person?.legal_entity?.cuit, disabled: true }, [Validators.required]),
+      razon: new FormControl({ value: cliente?.person?.legal_entity?.company_name, disabled: true }, [Validators.required]),
+      estado: new FormControl({ value: cliente?.person?.current_state?.state?.uuid, disabled: true }, []),
+      estadoComentario: new FormControl({ value: cliente?.person?.current_state?.comments, disabled: true }, []),
+      comentarios: new FormControl({ value: cliente?.person?.comments, disabled: true }, [Validators.required]),
+      calle: new FormControl({ value: cliente?.person?.street_name, disabled: true }, [Validators.required]),
+      numero: new FormControl({ value: cliente?.person?.door_number, disabled: true }, [Validators.required]),
+      detalleDireccion: new FormControl({ value: cliente?.person?.address_detail, disabled: true }, [Validators.required]),
+      pais: new FormControl({ value: cliente?.person?.city?.district?.country?.uuid, disabled: true }, [Validators.required]),
+      provincia: new FormControl({ value: cliente?.person?.city?.district?.uuid, disabled: true }, [Validators.required]),
+      ciudad: new FormControl({ value: cliente?.person?.city?.uuid, disabled: true }, [Validators.required]),
+      percepcionIVA: new FormControl({ value: cliente?.person?.vat_percent, disabled: true }, []),
     });
+    this.lastSelectedPaisUuid = cliente?.person?.city?.district?.country?.uuid;
+    this.lastSelectedProvinciaUuid = cliente?.person?.city?.district?.uuid;
+
+    this.onChangeEdicion();
+
+  }
+
+  onChangeEdicion() {
+    this.clienteForm.get('pais')!.valueChanges.subscribe(
+      (uuid: string) => {
+        // if ((uuid && uuid !== this.selectedProveedor.person.city.district.country.uuid) || (uuid && uuid !== this.lastSelectedPaisUuid)) {
+        if ((uuid && uuid !== this.lastSelectedPaisUuid)) {
+
+          this.lastSelectedPaisUuid = uuid;
+          this._catalogoService.getProvinciasByCountry(uuid).subscribe({
+            next: res => {
+              this.clienteForm.get('provincia')?.setValue(null);
+              this.clienteForm.get('provincia')?.enable();
+              this.provincias = res.data.districts;
+            },
+            error: error => {
+              this.swalService.toastError('center', 'Error al traer provincias del servidor.');
+              console.error(error);
+            }
+          });
+        } else if (!uuid) {
+          this.lastSelectedPaisUuid = null;
+          this.clienteForm.get('provincia')?.setValue(null);
+          this.clienteForm.get('provincia')?.disable();
+          this.clienteForm.get('ciudad')?.setValue(null);
+          this.clienteForm.get('ciudad')?.disable();
+          this.provincias = [];
+          this.ciudades = [];
+        }
+      });
+
+    this.clienteForm.get('provincia')!.valueChanges.subscribe(
+      (uuid: string) => {
+        // if ((uuid && uuid !== this.selectedProveedor.person.city.district.uuid)) {
+        if (uuid && uuid !== this.lastSelectedProvinciaUuid) {
+          this.lastSelectedProvinciaUuid = uuid;
+          this._catalogoService.getCiudadesByProvincia(uuid).subscribe({
+            next: res => {
+              this.clienteForm.get('ciudad')?.setValue(null);
+              this.clienteForm.get('ciudad')?.enable();
+              this.ciudades = res.data.cities;
+            },
+            error: error => {
+              this.swalService.toastError('center', 'Error al traer provincias del servidor.');
+              console.error(error);
+            }
+          });
+        } else if (!uuid) {
+          this.lastSelectedProvinciaUuid = null;
+          this.clienteForm.get('ciudad')?.setValue(null);
+          this.clienteForm.get('ciudad')?.disable();
+          this.ciudades = [];
+        }
+      });
 
   }
 
@@ -183,10 +253,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
 
   getName(cliente: any) {
-    if (cliente.human) {
-      return cliente.human.firstname + ' ' + cliente.human.lastname
-    } else if (cliente.legal_entity) {
-      return cliente.legal_entity.company_name
+    if (cliente.person?.human) {
+      return cliente.person?.human.firstname + ' ' + cliente.person?.human.lastname
+    } else if (cliente.person?.legal_entity) {
+      return cliente.person?.legal_entity?.company_name
     } else {
       return ' ';
     }
@@ -197,13 +267,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.inicializarForm(cliente);
   }
 
-  toggleEdicion() {
-    this.isEdicion = !this.isEdicion;
-    if (this.isEdicion) {
-      this.modificarValidacionesForm();
-    } else {
-      this.cancelarEdicion();
-    }
+  editarUsuario(cliente: any) {
+    this.isEdicion = true;
+    this.inicializarForm(cliente);
+    this.modificarValidacionesForm();
   }
 
   modificarValidacionesForm() {
@@ -211,7 +278,8 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.clienteForm.get('apellido')?.enable();
     this.clienteForm.get('genero')?.enable();
     this.clienteForm.get('razon')?.enable();
-    this.clienteForm.get('sigla')?.enable();
+    this.clienteForm.get('estado')?.enable();
+    this.clienteForm.get('estadoComentario')?.enable();
     this.clienteForm.get('comentarios')?.enable();
     this.clienteForm.get('calle')?.enable();
     this.clienteForm.get('numero')?.enable();
@@ -222,6 +290,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.clienteForm.get('pais')?.enable();
     this.clienteForm.get('provincia')?.enable();
     this.clienteForm.get('ciudad')?.enable();
+    this.clienteForm.get('percepcionIVA')?.enable();
     if (this.isHuman) {
       this.clienteForm.get('nombre')?.setValidators([Validators.required]);
       this.clienteForm.get('apellido')?.setValidators([Validators.required]);
@@ -248,10 +317,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
   confirmarEdicion() {
     if (this.clienteForm.valid) {
       this.spinner.show();
-      let proveedor = new ProveedorDTO();
-      this.armarDTOEdicion(proveedor);
+      let cliente = new ClienteDTO();
+      this.armarDTOEdicion(cliente);
       this.subscription.add(
-        this._proveedoresService.editProveedor(this.selectedCliente.uuid, proveedor).subscribe({
+        this._clienteService.editCliente(this.selectedCliente.uuid, cliente).subscribe({
           next: res => {
             // console.log(res);
             this.inicializarForm(res.data);
@@ -267,16 +336,16 @@ export class ClientesComponent implements OnInit, OnDestroy {
       )
     }
   }
-  armarDTOEdicion(proveedor: ProveedorDTO) {
-    // console.log(this.newProveedorForm);
-    proveedor.actual_role = this.actual_role;
-    proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+  armarDTOEdicion(cliente: ClienteDTO) {
+    // console.log(this.newclienteForm);
+    cliente.actual_role = this.actual_role;
+    cliente.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.documentType", "person.legalEntity"];
-    proveedor.batch_prefix = this.clienteForm.get('sigla')?.value;
-    proveedor.comments = this.clienteForm.get('comentarios')?.value;
-    proveedor.perception = true; // TODO
-    proveedor.vat_percent = '1'; // TODO
-    proveedor.withholding = true; // TODO
+    // cliente.batch_prefix = this.clienteForm.get('sigla')?.value;
+    cliente.comments = this.clienteForm.get('comentarios')?.value;
+    // cliente.perception = true; // TODO
+    cliente.vat_percent = this.clienteForm.get('percepcionIVA')?.value;
+    // cliente.withholding = true; // TODO
     let person = new Person();
     person.street_name = this.clienteForm.get('calle')?.value;
     person.door_number = this.clienteForm.get('numero')?.value;
@@ -297,7 +366,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
       legal_entity.company_name = this.clienteForm.get('razon')?.value;
       person.legal_entity = legal_entity;
     }
-    proveedor.person = person;
+    cliente.person = person;
   }
 
   filtrarDatos() {
@@ -306,12 +375,12 @@ export class ClientesComponent implements OnInit, OnDestroy {
       // Es búsqueda avanzada
       if (this.filtros.tipoPersona === 'fisica') {
         resultados = this.clientesFiltrados.filter(dato => {
-          return dato.human
+          return dato.person?.human
         })
 
       } else if (this.filtros.tipoPersona === 'juridica') {
         resultados = this.clientesFiltrados.filter(dato => {
-          return dato.legal_entity
+          return dato.person?.legal_entity
         })
       } else {
         // todos
@@ -319,17 +388,17 @@ export class ClientesComponent implements OnInit, OnDestroy {
       }
       if (this.filtros.nombre) {
         resultados = resultados.filter(dato => {
-          return dato.human?.firstname?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
+          return dato.person?.human?.firstname?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
         })
       }
       if (this.filtros.apellido) {
         resultados = resultados.filter(dato => {
-          return dato.human?.lastname?.toLowerCase().includes(this.filtros.apellido.toLowerCase());
+          return dato.person?.human?.lastname?.toLowerCase().includes(this.filtros.apellido.toLowerCase());
         })
       }
       if (this.filtros.razon) {
         resultados = resultados.filter(dato => {
-          return dato.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
+          return dato.person?.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
         })
       }
       if (this.filtros.cuit) {
@@ -337,31 +406,31 @@ export class ClientesComponent implements OnInit, OnDestroy {
         // y luego, en caso de ser 'todos', chequear si es fisica o jurídica para poder saber de donde sacar la info.
         resultados = resultados.filter(dato => {
           if (this.filtros.tipoPersona === 'todos') {
-            if (dato.human) {
-              return dato.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-                dato.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            if (dato.person?.human) {
+              return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
+                dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
             } else {
               // Es juridica
-              return dato.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+              return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
             }
           } else if (this.filtros.tipoPersona === 'fisica') {
-            return dato.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-              dato.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
+              dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
           } else {
             // Filtrado por jurídica
-            return dato.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
           }
         })
       }
     } else {
-      // Busca solo por proveedor en la búsqueda simple
+      // Busca solo por cliente en la búsqueda simple
       if (this.filtros.name) {
         resultados = this.clientesFiltrados.filter(dato => {
           let nombreCompleto;
-          if (dato.human) {
-            nombreCompleto = (dato.human?.firstname + ' ' + dato.human?.lastname).toLocaleLowerCase();
+          if (dato.person?.human) {
+            nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
           } else {
-            nombreCompleto = dato.legal_entity?.company_name.toLocaleLowerCase();
+            nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
           }
           if (this.busqueda_contiene) {
             return nombreCompleto.includes(this.filtros.name.toLowerCase());
@@ -374,10 +443,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
     return resultados;
   }
 
-  openSwalEliminar(proveedor: any) {
+  openSwalEliminar(cliente: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el proveedor ${this.getName(proveedor)}?`,
+      text: `¿Desea eliminar el cliente ${this.getName(cliente)}?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -390,17 +459,17 @@ export class ClientesComponent implements OnInit, OnDestroy {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eliminarProveedor(proveedor);
+        this.eliminarCliente(cliente);
       } else if (result.isDenied) {
 
       }
     })
   }
 
-  eliminarProveedor(proveedor: any) {
+  eliminarCliente(cliente: any) {
     this.spinner.show();
     this.subscription.add(
-      this._proveedoresService.eliminarProveedor(proveedor.uuid, this.actual_role.toUpperCase()).subscribe({
+      this._clienteService.eliminarCliente(cliente.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
           this.obtenerClientes();
           this.tokenService.setToken(res.token);
@@ -422,12 +491,12 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   openModalNuevoCliente() {
     this.tituloModal = 'Nuevo cliente';
-    this.inicializarNuevoFormularioProveedor();
+    this.inicializarNuevoFormularioCliente();
     this.modalCliente.options = this.modalOptions;
     this.modalCliente.open();
   }
 
-  inicializarNuevoFormularioProveedor() {
+  inicializarNuevoFormularioCliente() {
     this.newClienteForm = new FormGroup({
       tipoPersona: new FormControl('fisica', [Validators.required]),
       nombre: new FormControl(null, [Validators.required]),
@@ -437,14 +506,17 @@ export class ClientesComponent implements OnInit, OnDestroy {
       cuit: new FormControl(null, []),
       genero: new FormControl(null, [Validators.required]),
       razon: new FormControl(null, []),
-      sigla: new FormControl(null, [Validators.required]),
+      estado: new FormControl(null, [Validators.required]),
+      estadoComentario: new FormControl(null, [Validators.required]),
       calle: new FormControl(null, []),
       numero: new FormControl(null, []),
       detalleDireccion: new FormControl(null, []),
       comentarios: new FormControl(null, []),
-      pais: new FormControl(null, [Validators.required]),
-      provincia: new FormControl(null, [Validators.required]),
-      ciudad: new FormControl(null, [Validators.required])
+      pais: new FormControl(null, []),
+      provincia: new FormControl(null, []),
+      ciudad: new FormControl(null, []),
+      percepcionIVA: new FormControl(0, []),
+      condicion: new FormControl(null, []),
     });
     this.provincias = [];
     this.ciudades = [];
@@ -485,11 +557,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
     this.newClienteForm.get('tipoPersona')!.valueChanges.subscribe(
       (tipo: string) => {
-        this.modificarValidacionesNuevoProveedor(tipo);
+        this.modificarValidacionesNuevoCliente(tipo);
       });
   }
 
-  modificarValidacionesNuevoProveedor(tipo: string) {
+  modificarValidacionesNuevoCliente(tipo: string) {
     if (tipo === 'fisica') {
       this.newClienteForm.get('nombre')?.setValidators([Validators.required]);
       this.newClienteForm.get('apellido')?.setValidators([Validators.required]);
@@ -516,13 +588,17 @@ export class ClientesComponent implements OnInit, OnDestroy {
     forkJoin({
       generos: this._catalogoService.getGeneros(),
       paises: this._catalogoService.getPaises(),
-      documentos: this._catalogoService.getDocumentos()
+      documentos: this._catalogoService.getDocumentos(),
+      posiblesEstados: this._catalogoService.getPosiblesEstados(this.actual_role),
+      condicionIva: this._catalogoService.getCondicionIva(this.actual_role)
     }).subscribe({
       next: res => {
         // console.log(res);
         this.generos = res.generos.data;
         this.paises = res.paises.data;
         this.documentos = res.documentos.data;
+        this.posiblesEstados = res.posiblesEstados.data;
+        this.condicionesIva = res.condicionIva.data;
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -530,14 +606,14 @@ export class ClientesComponent implements OnInit, OnDestroy {
     });
   }
 
-  confirmarNuevoProveedor() {
+  confirmarNuevoCliente() {
     this.isSubmit = true;
     if (this.newClienteForm.valid) {
       this.spinner.show();
-      let proveedor = new ProveedorDTO();
-      this.armarDtoNuevoProveedor(proveedor);
+      let cliente = new ClienteDTO();
+      this.armarDtoNuevoCliente(cliente);
       this.subscription.add(
-        this._proveedoresService.saveProveedor(proveedor).subscribe({
+        this._clienteService.saveCliente(cliente).subscribe({
           next: res => {
             // console.log(res);
             this.spinner.hide();
@@ -555,21 +631,23 @@ export class ClientesComponent implements OnInit, OnDestroy {
     }
   }
 
-  armarDtoNuevoProveedor(proveedor: ProveedorDTO) {
-    // console.log(this.newProveedorForm);
-    proveedor.actual_role = this.actual_role;
-    proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+  armarDtoNuevoCliente(cliente: ClienteDTO) {
+    cliente.actual_role = this.actual_role;
+    cliente.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.documentType", "person.legalEntity"];
-    proveedor.batch_prefix = this.newClienteForm.get('sigla')?.value;
-    proveedor.comments = this.newClienteForm.get('comentarios')?.value;
-    proveedor.perception = true; // TODO
-    proveedor.vat_percent = "1"; // TODO
-    proveedor.withholding = true; // TODO
+    // cliente.batch_prefix = this.newClienteForm.get('sigla')?.value;
+    cliente.comments = this.newClienteForm.get('comentarios')?.value;
+    // cliente.perception = true; // TODO
+    cliente.vat_percent = this.newClienteForm.get('percepcionIVA')?.value;
+    cliente.vat_condition_uuid = this.newClienteForm.get('condicion')?.value;
+    // cliente.withholding = true; // TODO
     let person = new Person();
     person.street_name = this.newClienteForm.get('calle')?.value;
     person.door_number = this.newClienteForm.get('numero')?.value;
     person.address_detail = this.newClienteForm.get('detalleDireccion')?.value;
     person.city_uuid = this.newClienteForm.get('ciudad')?.value;
+    person.possible_person_state_uuid = this.newClienteForm.get('estado')?.value;
+    person.state_comments = this.newClienteForm.get('estadoComentario')?.value;
     if (this.newClienteForm.get('tipoPersona')?.value === 'fisica') {
       let human = new Human();
       human.firstname = this.newClienteForm.get('nombre')?.value;
@@ -585,9 +663,21 @@ export class ClientesComponent implements OnInit, OnDestroy {
       legal_entity.company_name = this.newClienteForm.get('razon')?.value;
       person.legal_entity = legal_entity;
     }
-    proveedor.person = person;
+    cliente.person = person;
+    this.cleanObject(cliente);
   }
 
+  // Se eliminan los nulos.
+  private cleanObject(obj: any): void {
+    Object.keys(obj).forEach(key => {
+      if (obj[key] && typeof obj[key] === 'object') {
+        this.cleanObject(obj[key]); // Limpiar objetos anidados
+      }
+      if (obj[key] == null) {
+        delete obj[key]; // Eliminar propiedades nulas o undefined
+      }
+    });
+  }
 
 
   toggleFilter() {

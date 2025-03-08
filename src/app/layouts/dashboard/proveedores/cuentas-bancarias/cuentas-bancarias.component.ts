@@ -84,6 +84,7 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['proveedor'] && changes['proveedor'].currentValue) {
+      this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
       this.filtrosCuentasBancarias.supplier_uuid = this.proveedor.uuid;
       this.obtenerCuentasBancariasDeProveedor();
@@ -173,10 +174,12 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
           console.log(res);
           this.cuentasBancarias = res.data;
           this.modificarPaginacion(res);
+          this.spinner.hide();
         },
         error: error => {
           this._swalService.toastError('top-right', error.error.message);
           console.error(error);
+          this.spinner.hide();
         }
       })
     )
