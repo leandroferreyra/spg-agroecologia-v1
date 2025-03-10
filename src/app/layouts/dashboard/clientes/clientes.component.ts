@@ -319,6 +319,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let cliente = new ClienteDTO();
       this.armarDTOEdicion(cliente);
+      console.log(cliente);
       this.subscription.add(
         this._clienteService.editCliente(this.selectedCliente.uuid, cliente).subscribe({
           next: res => {

@@ -7,7 +7,6 @@ export class ProveedorDTO {
     person!: Person;
     with: string[] = [];
     actual_role!: string;
-    possible_person_state_uuid!: string;
     constructor() {
 
     }

@@ -329,6 +329,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDTOEdicion(proveedor);
+      console.log(proveedor);
       this.subscription.add(
         this._proveedoresService.editProveedor(this.selectedProveedor.uuid, proveedor).subscribe({
           next: res => {
@@ -356,12 +357,14 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     proveedor.comments = this.proveedorForm.get('comentarios')?.value;
     proveedor.perception = !!this.proveedorForm.get('percepcionRG3337')?.value;
     proveedor.vat_percent = this.proveedorForm.get('percepcionIVA')?.value;
-    proveedor.withholding =!! this.proveedorForm.get('percepcionIIBB')?.value;
+    proveedor.withholding = !!this.proveedorForm.get('percepcionIIBB')?.value;
     let person = new Person();
     person.street_name = this.proveedorForm.get('calle')?.value;
     person.door_number = this.proveedorForm.get('numero')?.value;
     person.address_detail = this.proveedorForm.get('detalleDireccion')?.value;
     person.city_uuid = this.proveedorForm.get('ciudad')?.value;
+    person.possible_person_state_uuid = this.proveedorForm.get('estado')?.value;
+    person.state_comments = this.proveedorForm.get('estadoComentario')?.value;
     if (this.isHuman) {
       let human = new Human();
       human.firstname = this.proveedorForm.get('nombre')?.value;
