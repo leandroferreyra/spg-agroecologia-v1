@@ -64,8 +64,8 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     name: ''
   };
   ordenamiento: any = {
-    country_name: 'asc',
-    name: 'asc'
+    'country.name': 'asc',
+    'name': 'asc'
   };
 
   provinciaForm!: FormGroup;

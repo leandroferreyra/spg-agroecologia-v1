@@ -60,6 +60,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   };
   showFilter: boolean = false;
   ordenamiento: any = {
+    
   };
   isSubmit = false;
 

@@ -375,7 +375,8 @@
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'compras'">
-
+                        <app-compras-proveedor [proveedor]="selectedProveedor" [rol]="actual_role">
+                        </app-compras-proveedor>
                     </div>
 
                 </div>

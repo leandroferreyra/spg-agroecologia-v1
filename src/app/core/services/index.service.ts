@@ -24,6 +24,8 @@ export class IndexService {
   apiProveedores = '/suppliers';
   apiClientes = '/customers';
   apiCuentasProveedor = '/bank_accounts';
+  apiComprasProveedor = '/purchases';
+
 
   constructor(private http: HttpClient) { }
 
@@ -39,13 +41,15 @@ export class IndexService {
     // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
     Object.keys(paramsObj.order_by).forEach((key, index) => {
       if (paramsObj.order_by[key] !== '') {
-        if (key === 'datetime_from') {
-          params = params.append(`order_by[${index}][]`, key);
-          params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
-        } else {
-          params = params.append(`order_by[${index}][]`, key.replace(/_/g, '.'));
-          params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
-        }
+        params = params.append(`order_by[${index}][]`, key);
+        params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+        // if (key === 'datetime_from') {
+        //   params = params.append(`order_by[${index}][]`, key);
+        //   params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+        // } else {
+        //   params = params.append(`order_by[${index}][]`, key.replace(/_/g, '.'));
+        //   params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+        // }
       }
     });
     // para cada elemento de paramsObj.filters, agregar un filters[]
@@ -59,9 +63,10 @@ export class IndexService {
           params = params.append(`filters[${index}][]`, key);
           params = params.append(`filters[${index}][]`, 'LIKE');
           params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
-        } else if (key === 'currency_name' || key === 'supplier_uuid') {
+        } else if (key === 'currency_name' || key === 'supplier_uuid' || key === 'transaction_person_uuid') {
           // Si entró por currency_name es porque está trayendo los tipos de cambio.
           // Si entró por supplier_uuid es porque está trayendo las cuentas bancarias de un proveedor (proveedor.component)
+          // Si entró por transaction_person_uuid es porque está trayendo las compras de un proveedor (proveedor.component)
           params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
           params = params.append(`filters[${index}][]`, '=');
           params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
@@ -185,5 +190,11 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCuentasProveedor, { headers, params: this.getParams(paramsObj, rol) });
   }
 
- 
+
+  getComprasProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasProveedor, { headers, params: this.getParams(paramsObj, rol) });
+  }
+
+
 }

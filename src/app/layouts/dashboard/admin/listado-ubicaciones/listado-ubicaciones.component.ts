@@ -63,7 +63,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   };
   showFilter: boolean = false;
   ordenamiento: any = {
-    name: 'asc'
+    'name': 'asc'
   };
   // isFiltrando: boolean = false;
 

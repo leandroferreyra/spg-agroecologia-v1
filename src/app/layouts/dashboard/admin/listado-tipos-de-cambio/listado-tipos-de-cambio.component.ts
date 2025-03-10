@@ -62,7 +62,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   };
   //showFilter: boolean = false;
   ordenamiento: any = {
-    datetime_from: 'desc'
+    'datetime_from': 'desc'
   };
 
   selectedDate: any;

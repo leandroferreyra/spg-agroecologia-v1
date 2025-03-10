@@ -52,9 +52,9 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
 
   // Mantener el estado del ordenamiento
   ordenamiento: any = {
-    district_country_name: 'asc',
-    district_name: 'asc',
-    name: 'asc'
+    'district.country.name': 'asc',
+    'district.name': 'asc',
+    'name': 'asc'
   };
 
   iconArrowUp = faArrowUp;

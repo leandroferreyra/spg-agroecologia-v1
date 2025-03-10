@@ -57,7 +57,7 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
   };
   showFilter: boolean = false;
   ordenamiento: any = {
-    name: 'asc'
+    'name': 'asc'
   };
 
   iconArrowUp = faArrowUp;

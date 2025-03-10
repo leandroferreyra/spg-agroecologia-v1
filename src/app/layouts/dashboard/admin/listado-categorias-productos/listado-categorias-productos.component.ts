@@ -64,7 +64,7 @@ export class ListadoCategoriasProductosComponent implements OnInit, OnDestroy {
   };
   showFilter: boolean = false;
   ordenamiento: any = {
-    name: 'asc'
+    'name': 'asc'
   };
 
   breadcrumbs: any[] = [];
