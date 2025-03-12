@@ -1,4 +1,4 @@
-export class ContactoProveedorDTO {
+export class ContactoDTO {
 
     value!: string;
     details!: string;

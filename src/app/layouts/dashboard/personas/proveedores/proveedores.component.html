@@ -367,6 +367,9 @@
                     <div *ngIf="tab1.toLowerCase() === 'datos-de-contacto'">
                         <app-contactos [persona]="selectedProveedor" [rol]="actual_role">
                         </app-contactos>
+
+                        <app-contactos-persona [persona]="selectedProveedor" [rol]="actual_role">
+                        </app-contactos-persona>
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'cuentas-bancarias'">

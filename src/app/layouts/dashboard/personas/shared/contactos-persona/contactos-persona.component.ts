@@ -8,10 +8,8 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { ContactoDTO } from 'src/app/core/models/request/contactoDTO';
-import { CuentaBancariaProveedorDTO } from 'src/app/core/models/request/cuentaBancariaProveedorDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { ContactosProveedorService } from 'src/app/core/services/contactosProveedor.service';
-import { CuentasProveedorService } from 'src/app/core/services/cuentasProveedor.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
@@ -22,14 +20,14 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-contactos',
+  selector: 'app-contactos-persona',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
     NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent],
-  templateUrl: './contactos.component.html',
-  styleUrl: './contactos.component.css'
+  templateUrl: './contactos-persona.component.html',
+  styleUrl: './contactos-persona.component.css'
 })
-export class ContactosComponent implements OnInit, OnDestroy {
+export class ContactosPersonaComponent implements OnInit, OnDestroy {
 
 
   @Input() persona: any;
@@ -154,16 +152,17 @@ export class ContactosComponent implements OnInit, OnDestroy {
   obtenerContactos() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["person", "contactDetailType"];
+    params.with = ["person", "person.human", "person.legalEntity"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtrosContactos;
 
     this.subscription.add(
-      this._indexService.getDetalleContactosWithParam(params, this.rol).subscribe({
+      this._indexService.getDetalleContactosPersonaWithParam(params, this.rol).subscribe({
         next: res => {
           this.contactos = res.data;
+          console.log(this.contactos);
           this.modificarPaginacion(res);
           this.spinner.hide();
         },
@@ -195,19 +194,19 @@ export class ContactosComponent implements OnInit, OnDestroy {
       this.isEdicion = false;
       this.tituloModal = 'Nuevo dato';
       this.contactoForm = new FormGroup({
-        contact_detail_type_uuid: new FormControl(null, Validators.required),
-        person_uuid: new FormControl(this.persona.person?.uuid, Validators.required),
-        value: new FormControl(null, Validators.required),
-        details: new FormControl(null)
+        // contact_detail_type_uuid: new FormControl(null, Validators.required),
+        // person_uuid: new FormControl(this.persona.person?.uuid, Validators.required),
+        // value: new FormControl(null, Validators.required),
+        // details: new FormControl(null)
       });
     } else {
       this.isEdicion = true;
       this.tituloModal = 'Edición dato';
       this.contactoForm = new FormGroup({
-        uuid: new FormControl(dato.uuid),
-        contact_detail_type: new FormControl(dato.contact_detail_type.name),
-        value: new FormControl(dato.value),
-        details: new FormControl(dato.details)
+        // uuid: new FormControl(dato.uuid),
+        // contact_detail_type: new FormControl(dato.contact_detail_type.name),
+        // value: new FormControl(dato.value),
+        // details: new FormControl(dato.details)
       });
     }
     this.modalContacto.options = this.modalOptions;
@@ -268,4 +267,19 @@ export class ContactosComponent implements OnInit, OnDestroy {
     )
   }
 
+  showName(data: any) {
+    if (data.person?.human) {
+      return data.person?.human?.firstname + ' ' + data.person?.human?.lastname
+    } else {
+      return data.person?.legal_entity?.company_name
+    }
+  }
+
+  showCuit(data: any) {
+    if (data.person?.human) {
+      return data.person?.human?.cuit;
+    } else {
+      return data.person?.legal_entity?.cuit;
+    }
+  }
 }

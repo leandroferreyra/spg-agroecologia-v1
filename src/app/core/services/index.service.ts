@@ -26,6 +26,7 @@ export class IndexService {
   apiCuentasProveedor = '/bank_accounts';
   apiComprasProveedor = '/purchases';
   apiDetalleContacto = '/contact_details';
+  apiDetalleContactoPersona = '/contact_people';
   apiComprasClientes = '/transactions';
 
   constructor(private http: HttpClient) { }
@@ -190,9 +191,14 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasProveedor, { headers, params: this.getParams(paramsObj, rol) });
   }
 
-  getDetalleContactosProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+  getDetalleContactosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiDetalleContacto, { headers, params: this.getParams(paramsObj, rol) });
+  }
+
+  getDetalleContactosPersonaWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDetalleContactoPersona, { headers, params: this.getParams(paramsObj, rol) });
   }
 
   getComprasClientesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
