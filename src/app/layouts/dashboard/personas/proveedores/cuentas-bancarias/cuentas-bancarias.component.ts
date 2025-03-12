@@ -234,11 +234,9 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilterCuentasBancarias = !this.showFilterCuentasBancarias;
     if (!this.showFilterCuentasBancarias) {
-      this.filtrosCuentasBancarias = {
-        account_number: '',
-        alias: '',
-        cbu: ''
-      };
+      this.filtrosCuentasBancarias.account_number = '';
+      this.filtrosCuentasBancarias.alias = '';
+      this.filtrosCuentasBancarias.cbu = '';
       this.obtenerCuentasBancariasDeProveedor();
     }
   }
