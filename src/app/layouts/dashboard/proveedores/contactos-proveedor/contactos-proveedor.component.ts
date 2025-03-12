@@ -50,10 +50,9 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
   pageSize: number = 0;
   total_rows: number = 0;
 
-  filtrosCuentasBancarias: any = {
+  filtrosContactos: any = {
     'person.uuid': ''
   };
-  showFilterCuentasBancarias: boolean = false;
   ordenamiento: any = {
 
   };
@@ -86,7 +85,7 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
     if (changes['proveedor'] && changes['proveedor'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
-      this.filtrosCuentasBancarias['person.uuid'] = this.proveedor.person?.uuid;
+      this.filtrosContactos['person.uuid'] = this.proveedor.person?.uuid;
       this.obtenerContactos();
     }
   }
@@ -159,7 +158,7 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
-    params.filters = this.filtrosCuentasBancarias;
+    params.filters = this.filtrosContactos;
 
     this.subscription.add(
       this._indexService.getDetalleContactosProveedorWithParam(params, this.rol).subscribe({
@@ -213,18 +212,6 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
     }
     this.modalContacto.options = this.modalOptions;
     this.modalContacto.open();
-  }
-
-  toggleFilter() {
-    this.showFilterCuentasBancarias = !this.showFilterCuentasBancarias;
-    if (!this.showFilterCuentasBancarias) {
-      this.filtrosCuentasBancarias = {
-        account_number: '',
-        alias: '',
-        cbu: ''
-      };
-      this.obtenerContactos();
-    }
   }
 
   openSwalEliminar(dato: any) {

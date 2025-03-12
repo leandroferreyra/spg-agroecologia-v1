@@ -1,15 +1,17 @@
 <div class="container mt-4">
-    <!-- Datos de Contacto -->
     <div class="card position-relative mb-4">
-        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Datos de Contacto</h5>
-            <button type="button" class="" ngxTippy="Agregar dato de contacto" (click)="openModalContacto('NEW')">
-                <icon-plus />
-            </button>
+
+        <div class="m-2 flex flex-col md:flex-row md:items-center justify-between border-bottom">
+            <div class="flex items-center gap-2">
+                <h5 class="ml-2">Datos de Contacto</h5>
+                <button type="button" ngxTippy="Agregar dato de contacto" (click)="openModalContacto('NEW')">
+                    <icon-plus />
+                </button>
+            </div>
         </div>
+
+
         <div class="card-body">
-
-
 
             <div class="row mb-2">
                 <div class="col-6">
@@ -49,28 +51,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- @if (showFilterCuentasBancarias) {
-                        <tr>
-                            <td>
-                                <input type="text" class="form-control campo-busqueda"
-                                    [(ngModel)]="filtrosCuentasBancarias.account_number"
-                                    (input)="obtenerContactos()" />
-                            </td>
-                            <td>
-                                <input type="text" class="form-control campo-busqueda"
-                                    [(ngModel)]="filtrosCuentasBancarias.alias"
-                                    (input)="obtenerContactos()" />
-                            </td>
-                            <td>
-                                <input type="text" class="form-control campo-busqueda"
-                                    [(ngModel)]="filtrosCuentasBancarias.cbu"
-                                    (input)="obtenerContactos()" />
-                            </td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        } -->
                         @for(data of contactos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                         <tr>
                             <td class="whitespace-nowrap">{{ data.contact_detail_type.name}} </td>
@@ -192,7 +172,7 @@
                                 <input type="text" class="form-control" formControlName="value">
                             </div>
                             }
-                            
+
                             @if (isEdicion) {
                             <div class="mb-2"
                                 [ngClass]="isSubmit ? contactoForm.controls['value'].errors ? 'has-error' : 'has-success' : ''">
