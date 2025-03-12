@@ -18,6 +18,7 @@ export class CatalogoService {
   apiDocumentos = '/document_types';
   apiPosiblesEstados = '/possible_person_states';
   apiCondicionIva = '/vat_conditions';
+  apiTiposDetalleContacto = '/contact_detail_types';
 
   constructor(private http: HttpClient) { }
 
@@ -77,6 +78,13 @@ export class CatalogoService {
     let params = new HttpParams();
     params = params.append('actual_role', rol);
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCondicionIva, { headers, params: params });
+  }
+
+  getTiposDetalleContacto(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposDetalleContacto, { headers, params: params });
   }
 
 }

@@ -7,7 +7,10 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
+import { ContactoProveedorDTO } from 'src/app/core/models/request/contactoProveedorDTO';
 import { CuentaBancariaProveedorDTO } from 'src/app/core/models/request/cuentaBancariaProveedorDTO';
+import { CatalogoService } from 'src/app/core/services/catalogo.service';
+import { ContactosProveedorService } from 'src/app/core/services/contactosProveedor.service';
 import { CuentasProveedorService } from 'src/app/core/services/cuentasProveedor.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -22,7 +25,7 @@ import Swal from 'sweetalert2';
   selector: 'app-contactos-proveedor',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
-      NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent],
+    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent],
   templateUrl: './contactos-proveedor.component.html',
   styleUrl: './contactos-proveedor.component.css'
 })
@@ -31,10 +34,10 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
 
   @Input() proveedor: any;
   @Input() rol!: string;
-  cuentasBancarias: any[] = [];
-  monedas: any[] = [];
-  tiposDeCuenta: any[] = [];
-  bancos: any[] = [];
+  contactos: any[] = [];
+  // monedas: any[] = [];
+  tiposDeDatoContacto: any[] = [];
+  // bancos: any[] = [];
 
   private subscription: Subscription = new Subscription();
 
@@ -56,20 +59,20 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
   };
 
   // Referencia al modal para crear y editar países.
-  @ViewChild('modalCuenta') modalCuenta!: NgxCustomModalComponent;
+  @ViewChild('modalContacto') modalContacto!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
     closeOnEscape: false
   };
 
-  cuentaForm!: FormGroup;
+  contactoForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _cuentasBancariasService: CuentasProveedorService, private _tokenService: TokenService) {
+    private _contactoService: ContactosProveedorService, private _tokenService: TokenService, private _catalogoService: CatalogoService) {
 
   }
   ngOnInit(): void {
@@ -84,33 +87,30 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
       this.filtrosCuentasBancarias['person.uuid'] = this.proveedor.person?.uuid;
-      this.obtenerCuentasBancariasDeProveedor();
+      this.obtenerContactos();
     }
   }
 
   cerrarModal() {
     this.isSubmit = false;
-    this.modalCuenta.close();
+    this.modalContacto.close();
   }
 
-  confirmarCuenta() {
+  confirmarContacto() {
     this.isSubmit = true;
-    if (this.cuentaForm.valid) {
+    if (this.contactoForm.valid) {
       this.spinner.show();
-      let cuenta = new CuentaBancariaProveedorDTO();
-      cuenta.bank_uuid = this.cuentaForm.get('bank_uuid')?.value;
-      cuenta.account_type_uuid = this.cuentaForm.get('account_type_uuid')?.value;
-      cuenta.currency_uuid = this.cuentaForm.get('currency_uuid')?.value;
-      cuenta.account_number = this.cuentaForm.get('account_number')?.value;
-      cuenta.cbu = this.cuentaForm.get('cbu')?.value;
-      cuenta.alias = this.cuentaForm.get('alias')?.value;
-      cuenta.actual_role = this.rol;
-      cuenta.supplier_uuid = this.proveedor.uuid;
+      let contacto = new ContactoProveedorDTO();
+      contacto.value = this.contactoForm.get('value')?.value;
+      contacto.details = this.contactoForm.get('details')?.value;
+      contacto.actual_role = this.rol;
       if (!this.isEdicion) {
+        contacto.contact_detail_type_uuid = this.contactoForm.get('contact_detail_type_uuid')?.value;
+        contacto.person_uuid = this.contactoForm.get('person_uuid')?.value;
         this.subscription.add(
-          this._cuentasBancariasService.saveCuenta(cuenta).subscribe({
+          this._contactoService.saveContacto(contacto).subscribe({
             next: res => {
-              this.obtenerCuentasBancariasDeProveedor();
+              this.obtenerContactos();
               this.cerrarModal();
               this._swalService.toastSuccess('top-right', res.message);
               this._tokenService.setToken(res.token);
@@ -125,20 +125,16 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
         )
       } else {
         this.subscription.add(
-          this._cuentasBancariasService.editCuenta(this.cuentaForm.get('uuid')?.value, cuenta).subscribe({
+          this._contactoService.editContacto(this.contactoForm.get('uuid')?.value, contacto).subscribe({
             next: res => {
-              const index = this.cuentasBancarias.findIndex(p => p.uuid === (this.cuentaForm.get('uuid')?.value));
+              const index = this.contactos.findIndex(p => p.uuid === (this.contactoForm.get('uuid')?.value));
               if (index !== -1) {
-                this.cuentasBancarias[index] = {
-                  ...this.cuentasBancarias[index],
-                  bank_uuid: this.cuentaForm.get('bank_uuid')?.value,
-                  account_type_uuid: this.cuentaForm.get('account_type_uuid')?.value,
-                  currency_uuid: this.cuentaForm.get('currency_uuid')?.value,
-                  account_number: this.cuentaForm.get('account_number')?.value,
-                  alias: this.cuentaForm.get('alias')?.value,
-                  cbu: this.cuentaForm.get('cbu')?.value,
+                this.contactos[index] = {
+                  ...this.contactos[index],
+                  value: this.contactoForm.get('value')?.value,
+                  details: this.contactoForm.get('details')?.value
                 };
-                this.cuentasBancarias = [...this.cuentasBancarias];
+                this.contactos = [...this.contactos];
               }
               this.cerrarModal();
               this._swalService.toastSuccess('top-right', res.message)
@@ -156,10 +152,10 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
     }
   }
 
-  obtenerCuentasBancariasDeProveedor() {
+  obtenerContactos() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["person"];
+    params.with = ["person", "contactDetailType"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -168,8 +164,7 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getDetalleContactosProveedorWithParam(params, this.rol).subscribe({
         next: res => {
-          console.log(res);
-          this.cuentasBancarias = res.data;
+          this.contactos = res.data;
           this.modificarPaginacion(res);
           this.spinner.hide();
         },
@@ -185,7 +180,7 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
-    if (this.cuentasBancarias.length <= this.itemsPerPage) {
+    if (this.contactos.length <= this.itemsPerPage) {
       if (res.meta?.current_page === res.meta?.last_page) {
         this.itemsInPage = this.total_rows;
       } else {
@@ -195,37 +190,29 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
   }
 
 
-  openModalNuevaCuenta(type: string, cuenta?: any) {
-    this.obtenerBancos();
-    this.obtenerTiposDeCuenta();
-    this.obtenerMonedas();
+  openModalContacto(type: string, dato?: any) {
     if (type === 'NEW') {
+      this.obtenerTiposDatoContacto();
       this.isEdicion = false;
-      this.tituloModal = 'Nueva cuenta';
-      this.cuentaForm = new FormGroup({
-        bank_uuid: new FormControl(null, [Validators.required]),
-        account_type_uuid: new FormControl(null, [Validators.required]),
-        currency_uuid: new FormControl(null, [Validators.required]),
-        account_number: new FormControl(null, [Validators.required]),
-        cbu: new FormControl(null, []),
-        alias: new FormControl(null, []),
+      this.tituloModal = 'Nuevo dato';
+      this.contactoForm = new FormGroup({
+        contact_detail_type_uuid: new FormControl(null, Validators.required),
+        person_uuid: new FormControl(this.proveedor.person?.uuid, Validators.required),
+        value: new FormControl(null, Validators.required),
+        details: new FormControl(null)
       });
     } else {
-      // console.log(moneda);
       this.isEdicion = true;
-      this.tituloModal = 'Edición cuenta';
-      this.cuentaForm = new FormGroup({
-        uuid: new FormControl(cuenta?.uuid, []),
-        bank_uuid: new FormControl(cuenta?.bank?.uuid, [Validators.required]),
-        account_type_uuid: new FormControl(cuenta?.account_type?.uuid, [Validators.required]),
-        currency_uuid: new FormControl(cuenta?.currency?.uuid, [Validators.required]),
-        account_number: new FormControl(cuenta?.account_number, [Validators.required]),
-        cbu: new FormControl(cuenta?.cbu, []),
-        alias: new FormControl(cuenta?.alias, []),
+      this.tituloModal = 'Edición dato';
+      this.contactoForm = new FormGroup({
+        uuid: new FormControl(dato.uuid),
+        contact_detail_type: new FormControl(dato.contact_detail_type.name),
+        value: new FormControl(dato.value),
+        details: new FormControl(dato.details)
       });
     }
-    this.modalCuenta.options = this.modalOptions;
-    this.modalCuenta.open();
+    this.modalContacto.options = this.modalOptions;
+    this.modalContacto.open();
   }
 
   toggleFilter() {
@@ -236,15 +223,14 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
         alias: '',
         cbu: ''
       };
-      this.obtenerCuentasBancariasDeProveedor();
+      this.obtenerContactos();
     }
   }
 
-  openSwalEliminar(cuenta: any) {
-    console.log(cuenta);
+  openSwalEliminar(dato: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar la cuenta ${cuenta.account_number}?`,
+      text: `¿Desea eliminar el dato ${dato.contact_detail_type.name}?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -257,19 +243,19 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eliminarCuenta(cuenta);
+        this.eliminarDato(dato);
       } else if (result.isDenied) {
 
       }
     })
   }
 
-  eliminarCuenta(cuenta: any) {
+  eliminarDato(contacto: any) {
     this.spinner.show();
     this.subscription.add(
-      this._cuentasBancariasService.eliminarCuenta(cuenta.uuid, this.rol.toUpperCase()).subscribe({
+      this._contactoService.deleteContacto(contacto.uuid, this.rol.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerCuentasBancariasDeProveedor();
+          this.obtenerContactos();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -282,40 +268,11 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
     )
   }
 
-  obtenerMonedas() {
+  obtenerTiposDatoContacto() {
     this.subscription.add(
-      this._indexService.getMonedas(this.rol).subscribe({
+      this._catalogoService.getTiposDetalleContacto(this.rol).subscribe({
         next: res => {
-          // console.log(res);
-          this.monedas = res.data;
-        },
-        error: error => {
-          console.error(error);
-        }
-      })
-    )
-  }
-
-  obtenerBancos() {
-    this.subscription.add(
-      this._indexService.getBancos(this.rol).subscribe({
-        next: res => {
-          // console.log(res);
-          this.bancos = res.data;
-        },
-        error: error => {
-          console.error(error);
-        }
-      })
-    )
-  }
-
-  obtenerTiposDeCuenta() {
-    this.subscription.add(
-      this._indexService.getTipoDeCuentas(this.rol).subscribe({
-        next: res => {
-          // console.log(res);
-          this.tiposDeCuenta = res.data;
+          this.tiposDeDatoContacto = res.data;
         },
         error: error => {
           console.error(error);
