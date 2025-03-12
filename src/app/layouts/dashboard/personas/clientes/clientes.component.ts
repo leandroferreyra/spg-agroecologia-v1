@@ -26,13 +26,16 @@ import Swal from 'sweetalert2';
 import { ComprasClientesComponent } from './compras-clientes/compras-clientes.component';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { ContactosComponent } from '../shared/contactos/contactos.component';
+import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos-persona.component';
+import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent, ContactosPersonaComponent,
+    IconSettingsComponent, IconPlusComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.css',
@@ -66,6 +69,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
   ordenamiento: any = {
 
   };
+
+  filtroSimple: boolean = false;
+  busquedaPorNombreSimple: string = '';
   isSubmit = false;
 
   tab1: string = 'datos-generales';
@@ -135,19 +141,26 @@ export class ClientesComponent implements OnInit, OnDestroy {
     )
   }
 
-  // filtrarClientes(clientes: any) {
-  //   return clientes.filter((dato: any) => {
-  //     // Caso 1: Si es humano, lo devolvemos solo si user es null y supplier es null
-  //     if (dato.human) {
-  //       return dato.human.user === null && dato.supplier === null;
-  //     }
-  //     // Caso 2: Si no es humano pero tiene legal_entity, lo devolvemos solo si supplier es null
-  //     if (dato.legal_entity) {
-  //       return dato.supplier === null;
-  //     }
-  //     return false;
-  //   });
-  // }
+  mostrarFiltros() {
+    this.showFilter = true;
+    // Desactivo filtros simples
+    this.filtroSimple = false;
+    this.busquedaPorNombreSimple = '';
+    this.busqueda_contiene = false;
+  }
+
+  filtroSimpleInput() {
+    // Si ingresa acá es porque busca por búsqueda simple, por lo que se desactivas los filtros.
+    this.filtroSimple = true;
+    this.limpiarFiltros();
+  }
+
+  limpiarFiltros() {
+    this.showFilter = false;
+    this.filtros = {
+      tipoPersona: 'todos'
+    };
+  }
 
   inicializarForm(cliente?: any) {
     if (cliente) {
@@ -377,7 +390,23 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   filtrarDatos() {
     let resultados = this.clientesFiltrados;
-    if (this.showFilter) {
+
+    if (this.filtroSimple) {
+      // Escribió en el input simple
+      resultados = this.clientesFiltrados.filter(dato => {
+        let nombreCompleto;
+        if (dato.person?.human) {
+          nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
+        } else {
+          nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
+        }
+        if (this.busqueda_contiene) {
+          return nombreCompleto.includes(this.busquedaPorNombreSimple.toLowerCase());
+        } else {
+          return nombreCompleto.startsWith(this.busquedaPorNombreSimple.toLowerCase());
+        }
+      })
+    } else if (this.showFilter) {
       // Es búsqueda avanzada
       if (this.filtros.tipoPersona === 'fisica') {
         resultados = this.clientesFiltrados.filter(dato => {
@@ -407,6 +436,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
           return dato.person?.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
         })
       }
+      if (this.filtros.sigla) {
+        resultados = resultados.filter(dato => {
+          return dato.batch_prefix?.toLowerCase().includes(this.filtros.sigla.toLowerCase());
+        })
+      }
       if (this.filtros.cuit) {
         // Acá filtra por cuit o dni, por lo que debe chequear dos cosas, primero con que filtro se está aplicando (todos, fisica o jurídica)
         // y luego, en caso de ser 'todos', chequear si es fisica o jurídica para poder saber de donde sacar la info.
@@ -428,24 +462,8 @@ export class ClientesComponent implements OnInit, OnDestroy {
           }
         })
       }
-    } else {
-      // Busca solo por cliente en la búsqueda simple
-      if (this.filtros.name) {
-        resultados = this.clientesFiltrados.filter(dato => {
-          let nombreCompleto;
-          if (dato.person?.human) {
-            nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
-          } else {
-            nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
-          }
-          if (this.busqueda_contiene) {
-            return nombreCompleto.includes(this.filtros.name.toLowerCase());
-          } else {
-            return nombreCompleto.startsWith(this.filtros.name.toLowerCase());
-          }
-        })
-      }
     }
+
     return resultados;
   }
 

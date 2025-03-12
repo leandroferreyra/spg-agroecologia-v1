@@ -9,9 +9,18 @@
             <!-- PANEL IZQUIERDO -->
 
             <div class="flex h-full flex-col pb-16">
-                <div class="pb-5">
-                    <button class="btn btn-primary w-full" type="button" (click)="openModalNuevoProveedor()">Agregar
-                        proveedor</button>
+
+                <div class="flex items-center justify-between text-md mb-3">
+                    <button type="button" class="hover:text-primary" (click)="openModalNuevoProveedor()">
+                        <icon-plus class="mx-auto mb-1" />
+                        Agregar proveedor
+                    </button>
+
+                    <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas"
+                        (click)="mostrarFiltros()" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                        <icon-settings class="mx-auto mb-1" />
+                        Filtros avanzados
+                    </button>
                 </div>
 
                 <!-- <ng-scrollbar class="relative h-full grow" appearance="compact"> -->
@@ -48,27 +57,27 @@
 
                 <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
                     <div class="group relative">
-                        <input type="text" placeholder="Buscar proveedor..." [(ngModel)]="filtros.name"
-                            class="peer form-input ltr:pr-8 rtl:pl-8" />
+                        <input type="text" placeholder="Buscar proveedor..." [(ngModel)]="busquedaPorNombreSimple"
+                            (input)="filtroSimpleInput()" class="peer form-input ltr:pr-8 rtl:pl-8" />
                         <div
                             class="absolute top-1/2 -translate-y-1/2 peer-focus:text-primary ltr:right-[11px] rtl:left-[11px]">
                             <icon-search />
                         </div>
                     </div>
-                    <div class="form-check form-check-inline flex" style="margin-top:10px">
-                        <label class="form-check-label flex gap-1">
-                            <input class="form-checkbox h-5 w-5" type="checkbox" [checked]="busqueda_contiene"
-                                [(ngModel)]="busqueda_contiene" (change)="filtrarDatos()">
-                            <span class="form-check-sign">Contiene</span>
+
+                    <div class="flex items-center gap-2 mt-2">
+                        <label class="w-12 h-6 relative">
+                            <input type="checkbox"
+                                class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                id="custom_switch_checkbox2" [(ngModel)]="busqueda_contiene"
+                                (change)="filtrarDatos()" />
+                            <span for="custom_switch_checkbox2"
+                                class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                            </span>
                         </label>
+                        <span>Contiene</span>
                     </div>
-                    <div class="form-check form-check-inline flex" style="margin-top:10px">
-                        <label class="form-check-label flex gap-1">
-                            <input class="form-checkbox h-5 w-5" type="checkbox" [checked]="showFilter"
-                                (change)="toggleFilter()">
-                            <span class="form-check-sign">Filtros avanzados</span>
-                        </label>
-                    </div>
+                    
                 </div>
 
             </div>
@@ -97,83 +106,6 @@
             <!-- BORDER -->
             <!-- <div class="h-px border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div> -->
 
-            @if (showFilter) {
-            <!-- FILTROS -->
-            <div class="row d-flex justify-content-center">
-                <div class="col-12 d-flex justify-content-center">
-                    <div
-                        class="max-w-[50rem] mt-3 w-full shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-[#e0e6ed] dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none mx-auto">
-                        <div class="py-7 px-6">
-                            <!-- <h5 class="text-[#3b3f5c] text-center text-xl font-semibold mb-4 dark:text-white-light">
-                                Filtros
-                            </h5> -->
-
-                            <!-- Tipo de Persona -->
-                            <div class="mb-3 text-center">
-                                <label class="font-semibold text-gray-700 d-block">Tipo de Persona:</label>
-                                <div class="d-flex justify-content-center gap-3">
-                                    <div class="form-check">
-                                        <label class="inline-flex items-center" for="radioTodos">
-                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                                id="radioTodos" value="todos" [(ngModel)]="filtros.tipoPersona"
-                                                (change)="cleanFilters()">
-                                            <span class="ml-2 cursor-pointer">Todos</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <label class="inline-flex items-center" for="radioFisica">
-                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                                id="radioFisica" value="fisica" [(ngModel)]="filtros.tipoPersona"
-                                                (change)="cleanFilters()">
-                                            <span class="ml-2 cursor-pointer">Física</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <label class="inline-flex items-center" for="radioJuridica">
-                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                                id="radioJuridica" value="juridica" [(ngModel)]="filtros.tipoPersona"
-                                                (change)="cleanFilters()">
-                                            <span class="ml-2 cursor-pointer">Jurídica</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Inputs de Filtros -->
-                            <div class="d-flex flex-column flex-md-row gap-2">
-                                @if(this.filtros.tipoPersona === 'fisica' || this.filtros.tipoPersona === 'todos') {
-                                <div class="w-100">
-                                    <label for="nombre">Nombre</label>
-                                    <input type="text" id="nombre" class="form-control" [(ngModel)]="filtros.nombre">
-                                </div>
-                                <div class="w-100">
-                                    <label for="apellido">Apellido</label>
-                                    <input type="text" id="apellido" class="form-control"
-                                        [(ngModel)]="filtros.apellido">
-                                </div>
-                                }
-                                @if(this.filtros.tipoPersona === 'juridica' || this.filtros.tipoPersona === 'todos') {
-                                <div class="w-100">
-                                    <label for="razon">Razón Social</label>
-                                    <input type="text" id="razon" class="form-control" [(ngModel)]="filtros.razon">
-                                </div>
-                                }
-                                <div class="w-100">
-                                    <label for="sigla">Sigla</label>
-                                    <input type="text" id="sigla" class="form-control" [(ngModel)]="filtros.sigla">
-                                </div>
-                                <div class="w-100">
-                                    <label for="cuit">Cuit / Dni</label>
-                                    <input type="text" id="cuit" class="form-control" [(ngModel)]="filtros.cuit">
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-            }
-
             <!-- TABS -->
             <div class="">
                 <!-- <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
@@ -194,6 +126,14 @@
                         (click)="tab1 = 'datos-de-contacto'">
                         <!-- <icon-user class="mr-3" /> -->
                         Datos de contacto
+                    </a>
+
+                    <a href="javascript:;"
+                        class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'personas-de-contacto' }"
+                        (click)="tab1 = 'personas-de-contacto'">
+                        <!-- <icon-user class="mr-3" /> -->
+                        Personas de contacto
                     </a>
 
                     <a href="javascript:;"
@@ -367,7 +307,9 @@
                     <div *ngIf="tab1.toLowerCase() === 'datos-de-contacto'">
                         <app-contactos [persona]="selectedProveedor" [rol]="actual_role">
                         </app-contactos>
+                    </div>
 
+                    <div *ngIf="tab1.toLowerCase() === 'personas-de-contacto'">
                         <app-contactos-persona [persona]="selectedProveedor" [rol]="actual_role">
                         </app-contactos-persona>
                     </div>
@@ -392,7 +334,7 @@
 
 
 <div>
-    <ngx-custom-modal #modalProveedor class="modal-top extra-large-modal animate animate-fade-in">
+    <ngx-custom-modal #modalProveedor class=" modal-top extra-large-modal animate animate-fade-in">
         <ng-template #modalHeader>
             <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
         </ng-template>
@@ -592,3 +534,94 @@
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
     <p style="font-size: 20px; color: white">Cargando</p>
 </ngx-spinner>
+
+
+
+
+<div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasRight"
+    aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <!-- <h5 class="offcanvas-title" id="offcanvasRightLabel">Filtros avanzados</h5> -->
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 d-flex justify-content-center">
+                <div class="max-w-[50rem] mt-3 w-full shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-[#e0e6ed] 
+                    dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none mx-auto">
+                    <div class="py-4 px-4">
+
+                        <!-- Tipo de Persona -->
+                        <div class="mb-3 text-center">
+                            <label class="font-semibold text-gray-700 d-block">Tipo de Persona:</label>
+                            <div class="d-flex justify-content-center gap-3">
+                                <div class="form-check">
+                                    <label class="inline-flex items-center" for="radioTodos">
+                                        <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                            id="radioTodos" value="todos" [(ngModel)]="filtros.tipoPersona"
+                                            (change)="cleanFilters()">
+                                        <span class="ml-2 cursor-pointer">Todos</span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <label class="inline-flex items-center" for="radioFisica">
+                                        <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                            id="radioFisica" value="fisica" [(ngModel)]="filtros.tipoPersona"
+                                            (change)="cleanFilters()">
+                                        <span class="ml-2 cursor-pointer">Física</span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <label class="inline-flex items-center" for="radioJuridica">
+                                        <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                            id="radioJuridica" value="juridica" [(ngModel)]="filtros.tipoPersona"
+                                            (change)="cleanFilters()">
+                                        <span class="ml-2 cursor-pointer">Jurídica</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos en una sola fila -->
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            @if(this.filtros.tipoPersona === 'fisica' || this.filtros.tipoPersona === 'todos') {
+                            <div class="flex-grow-1">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" class="form-control" [(ngModel)]="filtros.nombre">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="apellido">Apellido</label>
+                                <input type="text" id="apellido" class="form-control" [(ngModel)]="filtros.apellido">
+                            </div>
+                            }
+                            @if(this.filtros.tipoPersona === 'juridica' || this.filtros.tipoPersona === 'todos') {
+                            <div class="flex-grow-1">
+                                <label for="razon">Razón Social</label>
+                                <input type="text" id="razon" class="form-control" [(ngModel)]="filtros.razon">
+                            </div>
+                            }
+                            <div class="flex-grow-1">
+                                <label for="sigla">Sigla</label>
+                                <input type="text" id="sigla" class="form-control" [(ngModel)]="filtros.sigla">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="cuit">Cuit / Dni</label>
+                                <input type="text" id="cuit" class="form-control" [(ngModel)]="filtros.cuit">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <button class="mt-2 btn btn-primary" (click)="limpiarFiltros()">
+                Limpiar filtros avanzados
+            </button>
+
+        </div>
+
+
+
+    </div>
+</div>

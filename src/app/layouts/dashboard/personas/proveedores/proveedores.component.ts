@@ -31,6 +31,7 @@ import { CuentasBancariasComponent } from './cuentas-bancarias/cuentas-bancarias
 import { ComprasProveedorComponent } from './compras-proveedor/compras-proveedor.component';
 import { ContactosComponent } from '../shared/contactos/contactos.component';
 import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos-persona.component';
+import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
 
 @Component({
   selector: 'app-proveedores',
@@ -38,7 +39,7 @@ import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent
+    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent
   ],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.css',
@@ -70,6 +71,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     'tipoPersona': 'todos'
   };
   showFilter: boolean = false;
+  filtroSimple: boolean = false;
+  busquedaPorNombreSimple: string = '';
   isSubmit = false;
 
 
@@ -112,6 +115,17 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       .subscribe((d) => {
         this.actual_role = d.userRole;
       });
+  }
+
+  ngAfterViewInit() {
+    const offcanvasElement = document.getElementById('offcanvasRight');
+
+    if (offcanvasElement) {
+      offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
+        console.log('El offcanvas se ha cerrado');
+        // Aquí puedes ejecutar cualquier acción adicional al cierre
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -387,9 +401,31 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     proveedor.person = person;
   }
 
+  filtroSimpleInput() {
+    // Si ingresa acá es porque busca por búsqueda simple, por lo que se desactivas los filtros.
+    this.filtroSimple = true;
+    this.limpiarFiltros();
+  }
+
   filtrarDatos() {
     let resultados = this.proveedoresFiltrados;
-    if (this.showFilter) {
+
+    if (this.filtroSimple) {
+      // Escribió en el input simple
+      resultados = this.proveedoresFiltrados.filter(dato => {
+        let nombreCompleto;
+        if (dato.person?.human) {
+          nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
+        } else {
+          nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
+        }
+        if (this.busqueda_contiene) {
+          return nombreCompleto.includes(this.busquedaPorNombreSimple.toLowerCase());
+        } else {
+          return nombreCompleto.startsWith(this.busquedaPorNombreSimple.toLowerCase());
+        }
+      })
+    } else if (this.showFilter) {
       // Es búsqueda avanzada
       if (this.filtros.tipoPersona === 'fisica') {
         resultados = this.proveedoresFiltrados.filter(dato => {
@@ -445,24 +481,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
           }
         })
       }
-    } else {
-      // Busca solo por proveedor en la búsqueda simple
-      if (this.filtros.name) {
-        resultados = this.proveedoresFiltrados.filter(dato => {
-          let nombreCompleto;
-          if (dato.person?.human) {
-            nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
-          } else {
-            nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
-          }
-          if (this.busqueda_contiene) {
-            return nombreCompleto.includes(this.filtros.name.toLowerCase());
-          } else {
-            return nombreCompleto.startsWith(this.filtros.name.toLowerCase());
-          }
-        })
-      }
     }
+
     return resultados;
   }
 
@@ -687,7 +707,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
     proveedor.person = person;
     this.cleanObject(proveedor);
-
   }
 
   // Se eliminan los nulos.
@@ -702,14 +721,29 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleFilter() {
-    this.showFilter = !this.showFilter;
-    if (!this.showFilter) {
-      this.filtros = {
-        tipoPersona: 'todos'
-      };
-    }
+  mostrarFiltros() {
+    this.showFilter = true;
+    // Desactivo filtros simples
+    this.filtroSimple = false;
+    this.busquedaPorNombreSimple = '';
+    this.busqueda_contiene = false;
   }
+
+  limpiarFiltros() {
+    this.showFilter = false;
+    this.filtros = {
+      tipoPersona: 'todos'
+    };
+  }
+
+  // toggleFilter() {
+  //   this.showFilter = !this.showFilter;
+  //   if (!this.showFilter) {
+  //     this.filtros = {
+  //       tipoPersona: 'todos'
+  //     };
+  //   }
+  // }
 
   cleanFilters() {
     this.filtros.nombre = '';

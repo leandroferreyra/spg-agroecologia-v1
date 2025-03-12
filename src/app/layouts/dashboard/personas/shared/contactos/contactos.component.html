@@ -1,144 +1,103 @@
-<div class="container mt-4">
-    <div class="card position-relative mb-4">
+<div class="panel pb-0">
 
-        <div class="m-2 flex flex-col md:flex-row md:items-center justify-between border-bottom">
-            <div class="flex items-center gap-2">
-                <h5 class="ml-2">Datos de Contacto</h5>
-                <button type="button" ngxTippy="Agregar dato de contacto" (click)="openModalContacto('NEW')">
-                    <icon-plus />
-                </button>
-            </div>
+    <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between">
+        <button type="button" ngxTippy="Agregar dato de contacto" (click)="openModalContacto('NEW')">
+            <icon-plus />
+        </button>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="contactos && contactos.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
         </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="contactos && contactos.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
 
-
-        <div class="card-body">
-
-            <div class="row mb-2">
-                <div class="col-6">
-                    <span *ngIf="contactos && contactos.length > 0" class="float-md-start color-gris">
-                        Página: {{ currentPage}}/{{numPages.pageCount }}
-                    </span>
-                </div>
-                <div class="col-6" style="text-align: right;">
-                    <span *ngIf="contactos && contactos.length > 0" class="float-md-end color-gris">
-                        Ítems: {{itemsInPage}}/{{ total_rows }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table-hover">
-                    <thead>
-                        <tr>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Tipo
-                                </span>
-                            </th>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Valor
-                                </span>
-                            </th>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Detalle
-                                </span>
-                            </th>
-                            <th>
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for(data of contactos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
-                        <tr>
-                            <td class="whitespace-nowrap">{{ data.contact_detail_type.name}} </td>
-                            <td class="whitespace-nowrap">{{ data.value}} </td>
-                            <td class="whitespace-nowrap">{{ data.details}} </td>
-                            <td>
-                                <div class="flex items-center">
-                                    <div>
-                                        <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                            (click)="openModalContacto('EDIT', data)">
-                                            <icon-pencil />
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                            <icon-trash-lines />
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
-
-                <div class="row mt-4">
-                    <div class="col">
-                        <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                            [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                            [boundaryLinks]="true" (pageChange)="obtenerContactos()" />
-                    </div>
-
-                    <div class="col">
-                        <div class="row align-items-center float-md-end">
-                            <div class="col-auto">
-                                <label for="paginacion">Ítems por página:</label>
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Tipo
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Valor
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Detalle
+                        </span>
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of contactos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.contact_detail_type.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.value}} </td>
+                    <td class="whitespace-nowrap">{{ data.details}} </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalContacto('EDIT', data)">
+                                    <icon-pencil />
+                                </button>
                             </div>
-                            <div class="col-auto">
-                                <select id="paginacion" class="form-control" (change)="obtenerContactos()"
-                                    [(ngModel)]="itemsPerPage">
-                                    <option value=5>5</option>
-                                    <option value=10>10</option>
-                                    <option value=20>20</option>
-                                    <option value=50>50</option>
-                                    <option value=100>100</option>
-                                </select>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
                             </div>
                         </div>
-                    </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
 
-                </div>
+        <div class="row mt-4">
+            <div class="col">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerContactos()" />
             </div>
 
+            <div class="col">
+                <div class="row align-items-center float-md-end">
+                    <div class="col-auto">
+                        <label for="paginacion">Ítems por página:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select id="paginacion" class="form-control" (change)="obtenerContactos()"
+                            [(ngModel)]="itemsPerPage">
+                            <option value=5>5</option>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
 
-    <!-- Datos de Persona de Contacto -->
-    <!-- <div class="card position-relative">
-        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Datos de Persona de Contacto</h5>
-            <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar datos de persona de contacto">
-                <icon-pencil />
-            </button>
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label for="nombre" class="form-label">Nombre</label>
-                    <input type="text" id="nombre" class="form-control">
-                </div>
-                <div class="col-md-6">
-                    <label for="apellido" class="form-label">Apellido</label>
-                    <input type="text" id="apellido" class="form-control">
-                </div>
-                <div class="col-md-6">
-                    <label for="telefonoContacto" class="form-label">Teléfono</label>
-                    <input type="text" id="telefonoContacto" class="form-control">
-                </div>
-                <div class="col-md-6">
-                    <label for="emailContacto" class="form-label">Email</label>
-                    <input type="email" id="emailContacto" class="form-control">
-                </div>
-            </div>
-        </div>
-    </div> -->
 </div>
-
 
 
 <!-- MODAL DATO DE CONTACTO -->
