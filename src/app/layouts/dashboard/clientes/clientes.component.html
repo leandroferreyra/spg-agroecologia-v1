@@ -194,6 +194,14 @@
 
                     <a href="javascript:;"
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-de-contacto' }"
+                        (click)="tab1 = 'datos-de-contacto'">
+                        <!-- <icon-user class="mr-3" /> -->
+                        Datos de contacto
+                    </a>
+
+                    <a href="javascript:;"
+                        class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'compras' }"
                         (click)="tab1 = 'compras'">
                         Compras
@@ -334,6 +342,11 @@
                             }
 
                         </form>
+
+                    </div>
+
+
+                    <div *ngIf="tab1.toLowerCase() === 'datos-de-contacto'">
 
                     </div>
 
