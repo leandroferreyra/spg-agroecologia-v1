@@ -8,21 +8,16 @@ import { ContactoDTO } from '../models/request/contactoDTO';
 @Injectable({
   providedIn: 'root'
 })
-export class ContactosProveedorService {
+export class DatosContactoPersonaService {
 
-  private apiContactos = '/contact_details';
+  private apiContactos = '/contact_people';
 
   constructor(private http: HttpClient) { }
 
-  saveContacto(contacto: ContactoDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiContactos, JSON.stringify(contacto), { headers });
-  }
-
-  editContacto(uuid: string, contacto: ContactoDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put<AuthResponse>(environment.baseUrl + this.apiContactos + '/' + uuid, JSON.stringify(contacto), { headers });
-  }
+  // saveContacto(contacto: ContactoDTO): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiContactos, JSON.stringify(contacto), { headers });
+  // }
 
   deleteContacto(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

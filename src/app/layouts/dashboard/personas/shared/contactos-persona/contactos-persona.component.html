@@ -1,174 +1,166 @@
-<div class="container mt-4">
-    <div class="card position-relative mb-4">
+<div class="panel pb-0">
 
-        <div class="m-2 flex flex-col md:flex-row md:items-center justify-between border-bottom">
-            <div class="flex items-center gap-2">
-                <h5 class="ml-2">Datos de Persona de Contacto</h5>
-                <button type="button" ngxTippy="Agregar dato de contacto de persona" (click)="openModalContacto('NEW')">
-                    <icon-plus />
-                </button>
-            </div>
+    <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between">
+        <button type="button" ngxTippy="Agregar persona de contacto" (click)="openModalContacto('NEW')">
+            <icon-plus />
+        </button>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="contactos && contactos.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
         </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="contactos && contactos.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
 
 
-        <div class="card-body">
-
-            <div class="row mb-2">
-                <div class="col-6">
-                    <span *ngIf="contactos && contactos.length > 0" class="float-md-start color-gris">
-                        Página: {{ currentPage}}/{{numPages.pageCount }}
-                    </span>
-                </div>
-                <div class="col-6" style="text-align: right;">
-                    <span *ngIf="contactos && contactos.length > 0" class="float-md-end color-gris">
-                        Ítems: {{itemsInPage}}/{{ total_rows }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table-hover">
-                    <thead>
-                        <tr>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Nombre completo
-                                </span>
-                            </th>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Documento
-                                </span>
-                            </th>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Cuit
-                                </span>
-                            </th>
-                            <th>
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for(data of contactos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
-                        <tr>
-                            <td class="whitespace-nowrap">{{ showName(data) }} </td>
-                            <td class="whitespace-nowrap">{{ data.person?.human?.document_number}} </td>
-                            <td class="whitespace-nowrap">{{ showCuit(data) }} </td>
-                            <td>
-                                <div class="flex items-center">
-                                    <div>
-                                        <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                            (click)="openModalContacto('EDIT', data)">
-                                            <icon-pencil />
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                            <icon-trash-lines />
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
-
-                <div class="row mt-4">
-                    <div class="col">
-                        <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                            [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                            [boundaryLinks]="true" (pageChange)="obtenerContactos()" />
-                    </div>
-
-                    <div class="col">
-                        <div class="row align-items-center float-md-end">
-                            <div class="col-auto">
-                                <label for="paginacion">Ítems por página:</label>
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Nombre completo
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Documento
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Cuit
+                        </span>
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of contactos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ showName(data) }} </td>
+                    <td class="whitespace-nowrap">{{ data.person?.human?.document_number}} </td>
+                    <td class="whitespace-nowrap">{{ showCuit(data) }} </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <!-- <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalContacto('EDIT', data)">
+                                    <icon-pencil />
+                                </button> -->
                             </div>
-                            <div class="col-auto">
-                                <select id="paginacion" class="form-control" (change)="obtenerContactos()"
-                                    [(ngModel)]="itemsPerPage">
-                                    <option value=5>5</option>
-                                    <option value=10>10</option>
-                                    <option value=20>20</option>
-                                    <option value=50>50</option>
-                                    <option value=100>100</option>
-                                </select>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
                             </div>
                         </div>
-                    </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
 
-                </div>
+        <div class="row mt-4">
+            <div class="col">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerContactos()" />
             </div>
 
+            <div class="col">
+                <div class="row align-items-center float-md-end">
+                    <div class="col-auto">
+                        <label for="paginacion">Ítems por página:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select id="paginacion" class="form-control" (change)="obtenerContactos()"
+                            [(ngModel)]="itemsPerPage">
+                            <option value=5>5</option>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
 
-    <!-- MODAL DATO DE CONTACTO -->
-    <div>
-        <ngx-custom-modal #modalContacto class="modal-top animate extra-large-modal animate-fade-in">
-            <ng-template #modalHeader>
-                <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
-            </ng-template>
+</div>
 
-            <ng-template #modalBody>
-                <div class="container">
-                    <div class="row justify-content-center">
 
-                        <div class="col-md-12">
-                            <form [formGroup]="contactoForm" (keydown.enter)="confirmarContacto()">
+<div>
+    <ngx-custom-modal #modalContacto class="modal-top animate extra-large-modal animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
 
-                                @if (!isEdicion) {
-                                <div class="mb-2"
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="contactoForm" (keydown.enter)="confirmarContacto()">
+
+                            @if (!isEdicion) {
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? contactoForm.controls['contact_detail_type_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Tipo</label>
+                                <ng-select [items]="tiposDeDatoContacto" bindLabel="name" bindValue="uuid"
+                                    formControlName="contact_detail_type_uuid" [virtualScroll]="true"
+                                    [appendTo]="'body'"
                                     [ngClass]="isSubmit ? contactoForm.controls['contact_detail_type_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                    <label>Tipo</label>
-                                    <ng-select [items]="tiposDeDatoContacto" bindLabel="name" bindValue="uuid"
-                                        formControlName="contact_detail_type_uuid" [virtualScroll]="true"
-                                        [appendTo]="'body'"
-                                        [ngClass]="isSubmit ? contactoForm.controls['contact_detail_type_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                    </ng-select>
+                                </ng-select>
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? contactoForm.controls['value'].errors ? 'has-error' : 'has-success' : ''">
+                                <label class="form-label">Valor</label>
+                                <input type="text" class="form-control" formControlName="value">
+                            </div>
+                            }
+
+                            @if (isEdicion) {
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? contactoForm.controls['value'].errors ? 'has-error' : 'has-success' : ''">
+                                <label class="form-label">{{ contactoForm.get('contact_detail_type')?.value
+                                    }}</label>
+                                <input type="text" class="form-control" formControlName="value">
+                            </div>
+                            }
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? contactoForm.controls['details'].errors ? 'has-error' : 'has-success' : ''">
+                                <label class="form-label">Detalle</label>
+                                <input type="text" class="form-control" formControlName="details">
+                            </div>
+
+                            <div class="row mt-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarContacto()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
                                 </div>
+                            </div>
 
-                                <div class="mb-2"
-                                    [ngClass]="isSubmit ? contactoForm.controls['value'].errors ? 'has-error' : 'has-success' : ''">
-                                    <label class="form-label">Valor</label>
-                                    <input type="text" class="form-control" formControlName="value">
-                                </div>
-                                }
-
-                                @if (isEdicion) {
-                                <div class="mb-2"
-                                    [ngClass]="isSubmit ? contactoForm.controls['value'].errors ? 'has-error' : 'has-success' : ''">
-                                    <label class="form-label">{{ contactoForm.get('contact_detail_type')?.value
-                                        }}</label>
-                                    <input type="text" class="form-control" formControlName="value">
-                                </div>
-                                }
-
-                                <div class="mb-2"
-                                    [ngClass]="isSubmit ? contactoForm.controls['details'].errors ? 'has-error' : 'has-success' : ''">
-                                    <label class="form-label">Detalle</label>
-                                    <input type="text" class="form-control" formControlName="details">
-                                </div>
-
-                                <div class="row mt-2">
-                                    <div class="col-12 d-flex justify-content-center">
-                                        <button type="button" class="btn btn-wd btn-primary mr-4"
-                                            (click)="confirmarContacto()">Confirmar</button>
-                                        <button id="back-button-with-border" type="button" class="btn btn-wd"
-                                            (click)="cerrarModal()">Cancelar</button>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-
+                        </form>
                     </div>
+
                 </div>
-            </ng-template>
-        </ngx-custom-modal>
-    </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>

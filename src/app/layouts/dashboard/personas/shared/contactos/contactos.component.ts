@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 import { ContactoDTO } from 'src/app/core/models/request/contactoDTO';
 import { CuentaBancariaProveedorDTO } from 'src/app/core/models/request/cuentaBancariaProveedorDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
-import { ContactosProveedorService } from 'src/app/core/services/contactosProveedor.service';
+import { DatosContactoService } from 'src/app/core/services/datosContactos.service';
 import { CuentasProveedorService } from 'src/app/core/services/cuentasProveedor.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -71,7 +71,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
   isEdicion = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _contactoService: ContactosProveedorService, private _tokenService: TokenService, private _catalogoService: CatalogoService) {
+    private _contactoService: DatosContactoService, private _tokenService: TokenService, private _catalogoService: CatalogoService) {
 
   }
   ngOnInit(): void {

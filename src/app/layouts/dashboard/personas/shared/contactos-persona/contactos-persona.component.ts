@@ -9,7 +9,8 @@ import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { ContactoDTO } from 'src/app/core/models/request/contactoDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
-import { ContactosProveedorService } from 'src/app/core/services/contactosProveedor.service';
+import { DatosContactoService } from 'src/app/core/services/datosContactos.service';
+import { DatosContactoPersonaService } from 'src/app/core/services/datosContactosPersonas.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
@@ -69,8 +70,8 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   isEdicion = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _contactoService: ContactosProveedorService, private _tokenService: TokenService, private _catalogoService: CatalogoService) {
-
+    private _contactoService: DatosContactoService, private _personaContactoService: DatosContactoPersonaService,
+    private _tokenService: TokenService, private _catalogoService: CatalogoService) {
   }
   ngOnInit(): void {
   }
@@ -216,7 +217,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   openSwalEliminar(dato: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el dato ${dato.contact_detail_type.name}?`,
+      text: `¿Desea eliminar el contacto ${this.getName(dato)} ?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -239,7 +240,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   eliminarDato(contacto: any) {
     this.spinner.show();
     this.subscription.add(
-      this._contactoService.deleteContacto(contacto.uuid, this.rol.toUpperCase()).subscribe({
+      this._personaContactoService.deleteContacto(contacto.uuid, this.rol.toUpperCase()).subscribe({
         next: res => {
           this.obtenerContactos();
           this._tokenService.setToken(res.token);
@@ -253,6 +254,18 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       })
     )
   }
+
+  getName(dato: any) {
+    if (dato.person?.human) {
+      return dato.person?.human.firstname + ' ' + dato.person?.human.lastname
+    } else if (dato.person?.legal_entity) {
+      return dato.person?.legal_entity?.company_name
+    } else {
+      return ' ';
+    }
+  }
+
+
 
   obtenerTiposDatoContacto() {
     this.subscription.add(
