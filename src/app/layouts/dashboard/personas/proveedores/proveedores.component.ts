@@ -29,7 +29,7 @@ import { IconUserComponent } from 'src/app/shared/icon/icon-user';
 import Swal from 'sweetalert2';
 import { CuentasBancariasComponent } from './cuentas-bancarias/cuentas-bancarias.component';
 import { ComprasProveedorComponent } from './compras-proveedor/compras-proveedor.component';
-import { ContactosProveedorComponent } from './contactos-proveedor/contactos-proveedor.component';
+import { ContactosComponent } from '../shared/contactos/contactos.component';
 
 @Component({
   selector: 'app-proveedores',
@@ -37,7 +37,7 @@ import { ContactosProveedorComponent } from './contactos-proveedor/contactos-pro
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosProveedorComponent
+    ContactosComponent
   ],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.css',

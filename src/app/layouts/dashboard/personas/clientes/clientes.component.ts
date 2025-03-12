@@ -25,13 +25,14 @@ import { IconUserComponent } from 'src/app/shared/icon/icon-user';
 import Swal from 'sweetalert2';
 import { ComprasClientesComponent } from './compras-clientes/compras-clientes.component';
 import { toggleAnimation } from 'src/app/shared/animations';
+import { ContactosComponent } from '../shared/contactos/contactos.component';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.css',

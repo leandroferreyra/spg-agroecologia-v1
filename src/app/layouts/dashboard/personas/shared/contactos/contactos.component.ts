@@ -22,17 +22,17 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-contactos-proveedor',
+  selector: 'app-contactos',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
     NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent],
-  templateUrl: './contactos-proveedor.component.html',
-  styleUrl: './contactos-proveedor.component.css'
+  templateUrl: './contactos.component.html',
+  styleUrl: './contactos.component.css'
 })
-export class ContactosProveedorComponent implements OnInit, OnDestroy {
+export class ContactosComponent implements OnInit, OnDestroy {
 
 
-  @Input() proveedor: any;
+  @Input() persona: any;
   @Input() rol!: string;
   contactos: any[] = [];
   // monedas: any[] = [];
@@ -82,10 +82,10 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['proveedor'] && changes['proveedor'].currentValue) {
+    if (changes['persona'] && changes['persona'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
-      this.filtrosContactos['person.uuid'] = this.proveedor.person?.uuid;
+      this.filtrosContactos['person.uuid'] = this.persona.person?.uuid;
       this.obtenerContactos();
     }
   }
@@ -196,7 +196,7 @@ export class ContactosProveedorComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Nuevo dato';
       this.contactoForm = new FormGroup({
         contact_detail_type_uuid: new FormControl(null, Validators.required),
-        person_uuid: new FormControl(this.proveedor.person?.uuid, Validators.required),
+        person_uuid: new FormControl(this.persona.person?.uuid, Validators.required),
         value: new FormControl(null, Validators.required),
         details: new FormControl(null)
       });
