@@ -23,16 +23,19 @@ import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import { IconUserComponent } from 'src/app/shared/icon/icon-user';
 import Swal from 'sweetalert2';
+import { ComprasClientesComponent } from './compras-clientes/compras-clientes.component';
+import { toggleAnimation } from 'src/app/shared/animations';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule, IconHorizontalDotsComponent, MenuModule
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent
   ],
   templateUrl: './clientes.component.html',
-  styleUrl: './clientes.component.css'
+  styleUrl: './clientes.component.css',
+  animations: [toggleAnimation]
 })
 export class ClientesComponent implements OnInit, OnDestroy {
 
@@ -60,11 +63,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
   };
   showFilter: boolean = false;
   ordenamiento: any = {
-    
+
   };
   isSubmit = false;
 
-  tab1: string = 'Datos generales';
+  tab1: string = 'datos-generales';
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCliente') modalCliente!: NgxCustomModalComponent;
@@ -115,7 +118,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getClientesWithParam(this.actual_role).subscribe({
         next: res => {
-          console.log(res);
+          // console.log(res);
           this.clientes = res.data;
           this.clientesFiltrados = this.clientes;
           if (!alta && this.clientes.length > 0) {
@@ -320,7 +323,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let cliente = new ClienteDTO();
       this.armarDTOEdicion(cliente);
-      console.log(cliente);
+      // console.log(cliente);
       this.subscription.add(
         this._clienteService.editCliente(this.selectedCliente.uuid, cliente).subscribe({
           next: res => {

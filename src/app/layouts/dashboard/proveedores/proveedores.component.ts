@@ -29,13 +29,15 @@ import { IconUserComponent } from 'src/app/shared/icon/icon-user';
 import Swal from 'sweetalert2';
 import { CuentasBancariasComponent } from './cuentas-bancarias/cuentas-bancarias.component';
 import { ComprasProveedorComponent } from './compras-proveedor/compras-proveedor.component';
+import { ContactosProveedorComponent } from './contactos-proveedor/contactos-proveedor.component';
 
 @Component({
   selector: 'app-proveedores',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
+    ContactosProveedorComponent
   ],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.css',
@@ -64,7 +66,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   // Orden y filtro para datos listado proveedores.
   filtros: any = {
-    tipoPersona: 'todos'
+    'tipoPersona': 'todos'
   };
   showFilter: boolean = false;
   isSubmit = false;
@@ -128,7 +130,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProveedoresWithParam(this.actual_role).subscribe({
         next: res => {
-          console.log(res);
+          // console.log(res);
           this.proveedores = res.data;
           this.proveedoresFiltrados = this.proveedores;
           if (!alta && this.proveedores.length > 0) {
@@ -330,7 +332,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDTOEdicion(proveedor);
-      console.log(proveedor);
+      // console.log(proveedor);
       this.subscription.add(
         this._proveedoresService.editProveedor(this.selectedProveedor.uuid, proveedor).subscribe({
           next: res => {
@@ -632,7 +634,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDtoNuevoProveedor(proveedor);
-      console.log(proveedor);
+      // console.log(proveedor);
       this.subscription.add(
         this._proveedoresService.saveProveedor(proveedor).subscribe({
           next: res => {

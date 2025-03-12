@@ -186,9 +186,9 @@
                 <div class="mt-3 mb-5 flex flex-wrap">
                     <a href="javascript:;"
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos generales' }"
-                        (click)="tab1 = 'datos generales'">
-                        <icon-user class="mr-3" />
+                        [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales' }"
+                        (click)="tab1 = 'datos-generales'">
+                        <!-- <icon-user class="mr-3" /> -->
                         Datos generales
                     </a>
 
@@ -215,7 +215,7 @@
                 </div>
 
                 <div class="flex-1 text-sm">
-                    <div *ngIf="tab1.toLowerCase() === 'datos generales'">
+                    <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
                         <!-- <h4 class="mb-4 text-2xl font-semibold"></h4> -->
                         <form [formGroup]="clienteForm" class="p-4">
                             <div class="flex flex-col sm:flex-row">
@@ -338,7 +338,8 @@
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'compras'">
-
+                        <app-compras-clientes [cliente]="selectedCliente" [rol]="actual_role">
+                        </app-compras-clientes>
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'productos-adquiridos'">

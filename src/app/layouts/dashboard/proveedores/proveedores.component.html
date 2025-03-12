@@ -1,5 +1,5 @@
 <div>
-    <div class=" mt-4 relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
+    <div class="relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
         <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
             [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
 
@@ -13,7 +13,6 @@
                     <button class="btn btn-primary w-full" type="button" (click)="openModalNuevoProveedor()">Agregar
                         proveedor</button>
                 </div>
-
 
                 <!-- <ng-scrollbar class="relative h-full grow" appearance="compact"> -->
                 <div class="table-responsive">
@@ -185,7 +184,7 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales' }"
                         (click)="tab1 = 'datos-generales'">
-                        <icon-user class="mr-3" />
+                        <!-- <icon-user class="mr-3" /> -->
                         Datos generales
                     </a>
 
@@ -193,7 +192,7 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-de-contacto' }"
                         (click)="tab1 = 'datos-de-contacto'">
-                        <icon-user class="mr-3" />
+                        <!-- <icon-user class="mr-3" /> -->
                         Datos de contacto
                     </a>
 
@@ -366,7 +365,8 @@
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'datos-de-contacto'">
-
+                        <app-contactos-proveedor [proveedor]="selectedProveedor" [rol]="actual_role">
+                        </app-contactos-proveedor>
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'cuentas-bancarias'">

@@ -1,14 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { faCommentNodes } from '@fortawesome/free-solid-svg-icons';
-import { NgbPagination, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
-import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
+import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
-import { CuentaBancariaDTO } from 'src/app/core/models/request/cuentaBancariaDTO';
 import { CuentaBancariaProveedorDTO } from 'src/app/core/models/request/cuentaBancariaProveedorDTO';
 import { CuentasProveedorService } from 'src/app/core/services/cuentasProveedor.service';
 import { IndexService } from 'src/app/core/services/index.service';
@@ -21,15 +19,14 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-cuentas-bancarias',
+  selector: 'app-contactos-proveedor',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
-    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent
-  ],
-  templateUrl: './cuentas-bancarias.component.html',
-  styleUrl: './cuentas-bancarias.component.css'
+      NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent],
+  templateUrl: './contactos-proveedor.component.html',
+  styleUrl: './contactos-proveedor.component.css'
 })
-export class CuentasBancariasComponent implements OnInit, OnDestroy {
+export class ContactosProveedorComponent implements OnInit, OnDestroy {
 
 
   @Input() proveedor: any;
@@ -51,7 +48,7 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtrosCuentasBancarias: any = {
-    supplier_uuid: ''
+    'person.uuid': ''
   };
   showFilterCuentasBancarias: boolean = false;
   ordenamiento: any = {
@@ -86,7 +83,7 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
     if (changes['proveedor'] && changes['proveedor'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
-      this.filtrosCuentasBancarias.supplier_uuid = this.proveedor.uuid;
+      this.filtrosCuentasBancarias['person.uuid'] = this.proveedor.person?.uuid;
       this.obtenerCuentasBancariasDeProveedor();
     }
   }
@@ -162,14 +159,14 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
   obtenerCuentasBancariasDeProveedor() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["bank", "currency", "accountType"];
+    params.with = ["person"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtrosCuentasBancarias;
 
     this.subscription.add(
-      this._indexService.getCuentasProveedorWithParam(params, this.rol).subscribe({
+      this._indexService.getDetalleContactosProveedorWithParam(params, this.rol).subscribe({
         next: res => {
           console.log(res);
           this.cuentasBancarias = res.data;

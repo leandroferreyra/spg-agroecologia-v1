@@ -3,7 +3,7 @@
 
     <div class="panel mt-6 pb-0">
 
-        <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between">
+        <!-- <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between"> -->
             <!-- Botón Agregar Cuenta Bancaria -->
             <!-- <button type="button" ngxTippy="Agregar compra" (click)="openModalNuevaCompra('NEW')">
                 <icon-plus />
@@ -21,7 +21,7 @@
                     </span>
                 </label>
             </div> -->
-        </div>
+        <!-- </div> -->
 
 
 
@@ -42,11 +42,11 @@
             <table class="table-hover">
                 <thead>
                     <tr>
-                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('transaction.transaction_datetime')">
+                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('transaction_datetime')">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Fecha
                                 <fa-icon
-                                    [icon]="ordenamiento['transaction.transaction_datetime']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                                    [icon]="ordenamiento['transaction_datetime']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
                             </span>
                         </th>
                         <th style="cursor: pointer;">
@@ -56,7 +56,7 @@
                         </th>
                         <th style="cursor: pointer;">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Comentarios
+                                Tipo transacción
                             </span>
                         </th>
                         <!-- <th style="cursor: pointer;">
@@ -104,26 +104,26 @@
                     } -->
                     @for(data of compras | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                     <tr>
-                        <td class="whitespace-nowrap">{{ data.transaction.transaction_datetime}} </td>
-                        <td class="whitespace-nowrap">{{ data.transaction.current_state.state}} </td>
-                        <td class="whitespace-nowrap">{{ data.qualification_comments}} </td>
+                        <td class="whitespace-nowrap">{{ data.transaction_datetime}} </td>
+                        <td class="whitespace-nowrap">{{ data.current_state.state}} </td>
+                        <td class="whitespace-nowrap">{{ data.transaction_type.name}} </td>
                         <!-- <td class="whitespace-nowrap">{{ data.account_type.name}} </td>
                         <td class="whitespace-nowrap">{{ data.bank.name}} </td>
                         <td class="whitespace-nowrap">{{ data.currency.name}} </td> -->
 
                         <td>
                             <div class="flex items-center">
-                                <div>
+                                <!-- <div>
                                     <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
                                         (click)="openModalNuevaCompra('EDIT', data)">
                                         <icon-pencil />
                                     </button>
-                                </div>
-                                <div>
+                                </div> -->
+                                <!-- <div>
                                     <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                         <icon-trash-lines />
                                     </button>
-                                </div>
+                                </div> -->
                             </div>
                         </td>
                     </tr>

@@ -25,7 +25,8 @@ export class IndexService {
   apiClientes = '/customers';
   apiCuentasProveedor = '/bank_accounts';
   apiComprasProveedor = '/purchases';
-
+  apiDetalleContacto = '/contact_details';
+  apiComprasClientes = '/transactions';
 
   constructor(private http: HttpClient) { }
 
@@ -43,19 +44,12 @@ export class IndexService {
       if (paramsObj.order_by[key] !== '') {
         params = params.append(`order_by[${index}][]`, key);
         params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
-        // if (key === 'datetime_from') {
-        //   params = params.append(`order_by[${index}][]`, key);
-        //   params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
-        // } else {
-        //   params = params.append(`order_by[${index}][]`, key.replace(/_/g, '.'));
-        //   params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
-        // }
       }
     });
     // para cada elemento de paramsObj.filters, agregar un filters[]
     Object.keys(paramsObj.filters).forEach((key, index) => {
       if (paramsObj.filters[key] !== '') {
-        if (key === 'location_uuid' || key === 'product_category_uuid') {
+        if (key === 'location_uuid' || key === 'product_category_uuid' || key === 'person.uuid' || key === 'transactionType.name') {
           params = params.append(`filters[${index}][]`, key);
           params = params.append(`filters[${index}][]`, '=');
           params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
@@ -196,5 +190,13 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasProveedor, { headers, params: this.getParams(paramsObj, rol) });
   }
 
+  getDetalleContactosProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDetalleContacto, { headers, params: this.getParams(paramsObj, rol) });
+  }
 
+  getComprasClientesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasClientes, { headers, params: this.getParams(paramsObj, rol) });
+  }
 }
