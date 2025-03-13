@@ -9,7 +9,7 @@ import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { CompraProveedorDTO } from 'src/app/core/models/request/compraProveedorDTO';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.service';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons'; import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.service';
 import { CuentasProveedorService } from 'src/app/core/services/cuentasProveedor.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -51,7 +51,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtrosCompras: any = {
-    transaction_person_uuid: ''
+    'transaction.person.uuid': { value: '', op: '=', contiene: false }
   };
   showFilterCompras: boolean = false;
   ordenamiento: any = {
@@ -90,7 +90,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     if (changes['proveedor'] && changes['proveedor'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las compras
-      this.filtrosCompras.transaction_person_uuid = this.proveedor.uuid;
+      this.filtrosCompras['transaction.person.uuid'].value = this.proveedor.uuid;
       this.obtenerCompras();
     }
   }
@@ -248,11 +248,9 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilterCompras = !this.showFilterCompras;
     if (!this.showFilterCompras) {
-      this.filtrosCompras = {
-        account_number: '',
-        alias: '',
-        cbu: ''
-      };
+      this.filtrosCompras.account_number = { value: '', op: 'LIKE', contiene: true }
+      this.filtrosCompras.alias = { value: '', op: 'LIKE', contiene: true }
+      this.filtrosCompras.cbu = { value: '', op: 'LIKE', contiene: true }
       this.obtenerCompras();
     }
   }

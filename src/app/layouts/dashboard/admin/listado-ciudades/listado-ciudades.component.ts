@@ -64,9 +64,9 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   // filtro
   showFilter: boolean = false;
   filtros: any = {
-    district_country_name: '',
-    district_name: '',
-    name: ''
+    'name': { value: '', op: 'LIKE', contiene: true },
+    'district.name': { value: '', op: 'LIKE', contiene: true },
+    'district.country.name': { value: '', op: 'LIKE', contiene: true },
   };
 
   ciudadForm!: FormGroup;
@@ -310,9 +310,9 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        district_country_name: '',
-        district_name: '',
-        name: ''
+        'name': { value: '', op: 'LIKE', contiene: true },
+        'district.name': { value: '', op: 'LIKE', contiene: true },
+        'district.country.name': { value: '', op: 'LIKE', contiene: true },
       };
       this.obtenerCiudades();
     }

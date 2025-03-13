@@ -43,7 +43,7 @@
                     @if (showFilter) {
                     <tr>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
                                 (input)="obtenerBancos()" />
                         </td>
                         <td></td>
@@ -85,8 +85,8 @@
                             <label for="paginacion">Ítems por página:</label>
                         </div>
                         <div class="col-auto">
-                            <select id="paginacion" class="form-control"
-                                (change)="obtenerBancos()" [(ngModel)]="itemsPerPage">
+                            <select id="paginacion" class="form-control" (change)="obtenerBancos()"
+                                [(ngModel)]="itemsPerPage">
                                 <option value=5>5</option>
                                 <option value=10>10</option>
                                 <option value=20>20</option>

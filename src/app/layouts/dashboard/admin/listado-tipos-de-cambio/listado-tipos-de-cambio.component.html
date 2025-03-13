@@ -18,7 +18,7 @@
                         <label class="inline-flex mr-3" [for]="'radio_' + moneda.uuid">
                             <input class="form-radio" type="radio" name="radio_monedas" [id]="'radio_' + moneda.uuid"
                                 [value]="moneda.name" (change)="obtenerTiposCambio()"
-                                [(ngModel)]="filtros.currency_name">
+                                [(ngModel)]="filtros['currency.name'].value">
                             <span style="cursor: pointer;">{{ moneda.name }}</span>
                         </label>
                     </div>
@@ -85,15 +85,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- @if (showFilter) {
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
-                                (input)="obtenerTiposCambio()" />
-                        </td>
-                        <td></td>
-                    </tr>
-                    } -->
                     @for(data of tiposCambio | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                     <tr>
                         <td class="whitespace-nowrap">{{ data.currency.name}} </td>
@@ -167,7 +158,8 @@
 
                             <div class="mb-3">
                                 <label>Moneda</label>
-                                <input type="text" class="form-control" [value]="filtros.currency_name" disabled>
+                                <input type="text" class="form-control" [value]="filtros['currency.name'].value"
+                                    disabled>
                             </div>
 
                             <div class="mb-3"

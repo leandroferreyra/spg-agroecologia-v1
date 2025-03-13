@@ -58,7 +58,8 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    name: '',
+    'name': { value: '', op: 'LIKE', contiene: true },
+
     // location_uuid: null,
   };
   showFilter: boolean = false;
@@ -109,7 +110,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
       this.busqueda_global = false;
       if (this.filtros.name) {
         // Si ingresa acá es porque entró desde "Mostrar sububicaciones" por lo que se borra el filtro nombre para traer todos los datos.
-        this.filtros.name = '';
+        this.filtros.name.value = '';
       }
     }
     // Inicializamos un objeto vacío para los parámetros
@@ -120,7 +121,10 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     params.order_by = this.ordenamiento;
 
     if (this.locationToGo) {
-      this.filtros.location_uuid = this.locationToGo.uuid;
+      this.filtros.location_uuid = {};
+      this.filtros.location_uuid.value = this.locationToGo.uuid;
+      this.filtros.location_uuid.op = '=';
+      this.filtros.location_uuid.contiene = false;
     } else {
       this.filtros.location_uuid = null;
     }
@@ -299,7 +303,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        name: '',
+        'name': { value: '', op: 'LIKE', contiene: true },
       };
       this.busqueda_global = false;
       if (this.breadcrumbs.length > 0) {

@@ -58,7 +58,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    currency_name: 'Dólares'
+    'currency.name': { value: 'Dólares', op: '=', contiene: false },
   };
   //showFilter: boolean = false;
   ordenamiento: any = {
@@ -248,7 +248,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   }
 
   getUuidFromFilterCurrencyName() {
-    const monedaEncontrada = this.monedas.find(moneda => moneda.name === this.filtros.currency_name);
+    const monedaEncontrada = this.monedas.find(moneda => moneda.name === this.filtros.currency_name.value);
     return monedaEncontrada?.uuid;
   }
 
@@ -257,15 +257,15 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
     this.modalTipoCambio.close();
   }
 
-/*   toggleFilter() {
-    this.showFilter = !this.showFilter;
-    if (!this.showFilter) {
-      this.filtros = {
-        currency_name: ''
-      };
-      this.obtenerTiposCambio();
-    }
-  } */
+  /*   toggleFilter() {
+      this.showFilter = !this.showFilter;
+      if (!this.showFilter) {
+        this.filtros = {
+          currency_name: ''
+        };
+        this.obtenerTiposCambio();
+      }
+    } */
 
   cambiarOrdenamiento(column: string) {
     if (this.ordenamiento[column] === 'asc') {

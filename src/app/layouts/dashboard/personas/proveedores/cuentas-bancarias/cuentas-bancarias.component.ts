@@ -51,7 +51,7 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtrosCuentasBancarias: any = {
-    supplier_uuid: ''
+    'supplier.uuid': { value: '', op: '=', contiene: false }
   };
   showFilterCuentasBancarias: boolean = false;
   ordenamiento: any = {
@@ -86,7 +86,7 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
     if (changes['proveedor'] && changes['proveedor'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
-      this.filtrosCuentasBancarias.supplier_uuid = this.proveedor.uuid;
+      this.filtrosCuentasBancarias['supplier.uuid'].value = this.proveedor.uuid;
       this.obtenerCuentasBancariasDeProveedor();
     }
   }
@@ -130,19 +130,7 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._cuentasBancariasService.editCuenta(this.cuentaForm.get('uuid')?.value, cuenta).subscribe({
             next: res => {
-              const index = this.cuentasBancarias.findIndex(p => p.uuid === (this.cuentaForm.get('uuid')?.value));
-              if (index !== -1) {
-                this.cuentasBancarias[index] = {
-                  ...this.cuentasBancarias[index],
-                  bank_uuid: this.cuentaForm.get('bank_uuid')?.value,
-                  account_type_uuid: this.cuentaForm.get('account_type_uuid')?.value,
-                  currency_uuid: this.cuentaForm.get('currency_uuid')?.value,
-                  account_number: this.cuentaForm.get('account_number')?.value,
-                  alias: this.cuentaForm.get('alias')?.value,
-                  cbu: this.cuentaForm.get('cbu')?.value,
-                };
-                this.cuentasBancarias = [...this.cuentasBancarias];
-              }
+              this.obtenerCuentasBancariasDeProveedor();
               this.cerrarModal();
               this._swalService.toastSuccess('top-right', res.message)
               this._tokenService.setToken(res.token);
@@ -234,10 +222,14 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilterCuentasBancarias = !this.showFilterCuentasBancarias;
     if (!this.showFilterCuentasBancarias) {
-      this.filtrosCuentasBancarias.account_number = '';
-      this.filtrosCuentasBancarias.alias = '';
-      this.filtrosCuentasBancarias.cbu = '';
+      delete this.filtrosCuentasBancarias.account_number;
+      delete this.filtrosCuentasBancarias.alias;
+      delete this.filtrosCuentasBancarias.cbu;
       this.obtenerCuentasBancariasDeProveedor();
+    } else {
+      this.filtrosCuentasBancarias.account_number = { value: '', op: 'LIKE', contiene: true }
+      this.filtrosCuentasBancarias.alias = { value: '', op: 'LIKE', contiene: true }
+      this.filtrosCuentasBancarias.cbu = { value: '', op: 'LIKE', contiene: true }
     }
   }
 

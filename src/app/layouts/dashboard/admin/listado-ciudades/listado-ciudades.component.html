@@ -56,14 +56,14 @@
                     <tr>
                         <td>
                             <input type="text" class="form-control campo-busqueda"
-                                [(ngModel)]="filtros.district_country_name" (input)="obtenerCiudades()" />
+                                [(ngModel)]="filtros['district.country.name'].value" (input)="obtenerCiudades()" />
                         </td>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.district_name"
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros['district.name'].value"
                                 (input)="obtenerCiudades()" />
                         </td>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
                                 (input)="obtenerCiudades()" />
                         </td>
                         <td></td>

@@ -29,6 +29,9 @@ export class IndexService {
   apiDetalleContactoPersona = '/contact_people';
   apiComprasClientes = '/transactions';
 
+  apiHumans = '/humans'
+  apiLegalEntities = '/legal_entities'
+
   constructor(private http: HttpClient) { }
 
   getParams(paramsObj: any, rol?: string): HttpParams {
@@ -54,7 +57,7 @@ export class IndexService {
           params = params.append(`filters[${index}][]`, key);
           params = params.append(`filters[${index}][]`, '=');
           params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
-        } else if (key === 'account_number') {
+        } else if (key === 'account_number' || key === 'document_number' || key === 'cuit') {
           params = params.append(`filters[${index}][]`, key);
           params = params.append(`filters[${index}][]`, 'LIKE');
           params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
@@ -79,14 +82,48 @@ export class IndexService {
     return params;
   }
 
+  getNewParams(paramsObj: any, rol?: string): HttpParams {
+    let params = new HttpParams();
+    // Paging 
+    paramsObj.paging && (params = params.append('paging', paramsObj.paging));
+    paramsObj.page && (params = params.append('page', paramsObj.page));
+    // para cada elemento de paramsObj.with, agregar un with[]
+    paramsObj.with.forEach((element: any) => {
+      params = params.append('with[]', element);
+    });
+    // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
+    Object.keys(paramsObj.order_by).forEach((key, index) => {
+      if (paramsObj.order_by[key] !== '') {
+        params = params.append(`order_by[${index}][]`, key);
+        params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+      }
+    });
+    // para cada elemento de paramsObj.filters, agregar un filters[]
+    Object.keys(paramsObj.filters).forEach((key, index) => {
+      if (paramsObj.filters[key] && paramsObj.filters[key].value !== '') {
+        params = params.append(`filters[${index}][]`, key);
+        params = params.append(`filters[${index}][]`, paramsObj.filters[key].op);
+        if (paramsObj.filters[key].contiene) {
+          params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key].value}%`);
+        } else {
+          params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
+        }
+      }
+    });
+    if (rol) {
+      params = params.append('actual_role', rol);
+    }
+    return params;
+  }
+
   getProvinciasWithParams(paramsObj: any): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params: this.getParams(paramsObj) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProvincias, { headers, params: this.getNewParams(paramsObj) });
   }
 
   getCiudadesWithParams(paramsObj: any): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params: this.getParams(paramsObj) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCiudades, { headers, params: this.getNewParams(paramsObj) });
   }
 
   getBancos(rol: string): Observable<AuthResponse> {
@@ -98,17 +135,17 @@ export class IndexService {
 
   getBancosWithParams(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getPaisesWithParams(paramsObj: any): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params: this.getParams(paramsObj) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params: this.getNewParams(paramsObj) });
   }
 
   getGenerosWithParam(paramsObj: any): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params: this.getParams(paramsObj) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiGeneros, { headers, params: this.getNewParams(paramsObj) });
   }
 
   getMonedas(rol: string): Observable<AuthResponse> {
@@ -120,27 +157,27 @@ export class IndexService {
 
   getMonedasWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMonedas, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getUbicacionesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiUbicaciones, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiUbicaciones, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getTiposCambioWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposDeCambio, { headers, params: this.getParams(paramsObj, rol) });
-  }
-
-  getCategoriasProductoWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCategoriasProducto, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposDeCambio, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getCuentasBancariasLadieWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCuentas, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCuentas, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getCategoriasProductoWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCategoriasProducto, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getTipoDeCuentas(rol: string): Observable<AuthResponse> {
@@ -150,7 +187,7 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiTipoDeCuentas, { headers, params });
   }
 
-  getProveedoresWithParam(rol: string): Observable<AuthResponse> {
+  getProveedores(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams();
     params = params.append('actual_role', rol)
@@ -164,7 +201,7 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProveedores, { headers, params: params });
   }
 
-  getClientesWithParam(rol: string): Observable<AuthResponse> {
+  getClientes(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams();
     params = params.append('actual_role', rol)
@@ -182,27 +219,40 @@ export class IndexService {
 
   getCuentasProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCuentasProveedor, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCuentasProveedor, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
 
   getComprasProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasProveedor, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasProveedor, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getDetalleContactosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDetalleContacto, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDetalleContacto, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getDetalleContactosPersonaWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDetalleContactoPersona, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDetalleContactoPersona, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getComprasClientesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasClientes, { headers, params: this.getParams(paramsObj, rol) });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasClientes, { headers, params: this.getNewParams(paramsObj, rol) });
   }
+
+  getHumansWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiHumans, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getLegalEntitiesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiLegalEntities, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+
+  
 }

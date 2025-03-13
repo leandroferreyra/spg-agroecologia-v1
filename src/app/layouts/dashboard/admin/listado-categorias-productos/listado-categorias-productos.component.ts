@@ -60,7 +60,7 @@ export class ListadoCategoriasProductosComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    name: '',
+    'name': { value: '', op: 'LIKE', contiene: true },
   };
   showFilter: boolean = false;
   ordenamiento: any = {
@@ -107,9 +107,9 @@ export class ListadoCategoriasProductosComponent implements OnInit, OnDestroy {
     if (categoria) {
       this.locationToGo = categoria;
       this.busqueda_global = false;
-      if (this.filtros.name) {
+      if (this.filtros.name.value) {
         // Si ingresa acá es porque entró desde "Mostrar sububicaciones" por lo que se borra el filtro nombre para traer todos los datos.
-        this.filtros.name = '';
+        this.filtros.name.value = '';
       }
     }
     // Inicializamos un objeto vacío para los parámetros
@@ -120,13 +120,16 @@ export class ListadoCategoriasProductosComponent implements OnInit, OnDestroy {
     params.order_by = this.ordenamiento;
 
     if (this.locationToGo) {
-      this.filtros.product_category_uuid = this.locationToGo.uuid;
+      this.filtros.product_category_uuid = {};
+      this.filtros.product_category_uuid.value = this.locationToGo.uuid;
+      this.filtros.product_category_uuid.op = '=';
+      this.filtros.product_category_uuid.contiene = false;
     } else {
-      this.filtros.productCategory_uuid = null;
+      this.filtros.product_category_uuid = null;
     }
     // Si filtra y es global eliminamos el uuid
-    if (this.filtros.name && this.busqueda_global) {
-      delete this.filtros.productCategory_uuid;
+    if (this.filtros.name.value && this.busqueda_global) {
+      delete this.filtros.product_category_uuid;
     }
     params.filters = this.filtros;
 
@@ -227,10 +230,11 @@ export class ListadoCategoriasProductosComponent implements OnInit, OnDestroy {
             next: res => {
               const index = this.categorias.findIndex(p => p.uuid === (this.categoriaForm.get('uuid')?.value));
               if (index !== -1) {
-                this.categorias[index] = { 
-                  ...this.categorias[index], 
+                this.categorias[index] = {
+                  ...this.categorias[index],
                   name: this.categoriaForm.get('nombre')?.value,
-                  abbreviation: this.categoriaForm.get('abreviatura')?.value };
+                  abbreviation: this.categoriaForm.get('abreviatura')?.value
+                };
                 this.categorias = [...this.categorias];
               }
               this.cerrarModal();
@@ -305,7 +309,7 @@ export class ListadoCategoriasProductosComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        name: '',
+        'name': { value: '', op: 'LIKE', contiene: true },
       };
       this.busqueda_global = false;
       if (this.breadcrumbs.length > 0) {

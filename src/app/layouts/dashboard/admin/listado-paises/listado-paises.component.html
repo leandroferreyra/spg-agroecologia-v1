@@ -44,7 +44,7 @@
                     @if (showFilter) {
                     <tr>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name"
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
                                 (input)="obtenerPaises()" />
                         </td>
                         <td></td>

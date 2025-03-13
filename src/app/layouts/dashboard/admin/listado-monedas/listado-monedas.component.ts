@@ -52,8 +52,8 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   // Orden y filtro
   showFilter: boolean = false;
   filtros: any = {
-    name: '',
-    symbol: ''
+    'name': { value: '', op: 'LIKE', contiene: true },
+    'symbol': { value: '', op: 'LIKE', contiene: true }
   };
   ordenamiento: any = {
     'name': 'asc',
@@ -274,8 +274,8 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        name: '',
-        symbol: ''
+        'name': { value: '', op: 'LIKE', contiene: true },
+        'symbol': { value: '', op: 'LIKE', contiene: true }
       };
       this.obtenerMonedas();
     }

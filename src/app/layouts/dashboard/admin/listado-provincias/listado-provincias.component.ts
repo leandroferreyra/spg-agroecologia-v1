@@ -60,8 +60,8 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   // Mantener el estado del filtro y orden
   showFilter: boolean = false;
   filtros: any = {
-    country_name: '',
-    name: ''
+    'name': { value: '', op: 'LIKE', contiene: true },
+    'country.name': { value: '', op: 'LIKE', contiene: true },
   };
   ordenamiento: any = {
     'country.name': 'asc',
@@ -296,8 +296,8 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        country_name: '',
-        name: ''
+        'name': { value: '', op: 'LIKE', contiene: true },
+        'country.name': { value: '', op: 'LIKE', contiene: true },
       };
       this.obtenerProvincias();
     }

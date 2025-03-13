@@ -51,7 +51,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    name: ''
+    'name': { value: '', op: 'LIKE' }
   };
   showFilter: boolean = false;
   ordenamiento: any = {
@@ -270,7 +270,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        name: ''
+        'name': { value: '', op: 'LIKE', contiene: true }
       };
       this.obtenerPaises();
     }

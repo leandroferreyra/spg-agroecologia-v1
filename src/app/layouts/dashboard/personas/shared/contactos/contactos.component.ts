@@ -51,7 +51,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtrosContactos: any = {
-    'person.uuid': ''
+    'person.uuid': { value: '', op: '=', contiene: false }
   };
   ordenamiento: any = {
 
@@ -85,7 +85,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     if (changes['persona'] && changes['persona'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
-      this.filtrosContactos['person.uuid'] = this.persona.person?.uuid;
+      this.filtrosContactos['person.uuid'].value = this.persona.person?.uuid;
       this.obtenerContactos();
     }
   }

@@ -78,16 +78,16 @@
                 <tr>
                     <td>
                         <input type="text" class="form-control campo-busqueda"
-                            [(ngModel)]="filtrosCuentasBancarias.account_number"
+                            [(ngModel)]="filtrosCuentasBancarias['account_number'].value"
                             (input)="obtenerCuentasBancariasDeProveedor()" />
                     </td>
                     <td>
                         <input type="text" class="form-control campo-busqueda"
-                            [(ngModel)]="filtrosCuentasBancarias.alias"
+                            [(ngModel)]="filtrosCuentasBancarias.alias.value"
                             (input)="obtenerCuentasBancariasDeProveedor()" />
                     </td>
                     <td>
-                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtrosCuentasBancarias.cbu"
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtrosCuentasBancarias.cbu.value"
                             (input)="obtenerCuentasBancariasDeProveedor()" />
                     </td>
                     <td></td>

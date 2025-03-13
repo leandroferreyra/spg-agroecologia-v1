@@ -58,15 +58,11 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
   // Orden y filtro
   showFilter: boolean = false;
   filtros: any = {
-    account_number: '',
-    alias: '',
-    cbu: ''
-    // name: '',
-    // symbol: ''
+    'account_number': { value: '', op: 'LIKE', contiene: true },
+    'alias': { value: '', op: 'LIKE', contiene: true },
+    'cbu': { value: '', op: 'LIKE', contiene: true }
   };
   ordenamiento: any = {
-    // name: 'asc',
-    // symbol: 'asc'
   };
 
   iconArrowUp = faArrowUp;
@@ -347,9 +343,9 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        account_number: '',
-        alias: '',
-        cbu: ''
+        'account_number': { value: '', op: 'LIKE', contiene: true },
+        'alias': { value: '', op: 'LIKE', contiene: true },
+        'cbu': { value: '', op: 'LIKE', contiene: true }
       };
       this.obtenerCuentas();
     }

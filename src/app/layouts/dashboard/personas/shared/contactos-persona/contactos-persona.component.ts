@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { timeStamp } from 'console';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
@@ -24,23 +26,20 @@ import Swal from 'sweetalert2';
   selector: 'app-contactos-persona',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
-    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent],
+    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, RouterOutlet],
   templateUrl: './contactos-persona.component.html',
   styleUrl: './contactos-persona.component.css'
 })
 export class ContactosPersonaComponent implements OnInit, OnDestroy {
 
-
   @Input() persona: any;
   @Input() rol!: string;
   contactos: any[] = [];
-  // monedas: any[] = [];
-  tiposDeDatoContacto: any[] = [];
-  // bancos: any[] = [];
+  personas: any[] = [];
 
   private subscription: Subscription = new Subscription();
 
-  // Orden, filtro y paginación para cuentas bancarias de proveedor
+  // Orden, filtro y paginación para personas de contacto de proveedor
   MAX_ITEMS_PER_PAGE = 10;
   currentPage = 1;
   last_page = 1;
@@ -48,13 +47,27 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   itemsInPage = this.itemsPerPage;
   pageSize: number = 0;
   total_rows: number = 0;
-
   filtrosContactos: any = {
-    'person.uuid': ''
+    'person.uuid': { value: '', op: '=', contiene: false }
   };
   ordenamiento: any = {
 
   };
+
+  // Orden, filtro y paginación para buscar personas de contacto de proveedor
+  showFilterPersonas: boolean = false;
+  MAX_ITEMS_PER_PAGE_buscar = 5;
+  currentPage_buscar = 1;
+  last_page_buscar = 1;
+  itemsPerPage_buscar = this.MAX_ITEMS_PER_PAGE_buscar;
+  itemsInPage_buscar = this.itemsPerPage_buscar;
+  pageSize_buscar: number = 0;
+  total_rows_buscar: number = 0;
+  filtrosContactos_buscar: any = {
+  };
+  ordenamiento_buscar: any = {
+  };
+
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalContacto') modalContacto!: NgxCustomModalComponent;
@@ -71,9 +84,12 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _contactoService: DatosContactoService, private _personaContactoService: DatosContactoPersonaService,
-    private _tokenService: TokenService, private _catalogoService: CatalogoService) {
+    private _tokenService: TokenService, private _catalogoService: CatalogoService, private _router: Router,
+    private route: ActivatedRoute) {
+
   }
   ngOnInit(): void {
+
   }
 
   ngOnDestroy(): void {
@@ -84,7 +100,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     if (changes['persona'] && changes['persona'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
-      this.filtrosContactos['person.uuid'] = this.persona.person?.uuid;
+      this.filtrosContactos['person.uuid'].value = this.persona.person?.uuid;
       this.obtenerContactos();
     }
   }
@@ -188,18 +204,30 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     }
   }
 
+  modificarPaginacionBusqueda(res: any) {
+    this.total_rows_buscar = res.meta.total;
+    this.last_page_buscar = res.meta.last_page;
+    if (this.personas.length <= this.itemsPerPage_buscar) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage_buscar = this.total_rows_buscar;
+      } else {
+        this.itemsInPage_buscar = this.currentPage_buscar * this.itemsPerPage_buscar;
+      }
+    }
+  }
+
 
   openModalContacto(type: string, dato?: any) {
     if (type === 'NEW') {
-      this.obtenerTiposDatoContacto();
       this.isEdicion = false;
-      this.tituloModal = 'Nuevo dato';
+      this.tituloModal = 'Nueva persona de contacto';
       this.contactoForm = new FormGroup({
-        // contact_detail_type_uuid: new FormControl(null, Validators.required),
+        tipoPersona: new FormControl('fisica', Validators.required),
         // person_uuid: new FormControl(this.persona.person?.uuid, Validators.required),
         // value: new FormControl(null, Validators.required),
         // details: new FormControl(null)
       });
+      this.obtenerPersonas();
     } else {
       this.isEdicion = true;
       this.tituloModal = 'Edición dato';
@@ -212,12 +240,64 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     }
     this.modalContacto.options = this.modalOptions;
     this.modalContacto.open();
+    this.onChanges();
+  }
+
+  onChanges() {
+    this.contactoForm.get('tipoPersona')!.valueChanges.subscribe(
+      (tipo: string) => {
+        console.log(tipo);
+        this.obtenerPersonas();
+      });
+  }
+
+  obtenerPersonas() {
+    this.spinner.show();
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = ["person"];
+    params.paging = this.itemsPerPage_buscar;
+    params.page = this.currentPage_buscar;
+    params.order_by = this.ordenamiento_buscar;
+    params.filters = this.filtrosContactos_buscar;
+
+    if (this.contactoForm.get('tipoPersona')?.value === 'fisica') {
+      this.subscription.add(
+        this._indexService.getHumansWithParam(params, this.rol).subscribe({
+          next: res => {
+            console.log(res);
+            this.personas = res.data;
+            this.modificarPaginacionBusqueda(res);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    } else {
+      this.subscription.add(
+        this._indexService.getLegalEntitiesWithParam(params, this.rol).subscribe({
+          next: res => {
+            console.log(res);
+            this.personas = res.data;
+            this.modificarPaginacionBusqueda(res);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
   }
 
   openSwalEliminar(dato: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el contacto ${this.getName(dato)} ?`,
+      text: `¿Desea eliminar el contacto ${this.showName(dato)} ?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -255,7 +335,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     )
   }
 
-  getName(dato: any) {
+  showName(dato: any) {
     if (dato.person?.human) {
       return dato.person?.human.firstname + ' ' + dato.person?.human.lastname
     } else if (dato.person?.legal_entity) {
@@ -265,28 +345,13 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-  obtenerTiposDatoContacto() {
-    this.subscription.add(
-      this._catalogoService.getTiposDetalleContacto(this.rol).subscribe({
-        next: res => {
-          this.tiposDeDatoContacto = res.data;
-        },
-        error: error => {
-          console.error(error);
-        }
-      })
-    )
-  }
-
-  showName(data: any) {
-    if (data.person?.human) {
-      return data.person?.human?.firstname + ' ' + data.person?.human?.lastname
-    } else {
-      return data.person?.legal_entity?.company_name
-    }
-  }
+  // showName(data: any) {
+  //   if (data.person?.human) {
+  //     return data.person?.human?.firstname + ' ' + data.person?.human?.lastname
+  //   } else {
+  //     return data.person?.legal_entity?.company_name
+  //   }
+  // }
 
   showCuit(data: any) {
     if (data.person?.human) {
@@ -295,4 +360,32 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       return data.person?.legal_entity?.cuit;
     }
   }
+
+  // Este es el de la búsqueda
+  getName(dato: any) {
+    if (this.contactoForm.get('tipoPersona')?.value === 'fisica') {
+      return dato.firstname + ' ' + dato.lastname
+    } else {
+      return dato.company_name;
+    }
+  }
+
+  agregarPersonaDeContacto(dato: any) {
+    console.log(dato);
+  }
+
+  agregarNuevaPersona() {
+
+  }
+
+  toggleFilter() {
+    this.showFilterPersonas = !this.showFilterPersonas;
+    if (!this.showFilterPersonas) {
+      this.filtrosContactos_buscar.name = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.document = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.cuit = { value: '', op: 'LIKE', contiene: true };
+      this.obtenerPersonas();
+    }
+  }
+
 }

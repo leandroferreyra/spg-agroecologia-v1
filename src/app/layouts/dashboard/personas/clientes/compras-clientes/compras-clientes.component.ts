@@ -51,8 +51,8 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtrosCompras: any = {
-    'transactionType.name': '',
-    'person.uuid': ''
+    'transactionType.name': { value: '', op: '=', contiene: false },
+    'person.uuid': { value: '', op: '=', contiene: false }
   };
   showFilterCompras: boolean = false;
   ordenamiento: any = {
@@ -91,8 +91,8 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     if (changes['cliente'] && changes['cliente'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las compras
-      this.filtrosCompras['transactionType.name'] = 'Venta';
-      this.filtrosCompras['person.uuid'] = this.cliente.person?.uuid;
+      this.filtrosCompras['transactionType.name'].value = 'Venta';
+      this.filtrosCompras['person.uuid'].value = this.cliente.person?.uuid;
       this.obtenerCompras();
     }
   }
@@ -250,11 +250,9 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilterCompras = !this.showFilterCompras;
     if (!this.showFilterCompras) {
-      this.filtrosCompras = {
-        account_number: '',
-        alias: '',
-        cbu: ''
-      };
+      this.filtrosCompras.account_number = { value: '', op: 'LIKE', contiene: true }
+      this.filtrosCompras.alias = { value: '', op: 'LIKE', contiene: true }
+      this.filtrosCompras.cbu = { value: '', op: 'LIKE', contiene: true }
       this.obtenerCompras();
     }
   }

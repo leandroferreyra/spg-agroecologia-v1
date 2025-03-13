@@ -53,7 +53,7 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    name: ''
+    'name': { value: '', op: 'LIKE', contiene: true },
   };
   showFilter: boolean = false;
   ordenamiento: any = {
@@ -98,38 +98,6 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.obtenerGeneros();
   }
-
-  // obtenerGenerosWithNameFilter(paging: number, filter: string) {
-  //   this.subscription.add(
-  //     this._catalogoService.getGenerosWithNameFilter(paging, filter).subscribe({
-  //       next: res => {
-  //         this.generos = res.data;
-  //         this.modificarPaginacion(res);
-  //         this.spinner.hide();
-  //       },
-  //       error: error => {
-  //         this.spinner.hide();
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
-
-  // obtenerGenerosWithOrder(paging: number, column: string, direction: string) {
-  //   this.subscription.add(
-  //     this._catalogoService.getGenerosWithOrder(paging, column, direction).subscribe({
-  //       next: res => {
-  //         this.generos = res.data;
-  //         this.modificarPaginacion(res);
-  //         this.spinner.hide();
-  //       },
-  //       error: error => {
-  //         this.spinner.hide();
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
 
   obtenerGeneros() {
     // Inicializamos un objeto vacío para los parámetros
@@ -251,7 +219,7 @@ export class ListadoGenerosComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        name: ''
+        'name': { value: '', op: 'LIKE', contiene: true },
       };
       this.obtenerGeneros();
     }

@@ -75,9 +75,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   busquedaPorNombreSimple: string = '';
   isSubmit = false;
 
-
-  // 
-
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
@@ -143,7 +140,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
     this.subscription.add(
-      this._indexService.getProveedoresWithParam(this.actual_role).subscribe({
+      this._indexService.getProveedores(this.actual_role).subscribe({
         next: res => {
           // console.log(res);
           this.proveedores = res.data;
@@ -730,7 +727,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   limpiarFiltros() {
-    this.showFilter = false;
+    // this.showFilter = false;
     this.filtros = {
       tipoPersona: 'todos'
     };

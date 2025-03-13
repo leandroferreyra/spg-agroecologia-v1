@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { DashboardComponent } from "./dashboard.component";
 import { RoleGuard } from "src/app/core/guards/roleGuard";
+import path from "path";
 
 
 export const DASHBOARD_ROUTES: Routes = [

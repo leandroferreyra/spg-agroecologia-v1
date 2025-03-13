@@ -68,15 +68,15 @@
                     @if (showFilter) {
                     <tr>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.account_number"
+                            <input type="text" class="form-control campo-busqueda"
+                                [(ngModel)]="filtros.account_number.value" (input)="obtenerCuentas()" />
+                        </td>
+                        <td>
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.alias.value"
                                 (input)="obtenerCuentas()" />
                         </td>
                         <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.alias"
-                                (input)="obtenerCuentas()" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.cbu"
+                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.cbu.value"
                                 (input)="obtenerCuentas()" />
                         </td>
                         <td></td>
