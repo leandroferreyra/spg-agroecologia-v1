@@ -90,7 +90,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     if (changes['proveedor'] && changes['proveedor'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las compras
-      this.filtrosCompras['transaction.person.uuid'].value = this.proveedor.uuid;
+      this.filtrosCompras['transaction.person.uuid'].value = this.proveedor.person.uuid;
       this.obtenerCompras();
     }
   }
