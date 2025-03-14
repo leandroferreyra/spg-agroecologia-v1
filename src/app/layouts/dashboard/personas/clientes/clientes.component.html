@@ -9,7 +9,7 @@
             <!-- PANEL IZQUIERDO -->
 
             <div class="flex h-full flex-col pb-16">
-               
+
                 <div class="flex items-center justify-between text-md mb-3">
                     <button type="button" class="hover:text-primary" (click)="openModalNuevoCliente()">
                         <icon-plus class="mx-auto mb-1" />
@@ -295,7 +295,8 @@
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'productos-adquiridos'">
-
+                        <app-productos-adquiridos [cliente]="selectedCliente" [rol]="actual_role">
+                        </app-productos-adquiridos>
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'productos-en-posesion'">

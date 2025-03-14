@@ -28,6 +28,7 @@ import { toggleAnimation } from 'src/app/shared/animations';
 import { ContactosComponent } from '../shared/contactos/contactos.component';
 import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos-persona.component';
 import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
+import { ProductosAdquiridosComponent } from './productos-adquiridos/productos-adquiridos.component';
 
 @Component({
   selector: 'app-clientes',
@@ -35,7 +36,7 @@ import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent, ContactosPersonaComponent,
-    IconSettingsComponent, IconPlusComponent
+    IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.css',

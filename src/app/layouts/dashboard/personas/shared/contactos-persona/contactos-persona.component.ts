@@ -10,6 +10,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { ContactoDTO } from 'src/app/core/models/request/contactoDTO';
+import { ContactoPersonaDTO } from 'src/app/core/models/request/contactoPersonaDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { DatosContactoService } from 'src/app/core/services/datosContactos.service';
 import { DatosContactoPersonaService } from 'src/app/core/services/datosContactosPersonas.service';
@@ -64,6 +65,11 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   pageSize_buscar: number = 0;
   total_rows_buscar: number = 0;
   filtrosContactos_buscar: any = {
+    'firstname': { value: '', op: 'LIKE', contiene: true },
+    'lastname': { value: '', op: 'LIKE', contiene: true },
+    'document_number': { value: '', op: 'LIKE', contiene: true },
+    'cuit': { value: '', op: 'LIKE', contiene: true },
+    'company_name': { value: '', op: 'LIKE', contiene: true }
   };
   ordenamiento_buscar: any = {
   };
@@ -179,7 +185,6 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       this._indexService.getDetalleContactosPersonaWithParam(params, this.rol).subscribe({
         next: res => {
           this.contactos = res.data;
-          console.log(this.contactos);
           this.modificarPaginacion(res);
           this.spinner.hide();
         },
@@ -246,7 +251,6 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   onChanges() {
     this.contactoForm.get('tipoPersona')!.valueChanges.subscribe(
       (tipo: string) => {
-        console.log(tipo);
         this.obtenerPersonas();
       });
   }
@@ -265,7 +269,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._indexService.getHumansWithParam(params, this.rol).subscribe({
           next: res => {
-            console.log(res);
+            // console.log(res);
             this.personas = res.data;
             this.modificarPaginacionBusqueda(res);
             this.spinner.hide();
@@ -280,7 +284,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._indexService.getLegalEntitiesWithParam(params, this.rol).subscribe({
           next: res => {
-            console.log(res);
+            // console.log(res);
             this.personas = res.data;
             this.modificarPaginacionBusqueda(res);
             this.spinner.hide();
@@ -361,17 +365,28 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Este es el de la búsqueda
-  getName(dato: any) {
-    if (this.contactoForm.get('tipoPersona')?.value === 'fisica') {
-      return dato.firstname + ' ' + dato.lastname
-    } else {
-      return dato.company_name;
-    }
-  }
-
   agregarPersonaDeContacto(dato: any) {
-    console.log(dato);
+    this.spinner.show();
+    let contactoPersonaDTO = new ContactoPersonaDTO();
+    contactoPersonaDTO.actual_role = this.rol;
+    contactoPersonaDTO.person_uuid = this.persona.person?.uuid;
+    contactoPersonaDTO['person->contact_uuid'] = dato.person.uuid;
+    console.log(contactoPersonaDTO);
+    this.subscription.add(
+      this._personaContactoService.saveContactoPersona(contactoPersonaDTO).subscribe({
+        next: res => {
+          this._tokenService.setToken(res.token);
+          this.cerrarModal();
+          this.obtenerContactos();
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    );
   }
 
   agregarNuevaPersona() {
@@ -381,8 +396,10 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   toggleFilter() {
     this.showFilterPersonas = !this.showFilterPersonas;
     if (!this.showFilterPersonas) {
-      this.filtrosContactos_buscar.name = { value: '', op: 'LIKE', contiene: true };
-      this.filtrosContactos_buscar.document = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.firstname = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.lastname = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.company_name = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.document_number = { value: '', op: 'LIKE', contiene: true };
       this.filtrosContactos_buscar.cuit = { value: '', op: 'LIKE', contiene: true };
       this.obtenerPersonas();
     }
