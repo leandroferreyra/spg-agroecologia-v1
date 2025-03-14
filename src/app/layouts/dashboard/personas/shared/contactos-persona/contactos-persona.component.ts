@@ -49,7 +49,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   pageSize: number = 0;
   total_rows: number = 0;
   filtrosContactos: any = {
-    'person.uuid': { value: '', op: '=', contiene: false }
+    'person_uuid': { value: '', op: '=', contiene: false }
   };
   ordenamiento: any = {
 
@@ -106,7 +106,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     if (changes['persona'] && changes['persona'].currentValue) {
       this.spinner.show();
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las cuentas
-      this.filtrosContactos['person.uuid'].value = this.persona.person?.uuid;
+      this.filtrosContactos['person_uuid'].value = this.persona.person?.uuid;
       this.obtenerContactos();
     }
   }
@@ -175,11 +175,13 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   obtenerContactos() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["person", "person.human", "person.legalEntity"];
+    params.with = ["person", "person.human", "person.legalEntity", "contact.human", "contact.legalEntity"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtrosContactos;
+
+    console.log(params);
 
     this.subscription.add(
       this._indexService.getDetalleContactosPersonaWithParam(params, this.rol).subscribe({
@@ -340,10 +342,10 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   }
 
   showName(dato: any) {
-    if (dato.person?.human) {
-      return dato.person?.human.firstname + ' ' + dato.person?.human.lastname
-    } else if (dato.person?.legal_entity) {
-      return dato.person?.legal_entity?.company_name
+    if (dato.contact?.human) {
+      return dato.contact?.human.firstname + ' ' + dato.contact?.human.lastname
+    } else if (dato.contact?.legal_entity) {
+      return dato.contact?.legal_entity?.company_name
     } else {
       return ' ';
     }
@@ -358,10 +360,10 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   // }
 
   showCuit(data: any) {
-    if (data.person?.human) {
-      return data.person?.human?.cuit;
+    if (data.contact?.human) {
+      return data.contact?.human?.cuit;
     } else {
-      return data.person?.legal_entity?.cuit;
+      return data.contact?.legal_entity?.cuit;
     }
   }
 
