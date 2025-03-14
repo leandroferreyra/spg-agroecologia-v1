@@ -17,57 +17,57 @@ export const DASHBOARD_ROUTES: Routes = [
             },
             {
                 path: 'bancos',
-                loadComponent: () => import('../dashboard/admin/listado-bancos/listado-bancos.component').then(m => m.ListadoBancosComponent),
+                loadComponent: () => import('./config/listado-bancos/listado-bancos.component').then(m => m.ListadoBancosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'paises',
-                loadComponent: () => import('../dashboard/admin/listado-paises/listado-paises.component').then(m => m.ListadoPaisesComponent),
+                loadComponent: () => import('./config/listado-paises/listado-paises.component').then(m => m.ListadoPaisesComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'provincias',
-                loadComponent: () => import('../dashboard/admin/listado-provincias/listado-provincias.component').then(m => m.ListadoProvinciasComponent),
+                loadComponent: () => import('./config/listado-provincias/listado-provincias.component').then(m => m.ListadoProvinciasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'ciudades',
-                loadComponent: () => import('../dashboard/admin/listado-ciudades/listado-ciudades.component').then(m => m.ListadoCiudadesComponent),
+                loadComponent: () => import('./config/listado-ciudades/listado-ciudades.component').then(m => m.ListadoCiudadesComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'generos',
-                loadComponent: () => import('../dashboard/admin/listado-generos/listado-generos.component').then(m => m.ListadoGenerosComponent),
+                loadComponent: () => import('./config/listado-generos/listado-generos.component').then(m => m.ListadoGenerosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'monedas',
-                loadComponent: () => import('../dashboard/admin/listado-monedas/listado-monedas.component').then(m => m.ListadoMonedasComponent),
+                loadComponent: () => import('./config/listado-monedas/listado-monedas.component').then(m => m.ListadoMonedasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'ubicaciones',
-                loadComponent: () => import('../dashboard/admin/listado-ubicaciones/listado-ubicaciones.component').then(m => m.ListadoUbicacionesComponent),
+                loadComponent: () => import('./config/listado-ubicaciones/listado-ubicaciones.component').then(m => m.ListadoUbicacionesComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'exchanges',
-                loadComponent: () => import('../dashboard/admin/listado-tipos-de-cambio/listado-tipos-de-cambio.component').then(m => m.ListadoTiposDeCambioComponent),
+                loadComponent: () => import('./config/listado-tipos-de-cambio/listado-tipos-de-cambio.component').then(m => m.ListadoTiposDeCambioComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'cuentas-bancarias',
-                loadComponent: () => import('../dashboard/admin/listado-cuentas-bancarias/listado-cuentas-bancarias.component').then(m => m.ListadoCuentasBancariasComponent),
+                loadComponent: () => import('./config/listado-cuentas-bancarias/listado-cuentas-bancarias.component').then(m => m.ListadoCuentasBancariasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'categorias-productos',
-                loadComponent: () => import('../dashboard/admin/listado-categorias-productos/listado-categorias-productos.component').then(m => m.ListadoCategoriasProductosComponent),
+                loadComponent: () => import('./config/listado-categorias-productos/listado-categorias-productos.component').then(m => m.ListadoCategoriasProductosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
                 path: 'usuarios',
-                loadComponent: () => import('./admin/listado-usuarios/listado-usuarios.component').then(m => m.ListadoUsuariosComponent),
+                loadComponent: () => import('./config/listado-usuarios/listado-usuarios.component').then(m => m.ListadoUsuariosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['SUPER_ADMIN', 'ADMIN'] }
             },
             {
