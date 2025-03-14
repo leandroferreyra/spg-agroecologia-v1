@@ -240,6 +240,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       this._indexService.getDetalleContactosPersonaWithParam(params, this.rol).subscribe({
         next: res => {
           this.contactos = res.data;
+          console.log(this.contactos);
           this.modificarPaginacion(res);
           this.spinner.hide();
         },
@@ -480,7 +481,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       firstname: new FormControl(null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
       document_type_uuid: new FormControl(null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
       document_number: new FormControl(null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
-      cuit: new FormControl(null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      cuit: new FormControl(null, [Validators.required]),
       gender_uuid: new FormControl(null, []),
       company_name: new FormControl(null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [] : [Validators.required])
     });
