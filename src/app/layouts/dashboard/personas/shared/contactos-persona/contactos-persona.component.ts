@@ -180,9 +180,6 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtrosContactos;
-
-    console.log(params);
-
     this.subscription.add(
       this._indexService.getDetalleContactosPersonaWithParam(params, this.rol).subscribe({
         next: res => {
