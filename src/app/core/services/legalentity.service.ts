@@ -5,24 +5,21 @@ import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { CiudadDTO } from '../models/request/ciudadDTO';
 import { HumanDTO } from '../models/request/humanDTO';
+import { LegalEntityDTO } from '../models/request/legalEntityDTO';
 
 @Injectable({
   providedIn: 'root'
 })
-export class HumanService {
+export class LegalEntityService {
 
-  private apiHuman = '/humans';
+  private apiLegalEntities = '/legal_entities';
 
   constructor(private http: HttpClient) { }
 
-  updateHuman(uuid: string, userUpdateDTO: any): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put<AuthResponse>(environment.baseUrl + this.apiHuman + '/' + uuid, JSON.stringify(userUpdateDTO), { headers });
-  }
 
-  saveHuman(humanDTO: HumanDTO) {
+  saveLegalEntity(legalEntityDTO: LegalEntityDTO) {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiHuman, JSON.stringify(humanDTO), { headers });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiLegalEntities, JSON.stringify(legalEntityDTO), { headers });
   }
 
 

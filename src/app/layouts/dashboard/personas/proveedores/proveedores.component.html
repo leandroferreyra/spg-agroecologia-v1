@@ -310,7 +310,8 @@
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'personas-de-contacto'">
-                        <app-contactos-persona [persona]="selectedProveedor" [rol]="actual_role">
+                        <app-contactos-persona [persona]="selectedProveedor" [rol]="actual_role" [generos]="generos"
+                            [paises]="paises" [documentos]="documentos">
                         </app-contactos-persona>
                     </div>
 
