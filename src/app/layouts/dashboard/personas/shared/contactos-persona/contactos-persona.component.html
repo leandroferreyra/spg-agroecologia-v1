@@ -47,7 +47,7 @@
                 @for(data of contactos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                 <tr>
                     <td class="whitespace-nowrap">{{ showName(data) }} </td>
-                    <td class="whitespace-nowrap">{{ data.person?.human?.document_number}} </td>
+                    <td class="whitespace-nowrap">{{ data.contact?.human?.document_number}} </td>
                     <td class="whitespace-nowrap">{{ showCuit(data) }} </td>
                     <td>
                         <div class="flex items-center">
