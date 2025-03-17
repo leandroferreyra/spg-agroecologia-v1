@@ -869,8 +869,12 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   agregarProveedorAFormulario(dato: any) {
-    this.inicializarNuevoFormularioProveedor(dato);
-    this.altaPersona = true; // Muestra formulario
+    if(!this.isProveedor(dato)) {
+      this.inicializarNuevoFormularioProveedor(dato);
+      this.altaPersona = true; // Muestra formulario
+    } else {
+      this.swalService.toastError('top-right', 'La persona ya es proveedor');
+    }
   }
 
   isProveedor(data: any) {

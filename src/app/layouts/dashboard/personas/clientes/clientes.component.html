@@ -28,7 +28,8 @@
                     <table class="table-hover">
                         <tbody>
                             @for(data of filtrarDatos() ; track data.uuid) {
-                            <tr style="cursor: pointer;">
+                            <tr style="cursor: pointer;"
+                                [ngClass]="{'bg-blue-200': selectedCliente?.uuid === data.uuid}">
                                 <td (click)="showDataCliente(data)">{{ getName(data) }}
                                 </td>
                                 <td>
@@ -93,6 +94,16 @@
             <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
                 <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                     Clientes
+                    @if (clientes.length > 0) {
+                    -
+                    <span class="badge badge-outline-dark">
+                        @if(isHuman){
+                        {{ selectedCliente.person?.human?.firstname }} {{ selectedCliente.person?.human?.lastname }}
+                        } @else {
+                        {{ selectedCliente.person?.legal_entity?.company_name }}
+                        }
+                    </span>
+                    }
                 </h5>
 
                 <div class="flex w-full items-center justify-between sm:w-auto">
@@ -315,181 +326,367 @@
 <div>
     <ngx-custom-modal #modalCliente class="modal-top extra-large-modal animate animate-fade-in">
         <ng-template #modalHeader>
-            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+            <div class="position-relative text-center w-100">
+                @if(altaPersona) {
+                <button class="btn btn-wd position-absolute start-0" id="back-button-with-border" (click)="volver()">
+                    <fa-icon [icon]="iconArrowLeft" style="color: #ada8a8"></fa-icon>
+                    Atrás
+                </button>
+                }
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
+            </div>
         </ng-template>
 
         <ng-template #modalBody>
-            <div class="container">
-                <div class="row justify-content-center">
+            <!-- <div class="container">
+                <div class="row justify-content-center"> -->
+            <form [formGroup]="tipoPersonaForm">
+                <div class="row mb-4">
+                    <div class="col-lg-12">
+                        <div class="text-center">
 
-                    <div class="col-md-12">
-                        <form [formGroup]="newClienteForm">
-                            <div class="row mb-4">
-                                <div class="col-lg-12">
-                                    <div class="text-center">
-
-                                        <div class="form-check form-check-inline">
-                                            <label class="inline-flex mr-3" for="personafisica">
-                                                <input class="form-radio" type="radio" name="tipoPersona"
-                                                    id="personafisica" value="fisica" formControlName="tipoPersona">
-                                                <span style="cursor: pointer;">Persona física</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <label class="inline-flex mr-3" for="personajuridica">
-                                                <input class="form-radio" type="radio" name="tipoPersona"
-                                                    id="personajuridica" value="juridica" formControlName="tipoPersona">
-                                                <span style="cursor: pointer;">Persona jurídica</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="form-check form-check-inline">
+                                <label class="inline-flex mr-3" for="personafisica">
+                                    <input class="form-radio" type="radio" name="tipoPersona" id="personafisica"
+                                        value="fisica" formControlName="tipoPersona">
+                                    <span style="cursor: pointer;">Persona física</span>
+                                </label>
                             </div>
-
-                            <div class="flex flex-col sm:flex-row">
-                                <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
-
-                                    <!-- FORMULARIO -->
-                                    @if (newClienteForm.controls['tipoPersona'].value === 'fisica') {
-                                    <!-- FISICA -->
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label>Nombre</label>
-                                        <input type="text" class="form-control" formControlName="nombre">
-                                    </div>
-
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['apellido'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label>Apellido</label>
-                                        <input type="text" class="form-control" formControlName="apellido">
-                                    </div>
-                                    <div>
-                                        <label for="tipoDocumento">Tipo documento</label>
-                                        <ng-select [items]="documentos" bindLabel="name" bindValue="uuid"
-                                            [selectOnTab]="true" formControlName="tipoDocumento"
-                                            [ngClass]="isSubmit ? newClienteForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
-                                        </ng-select>
-                                    </div>
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['documento'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label>Documento</label>
-                                        <input type="text" class="form-control" formControlName="documento">
-                                    </div>
-                                    <div>
-                                        <label for="genero">Género</label>
-                                        <ng-select [items]="generos" bindLabel="name" bindValue="uuid"
-                                            formControlName="genero" [selectOnTab]="true"
-                                            [ngClass]="isSubmit ? newClienteForm.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
-                                        </ng-select>
-                                    </div>
-                                    }@else {
-                                    <!-- JURIDICA -->
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['razon'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label>Razón</label>
-                                        <input type="text" class="form-control" formControlName="razon">
-                                    </div>
-                                    }
-                                    <!-- DATOS COMUNES  -->
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['cuit'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label>Cuit</label>
-                                        <input type="text" class="form-control" formControlName="cuit">
-                                    </div>
-                                    <div>
-                                        <label for="condicion">Condición</label>
-                                        <ng-select [items]="condicionesIva" bindLabel="name" bindValue="uuid"
-                                            formControlName="condicion" [virtualScroll]="true" [selectOnTab]="true"
-                                            [ngClass]="isSubmit ? newClienteForm.controls['condicion'].errors ? 'has-error' : 'has-success' : ''">
-                                        </ng-select>
-                                    </div>
-                                    <div>
-                                        <label for="estado">Estado</label>
-                                        <ng-select [items]="posiblesEstados" bindLabel="name" bindValue="uuid"
-                                            formControlName="estado" [virtualScroll]="true" [selectOnTab]="true"
-                                            clearAllText="Limpiar"
-                                            [ngClass]="isSubmit ? newClienteForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''">
-                                        </ng-select>
-                                    </div>
-
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label for="estadoComentario">Comentario sobre el estado</label>
-                                        <textarea class="form-control" id="estadoComentario"
-                                            formControlName="estadoComentario" rows="1"></textarea>
-                                    </div>
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['calle'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label>Calle</label>
-                                        <input type="text" class="form-control" formControlName="calle">
-                                    </div>
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['numero'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label>Número</label>
-                                        <input type="text" class="form-control" formControlName="numero">
-                                    </div>
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['detalleDireccion'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label for="detalleDireccion">Detalle de la dirección</label>
-                                        <textarea class="form-control" id="detalleDireccion"
-                                            formControlName="detalleDireccion" rows="1"></textarea>
-                                    </div>
-
-                                    <div>
-                                        <label for="pais">País</label>
-                                        <ng-select [items]="paises" bindLabel="name" bindValue="uuid"
-                                            formControlName="pais" [virtualScroll]="true" [selectOnTab]="true"
-                                            [ngClass]="isSubmit ? newClienteForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
-                                        </ng-select>
-                                    </div>
-
-                                    <div>
-                                        <label for="provincia">Provincia</label>
-                                        <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
-                                            formControlName="provincia" [selectOnTab]="true"
-                                            [ngClass]="isSubmit ? newClienteForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
-                                        </ng-select>
-                                    </div>
-
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label for="ciudad">Ciudad</label>
-                                        <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid"
-                                            formControlName="ciudad" [virtualScroll]="true" [selectOnTab]="true"
-                                            [ngClass]="isSubmit ? newClienteForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
-                                        </ng-select>
-                                    </div>
-
-                                    <div
-                                        [ngClass]="isSubmit ? newClienteForm.controls['comentarios'].errors ? 'has-error' : 'has-success' : ''">
-                                        <label for="comentarios">Comentarios</label>
-                                        <textarea class="form-control" id="comentarios" formControlName="comentarios"
-                                            rows="1"></textarea>
-
-                                    </div>
-                                    <div>
-                                        <label for="percepcionIVA">IVA (%)</label>
-                                        <input id="percepcionIVA" type="text" placeholder="" class="form-control"
-                                            formControlName="percepcionIVA" />
-                                    </div>
-
-                                </div>
+                            <div class="form-check form-check-inline">
+                                <label class="inline-flex mr-3" for="personajuridica">
+                                    <input class="form-radio" type="radio" name="tipoPersona" id="personajuridica"
+                                        value="juridica" formControlName="tipoPersona">
+                                    <span style="cursor: pointer;">Persona jurídica</span>
+                                </label>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
 
-                            <div class="row mt-3">
-                                <div class="col-12 d-flex justify-content-center">
-                                    <button type="button" class="btn btn-wd btn-primary mr-4"
-                                        (click)="confirmarNuevoCliente()">Confirmar</button>
-                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
-                                        (click)="cerrarModal()">Cancelar</button>
+
+            @if (!altaPersona) {
+            <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between">
+                <!-- Botón Agregar Cuenta Bancaria -->
+                <button type="button" ngxTippy="Agregar nuevo cliente" (click)="altaNuevoCliente();">
+                    <icon-plus />
+                </button>
+
+                <!-- Contenedor del Switch -->
+                <div class="flex items-center gap-2">
+                    <span>Filtros de búsqueda</span>
+                    <label class="w-12 h-6 relative">
+                        <input type="checkbox"
+                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                            id="custom_switch_checkbox2" (change)="toggleFilter()" />
+                        <span for="custom_switch_checkbox2"
+                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <!-- TABLA  BÚSQUEDA -->
+            <div class="row mb-2">
+                <div class="col-6">
+                    <span *ngIf="personas && personas.length > 0" class="float-md-start color-gris">
+                        Página: {{ currentPage_buscar}}/{{numPages.pageCount }}
+                    </span>
+                </div>
+                <div class="col-6" style="text-align: right;">
+                    <span *ngIf="personas && personas.length > 0" class="float-md-end color-gris">
+                        Ítems: {{itemsInPage_buscar}}/{{ total_rows_buscar }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-hover">
+                    <thead>
+                        <tr>
+                            @if (tipoPersonaForm.controls['tipoPersona'].value === 'fisica') {
+                            <th style="cursor: pointer;">
+                                <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                    Nombre
+                                </span>
+                            </th>
+                            <th style="cursor: pointer;">
+                                <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                    Apellido
+                                </span>
+                            </th>
+                            <th style="cursor: pointer;">
+                                <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                    Documento
+                                </span>
+                            </th>
+                            } @else {
+                            <th style="cursor: pointer;">
+                                <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                    Razón social
+                                </span>
+                            </th>
+                            }
+                            <th style="cursor: pointer;">
+                                <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                    Cuit
+                                </span>
+                            </th>
+                            <th style="cursor: pointer;">
+                                <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                    Es proveedor
+                                </span>
+                            </th>
+                            <th style="cursor: pointer;">
+                                <span style="display: inline-flex; align-items: center; gap: 10px;">
+                                    Es cliente
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (showFilterPersonas) {
+                        <tr>
+                            @if (tipoPersonaForm.controls['tipoPersona'].value === 'fisica') {
+
+                            <td>
+                                <input type="text" class="form-control campo-busqueda"
+                                    [(ngModel)]="filtrosContactos_buscar.firstname.value" (input)="obtenerPersonas()" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control campo-busqueda"
+                                    [(ngModel)]="filtrosContactos_buscar.lastname.value" (input)="obtenerPersonas()" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control campo-busqueda"
+                                    [(ngModel)]="filtrosContactos_buscar.document_number.value"
+                                    (input)="obtenerPersonas()" />
+                            </td>
+                            }@else {
+                            <td>
+                                <input type="text" class="form-control campo-busqueda"
+                                    [(ngModel)]="filtrosContactos_buscar.company_name.value"
+                                    (input)="obtenerPersonas()" />
+                            </td>
+                            }
+                            <td>
+                                <input type="text" class="form-control campo-busqueda"
+                                    [(ngModel)]="filtrosContactos_buscar.cuit.value" (input)="obtenerPersonas()" />
+                            </td>
+                            <!-- <td></td>
+                                <td></td>
+                                <td></td> -->
+                        </tr>
+                        }
+                        @for(data of (personas | slice: 0:itemsPerPage_buscar) ; track data.uuid) {
+                        <tr (click)="agregarClienteAFormulario(data)" style="cursor: pointer;">
+                            @if(tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
+                            <td class="whitespace-nowrap">{{ data.firstname }} </td>
+                            <td class="whitespace-nowrap">{{ data.lastname }} </td>
+                            <td class="whitespace-nowrap">{{ data.document_number }}</td>
+                            }@else {
+                            <td class="whitespace-nowrap">{{ data.company_name }} </td>
+                            }
+                            <td class="whitespace-nowrap">{{ data.cuit }} </td>
+                            <td class="whitespace-nowrap">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label flex items-center gap-2">
+                                        <input class="form-checkbox" type="checkbox" [checked]="isProveedor(data)">
+                                        <span class="form-check-sign"></span>
+                                    </label>
                                 </div>
-                            </div>
+                            </td>
+                            <td class="whitespace-nowrap">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label flex items-center gap-2">
+                                        <input class="form-checkbox" type="checkbox" [checked]="isCliente(data)">
+                                        <span class="form-check-sign"></span>
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
 
-                        </form>
+                <div class="row mt-2 mb-2">
+                    <div class="col">
+                        <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows_buscar"
+                            [pageSize]="itemsPerPage_buscar" [(page)]="currentPage_buscar" [maxSize]="2" [rotate]="true"
+                            #numPages [boundaryLinks]="true" (pageChange)="obtenerPersonas()" />
+                    </div>
+
+                    <div class="col">
+                        <div class="row align-items-center float-md-end">
+                            <div class="col-auto">
+                                <label for="paginacion">Ítems por página:</label>
+                            </div>
+                            <div class="col-auto">
+                                <select id="paginacion" class="form-control" (change)="obtenerPersonas()"
+                                    [(ngModel)]="itemsPerPage_buscar">
+                                    <option value=5>5</option>
+                                    <option value=10>10</option>
+                                    <option value=20>20</option>
+                                    <option value=50>50</option>
+                                    <option value=100>100</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
             </div>
+
+            } @else {
+            <div class="col-md-12">
+                <form [formGroup]="newClienteForm">
+                    <div class="flex flex-col sm:flex-row">
+                        <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+
+                            <!-- FORMULARIO -->
+                            @if (tipoPersonaForm.controls['tipoPersona'].value === 'fisica') {
+                            <!-- FISICA -->
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control" formControlName="nombre">
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['apellido'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Apellido</label>
+                                <input type="text" class="form-control" formControlName="apellido">
+                            </div>
+                            <div>
+                                <label for="tipoDocumento">Tipo documento</label>
+                                <ng-select [items]="documentos" bindLabel="name" bindValue="uuid" [selectOnTab]="true"
+                                    formControlName="tipoDocumento"
+                                    [ngClass]="isSubmit ? newClienteForm.controls['tipoDocumento'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['documento'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Documento</label>
+                                <input type="text" class="form-control" formControlName="documento">
+                            </div>
+                            <div>
+                                <label for="genero">Género</label>
+                                <ng-select [items]="generos" bindLabel="name" bindValue="uuid" formControlName="genero"
+                                    [selectOnTab]="true"
+                                    [ngClass]="isSubmit ? newClienteForm.controls['genero'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+                            }@else {
+                            <!-- JURIDICA -->
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['razon'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Razón</label>
+                                <input type="text" class="form-control" formControlName="razon">
+                            </div>
+                            }
+                            <!-- DATOS COMUNES  -->
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['cuit'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Cuit</label>
+                                <input type="text" class="form-control" formControlName="cuit">
+                            </div>
+                            <div>
+                                <label for="condicion">Condición</label>
+                                <ng-select [items]="condicionesIva" bindLabel="name" bindValue="uuid"
+                                    formControlName="condicion" [virtualScroll]="true" [selectOnTab]="true"
+                                    [ngClass]="isSubmit ? newClienteForm.controls['condicion'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+                            <div>
+                                <label for="estado">Estado</label>
+                                <ng-select [items]="posiblesEstados" bindLabel="name" bindValue="uuid"
+                                    formControlName="estado" [virtualScroll]="true" [selectOnTab]="true"
+                                    clearAllText="Limpiar"
+                                    [ngClass]="isSubmit ? newClienteForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="estadoComentario">Comentario sobre el estado</label>
+                                <textarea class="form-control" id="estadoComentario" formControlName="estadoComentario"
+                                    rows="1"></textarea>
+                            </div>
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['calle'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Calle</label>
+                                <input type="text" class="form-control" formControlName="calle">
+                            </div>
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['numero'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Número</label>
+                                <input type="text" class="form-control" formControlName="numero">
+                            </div>
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['detalleDireccion'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="detalleDireccion">Detalle de la dirección</label>
+                                <textarea class="form-control" id="detalleDireccion" formControlName="detalleDireccion"
+                                    rows="1"></textarea>
+                            </div>
+
+                            <div>
+                                <label for="pais">País</label>
+                                <ng-select [items]="paises" bindLabel="name" bindValue="uuid" formControlName="pais"
+                                    [virtualScroll]="true" [selectOnTab]="true"
+                                    [ngClass]="isSubmit ? newClienteForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div>
+                                <label for="provincia">Provincia</label>
+                                <ng-select [items]="provincias" bindLabel="name" bindValue="uuid"
+                                    formControlName="provincia" [selectOnTab]="true"
+                                    [ngClass]="isSubmit ? newClienteForm.controls['provincia'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="ciudad">Ciudad</label>
+                                <ng-select [items]="ciudades" bindLabel="name" bindValue="uuid" formControlName="ciudad"
+                                    [virtualScroll]="true" [selectOnTab]="true"
+                                    [ngClass]="isSubmit ? newClienteForm.controls['ciudad'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? newClienteForm.controls['comentarios'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="comentarios">Comentarios</label>
+                                <textarea class="form-control" id="comentarios" formControlName="comentarios"
+                                    rows="1"></textarea>
+
+                            </div>
+                            <div>
+                                <label for="percepcionIVA">IVA (%)</label>
+                                <input id="percepcionIVA" type="text" placeholder="" class="form-control"
+                                    formControlName="percepcionIVA" />
+                            </div>
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            }
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    @if(altaPersona){
+                    <button class="btn btn-primary mr-3" (click)="confirmarNuevoCliente()">
+                        Confirmar
+                    </button>
+                    }
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cerrarModal()">Cancelar</button>
+                </div>
+            </div>
+
+            <!-- </div>
+            </div> -->
         </ng-template>
     </ngx-custom-modal>
 </div>

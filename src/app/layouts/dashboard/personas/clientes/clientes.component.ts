@@ -29,6 +29,9 @@ import { ContactosComponent } from '../shared/contactos/contactos.component';
 import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos-persona.component';
 import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
 import { ProductosAdquiridosComponent } from './productos-adquiridos/productos-adquiridos.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-clientes',
@@ -36,7 +39,7 @@ import { ProductosAdquiridosComponent } from './productos-adquiridos/productos-a
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent, ContactosPersonaComponent,
-    IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent
+    IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent, FontAwesomeModule, NgbPaginationModule
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.css',
@@ -94,6 +97,32 @@ export class ClientesComponent implements OnInit, OnDestroy {
   documentos: any[] = [];
   posiblesEstados: any[] = [];
   condicionesIva: any[] = [];
+  personas: any[] = [];
+
+  altaPersona: boolean = false;
+  tipoPersonaForm!: FormGroup;
+
+  // Orden, filtro y paginación para buscar personas
+  showFilterPersonas: boolean = false;
+  MAX_ITEMS_PER_PAGE_buscar = 5;
+  currentPage_buscar = 1;
+  last_page_buscar = 1;
+  itemsPerPage_buscar = this.MAX_ITEMS_PER_PAGE_buscar;
+  itemsInPage_buscar = this.itemsPerPage_buscar;
+  pageSize_buscar: number = 0;
+  total_rows_buscar: number = 0;
+  filtrosContactos_buscar: any = {
+    'firstname': { value: '', op: 'LIKE', contiene: true },
+    'lastname': { value: '', op: 'LIKE', contiene: true },
+    'document_number': { value: '', op: 'LIKE', contiene: true },
+    'cuit': { value: '', op: 'LIKE', contiene: true },
+    'company_name': { value: '', op: 'LIKE', contiene: true }
+  };
+  ordenamiento_buscar: any = {
+  };
+
+  iconArrowLeft = faArrowLeft;
+
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _clienteService: ClientesService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -516,30 +545,43 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   openModalNuevoCliente() {
     this.tituloModal = 'Nuevo cliente';
-    this.inicializarNuevoFormularioCliente();
+    this.tipoPersonaForm = new FormGroup({
+      tipoPersona: new FormControl('fisica', Validators.required),
+    });
+    this.obtenerPersonas();
+    this.onChangePersona();
     this.modalCliente.options = this.modalOptions;
     this.modalCliente.open();
   }
+  onChangePersona() {
+    this.tipoPersonaForm.get('tipoPersona')!.valueChanges.subscribe(
+      (tipo: string) => {
+        this.obtenerPersonas();
+        if (this.newClienteForm) {
+          this.modificarValidacionesNuevoCliente(tipo);
+        }
+      });
+  }
 
-  inicializarNuevoFormularioCliente() {
+
+  inicializarNuevoFormularioCliente(dato?: any) {
     this.newClienteForm = new FormGroup({
-      tipoPersona: new FormControl('fisica', [Validators.required]),
-      nombre: new FormControl(null, [Validators.required]),
-      apellido: new FormControl(null, [Validators.required]),
-      tipoDocumento: new FormControl(null, [Validators.required]),
-      documento: new FormControl(null, [Validators.required]),
-      cuit: new FormControl(null, []),
-      genero: new FormControl(null, [Validators.required]),
-      razon: new FormControl(null, []),
-      estado: new FormControl(null, [Validators.required]),
-      estadoComentario: new FormControl(null, [Validators.required]),
-      calle: new FormControl(null, []),
-      numero: new FormControl(null, []),
-      detalleDireccion: new FormControl(null, []),
+      nombre: new FormControl(dato ? dato.firstname : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      apellido: new FormControl(dato ? dato.lastname : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      tipoDocumento: new FormControl(dato ? dato.document_type?.uuid : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      documento: new FormControl(dato ? dato.document_number : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      cuit: new FormControl(dato ? dato.cuit : null, []),
+      genero: new FormControl(dato ? dato.gender?.uuid : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      razon: new FormControl(dato ? dato.company_name : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [] : [Validators.required]),
+      estado: new FormControl(dato ? dato.person?.current_state?.state?.uuid : null, [Validators.required]),
+      estadoComentario: new FormControl(dato ? dato.person?.current_state?.comments : null, []),
+      calle: new FormControl(dato ? dato.person?.street_name : null, []),
+      numero: new FormControl(dato ? dato.person?.door_number : null, []),
+      detalleDireccion: new FormControl(dato ? dato.person?.address_detail : null, []),
       comentarios: new FormControl(null, []),
-      pais: new FormControl(null, []),
-      provincia: new FormControl(null, []),
-      ciudad: new FormControl(null, []),
+      pais: new FormControl(dato ? dato.person?.city?.district?.country?.uuid : null, []),
+      provincia: new FormControl(dato ? dato.person?.city?.district?.uuid : null, []),
+      ciudad: new FormControl(dato ? dato.person?.city?.uuid : null, []),
       percepcionIVA: new FormControl(0, []),
       condicion: new FormControl(null, []),
     });
@@ -577,12 +619,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
             }
           });
         }
-      });
-
-
-    this.newClienteForm.get('tipoPersona')!.valueChanges.subscribe(
-      (tipo: string) => {
-        this.modificarValidacionesNuevoCliente(tipo);
       });
   }
 
@@ -705,14 +741,14 @@ export class ClientesComponent implements OnInit, OnDestroy {
   }
 
 
-  toggleFilter() {
-    this.showFilter = !this.showFilter;
-    if (!this.showFilter) {
-      this.filtros = {
-        tipoPersona: 'todos'
-      };
-    }
-  }
+  // toggleFilter() {
+  //   this.showFilter = !this.showFilter;
+  //   if (!this.showFilter) {
+  //     this.filtros = {
+  //       tipoPersona: 'todos'
+  //     };
+  //   }
+  // }
 
   cleanFilters() {
     this.filtros.nombre = '';
@@ -721,6 +757,102 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.filtros.cuit = '';
   }
 
+  obtenerPersonas() {
+    this.spinner.show();
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    if (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
+      params.with = ["person", "person.city", "person.city.district", "person.city.district.country", "person.personStates", "gender", "documentType", "person.supplier", "person.customer"];
+    } else {
+      params.with = ["person", "person.city", "person.city.district", "person.city.district.country", "person.personStates"];
+    }
+    params.paging = this.itemsPerPage_buscar;
+    params.page = this.currentPage_buscar;
+    params.order_by = this.ordenamiento_buscar;
+    params.filters = this.filtrosContactos_buscar;
 
+    if (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
+      this.subscription.add(
+        this._indexService.getHumansWithParam(params, this.actual_role).subscribe({
+          next: res => {
+            // console.log(res);
+            this.personas = res.data;
+            this.modificarPaginacionBusqueda(res);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    } else {
+      this.subscription.add(
+        this._indexService.getLegalEntitiesWithParam(params, this.actual_role).subscribe({
+          next: res => {
+            // console.log(res);
+            this.personas = res.data;
+            this.modificarPaginacionBusqueda(res);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
+  }
+
+  modificarPaginacionBusqueda(res: any) {
+    this.total_rows_buscar = res.meta.total;
+    this.last_page_buscar = res.meta.last_page;
+    if (this.personas.length <= this.itemsPerPage_buscar) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage_buscar = this.total_rows_buscar;
+      } else {
+        this.itemsInPage_buscar = this.currentPage_buscar * this.itemsPerPage_buscar;
+      }
+    }
+  }
+
+  altaNuevoCliente() {
+    this.altaPersona = true;
+    this.inicializarNuevoFormularioCliente();
+  }
+
+  toggleFilter() {
+    this.showFilterPersonas = !this.showFilterPersonas;
+    if (!this.showFilterPersonas) {
+      this.filtrosContactos_buscar.firstname = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.lastname = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.company_name = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.document_number = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.cuit = { value: '', op: 'LIKE', contiene: true };
+      this.obtenerPersonas();
+    }
+  }
+
+  agregarClienteAFormulario(dato: any) {
+    if(!this.isCliente(dato)) {
+      this.inicializarNuevoFormularioCliente(dato);
+      this.altaPersona = true; // Muestra formulario
+    } else {
+      this.swalService.toastError('top-right', 'La persona ya es cliente');
+    }
+  }
+
+  isProveedor(data: any) {
+    return data.person?.supplier ? true : false;
+  }
+
+  isCliente(data: any) {
+    return data.person?.customer ? true : false;
+  }
+
+  volver() {
+    this.altaPersona = false;
+    // this.contactoForm.reset();
+  }
 
 }
