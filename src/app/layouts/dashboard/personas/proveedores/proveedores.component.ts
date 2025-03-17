@@ -142,7 +142,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
     if (offcanvasElement) {
       offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
-        console.log('El offcanvas se ha cerrado');
+        // console.log('El offcanvas se ha cerrado');
         // Aquí puedes ejecutar cualquier acción adicional al cierre
       });
     }
@@ -165,7 +165,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProveedores(this.actual_role).subscribe({
         next: res => {
-          console.log(res);
+          // console.log(res);
           this.proveedores = res.data;
           this.proveedoresFiltrados = this.proveedores;
           if (!alta && this.proveedores.length > 0) {
@@ -689,7 +689,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDtoNuevoProveedor(proveedor);
-      console.log(proveedor);
+      // console.log(proveedor);
       this.subscription.add(
         this._proveedoresService.saveProveedor(proveedor).subscribe({
           next: res => {
@@ -869,7 +869,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   agregarProveedorAFormulario(dato: any) {
-    console.log(dato);
     this.inicializarNuevoFormularioProveedor(dato);
     this.altaPersona = true; // Muestra formulario
   }

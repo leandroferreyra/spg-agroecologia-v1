@@ -185,7 +185,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getComprasProveedorWithParam(params, this.rol).subscribe({
         next: res => {
-          console.log(res);
+          // console.log(res);
           this.compras = res.data;
           this.modificarPaginacion(res);
           this.spinner.hide();
@@ -256,7 +256,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   }
 
   openSwalEliminar(compra: any) {
-    console.log(compra);
+    // console.log(compra);
     Swal.fire({
       title: '',
       text: `¿Desea eliminar la compra ${compra.name}?`,

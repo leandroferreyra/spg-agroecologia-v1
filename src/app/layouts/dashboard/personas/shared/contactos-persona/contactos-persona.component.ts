@@ -22,6 +22,7 @@ import { IndexService } from 'src/app/core/services/index.service';
 import { LegalEntityService } from 'src/app/core/services/legalentity.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
@@ -33,7 +34,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
     NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, RouterOutlet,
-    FontAwesomeModule],
+    FontAwesomeModule, IconInfoCircleComponent],
   templateUrl: './contactos-persona.component.html',
   styleUrl: './contactos-persona.component.css'
 })
@@ -187,7 +188,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   }
 
   saveHuman(contacto: HumanDTO) {
-    console.log(contacto);
+    // console.log(contacto);
     this.subscription.add(
       this.humanService.saveHuman(contacto).subscribe({
         next: res => {
@@ -219,7 +220,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   }
 
   procesarRespuesta(res: any) {
-    console.log(res);
+    // console.log(res);
     this.cerrarModal();
     this._tokenService.setToken(res.token);
     // this.obtenerPersonas();
@@ -240,7 +241,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       this._indexService.getDetalleContactosPersonaWithParam(params, this.rol).subscribe({
         next: res => {
           this.contactos = res.data;
-          console.log(this.contactos);
+          // console.log(this.contactos);
           this.modificarPaginacion(res);
           this.spinner.hide();
         },
@@ -432,7 +433,6 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
     contactoPersonaDTO.actual_role = this.rol;
     contactoPersonaDTO.person_uuid = this.persona.person?.uuid;
     contactoPersonaDTO['person->contact_uuid'] = dato.person.uuid;
-    console.log(contactoPersonaDTO);
     this.subscription.add(
       this._personaContactoService.saveContactoPersona(contactoPersonaDTO).subscribe({
         next: res => {
@@ -537,6 +537,10 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
         }
       });
 
+  }
+
+  showDataContacto(data: any) {
+    console.log(data);
   }
 
 }
