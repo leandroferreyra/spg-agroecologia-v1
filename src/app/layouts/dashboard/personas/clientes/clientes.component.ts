@@ -372,6 +372,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
         this._clienteService.editCliente(this.selectedCliente.uuid, cliente).subscribe({
           next: res => {
             // console.log(res);
+            this.clientes = [...this.clientes.map(p =>
+              p.uuid === res.data.uuid ? res.data : p
+            )];
+            this.clientesFiltrados = this.clientes;
             this.inicializarForm(res.data);
             this.isEdicion = false;
             this.swalService.toastSuccess('top-right', "Usuario actualizado.");
