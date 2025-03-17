@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowUp, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
-import { error } from 'console';
 import { MenuModule } from 'headlessui-angular';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
@@ -32,6 +31,7 @@ import { ComprasProveedorComponent } from './compras-proveedor/compras-proveedor
 import { ContactosComponent } from '../shared/contactos/contactos.component';
 import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos-persona.component';
 import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
+import { NgbPagination, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-proveedores',
@@ -39,7 +39,7 @@ import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent
+    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule
   ],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.css',
@@ -77,6 +77,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
+  iconArrowLeft = faArrowLeft;
 
 
   tab1: string = 'Datos-generales';
@@ -95,10 +96,32 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   provincias: any[] = [];
   ciudades: any[] = [];
   generos: any[] = [];
-  documentos: any[] = [];
   posiblesEstados: any[] = [];
-
+  documentos: any[] = [];
+  personas: any[] = [];
   cuentasBancarias: any[] = [];
+
+  altaPersona: boolean = false;
+  tipoPersonaForm!: FormGroup;
+
+  // Orden, filtro y paginación para buscar personas
+  showFilterPersonas: boolean = false;
+  MAX_ITEMS_PER_PAGE_buscar = 5;
+  currentPage_buscar = 1;
+  last_page_buscar = 1;
+  itemsPerPage_buscar = this.MAX_ITEMS_PER_PAGE_buscar;
+  itemsInPage_buscar = this.itemsPerPage_buscar;
+  pageSize_buscar: number = 0;
+  total_rows_buscar: number = 0;
+  filtrosContactos_buscar: any = {
+    'firstname': { value: '', op: 'LIKE', contiene: true },
+    'lastname': { value: '', op: 'LIKE', contiene: true },
+    'document_number': { value: '', op: 'LIKE', contiene: true },
+    'cuit': { value: '', op: 'LIKE', contiene: true },
+    'company_name': { value: '', op: 'LIKE', contiene: true }
+  };
+  ordenamiento_buscar: any = {
+  };
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -142,7 +165,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProveedores(this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
+          console.log(res);
           this.proveedores = res.data;
           this.proveedoresFiltrados = this.proveedores;
           if (!alta && this.proveedores.length > 0) {
@@ -349,6 +372,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
         this._proveedoresService.editProveedor(this.selectedProveedor.uuid, proveedor).subscribe({
           next: res => {
             // console.log(res);
+            this.proveedores = [...this.proveedores.map(p =>
+              p.uuid === res.data.uuid ? res.data : p
+            )];
+            this.proveedoresFiltrados = this.proveedores;
             this.inicializarForm(res.data);
             this.isEdicion = false;
             this.swalService.toastSuccess('top-right', "Usuario actualizado.");
@@ -526,42 +553,58 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   cerrarModal() {
     this.isSubmit = false;
+    this.altaPersona = false;
     this.modalProveedor.close();
   }
 
   openModalNuevoProveedor() {
     this.tituloModal = 'Nuevo proveedor';
-    this.inicializarNuevoFormularioProveedor();
+    this.tipoPersonaForm = new FormGroup({
+      tipoPersona: new FormControl('fisica', Validators.required),
+    });
+    this.obtenerPersonas();
+    this.onChangePersona();
     this.modalProveedor.options = this.modalOptions;
     this.modalProveedor.open();
   }
 
-  inicializarNuevoFormularioProveedor() {
+  onChangePersona() {
+    this.tipoPersonaForm.get('tipoPersona')!.valueChanges.subscribe(
+      (tipo: string) => {
+        this.obtenerPersonas();
+        if (this.newProveedorForm) {
+          this.modificarValidacionesNuevoProveedor(tipo);
+        }
+      });
+  }
+
+  inicializarNuevoFormularioProveedor(dato?: any) {
     this.newProveedorForm = new FormGroup({
-      tipoPersona: new FormControl('fisica', [Validators.required]),
-      nombre: new FormControl(null, [Validators.required]),
-      apellido: new FormControl(null, [Validators.required]),
-      tipoDocumento: new FormControl(null, [Validators.required]),
-      documento: new FormControl(null, [Validators.required]),
-      cuit: new FormControl(null, []),
-      genero: new FormControl(null, [Validators.required]),
-      razon: new FormControl(null, []),
-      sigla: new FormControl(null, [Validators.required]),
-      estado: new FormControl(null, [Validators.required]),
-      estadoComentario: new FormControl(null, []),
-      calle: new FormControl(null, []),
-      numero: new FormControl(null, []),
-      detalleDireccion: new FormControl(null, []),
+      nombre: new FormControl(dato ? dato.firstname : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      apellido: new FormControl(dato ? dato.lastname : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      tipoDocumento: new FormControl(dato ? dato.document_type?.uuid : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      documento: new FormControl(dato ? dato.document_number : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      cuit: new FormControl(dato ? dato.cuit : null, []),
+      genero: new FormControl(dato ? dato.gender?.uuid : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
+      razon: new FormControl(dato ? dato.company_name : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [] : [Validators.required]),
+      sigla: new FormControl(null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [] : [Validators.required]),
+      estado: new FormControl(dato ? dato.person?.current_state?.state?.uuid : null, [Validators.required]),
+      estadoComentario: new FormControl(dato ? dato.person?.current_state?.comments : null, []),
+      calle: new FormControl(dato ? dato.person?.street_name : null, []),
+      numero: new FormControl(dato ? dato.person?.door_number : null, []),
+      detalleDireccion: new FormControl(dato ? dato.person?.address_detail : null, []),
       comentarios: new FormControl(null, []),
-      pais: new FormControl(null, []),
-      provincia: new FormControl(null, []),
-      ciudad: new FormControl(null, []),
+      pais: new FormControl(dato ? dato.person?.city?.district?.country?.uuid : null, []),
+      provincia: new FormControl(dato ? dato.person?.city?.district?.uuid : null, []),
+      ciudad: new FormControl(dato ? dato.person?.city?.uuid : null, []),
       percepcionRG3337: new FormControl(null, []),
       percepcionIIBB: new FormControl(null, []),
       percepcionIVA: new FormControl(0, []),
     });
-    this.provincias = [];
-    this.ciudades = [];
+    if (!dato) {
+      this.provincias = [];
+      this.ciudades = [];
+    }
     this.onChange();
   }
 
@@ -594,12 +637,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
             }
           });
         }
-      });
-
-
-    this.newProveedorForm.get('tipoPersona')!.valueChanges.subscribe(
-      (tipo: string) => {
-        this.modificarValidacionesNuevoProveedor(tipo);
       });
   }
 
@@ -652,7 +689,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDtoNuevoProveedor(proveedor);
-      // console.log(proveedor);
+      console.log(proveedor);
       this.subscription.add(
         this._proveedoresService.saveProveedor(proveedor).subscribe({
           next: res => {
@@ -687,7 +724,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     person.city_uuid = this.newProveedorForm.get('ciudad')?.value;
     person.possible_person_state_uuid = this.newProveedorForm.get('estado')?.value;
     person.state_comments = this.newProveedorForm.get('estadoComentario')?.value;
-    if (this.newProveedorForm.get('tipoPersona')?.value === 'fisica') {
+    if (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
       let human = new Human();
       human.firstname = this.newProveedorForm.get('nombre')?.value;
       human.lastname = this.newProveedorForm.get('apellido')?.value;
@@ -750,5 +787,99 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.filtros.cuit = '';
   }
 
+  volver() {
+    this.altaPersona = false;
+    // this.contactoForm.reset();
+  }
+
+  obtenerPersonas() {
+    this.spinner.show();
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    if (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
+      params.with = ["person", "person.city", "person.city.district", "person.city.district.country", "person.personStates", "gender", "documentType", "person.supplier", "person.customer"];
+    } else {
+      params.with = ["person", "person.city", "person.city.district", "person.city.district.country", "person.personStates"];
+    }
+    params.paging = this.itemsPerPage_buscar;
+    params.page = this.currentPage_buscar;
+    params.order_by = this.ordenamiento_buscar;
+    params.filters = this.filtrosContactos_buscar;
+
+    if (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
+      this.subscription.add(
+        this._indexService.getHumansWithParam(params, this.actual_role).subscribe({
+          next: res => {
+            // console.log(res);
+            this.personas = res.data;
+            this.modificarPaginacionBusqueda(res);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    } else {
+      this.subscription.add(
+        this._indexService.getLegalEntitiesWithParam(params, this.actual_role).subscribe({
+          next: res => {
+            // console.log(res);
+            this.personas = res.data;
+            this.modificarPaginacionBusqueda(res);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
+  }
+
+  modificarPaginacionBusqueda(res: any) {
+    this.total_rows_buscar = res.meta.total;
+    this.last_page_buscar = res.meta.last_page;
+    if (this.personas.length <= this.itemsPerPage_buscar) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage_buscar = this.total_rows_buscar;
+      } else {
+        this.itemsInPage_buscar = this.currentPage_buscar * this.itemsPerPage_buscar;
+      }
+    }
+  }
+
+  altaNuevoProveedor() {
+    this.altaPersona = true;
+    this.inicializarNuevoFormularioProveedor();
+  }
+
+  toggleFilter() {
+    this.showFilterPersonas = !this.showFilterPersonas;
+    if (!this.showFilterPersonas) {
+      this.filtrosContactos_buscar.firstname = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.lastname = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.company_name = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.document_number = { value: '', op: 'LIKE', contiene: true };
+      this.filtrosContactos_buscar.cuit = { value: '', op: 'LIKE', contiene: true };
+      this.obtenerPersonas();
+    }
+  }
+
+  agregarProveedorAFormulario(dato: any) {
+    console.log(dato);
+    this.inicializarNuevoFormularioProveedor(dato);
+    this.altaPersona = true; // Muestra formulario
+  }
+
+  isProveedor(data: any) {
+    return data.person?.supplier ? true : false;
+  }
+
+  isCliente(data: any) {
+    return data.person?.customer ? true : false;
+  }
 
 }

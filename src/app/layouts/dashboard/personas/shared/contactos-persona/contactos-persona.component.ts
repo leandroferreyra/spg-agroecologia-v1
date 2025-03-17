@@ -286,10 +286,11 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
         tipoPersona: new FormControl('fisica', Validators.required),
       });
       this.obtenerPersonas();
-    } else {
-      this.isEdicion = true;
-      this.tituloModal = 'Edición dato';
-    }
+    } 
+    // else {
+    //   this.isEdicion = true;
+    //   this.tituloModal = 'Edición dato';
+    // }
     this.modalContacto.options = this.modalOptions;
     this.modalContacto.open();
     this.onChanges();
