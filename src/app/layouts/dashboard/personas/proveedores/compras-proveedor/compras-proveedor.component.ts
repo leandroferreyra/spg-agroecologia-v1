@@ -181,7 +181,11 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   getTotal(data: any) {
     let total = 0;
     data.transaction.transaction_products.forEach((elem: any) => {
-      total += elem.unit_price * elem.quantity * (1 + elem.product.vat_percent)
+      total += elem.unit_price * elem.quantity * (1 + (+elem.product.vat_percent))
+      // console.log('precio unidad: ' + elem.unit_price);
+      // console.log('cantidad: ' + elem.quantity);
+      // console.log('vat: ' + (1 + (+elem.product.vat_percent)))
+      console.log(total);
     })
     total -= (+data.discount1) + (+data.discount2) + (+data.others);
     return total;
