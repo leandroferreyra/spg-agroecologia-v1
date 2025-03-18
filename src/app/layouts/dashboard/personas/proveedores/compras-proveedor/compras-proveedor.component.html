@@ -173,7 +173,7 @@
                             <td class="whitespace-nowrap">{{ data.product.code}} </td>
                             <td class="whitespace-nowrap">{{ data.product.name}} </td>
                             <td class="whitespace-nowrap"> {{ data.product.product_type.name}} </td>
-                            <td class="whitespace-nowrap"> {{ data.quantity }} </td>
+                            <td class="whitespace-nowrap"> {{ data.quantity | number:'1.0-0'}} </td>
                             <td class="whitespace-nowrap"> {{ data.unit_price }} </td>
                             <td class="whitespace-nowrap"> {{ data.unit_price * data.quantity }}</td>
                         </tr>
@@ -185,8 +185,9 @@
             <div class="row mt-4">
                 <div class="col">
                     <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                        [pageSize]="itemsPerPage_productos" [(page)]="currentPage_productos" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="onPageChange(currentPage_productos)" />
+                        [pageSize]="itemsPerPage_productos" [(page)]="currentPage_productos" [maxSize]="2"
+                        [rotate]="true" #numPages [boundaryLinks]="true"
+                        (pageChange)="onPageChange(currentPage_productos)" />
                 </div>
 
                 <div class="col">
