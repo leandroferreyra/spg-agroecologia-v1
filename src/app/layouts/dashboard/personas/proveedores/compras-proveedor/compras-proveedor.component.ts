@@ -39,9 +39,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   @Input() rol!: string;
   compras: any[] = [];
   productosView: any[] = [];
-  // monedas: any[] = [];
-  // tiposDeCuenta: any[] = [];
-  // bancos: any[] = [];
 
   private subscription: Subscription = new Subscription();
 
@@ -78,7 +75,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     closeOnEscape: false
   };
 
-  compraForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
@@ -86,6 +82,13 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
 
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
+
+  // Orden, filtro y paginación para productos de una compra en particular
+  MAX_ITEMS_PER_PAGE_productos = 10;
+  currentPage_productos = 1;
+  itemsPerPage_productos = this.MAX_ITEMS_PER_PAGE;
+  itemsInPage_productos = this.itemsPerPage;
+  pageSize_productos: number = 0;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _compraService: ComprasProveedorService, private _tokenService: TokenService) {
@@ -122,68 +125,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     this.modalCompra.close();
   }
 
-  confirmarCompra() {
-    this.isSubmit = true;
-    if (this.compraForm.valid) {
-      this.spinner.show();
-      let compra = new CompraProveedorDTO();
-      compra.bank_uuid = this.compraForm.get('bank_uuid')?.value;
-      compra.account_type_uuid = this.compraForm.get('account_type_uuid')?.value;
-      compra.currency_uuid = this.compraForm.get('currency_uuid')?.value;
-      compra.account_number = this.compraForm.get('account_number')?.value;
-      compra.cbu = this.compraForm.get('cbu')?.value;
-      compra.alias = this.compraForm.get('alias')?.value;
-      compra.actual_role = this.rol;
-      // compra.supplier_uuid = this.proveedor.uuid;
-      if (!this.isEdicion) {
-        this.subscription.add(
-          this._compraService.saveCompra(compra).subscribe({
-            next: res => {
-              this.obtenerCompras();
-              this.cerrarModal();
-              this._swalService.toastSuccess('top-right', res.message);
-              this._tokenService.setToken(res.token);
-              this.spinner.hide();
-            },
-            error: error => {
-              this._swalService.toastError('top-right', error.error.message);
-              console.error(error);
-              this.spinner.hide();
-            }
-          })
-        )
-      } else {
-        this.subscription.add(
-          this._compraService.editCompra(this.compraForm.get('uuid')?.value, compra).subscribe({
-            next: res => {
-              const index = this.compras.findIndex(p => p.uuid === (this.compraForm.get('uuid')?.value));
-              if (index !== -1) {
-                this.compras[index] = {
-                  ...this.compras[index],
-                  bank_uuid: this.compraForm.get('bank_uuid')?.value,
-                  account_type_uuid: this.compraForm.get('account_type_uuid')?.value,
-                  currency_uuid: this.compraForm.get('currency_uuid')?.value,
-                  account_number: this.compraForm.get('account_number')?.value,
-                  alias: this.compraForm.get('alias')?.value,
-                  cbu: this.compraForm.get('cbu')?.value,
-                };
-                this.compras = [...this.compras];
-              }
-              this.cerrarModal();
-              this._swalService.toastSuccess('top-right', res.message)
-              this._tokenService.setToken(res.token);
-              this.spinner.hide();
-            },
-            error: error => {
-              console.error(error);
-              this.spinner.hide();
-              this._swalService.toastError('top-right', error.error.message);
-            }
-          })
-        )
-      }
-    }
-  }
 
   obtenerCompras() {
     // Inicializamos un objeto vacío para los parámetros
@@ -227,40 +168,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     }
   }
 
-
-  openModalNuevaCompra(type: string, compra?: any) {
-    // this.obtenerBancos();
-    // this.obtenerTiposDeCuenta();
-    // this.obtenerMonedas();
-    if (type === 'NEW') {
-      this.isEdicion = false;
-      this.tituloModal = 'Nueva compra';
-      this.compraForm = new FormGroup({
-        bank_uuid: new FormControl(null, [Validators.required]),
-        account_type_uuid: new FormControl(null, [Validators.required]),
-        currency_uuid: new FormControl(null, [Validators.required]),
-        account_number: new FormControl(null, [Validators.required]),
-        cbu: new FormControl(null, []),
-        alias: new FormControl(null, []),
-      });
-    } else {
-      // console.log(moneda);
-      this.isEdicion = true;
-      this.tituloModal = 'Edición compra';
-      this.compraForm = new FormGroup({
-        uuid: new FormControl(compra?.uuid, []),
-        bank_uuid: new FormControl(compra?.bank?.uuid, [Validators.required]),
-        account_type_uuid: new FormControl(compra?.account_type?.uuid, [Validators.required]),
-        currency_uuid: new FormControl(compra?.currency?.uuid, [Validators.required]),
-        account_number: new FormControl(compra?.account_number, [Validators.required]),
-        cbu: new FormControl(compra?.cbu, []),
-        alias: new FormControl(compra?.alias, []),
-      });
-    }
-    this.modalCompra.options = this.modalOptions;
-    this.modalCompra.open();
-  }
-
   toggleFilter() {
     this.showFilterCompras = !this.showFilterCompras;
     if (!this.showFilterCompras) {
@@ -269,48 +176,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
       this.filtrosCompras.cbu = { value: '', op: 'LIKE', contiene: true }
       this.obtenerCompras();
     }
-  }
-
-  openSwalEliminar(compra: any) {
-    // console.log(compra);
-    Swal.fire({
-      title: '',
-      text: `¿Desea eliminar la compra ${compra.name}?`,
-      icon: 'info',
-      confirmButtonText: 'Confirmar',
-      showDenyButton: true,
-      denyButtonText: 'Cancelar',
-      didRender: () => {
-        const cancelButton = Swal.getDenyButton();
-        if (cancelButton) {
-          cancelButton.setAttribute('id', 'back-button-with-border');
-        }
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.eliminarCompra(compra);
-      } else if (result.isDenied) {
-
-      }
-    })
-  }
-
-  eliminarCompra(compra: any) {
-    this.spinner.show();
-    this.subscription.add(
-      this._compraService.deleteCompra(compra.uuid, this.rol.toUpperCase()).subscribe({
-        next: res => {
-          this.obtenerCompras();
-          this._tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          console.error(error);
-          this._swalService.toastError('top-right', error.error.message);
-          this.spinner.hide();
-        }
-      })
-    )
   }
 
   getTotal(data: any) {
@@ -324,7 +189,9 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
 
   verProductos(data: any) {
     this.productosView = data.transaction.transaction_products;
-    console.log(this.productosView);
+    if (this.productosView.length <= this.itemsPerPage_productos) {
+      this.itemsInPage_productos = this.productosView.length;
+    }
     this.modalProductos.options = this.modalOptionsProductos;
     this.modalProductos.open();
   }
@@ -332,4 +199,13 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   cerrarModalProductos() {
     this.modalProductos.close();
   }
+
+  public onPageChange(pageNum: number): void {
+    this.currentPage_productos = pageNum;
+    this.pageSize_productos = this.itemsPerPage_productos * (pageNum - 1);
+  }
+  cambiarPaginacion() {
+    this.onPageChange(1);
+  }
+
 }

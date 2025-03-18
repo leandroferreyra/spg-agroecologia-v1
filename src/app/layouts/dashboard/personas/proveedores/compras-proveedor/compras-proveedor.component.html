@@ -3,28 +3,6 @@
 
     <div class="panel mt-6 pb-0">
 
-        <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between">
-            <!-- Botón Agregar Cuenta Bancaria -->
-            <!-- <button type="button" ngxTippy="Agregar compra" (click)="openModalNuevaCompra('NEW')">
-                <icon-plus />
-            </button> -->
-
-            <!-- Contenedor del Switch -->
-            <!-- <div class="flex items-center gap-2">
-                <span>Filtros de búsqueda</span>
-                <label class="w-12 h-6 relative">
-                    <input type="checkbox"
-                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                        id="custom_switch_checkbox2" (change)="toggleFilter()" />
-                    <span for="custom_switch_checkbox2"
-                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                    </span>
-                </label>
-            </div> -->
-        </div>
-
-
-
         <div class="row mb-2">
             <div class="col-6">
                 <span *ngIf="compras && compras.length > 0" class="float-md-start color-gris">
@@ -114,11 +92,6 @@
                                         <icon-shopping-cart />
                                     </button>
                                 </div>
-                                <div>
-                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                        <icon-trash-lines />
-                                    </button>
-                                </div>
                             </div>
                         </td>
                     </tr>
@@ -160,84 +133,6 @@
     </div>
 </div>
 
-
-<div>
-    <ngx-custom-modal #modalCompra class="modal-top animate extra-large-modal animate-fade-in">
-        <ng-template #modalHeader>
-            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
-        </ng-template>
-
-        <ng-template #modalBody>
-            <div class="container">
-                <div class="row justify-content-center">
-
-                    <div class="col-md-12">
-                        <form [formGroup]="compraForm" (keydown.enter)="confirmarCompra()">
-
-                            <div class="mb-2"
-                                [ngClass]="isSubmit ? compraForm.controls['account_number'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>Fecha</label>
-                                <input type="text" class="form-control" formControlName="account_number">
-                            </div>
-
-                            <!-- <div class="mb-2"
-                                [ngClass]="isSubmit ? compraForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>Moneda</label>
-                                <ng-select [items]="monedas" bindLabel="name" bindValue="uuid"
-                                    formControlName="currency_uuid" [virtualScroll]="true" [appendTo]="'body'"
-                                    [ngClass]="isSubmit ? compraForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                </ng-select>
-                            </div> -->
-
-                            <!-- <div class="mb-2"
-                                [ngClass]="isSubmit ? compraForm.controls['bank_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>Banco</label>
-                                <ng-select [items]="bancos" bindLabel="name" bindValue="uuid"
-                                    formControlName="bank_uuid" [virtualScroll]="true" [appendTo]="'body'"
-                                    [ngClass]="isSubmit ? compraForm.controls['bank_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                </ng-select>
-                            </div> -->
-
-                            <!-- <div class="mb-2"
-                                [ngClass]="isSubmit ? compraForm.controls['account_type_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>Tipo de cuenta</label>
-                                <ng-select [items]="tiposDeCuenta" bindLabel="name" bindValue="uuid"
-                                    formControlName="account_type_uuid" [virtualScroll]="true" [appendTo]="'body'"
-                                    [ngClass]="isSubmit ? compraForm.controls['account_type_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                </ng-select>
-                            </div> -->
-
-                            <div class="mb-2"
-                                [ngClass]="isSubmit ? compraForm.controls['alias'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>Alias</label>
-                                <input type="text" class="form-control" formControlName="alias">
-                            </div>
-
-                            <div class="mb-2"
-                                [ngClass]="isSubmit ? compraForm.controls['cbu'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>CBU</label>
-                                <input type="text" class="form-control" formControlName="cbu">
-                            </div>
-
-                            <div class="row mt-2">
-                                <div class="col-12 d-flex justify-content-center">
-                                    <button type="button" class="btn btn-wd btn-primary mr-4"
-                                        (click)="confirmarCompra()">Confirmar</button>
-                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
-                                        (click)="cerrarModal()">Cancelar</button>
-                                </div>
-                            </div>
-
-                        </form>
-                    </div>
-
-                </div>
-            </div>
-        </ng-template>
-    </ngx-custom-modal>
-</div>
-
-
 <!-- MODAL PRODUCTOS -->
 <div>
     <ngx-custom-modal #modalProductos class="modal-top animate extra-large-modal animate-fade-in">
@@ -246,6 +141,19 @@
         </ng-template>
 
         <ng-template #modalBody>
+
+            <div class="row mb-2">
+                <div class="col-6">
+                    <span *ngIf="productosView && productosView.length > 0" class="float-md-start color-gris">
+                        Página: {{ currentPage_productos}}/{{numPages.pageCount }}
+                    </span>
+                </div>
+                <div class="col-6" style="text-align: right;">
+                    <span *ngIf="productosView && productosView.length > 0" class="float-md-end color-gris">
+                        Ítems: {{itemsInPage_productos}}/{{ productosView.length }}
+                    </span>
+                </div>
+            </div>
 
             <div class="table-responsive">
                 <table class="table-hover">
@@ -272,6 +180,33 @@
                         }
                     </tbody>
                 </table>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col">
+                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                        [pageSize]="itemsPerPage_productos" [(page)]="currentPage_productos" [maxSize]="2" [rotate]="true" #numPages
+                        [boundaryLinks]="true" (pageChange)="onPageChange(currentPage_productos)" />
+                </div>
+
+                <div class="col">
+                    <div class="row align-items-center float-md-end">
+                        <div class="col-auto">
+                            <label for="paginacion">Ítems por página:</label>
+                        </div>
+                        <div class="col-auto">
+                            <select id="paginacion" class="form-control" (change)="cambiarPaginacion();"
+                                [(ngModel)]="itemsPerPage_productos">
+                                <option value=5>5</option>
+                                <option value=10>10</option>
+                                <option value=20>20</option>
+                                <option value=50>50</option>
+                                <option value=100>100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="row mt-3">
