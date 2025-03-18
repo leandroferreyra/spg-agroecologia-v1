@@ -27,7 +27,7 @@
                 <div class="table-responsive">
                     <table class="table-hover">
                         <tbody>
-                            @for(data of filtrarDatos() ; track data.uuid) {
+                            @for(data of filtrarDatos() ; let index = $index; track data.uuid) {
                             <tr style="cursor: pointer;"
                                 [ngClass]="{'bg-blue-200': selectedCliente?.uuid === data.uuid}">
                                 <td (click)="showDataCliente(data)">{{ getName(data) }}
@@ -37,7 +37,7 @@
                                         <button type="button" hlMenuButton>
                                             <icon-horizontal-dots class="rotate-90 opacity-70" />
                                         </button>
-                                        <ul *hlMenuItems @toggleAnimation class="ltr:right-0 rtl:left-0">
+                                        <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
                                             <li>
                                                 <a href="javascript:;" *hlMenuItem="let menuItem"
                                                     (click)="editarUsuario(data)">Editar</a>

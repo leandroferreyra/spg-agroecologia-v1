@@ -838,7 +838,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   }
 
   agregarClienteAFormulario(dato: any) {
-    if(!this.isCliente(dato)) {
+    if (!this.isCliente(dato)) {
       this.inicializarNuevoFormularioCliente(dato);
       this.altaPersona = true; // Muestra formulario
     } else {
@@ -857,6 +857,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
   volver() {
     this.altaPersona = false;
     // this.contactoForm.reset();
+  }
+
+  getDropdownClass(index: number) {
+    let mitad = this.clientesFiltrados.length / 2;
+    return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
   }
 
 }

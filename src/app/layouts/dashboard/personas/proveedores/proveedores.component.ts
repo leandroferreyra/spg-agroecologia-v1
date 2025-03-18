@@ -885,4 +885,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     return data.person?.customer ? true : false;
   }
 
+  getDropdownClass(index: number) {
+    let mitad = this.proveedoresFiltrados.length / 2;
+    return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
+  }
+
 }
