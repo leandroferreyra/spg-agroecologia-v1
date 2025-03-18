@@ -56,24 +56,13 @@
                         </th>
                         <th style="cursor: pointer;">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Comentarios
+                                Calificación
                             </span>
                         </th>
-                        <!-- <th style="cursor: pointer;">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Tipo de cuenta
-                            </span>
+                        <th>
+                            Comentario
                         </th>
-                        <th style="cursor: pointer;">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Banco
-                            </span>
-                        </th>
-                        <th style="cursor: pointer;">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Moneda
-                            </span>
-                        </th> -->
+                        <th>Total</th>
                         <th>
                             Acciones
                         </th>
@@ -106,17 +95,23 @@
                     <tr>
                         <td class="whitespace-nowrap">{{ data.transaction.transaction_datetime}} </td>
                         <td class="whitespace-nowrap">{{ data.transaction.current_state.state}} </td>
-                        <td class="whitespace-nowrap">{{ data.qualification_comments}} </td>
-                        <!-- <td class="whitespace-nowrap">{{ data.account_type.name}} </td>
-                        <td class="whitespace-nowrap">{{ data.bank.name}} </td>
-                        <td class="whitespace-nowrap">{{ data.currency.name}} </td> -->
-
+                        <td class="whitespace-nowrap" ngxTippy={{data.qualification_option.description}}>
+                            {{ data.qualification_option.score }} -
+                            {{ data.qualification_option.name }}
+                        </td>
+                        <td class="whitespace-nowrap"> {{ data.qualification_comments }} </td>
+                        <td class="whitespace-nowrap"> {{ getTotal(data) }} </td>
                         <td>
                             <div class="flex items-center">
                                 <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                        (click)="openModalNuevaCompra('EDIT', data)">
-                                        <icon-pencil />
+                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ver documentos">
+                                        <icon-clipboard-text />
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ver productos"
+                                        (click)="verProductos(data)">
+                                        <icon-shopping-cart />
                                     </button>
                                 </div>
                                 <div>
@@ -238,6 +233,54 @@
 
                 </div>
             </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+
+<!-- MODAL PRODUCTOS -->
+<div>
+    <ngx-custom-modal #modalProductos class="modal-top animate extra-large-modal animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+
+            <div class="table-responsive">
+                <table class="table-hover">
+                    <thead>
+                        <tr>
+                            <th> Código </th>
+                            <th> Nombre </th>
+                            <th> Tipo </th>
+                            <th> Cantidad </th>
+                            <th> Precio unitario </th>
+                            <th> Precio total </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for(data of productosView ; track data.uuid) {
+                        <tr>
+                            <td class="whitespace-nowrap">{{ data.product.code}} </td>
+                            <td class="whitespace-nowrap">{{ data.product.name}} </td>
+                            <td class="whitespace-nowrap"> {{ data.product.product_type.name}} </td>
+                            <td class="whitespace-nowrap"> {{ data.quantity }} </td>
+                            <td class="whitespace-nowrap"> {{ data.unit_price }} </td>
+                            <td class="whitespace-nowrap"> {{ data.unit_price * data.quantity }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cerrarModalProductos()">Cerrar</button>
+                </div>
+            </div>
+
         </ng-template>
     </ngx-custom-modal>
 </div>

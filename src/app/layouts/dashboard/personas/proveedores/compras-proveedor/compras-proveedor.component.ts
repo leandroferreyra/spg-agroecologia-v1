@@ -19,12 +19,15 @@ import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
+import { IconClipboardTextComponent } from 'src/app/shared/icon/icon-clipboard-text';
+import { IconShoppingCartComponent } from 'src/app/shared/icon/icon-shopping-cart';
 
 @Component({
   selector: 'app-compras-proveedor',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
-    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, FontAwesomeModule
+    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, FontAwesomeModule,
+    IconClipboardTextComponent, IconShoppingCartComponent
   ],
   templateUrl: './compras-proveedor.component.html',
   styleUrl: './compras-proveedor.component.css'
@@ -35,6 +38,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   @Input() proveedor: any;
   @Input() rol!: string;
   compras: any[] = [];
+  productosView: any[] = [];
   // monedas: any[] = [];
   // tiposDeCuenta: any[] = [];
   // bancos: any[] = [];
@@ -61,6 +65,14 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: false
+  };
+
+  // Referencia al modal para crear y editar países.
+  @ViewChild('modalProductos') modalProductos!: NgxCustomModalComponent;
+  modalOptionsProductos: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
     closeOnEscape: false
@@ -176,7 +188,10 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   obtenerCompras() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["transaction"];
+    params.with = ["transaction", "transaction.transactionProducts.product.productType",
+      "transaction.transactionDocuments.accountDocumentType",
+      "transaction.transactionDocuments.currency",
+      "qualificationOption"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -187,6 +202,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
         next: res => {
           // console.log(res);
           this.compras = res.data;
+          console.log(this.compras);
           this.modificarPaginacion(res);
           this.spinner.hide();
         },
@@ -297,46 +313,23 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     )
   }
 
-  // obtenerMonedas() {
-  //   this.subscription.add(
-  //     this._indexService.getMonedas(this.rol).subscribe({
-  //       next: res => {
-  //         // console.log(res);
-  //         this.monedas = res.data;
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
+  getTotal(data: any) {
+    let total = 0;
+    data.transaction.transaction_products.forEach((elem: any) => {
+      total += elem.unit_price * elem.quantity * (1 + elem.product.vat_percent)
+    })
+    total -= (+data.discount1) + (+data.discount2) + (+data.others);
+    return total;
+  }
 
-  // obtenerBancos() {
-  //   this.subscription.add(
-  //     this._indexService.getBancos(this.rol).subscribe({
-  //       next: res => {
-  //         // console.log(res);
-  //         this.bancos = res.data;
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
+  verProductos(data: any) {
+    this.productosView = data.transaction.transaction_products;
+    console.log(this.productosView);
+    this.modalProductos.options = this.modalOptionsProductos;
+    this.modalProductos.open();
+  }
 
-  // obtenerTiposDeCuenta() {
-  //   this.subscription.add(
-  //     this._indexService.getTipoDeCuentas(this.rol).subscribe({
-  //       next: res => {
-  //         // console.log(res);
-  //         this.tiposDeCuenta = res.data;
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
-
+  cerrarModalProductos() {
+    this.modalProductos.close();
+  }
 }
