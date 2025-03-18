@@ -584,10 +584,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       apellido: new FormControl(dato ? dato.lastname : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
       tipoDocumento: new FormControl(dato ? dato.document_type?.uuid : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
       documento: new FormControl(dato ? dato.document_number : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
-      cuit: new FormControl(dato ? dato.cuit : null, []),
+      cuit: new FormControl(dato ? dato.cuit : null, [Validators.required]),
       genero: new FormControl(dato ? dato.gender?.uuid : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [Validators.required] : []),
       razon: new FormControl(dato ? dato.company_name : null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [] : [Validators.required]),
-      sigla: new FormControl(null, (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') ? [] : [Validators.required]),
+      sigla: new FormControl(null, [Validators.required]),
       estado: new FormControl(dato ? dato.person?.current_state?.state?.uuid : null, [Validators.required]),
       estadoComentario: new FormControl(dato ? dato.person?.current_state?.comments : null, []),
       calle: new FormControl(dato ? dato.person?.street_name : null, []),
@@ -869,7 +869,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   agregarProveedorAFormulario(dato: any) {
-    if(!this.isProveedor(dato)) {
+    if (!this.isProveedor(dato)) {
       this.inicializarNuevoFormularioProveedor(dato);
       this.altaPersona = true; // Muestra formulario
     } else {
