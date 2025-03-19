@@ -56,10 +56,10 @@
             <tbody>
                 @for(data of productos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                 <tr>
-                    <td class="whitespace-nowrap">{{ data.transaction_product.product.code}} </td>
-                    <td class="whitespace-nowrap">{{ data.transaction_product.product.name}} </td>
-                    <td class="whitespace-nowrap">{{ data.transaction_product.product.product_type.name}} </td>
-                    <td class="whitespace-nowrap">{{ data.transaction_product.product.product_category.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.code}} </td>
+                    <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.product_type?.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.product_category?.name}} </td>
                     <td class="whitespace-nowrap">{{ data.serial_number}} </td>
                     <td class="whitespace-nowrap">{{ data.current_owner.datetime_from}} </td>
                 </tr>
