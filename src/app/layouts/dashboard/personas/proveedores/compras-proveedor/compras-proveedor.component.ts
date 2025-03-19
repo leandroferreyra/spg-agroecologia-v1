@@ -60,14 +60,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   };
 
   // Referencia al modal para crear y editar países.
-  @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
-  modalOptions: ModalOptions = {
-    closeOnOutsideClick: false,
-    hideCloseButton: true,
-    closeOnEscape: false
-  };
-
-  // Referencia al modal para crear y editar países.
   @ViewChild('modalProductos') modalProductos!: NgxCustomModalComponent;
   modalOptionsProductos: ModalOptions = {
     closeOnOutsideClick: false,
@@ -119,12 +111,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     }
     this.obtenerCompras();
   }
-
-  cerrarModal() {
-    this.isSubmit = false;
-    this.modalCompra.close();
-  }
-
 
   obtenerCompras() {
     // Inicializamos un objeto vacío para los parámetros
