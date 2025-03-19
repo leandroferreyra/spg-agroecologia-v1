@@ -88,21 +88,16 @@
         <!-- PANEL DERECHO -->
         <div class="panel h-full flex-1 overflow-x-hidden p-0">
 
-            <!-- <h5 class="mt-3 text-lg font-semibold dark:text-white-light min-w-0">Clientes</h5> -->
-
             <!-- MENU ICONO OCULTO RESPONSIVE -->
             <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
                 <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
-                    Clientes
+                    Cliente
                     @if (clientes.length > 0) {
-                    -
-                    <span class="badge badge-outline-dark">
-                        @if(isHuman){
-                        {{ selectedCliente.person?.human?.firstname }} {{ selectedCliente.person?.human?.lastname }}
-                        } @else {
-                        {{ selectedCliente.person?.legal_entity?.company_name }}
-                        }
-                    </span>
+                    @if(isHuman){
+                    {{ selectedCliente.person?.human?.firstname }} {{ selectedCliente.person?.human?.lastname }}
+                    } @else {
+                    {{ selectedCliente.person?.legal_entity?.company_name }}
+                    }
                     }
                 </h5>
 
