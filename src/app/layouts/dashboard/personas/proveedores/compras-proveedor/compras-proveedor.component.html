@@ -175,7 +175,7 @@
                             <td class="whitespace-nowrap"> {{ data.product.product_type.name}} </td>
                             <td class="whitespace-nowrap"> {{ data.quantity | number:'1.0-0'}} </td>
                             <td class="whitespace-nowrap"> {{ data.unit_price }} </td>
-                            <td class="whitespace-nowrap"> {{ data.unit_price * data.quantity }}</td>
+                            <td class="whitespace-nowrap"> {{ (data.unit_price * data.quantity).toFixed(2) }}</td>
                         </tr>
                         }
                     </tbody>

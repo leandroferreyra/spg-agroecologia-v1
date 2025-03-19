@@ -171,7 +171,7 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     data.transaction_products.forEach((elem: any) => {
       total += (+elem.unit_price) * (+elem.quantity) * (1 + (+elem.product.vat_percent)) / 100
     })
-    return total;
+    return total.toFixed(2);
   }
 
   verProductos(data: any) {
