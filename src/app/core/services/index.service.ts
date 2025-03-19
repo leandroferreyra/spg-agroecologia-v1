@@ -33,6 +33,7 @@ export class IndexService {
   apiLegalEntities = '/legal_entities'
 
   apiProductosAdquiridos = '/transaction_products';
+  apiProductosEnPosesion = '/product_instances';
 
   constructor(private http: HttpClient) { }
 
@@ -258,6 +259,11 @@ export class IndexService {
   getProductosAdquiridosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductosAdquiridos, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getProductosEnPosesionWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductosEnPosesion, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
 

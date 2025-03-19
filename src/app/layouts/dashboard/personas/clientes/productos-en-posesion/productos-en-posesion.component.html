@@ -1,0 +1,99 @@
+<div class="panel mt-6 pb-0">
+
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="productos && productos.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="productos && productos.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Código
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Nombre
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Tipo
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Categoría
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Número de serie
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;" (click)="cambiarOrdenamiento('owners.datetime_from')">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Fecha
+                            <fa-icon
+                                [icon]="ordenamiento['owners.datetime_from']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of productos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.transaction_product.product.code}} </td>
+                    <td class="whitespace-nowrap">{{ data.transaction_product.product.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.transaction_product.product.product_type.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.transaction_product.product.product_category.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.serial_number}} </td>
+                    <td class="whitespace-nowrap">{{ data.current_owner.datetime_from}} </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4">
+            <div class="col">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerProductosEnPosesion()" />
+            </div>
+
+            <div class="col">
+                <div class="row align-items-center float-md-end">
+                    <div class="col-auto">
+                        <label for="paginacion">Ítems por página:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select id="paginacion" class="form-control" (change)="obtenerProductosEnPosesion()"
+                            [(ngModel)]="itemsPerPage">
+                            <option value=5>5</option>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>

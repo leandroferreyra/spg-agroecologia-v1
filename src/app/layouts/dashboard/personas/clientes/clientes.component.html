@@ -311,7 +311,8 @@
                     </div>
 
                     <div *ngIf="tab1.toLowerCase() === 'productos-en-posesion'">
-
+                        <app-productos-en-posesion [cliente]="selectedCliente" [rol]="actual_role">
+                        </app-productos-en-posesion>
                     </div>
 
                 </div>

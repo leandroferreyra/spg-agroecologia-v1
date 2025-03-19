@@ -32,6 +32,7 @@ import { ProductosAdquiridosComponent } from './productos-adquiridos/productos-a
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { ProductosEnPosesionComponent } from './productos-en-posesion/productos-en-posesion.component';
 
 @Component({
   selector: 'app-clientes',
@@ -39,7 +40,8 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent, ContactosPersonaComponent,
-    IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent, FontAwesomeModule, NgbPaginationModule
+    IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent, FontAwesomeModule, NgbPaginationModule,
+    ProductosEnPosesionComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.css',
