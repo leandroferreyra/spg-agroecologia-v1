@@ -99,7 +99,6 @@ export class ProductosEnPosesionComponent implements OnInit, OnDestroy {
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtros;
-    console.log(params);
     this.subscription.add(
       this._indexService.getProductosEnPosesionWithParam(params, this.rol).subscribe({
         next: res => {
