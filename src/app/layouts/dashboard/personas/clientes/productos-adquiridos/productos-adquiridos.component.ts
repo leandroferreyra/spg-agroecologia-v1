@@ -35,9 +35,6 @@ export class ProductosAdquiridosComponent implements OnInit, OnDestroy {
   @Input() cliente: any;
   @Input() rol!: string;
   productos: any[] = [];
-  // monedas: any[] = [];
-  // tiposDeCuenta: any[] = [];
-  // bancos: any[] = [];
 
   private subscription: Subscription = new Subscription();
 
@@ -57,14 +54,6 @@ export class ProductosAdquiridosComponent implements OnInit, OnDestroy {
   showFilterCompras: boolean = false;
   ordenamiento: any = {
     'transaction.transaction_datetime': 'desc'
-  };
-
-  // Referencia al modal para crear y editar países.
-  @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
-  modalOptions: ModalOptions = {
-    closeOnOutsideClick: false,
-    hideCloseButton: true,
-    closeOnEscape: false
   };
 
   compraForm!: FormGroup;
@@ -107,66 +96,10 @@ export class ProductosAdquiridosComponent implements OnInit, OnDestroy {
     this.obtenerProductosAdquiridos();
   }
 
-  cerrarModal() {
-    this.isSubmit = false;
-    this.modalProducto.close();
-  }
-
-  confirmarCompra() {
-    this.isSubmit = true;
-    if (this.compraForm.valid) {
-      this.spinner.show();
-      let compra = new CompraProveedorDTO();
-      compra.bank_uuid = this.compraForm.get('bank_uuid')?.value;
-      compra.account_type_uuid = this.compraForm.get('account_type_uuid')?.value;
-      compra.currency_uuid = this.compraForm.get('currency_uuid')?.value;
-      compra.account_number = this.compraForm.get('account_number')?.value;
-      compra.cbu = this.compraForm.get('cbu')?.value;
-      compra.alias = this.compraForm.get('alias')?.value;
-      compra.actual_role = this.rol;
-      // compra.supplier_uuid = this.proveedor.uuid;
-      if (!this.isEdicion) {
-        this.subscription.add(
-          this._compraService.saveCompra(compra).subscribe({
-            next: res => {
-              this.obtenerProductosAdquiridos();
-              this.cerrarModal();
-              this._swalService.toastSuccess('top-right', res.message);
-              this._tokenService.setToken(res.token);
-              this.spinner.hide();
-            },
-            error: error => {
-              this._swalService.toastError('top-right', error.error.message);
-              console.error(error);
-              this.spinner.hide();
-            }
-          })
-        )
-      } else {
-        this.subscription.add(
-          this._compraService.editCompra(this.compraForm.get('uuid')?.value, compra).subscribe({
-            next: res => {
-              this.obtenerProductosAdquiridos();
-              this.cerrarModal();
-              this._swalService.toastSuccess('top-right', res.message)
-              this._tokenService.setToken(res.token);
-              this.spinner.hide();
-            },
-            error: error => {
-              console.error(error);
-              this.spinner.hide();
-              this._swalService.toastError('top-right', error.error.message);
-            }
-          })
-        )
-      }
-    }
-  }
-
   obtenerProductosAdquiridos() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["product.productType", "transaction.person.customer", "transaction.transactionType", "saleProduct.productInstances"];
+    params.with = ["transaction", "product.productType", "product.productCategory", "saleProduct.productInstances"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -201,40 +134,6 @@ export class ProductosAdquiridosComponent implements OnInit, OnDestroy {
     }
   }
 
-
-  openModalNuevaCompra(type: string, compra?: any) {
-    // this.obtenerBancos();
-    // this.obtenerTiposDeCuenta();
-    // this.obtenerMonedas();
-    if (type === 'NEW') {
-      this.isEdicion = false;
-      this.tituloModal = 'Nueva compra';
-      this.compraForm = new FormGroup({
-        bank_uuid: new FormControl(null, [Validators.required]),
-        account_type_uuid: new FormControl(null, [Validators.required]),
-        currency_uuid: new FormControl(null, [Validators.required]),
-        account_number: new FormControl(null, [Validators.required]),
-        cbu: new FormControl(null, []),
-        alias: new FormControl(null, []),
-      });
-    } else {
-      // console.log(moneda);
-      this.isEdicion = true;
-      this.tituloModal = 'Edición compra';
-      this.compraForm = new FormGroup({
-        uuid: new FormControl(compra?.uuid, []),
-        bank_uuid: new FormControl(compra?.bank?.uuid, [Validators.required]),
-        account_type_uuid: new FormControl(compra?.account_type?.uuid, [Validators.required]),
-        currency_uuid: new FormControl(compra?.currency?.uuid, [Validators.required]),
-        account_number: new FormControl(compra?.account_number, [Validators.required]),
-        cbu: new FormControl(compra?.cbu, []),
-        alias: new FormControl(compra?.alias, []),
-      });
-    }
-    this.modalProducto.options = this.modalOptions;
-    this.modalProducto.open();
-  }
-
   toggleFilter() {
     this.showFilterCompras = !this.showFilterCompras;
     if (!this.showFilterCompras) {
@@ -244,89 +143,5 @@ export class ProductosAdquiridosComponent implements OnInit, OnDestroy {
       this.obtenerProductosAdquiridos();
     }
   }
-
-  openSwalEliminar(compra: any) {
-    console.log(compra);
-    Swal.fire({
-      title: '',
-      text: `¿Desea eliminar la compra ${compra.name}?`,
-      icon: 'info',
-      confirmButtonText: 'Confirmar',
-      showDenyButton: true,
-      denyButtonText: 'Cancelar',
-      didRender: () => {
-        const cancelButton = Swal.getDenyButton();
-        if (cancelButton) {
-          cancelButton.setAttribute('id', 'back-button-with-border');
-        }
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.eliminarCompra(compra);
-      } else if (result.isDenied) {
-
-      }
-    })
-  }
-
-  eliminarCompra(compra: any) {
-    this.spinner.show();
-    this.subscription.add(
-      this._compraService.deleteCompra(compra.uuid, this.rol.toUpperCase()).subscribe({
-        next: res => {
-          this.obtenerProductosAdquiridos();
-          this._tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          console.error(error);
-          this._swalService.toastError('top-right', error.error.message);
-          this.spinner.hide();
-        }
-      })
-    )
-  }
-
-  // obtenerMonedas() {
-  //   this.subscription.add(
-  //     this._indexService.getMonedas(this.rol).subscribe({
-  //       next: res => {
-  //         // console.log(res);
-  //         this.monedas = res.data;
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
-
-  // obtenerBancos() {
-  //   this.subscription.add(
-  //     this._indexService.getBancos(this.rol).subscribe({
-  //       next: res => {
-  //         // console.log(res);
-  //         this.bancos = res.data;
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
-
-  // obtenerTiposDeCuenta() {
-  //   this.subscription.add(
-  //     this._indexService.getTipoDeCuentas(this.rol).subscribe({
-  //       next: res => {
-  //         // console.log(res);
-  //         this.tiposDeCuenta = res.data;
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
 
 }
