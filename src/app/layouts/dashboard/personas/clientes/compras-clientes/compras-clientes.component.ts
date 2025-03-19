@@ -129,7 +129,7 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getComprasClientesWithParam(params, this.rol).subscribe({
         next: res => {
-          console.log(res);
+          //console.log(res);
           this.compras = res.data;
           this.modificarPaginacion(res);
           this.spinner.hide();
@@ -169,15 +169,15 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
   getTotal(data: any) {
     let total = 0;
     data.transaction_products.forEach((elem: any) => {
-      total += (+elem.unit_price) * (+elem.quantity) * (1 + (+elem.product.vat_percent)) / 100
+      total += (+elem.unit_price) * (+elem.quantity) * (1 + (+elem.product.vat_percent / 100))
     })
     return total.toFixed(2);
   }
 
   verProductos(data: any) {
-    console.log(data);
+    //console.log(data);
     this.productosView = data.transaction_products;
-    console.log(this.productosView);
+    //console.log(this.productosView);
     if (this.productosView.length <= this.itemsPerPage_productos) {
       this.itemsInPage_productos = this.productosView.length;
     }

@@ -167,7 +167,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   getTotal(data: any) {
     let total = 0;
     data.transaction.transaction_products.forEach((elem: any) => {
-      total += elem.unit_price * elem.quantity * (1 + elem.product.vat_percent) / 100
+      total += elem.unit_price * elem.quantity * (1 + elem.product.vat_percent / 100)
     })
     total -= (+data.discount1) + (+data.discount2) + (+data.others);
     return total.toFixed(2);
