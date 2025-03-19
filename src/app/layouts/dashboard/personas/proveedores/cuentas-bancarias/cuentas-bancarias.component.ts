@@ -162,6 +162,7 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
           console.log(res);
           this.cuentasBancarias = res.data;
           this.modificarPaginacion(res);
+          this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {

@@ -132,6 +132,7 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
           //console.log(res);
           this.compras = res.data;
           this.modificarPaginacion(res);
+          this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {

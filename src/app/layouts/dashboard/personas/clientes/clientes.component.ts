@@ -163,6 +163,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
           if (!alta && this.clientes.length > 0) {
             this.inicializarForm(this.clientes[0]);
           }
+          this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {

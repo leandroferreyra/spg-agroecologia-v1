@@ -129,8 +129,8 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
         next: res => {
           // console.log(res);
           this.compras = res.data;
-          console.log(this.compras);
           this.modificarPaginacion(res);
+          this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {

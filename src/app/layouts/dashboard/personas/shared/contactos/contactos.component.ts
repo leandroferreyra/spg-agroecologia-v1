@@ -165,6 +165,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
         next: res => {
           this.contactos = res.data;
           this.modificarPaginacion(res);
+          this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {

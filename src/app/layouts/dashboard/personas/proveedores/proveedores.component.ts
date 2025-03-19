@@ -171,6 +171,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
           if (!alta && this.proveedores.length > 0) {
             this.inicializarForm(this.proveedores[0]);
           }
+          this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {

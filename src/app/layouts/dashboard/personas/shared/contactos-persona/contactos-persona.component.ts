@@ -241,7 +241,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       this._indexService.getDetalleContactosPersonaWithParam(params, this.rol).subscribe({
         next: res => {
           this.contactos = res.data;
-          // console.log(this.contactos);
+          this._tokenService.setToken(res.token);
           this.modificarPaginacion(res);
           this.spinner.hide();
         },
@@ -287,7 +287,7 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
         tipoPersona: new FormControl('fisica', Validators.required),
       });
       this.obtenerPersonas();
-    } 
+    }
     // else {
     //   this.isEdicion = true;
     //   this.tituloModal = 'Edición dato';

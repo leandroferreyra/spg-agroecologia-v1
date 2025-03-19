@@ -106,6 +106,7 @@ export class ProductosEnPosesionComponent implements OnInit, OnDestroy {
           console.log(res.data);
           this.productos = res.data;
           this.modificarPaginacion(res);
+          this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {
