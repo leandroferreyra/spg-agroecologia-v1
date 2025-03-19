@@ -108,7 +108,6 @@ export class ProductosAdquiridosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProductosAdquiridosWithParam(params, this.rol).subscribe({
         next: res => {
-          console.log(res.data);
           this.productos = res.data;
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
