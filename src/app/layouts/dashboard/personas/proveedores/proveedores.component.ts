@@ -59,7 +59,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   isHuman: boolean = false;
 
-  busqueda_contiene: boolean = false;
+  busqueda_contiene: boolean = true;
   isEdicion: boolean = false;
   lastSelectedPaisUuid: any = null;
   lastSelectedProvinciaUuid: any = null;
