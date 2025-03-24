@@ -58,3 +58,7 @@ ng-select.has-error .ng-select-container {
 .modal .modal-content {
     margin-top: 30px;
 }
+
+.color-gris {
+    color: #ada8a8 !important;
+}

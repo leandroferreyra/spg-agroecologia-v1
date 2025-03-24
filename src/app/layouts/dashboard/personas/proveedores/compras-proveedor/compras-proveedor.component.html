@@ -1,222 +1,191 @@
-<div>
+<div class="panel mt-6 pb-0">
 
-
-    <div class="panel mt-6 pb-0">
-
-        <div class="row mb-2">
-            <div class="col-6">
-                <span *ngIf="compras && compras.length > 0" class="float-md-start color-gris">
-                    Página: {{ currentPage}}/{{numPages.pageCount }}
-                </span>
-            </div>
-            <div class="col-6" style="text-align: right;">
-                <span *ngIf="compras && compras.length > 0" class="float-md-end color-gris">
-                    Ítems: {{itemsInPage}}/{{ total_rows }}
-                </span>
-            </div>
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="compras && compras.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
         </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="compras && compras.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
 
-        <div class="table-responsive">
-            <table class="table-hover">
-                <thead>
-                    <tr>
-                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('transaction.transaction_datetime')">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Fecha
-                                <fa-icon
-                                    [icon]="ordenamiento['transaction.transaction_datetime']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
-                            </span>
-                        </th>
-                        <th style="cursor: pointer;">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Estado
-                            </span>
-                        </th>
-                        <th style="cursor: pointer;">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Calificación
-                            </span>
-                        </th>
-                        <th>
-                            Comentario
-                        </th>
-                        <th>Total</th>
-                        <th>
-                            Acciones
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- @if (showFilterCompras) {
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda"
-                                [(ngModel)]="filtrosCompras.account_number"
-                                (input)="obtenerCompras()" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda"
-                                [(ngModel)]="filtrosCompras.alias"
-                                (input)="obtenerCompras()" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda"
-                                [(ngModel)]="filtrosCompras.cbu"
-                                (input)="obtenerCompras()" />
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    } -->
-                    @for(data of compras | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
-                    <tr>
-                        <td class="whitespace-nowrap">{{ data.transaction.transaction_datetime}} </td>
-                        <td class="whitespace-nowrap">{{ data.transaction.current_state.state}} </td>
-                        <td class="whitespace-nowrap" ngxTippy={{data.qualification_option.description}}>
-                            {{ data.qualification_option.score }} -
-                            {{ data.qualification_option.name }}
-                        </td>
-                        <td class="whitespace-nowrap"> {{ data.qualification_comments }} </td>
-                        <td class="whitespace-nowrap"> {{ getTotal(data) }} </td>
-                        <td>
-                            <div class="flex items-center">
-                                <!-- <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ver documentos">
-                                        <icon-clipboard-text />
-                                    </button>
-                                </div> -->
-                                <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ver productos"
-                                        (click)="verProductos(data)">
-                                        <icon-shopping-cart />
-                                    </button>
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th style="cursor: pointer;" (click)="cambiarOrdenamiento('transaction.transaction_datetime')">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Fecha
+                            <fa-icon
+                                [icon]="ordenamiento['transaction.transaction_datetime']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Nro. de factura
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Total
+                        </span>
+                    </th>
+                    <th>
+                        Nro. de lote
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of compras | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.transaction?.transaction_datetime}} </td>
+                    <td class="whitespace-nowrap">{{ data.transaction?.transaction_documents[0]?.prefix_number }} -
+                        {{
+                        data.transaction?.transaction_documents[0]?.document_number }} </td>
+                    <td class="whitespace-nowrap"> {{ data.total }} </td>
+                    <td class="whitespace-nowrap"> {{ data.batch.batch_identification}} </td>
+                    <td>
+                        @if (productosExpandido[data.uuid]) {
+                        <span class="badge badge-outline-info" (click)="toggleProductos(data)" style="cursor: pointer;">
+                            Ocultar productos
+                        </span>
+                        }@else {
+                        <span class="badge badge-outline-info" (click)="toggleProductos(data)" style="cursor: pointer;">
+                            Ver productos
+                        </span>
+                        }
+                    </td>
+                </tr>
+
+                <!-- Fila de productos -->
+                @if (productosExpandido[data.uuid]){
+                <tr @toggleAnimation>
+                    <td colspan="5">
+
+                        <div class="table-responsive">
+                            <table class="table-hover">
+                                <thead>
+                                    <tr>
+                                        <th> Código </th>
+                                        <th> Nombre </th>
+                                        <th> Tipo </th>
+                                        <th> Cantidad </th>
+                                        <th> Precio unitario </th>
+                                        <th> Precio total </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for(p of data.transaction.transaction_products ; track p.uuid) {
+                                    <tr>
+                                        <td class="whitespace-nowrap">{{ p.product.code}} </td>
+                                        <td class="whitespace-nowrap">{{ p.product.name}} </td>
+                                        <td class="whitespace-nowrap"> {{ p.product.product_type.name}} </td>
+                                        <td class="whitespace-nowrap"> {{ p.quantity | number:'1.0-0'}} </td>
+                                        <td class="whitespace-nowrap"> {{ p.unit_price }} </td>
+                                        <td class="whitespace-nowrap"> {{ (p.unit_price *
+                                            p.quantity).toFixed(2)
+                                            }}</td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-4">
+
+                            <div class="col">
+
+                                <span
+                                    *ngIf="data.transaction.transaction_products && data.transaction.transaction_products.length > 0"
+                                    class="float-md-start color-gris">
+                                    Página: {{ paginadores[data.uuid].currentPage}}/{{numPages.pageCount }}
+                                </span>
+
+                            </div>
+
+                            <div class="col">
+                                <ngb-pagination class="ngb-pagination float-md-start"
+                                    [collectionSize]="paginadores[data.uuid].totalItems"
+                                    [pageSize]="paginadores[data.uuid].itemsPerPage"
+                                    [(page)]="paginadores[data.uuid].currentPage" [maxSize]="2" [rotate]="true"
+                                    #numPages [boundaryLinks]="true" (pageChange)="onPageChange(data.uuid, $event)">
+                                </ngb-pagination>
+
+                                <div class="row align-items-center float-md-end">
+                                    <div class="col-auto">
+                                        <label for="paginacion">Ítems por página:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <select id="paginacion-{{ data.uuid }}" class="form-control"
+                                            (change)="cambiarPaginacion(data.uuid)"
+                                            [(ngModel)]="paginadores[data.uuid].itemsPerPage">
+                                            <option value=5>5</option>
+                                            <option value=10>10</option>
+                                            <option value=20>20</option>
+                                            <option value=50>50</option>
+                                            <option value=100>100</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
 
-            <div class="row mt-4">
-                <div class="col">
-                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="obtenerCompras()" />
-                </div>
 
-                <div class="col">
-                    <div class="row align-items-center float-md-end">
-                        <div class="col-auto">
-                            <label for="paginacion">Ítems por página:</label>
+                            <!-- <div class="col">
+
+                            </div> -->
+
+                            <div class="col">
+                                <span
+                                    *ngIf="data.transaction.transaction_products && data.transaction.transaction_products.length > 0"
+                                    class="float-md-end color-gris">
+                                    Ítems: {{ paginadores[data.uuid].itemsInPage}}/{{ paginadores[data.uuid].totalItems
+                                    }}
+                                </span>
+                            </div>
+
+
                         </div>
-                        <div class="col-auto">
-                            <select id="paginacion" class="form-control" (change)="obtenerCompras()"
-                                [(ngModel)]="itemsPerPage">
-                                <option value=5>5</option>
-                                <option value=10>10</option>
-                                <option value=20>20</option>
-                                <option value=50>50</option>
-                                <option value=100>100</option>
-                            </select>
-                        </div>
+                    </td>
+                </tr>
+                }
+
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4">
+            <div class="col">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerCompras()" />
+            </div>
+
+            <div class="col">
+                <div class="row align-items-center float-md-end">
+                    <div class="col-auto">
+                        <label for="paginacion">Ítems por página:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select id="paginacion" class="form-control" (change)="obtenerCompras()"
+                            [(ngModel)]="itemsPerPage">
+                            <option value=5>5</option>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>
                     </div>
                 </div>
-
             </div>
+
         </div>
-
-
-
-
     </div>
-</div>
 
-<!-- MODAL PRODUCTOS -->
-<div>
-    <ngx-custom-modal #modalProductos class="modal-top animate extra-large-modal animate-fade-in">
-        <ng-template #modalHeader>
-            <h5 class="text-lg font-semibold dark:text-white-light">Listado de productos</h5>
-        </ng-template>
-
-        <ng-template #modalBody>
-
-            <div class="row mb-2">
-                <div class="col-6">
-                    <span *ngIf="productosView && productosView.length > 0" class="float-md-start color-gris">
-                        Página: {{ currentPage_productos}}/{{numPages.pageCount }}
-                    </span>
-                </div>
-                <div class="col-6" style="text-align: right;">
-                    <span *ngIf="productosView && productosView.length > 0" class="float-md-end color-gris">
-                        Ítems: {{itemsInPage_productos}}/{{ productosView.length }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table-hover">
-                    <thead>
-                        <tr>
-                            <th> Código </th>
-                            <th> Nombre </th>
-                            <th> Tipo </th>
-                            <th> Cantidad </th>
-                            <th> Precio unitario </th>
-                            <th> Precio total </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for(data of productosView ; track data.uuid) {
-                        <tr>
-                            <td class="whitespace-nowrap">{{ data.product.code}} </td>
-                            <td class="whitespace-nowrap">{{ data.product.name}} </td>
-                            <td class="whitespace-nowrap"> {{ data.product.product_type.name}} </td>
-                            <td class="whitespace-nowrap"> {{ data.quantity | number:'1.0-0'}} </td>
-                            <td class="whitespace-nowrap"> {{ data.unit_price }} </td>
-                            <td class="whitespace-nowrap"> {{ (data.unit_price * data.quantity).toFixed(2) }}</td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="row mt-4">
-                <div class="col">
-                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                        [pageSize]="itemsPerPage_productos" [(page)]="currentPage_productos" [maxSize]="2"
-                        [rotate]="true" #numPages [boundaryLinks]="true"
-                        (pageChange)="onPageChange(currentPage_productos)" />
-                </div>
-
-                <div class="col">
-                    <div class="row align-items-center float-md-end">
-                        <div class="col-auto">
-                            <label for="paginacion">Ítems por página:</label>
-                        </div>
-                        <div class="col-auto">
-                            <select id="paginacion" class="form-control" (change)="cambiarPaginacion();"
-                                [(ngModel)]="itemsPerPage_productos">
-                                <option value=5>5</option>
-                                <option value=10>10</option>
-                                <option value=20>20</option>
-                                <option value=50>50</option>
-                                <option value=100>100</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="row mt-3">
-                <div class="col-12 d-flex justify-content-center">
-                    <button id="back-button-with-border" type="button" class="btn btn-wd"
-                        (click)="cerrarModalProductos()">Cerrar</button>
-                </div>
-            </div>
-
-        </ng-template>
-    </ngx-custom-modal>
 </div>

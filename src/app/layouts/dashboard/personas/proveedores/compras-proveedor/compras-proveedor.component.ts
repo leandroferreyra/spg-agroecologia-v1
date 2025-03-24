@@ -21,6 +21,10 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 import { IconClipboardTextComponent } from 'src/app/shared/icon/icon-clipboard-text';
 import { IconShoppingCartComponent } from 'src/app/shared/icon/icon-shopping-cart';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { slideDownUp, toggleAnimation } from 'src/app/shared/animations';
+import { Paginador } from 'src/app/core/models/request/paginador';
+
 
 @Component({
   selector: 'app-compras-proveedor',
@@ -30,10 +34,10 @@ import { IconShoppingCartComponent } from 'src/app/shared/icon/icon-shopping-car
     IconClipboardTextComponent, IconShoppingCartComponent
   ],
   templateUrl: './compras-proveedor.component.html',
-  styleUrl: './compras-proveedor.component.css'
+  styleUrl: './compras-proveedor.component.css',
+  animations: [toggleAnimation, slideDownUp]
 })
 export class ComprasProveedorComponent implements OnInit, OnDestroy {
-
 
   @Input() proveedor: any;
   @Input() rol!: string;
@@ -42,7 +46,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
 
-  // Orden, filtro y paginación para cuentas bancarias de proveedor
+  // Orden, filtro y paginación para compras de proveedor
   MAX_ITEMS_PER_PAGE = 10;
   currentPage = 1;
   last_page = 1;
@@ -59,28 +63,24 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     'transaction.transaction_datetime': 'desc'
   };
 
-  // Referencia al modal para crear y editar países.
-  @ViewChild('modalProductos') modalProductos!: NgxCustomModalComponent;
-  modalOptionsProductos: ModalOptions = {
-    closeOnOutsideClick: false,
-    hideCloseButton: true,
-    closeOnEscape: false
-  };
+  productosExpandido: { [uuid: string]: boolean } = {}; // Estado de expansión de cada compra
+  expandirTodo = false;
+  // paginadores: { [uuid: string]: { currentPage: number; itemsPerPage: number; totalItems: number, itemsInPage: number, pageSize: number } } = {};
+  paginadores: { [uuid: string]: Paginador } = {};
 
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
 
-
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
   // Orden, filtro y paginación para productos de una compra en particular
-  MAX_ITEMS_PER_PAGE_productos = 10;
-  currentPage_productos = 1;
-  itemsPerPage_productos = this.MAX_ITEMS_PER_PAGE;
-  itemsInPage_productos = this.itemsPerPage;
-  pageSize_productos: number = 0;
+  // MAX_ITEMS_PER_PAGE_productos = 10;
+  // currentPage_productos = 1;
+  // itemsPerPage_productos = this.MAX_ITEMS_PER_PAGE;
+  // itemsInPage_productos = this.itemsPerPage;
+  // pageSize_productos: number = 0;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _compraService: ComprasProveedorService, private _tokenService: TokenService) {
@@ -115,10 +115,9 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   obtenerCompras() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["transaction", "transaction.transactionProducts.product.productType",
-      "transaction.transactionDocuments.accountDocumentType",
-      "transaction.transactionDocuments.currency",
-      "qualificationOption"];
+    params.with = ["transaction.transactionProducts.product.productType",
+      "transaction.transactionDocuments",
+      "batch"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -127,10 +126,11 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getComprasProveedorWithParam(params, this.rol).subscribe({
         next: res => {
-          // console.log(res);
+          console.log(res);
           this.compras = res.data;
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
+          this.iniciarPaginadoresProductos();
           this.spinner.hide();
         },
         error: error => {
@@ -154,6 +154,19 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     }
   }
 
+  iniciarPaginadoresProductos() {
+    this.compras.forEach(compra => {
+      if (!this.paginadores[compra.uuid]) {
+        this.paginadores[compra.uuid] = new Paginador(compra.transaction?.transaction_products?.length);
+        if (this.paginadores[compra.uuid].totalItems <= this.paginadores[compra.uuid].itemsPerPage) {
+          this.paginadores[compra.uuid].itemsInPage = this.paginadores[compra.uuid].totalItems;
+        }
+        // // console.log('PAGINADOR UUID: ' + compra.uuid);
+        // console.log(this.paginadores[compra.uuid]);
+      }
+    });
+  }
+
   toggleFilter() {
     this.showFilterCompras = !this.showFilterCompras;
     if (!this.showFilterCompras) {
@@ -164,34 +177,36 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     }
   }
 
-  getTotal(data: any) {
-    let total = 0;
-    data.transaction.transaction_products.forEach((elem: any) => {
-      total += elem.unit_price * elem.quantity * (1 + elem.product.vat_percent / 100)
-    })
-    total -= (+data.discount1) + (+data.discount2) + (+data.others);
-    return total.toFixed(2);
-  }
+  public onPageChange(uuid: string, pageNum: number): void {
+    if (this.paginadores[uuid]) {
+      this.paginadores[uuid].currentPage = pageNum;
+      // this.paginadores[uuid].itemsInPage = this.paginadores[uuid].itemsPerPage;
+      this.paginadores[uuid].pageSize = this.paginadores[uuid].itemsPerPage * (pageNum - 1);
 
-  verProductos(data: any) {
-    this.productosView = data.transaction.transaction_products;
-    if (this.productosView.length <= this.itemsPerPage_productos) {
-      this.itemsInPage_productos = this.productosView.length;
     }
-    this.modalProductos.options = this.modalOptionsProductos;
-    this.modalProductos.open();
+  }
+  cambiarPaginacion(uuid: string) {
+    this.onPageChange(uuid, 1);
   }
 
-  cerrarModalProductos() {
-    this.modalProductos.close();
+  toggleProductos(data: any) {
+    this.productosExpandido[data.uuid] = !this.productosExpandido[data.uuid];
+    // Si no existe un paginador para este `uuid`, lo creamos
+    // if (!this.paginadores[data.uuid]) {
+    //   this.paginadores[data.uuid] = {
+    //     currentPage: 1,
+    //     itemsPerPage: 5,
+    //     totalItems: this.compras.find(c => c.uuid === data.uuid)?.transaction.transaction_products.length || 0
+    //   };
+    // }
+    // this.verProductos(data);
   }
 
-  public onPageChange(pageNum: number): void {
-    this.currentPage_productos = pageNum;
-    this.pageSize_productos = this.itemsPerPage_productos * (pageNum - 1);
-  }
-  cambiarPaginacion() {
-    this.onPageChange(1);
-  }
+  // toggleTodos() {
+  //   this.expandirTodo = !this.expandirTodo;
+  //   this.compras.forEach(compra => {
+  //     this.productosExpandido[compra.uuid] = this.expandirTodo;
+  //   });
+  // }
 
 }
