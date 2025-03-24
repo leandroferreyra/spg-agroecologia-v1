@@ -65,7 +65,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
 
   productosExpandido: { [uuid: string]: boolean } = {}; // Estado de expansión de cada compra
   expandirTodo = false;
-  // paginadores: { [uuid: string]: { currentPage: number; itemsPerPage: number; totalItems: number, itemsInPage: number, pageSize: number } } = {};
   paginadores: { [uuid: string]: Paginador } = {};
 
   tituloModal: string = '';
@@ -75,17 +74,12 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
-  // Orden, filtro y paginación para productos de una compra en particular
-  // MAX_ITEMS_PER_PAGE_productos = 10;
-  // currentPage_productos = 1;
-  // itemsPerPage_productos = this.MAX_ITEMS_PER_PAGE;
-  // itemsInPage_productos = this.itemsPerPage;
-  // pageSize_productos: number = 0;
+  productos = ['prod 1', 'prod2', 'prod3'];
 
-  constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _compraService: ComprasProveedorService, private _tokenService: TokenService) {
-
+  constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService, 
+              private _tokenService: TokenService) {
   }
+  
   ngOnInit(): void {
   }
 
@@ -202,11 +196,11 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     // this.verProductos(data);
   }
 
-  // toggleTodos() {
-  //   this.expandirTodo = !this.expandirTodo;
-  //   this.compras.forEach(compra => {
-  //     this.productosExpandido[compra.uuid] = this.expandirTodo;
-  //   });
-  // }
+  toggleTodos() {
+    this.expandirTodo = !this.expandirTodo;
+    this.compras.forEach(compra => {
+      this.productosExpandido[compra.uuid] = this.expandirTodo;
+    });
+  }
 
 }

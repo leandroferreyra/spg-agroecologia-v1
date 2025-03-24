@@ -1,5 +1,27 @@
 <div class="panel mt-6 pb-0">
 
+    <div class="flex justify-between items-center w-full mb-3">
+        <!-- Select a la izquierda -->
+        <ng-select [items]="productos" class="w-1/3 min-w-[200px]"></ng-select>
+
+        <!-- Switch a la derecha -->
+        <div class="flex items-center gap-2">
+            @if (expandirTodo) {
+            <span>Ocultar todos los productos</span>
+            } @else {
+            <span>Ver todos los productos</span>
+            }
+            <label class="w-12 h-6 relative">
+                <input type="checkbox" class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                    id="custom_switch_checkbox2" (change)="toggleTodos()" />
+                <span for="custom_switch_checkbox2"
+                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                </span>
+            </label>
+        </div>
+    </div>
+
+
     <div class="row mb-2">
         <div class="col-6">
             <span *ngIf="compras && compras.length > 0" class="float-md-start color-gris">
