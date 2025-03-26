@@ -44,7 +44,7 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
 
   productosExpandido: { [uuid: string]: boolean } = {}; // Estado de expansión de cada compra
   expandirTodo = false;
-  paginadores: { [uuid: string]: Paginador } = {};
+  // paginadores: { [uuid: string]: Paginador } = {};
 
 
   private subscription: Subscription = new Subscription();
@@ -154,10 +154,9 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getComprasClientesWithParam(params, this.rol).subscribe({
         next: res => {
-          console.log(res);
           this.compras = res.data;
           this.modificarPaginacion(res);
-          this.iniciarPaginadoresProductos();
+          // this.iniciarPaginadoresProductos();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -182,18 +181,16 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     }
   }
 
-  iniciarPaginadoresProductos() {
-    this.compras.forEach(compra => {
-      if (!this.paginadores[compra.uuid]) {
-        this.paginadores[compra.uuid] = new Paginador(compra.transaction_products?.length);
-        if (this.paginadores[compra.uuid].totalItems <= this.paginadores[compra.uuid].itemsPerPage) {
-          this.paginadores[compra.uuid].itemsInPage = this.paginadores[compra.uuid].totalItems;
-        }
-        // // console.log('PAGINADOR UUID: ' + compra.uuid);
-        // console.log(this.paginadores[compra.uuid]);
-      }
-    });
-  }
+  // iniciarPaginadoresProductos() {
+  //   this.compras.forEach(compra => {
+  //     if (!this.paginadores[compra.uuid]) {
+  //       this.paginadores[compra.uuid] = new Paginador(compra.transaction_products?.length);
+  //       if (this.paginadores[compra.uuid].totalItems <= this.paginadores[compra.uuid].itemsPerPage) {
+  //         this.paginadores[compra.uuid].itemsInPage = this.paginadores[compra.uuid].totalItems;
+  //       }
+  //     }
+  //   });
+  // }
 
   toggleFilter() {
     this.showFilterCompras = !this.showFilterCompras;
@@ -224,17 +221,16 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
   //   this.modalProductos.open();
   // }
 
-  public onPageChange(uuid: string, pageNum: number): void {
-    if (this.paginadores[uuid]) {
-      this.paginadores[uuid].currentPage = pageNum;
-      // this.paginadores[uuid].itemsInPage = this.paginadores[uuid].itemsPerPage;
-      this.paginadores[uuid].pageSize = this.paginadores[uuid].itemsPerPage * (pageNum - 1);
+  // public onPageChange(uuid: string, pageNum: number): void {
+  //   if (this.paginadores[uuid]) {
+  //     this.paginadores[uuid].currentPage = pageNum;
+  //     this.paginadores[uuid].pageSize = this.paginadores[uuid].itemsPerPage * (pageNum - 1);
 
-    }
-  }
-  cambiarPaginacion(uuid: string) {
-    this.onPageChange(uuid, 1);
-  }
+  //   }
+  // }
+  // cambiarPaginacion(uuid: string) {
+  //   this.onPageChange(uuid, 1);
+  // }
 
   toggleProductos(data: any) {
     this.productosExpandido[data.uuid] = !this.productosExpandido[data.uuid];
