@@ -42,7 +42,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   @Input() proveedor: any;
   @Input() rol!: string;
   compras: any[] = [];
-  productosView: any[] = [];
+  productosTotales: any[] = [];
 
   private subscription: Subscription = new Subscription();
 
@@ -74,12 +74,11 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
-  productos = ['prod 1', 'prod2', 'prod3'];
 
-  constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService, 
-              private _tokenService: TokenService) {
+  constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
+    private _tokenService: TokenService) {
   }
-  
+
   ngOnInit(): void {
   }
 
@@ -93,6 +92,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
       // Si el supplierUuid cambia, actualizamos los filtros y obtenemos las compras
       this.filtrosCompras['transaction.person.uuid'].value = this.proveedor.person.uuid;
       this.obtenerCompras();
+      this.obtenerProductos();
     }
   }
 
@@ -125,6 +125,40 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.iniciarPaginadoresProductos();
+          this.spinner.hide();
+        },
+        error: error => {
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  obtenerProductos() {
+    let filtros: any = {
+      'transactionProducts.transaction.transactionType.name"': { value: 'Compra', op: '=', contiene: false },
+      'transactionProducts.transaction.person.uuid': { value: this.proveedor.person.uuid, op: '=', contiene: false }
+    }
+    let orden: any = {
+      'name': 'asc'
+    };
+    const params: any = {};
+    params.order_by = orden;
+    params.filters = filtros;
+    params.distinct = true;
+    params.with = [];
+
+    this.subscription.add(
+      this._indexService.getProductosTotalesComprados(params, this.rol).subscribe({
+        next: res => {
+          console.log(res);
+          // this.compras = res.data;
+          this.productosTotales = res.data;
+          // this.modificarPaginacion(res);
+          // this.iniciarPaginadoresProductos();
+          this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {
@@ -201,6 +235,11 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     this.compras.forEach(compra => {
       this.productosExpandido[compra.uuid] = this.expandirTodo;
     });
+  }
+
+  onProductoSeleccionado(productoSeleccionado: any) {
+    console.log("Producto seleccionado:", productoSeleccionado);
+    // Aquí puedes manipular la información como necesites
   }
 
 }

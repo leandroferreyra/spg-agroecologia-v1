@@ -34,6 +34,7 @@ export class IndexService {
 
   apiProductosAdquiridos = '/transaction_products';
   apiProductosEnPosesion = '/product_instances';
+  apiProductos = '/products';
 
   constructor(private http: HttpClient) { }
 
@@ -115,6 +116,9 @@ export class IndexService {
     });
     if (rol) {
       params = params.append('actual_role', rol);
+    }
+    if (paramsObj.distinct) {
+      params = params.append('distinct', paramsObj.district);
     }
     return params;
   }
@@ -266,5 +270,9 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductosEnPosesion, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
+  getProductosTotalesComprados(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
 
 }

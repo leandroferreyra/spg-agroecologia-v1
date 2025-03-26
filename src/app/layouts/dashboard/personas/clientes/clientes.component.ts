@@ -319,6 +319,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   }
 
   editarUsuario(cliente: any) {
+    this.tab1 = 'datos-generales';
     this.isEdicion = true;
     this.inicializarForm(cliente);
     this.modificarValidacionesForm();

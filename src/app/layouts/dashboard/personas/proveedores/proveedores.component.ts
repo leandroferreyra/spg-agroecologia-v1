@@ -80,7 +80,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   iconArrowLeft = faArrowLeft;
 
 
-  tab1: string = 'Datos-generales';
+  tab1: string = 'datos-generales';
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalProveedor') modalProveedor!: NgxCustomModalComponent;
@@ -312,6 +312,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   editarUsuario(proveedor: any) {
+    this.tab1 = 'datos-generales';
     this.isEdicion = true;
     this.inicializarForm(proveedor);
     this.modificarValidacionesForm();
