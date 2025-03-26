@@ -38,54 +38,6 @@ export class IndexService {
 
   constructor(private http: HttpClient) { }
 
-  getParams(paramsObj: any, rol?: string): HttpParams {
-    let params = new HttpParams();
-    // Paging 
-    paramsObj.paging && (params = params.append('paging', paramsObj.paging));
-    paramsObj.page && (params = params.append('page', paramsObj.page));
-    // para cada elemento de paramsObj.with, agregar un with[]
-    paramsObj.with.forEach((element: any) => {
-      params = params.append('with[]', element);
-    });
-    // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
-    Object.keys(paramsObj.order_by).forEach((key, index) => {
-      if (paramsObj.order_by[key] !== '') {
-        params = params.append(`order_by[${index}][]`, key);
-        params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
-      }
-    });
-    // para cada elemento de paramsObj.filters, agregar un filters[]
-    Object.keys(paramsObj.filters).forEach((key, index) => {
-      if (paramsObj.filters[key] !== '') {
-        if (key === 'location_uuid' || key === 'product_category_uuid' || key === 'person.uuid' || key === 'transactionType.name') {
-          params = params.append(`filters[${index}][]`, key);
-          params = params.append(`filters[${index}][]`, '=');
-          params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
-        } else if (key === 'account_number' || key === 'document_number' || key === 'cuit') {
-          params = params.append(`filters[${index}][]`, key);
-          params = params.append(`filters[${index}][]`, 'LIKE');
-          params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
-        } else if (key === 'currency_name' || key === 'supplier_uuid' || key === 'transaction_person_uuid') {
-          // Si entró por currency_name es porque está trayendo los tipos de cambio.
-          // Si entró por supplier_uuid es porque está trayendo las cuentas bancarias de un proveedor (proveedor.component)
-          // Si entró por transaction_person_uuid es porque está trayendo las compras de un proveedor (proveedor.component)
-          params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
-          params = params.append(`filters[${index}][]`, '=');
-          params = params.append(`filters[${index}][]`, `${paramsObj.filters[key]}`);
-        } else {
-          params = params.append(`filters[${index}][]`, key.replace(/_/g, '.'));
-          params = params.append(`filters[${index}][]`, 'LIKE');
-          params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key]}%`);
-        }
-      }
-    });
-    if (rol) {
-      params = params.append('actual_role', rol);
-    }
-
-    return params;
-  }
-
   getNewParams(paramsObj: any, rol?: string): HttpParams {
     let params = new HttpParams();
     // Paging 
@@ -117,8 +69,8 @@ export class IndexService {
     if (rol) {
       params = params.append('actual_role', rol);
     }
-    if (paramsObj.distinct) {
-      params = params.append('distinct', paramsObj.district);
+    if (paramsObj.distinct !== null && paramsObj.distinct !== undefined) {
+      params = params.append('distinct', paramsObj.distinct);
     }
     return params;
   }

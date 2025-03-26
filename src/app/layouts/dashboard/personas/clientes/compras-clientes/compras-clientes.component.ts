@@ -10,10 +10,12 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { CompraProveedorDTO } from 'src/app/core/models/request/compraProveedorDTO';
+import { Paginador } from 'src/app/core/models/request/paginador';
 import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { toggleAnimation, slideDownUp } from 'src/app/shared/animations';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
@@ -29,7 +31,8 @@ import Swal from 'sweetalert2';
     IconShoppingCartComponent
   ],
   templateUrl: './compras-clientes.component.html',
-  styleUrl: './compras-clientes.component.css'
+  styleUrl: './compras-clientes.component.css',
+  animations: [toggleAnimation, slideDownUp]
 })
 export class ComprasClientesComponent implements OnInit, OnDestroy {
 
@@ -37,9 +40,12 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
   @Input() cliente: any;
   @Input() rol!: string;
   compras: any[] = [];
-  // monedas: any[] = [];
-  // tiposDeCuenta: any[] = [];
-  // bancos: any[] = [];
+  productosTotales: any[] = [];
+
+  productosExpandido: { [uuid: string]: boolean } = {}; // Estado de expansión de cada compra
+  expandirTodo = false;
+  paginadores: { [uuid: string]: Paginador } = {};
+
 
   private subscription: Subscription = new Subscription();
 
@@ -69,22 +75,6 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
-  productosView: any[] = [];
-  // Referencia al modal para crear y editar países.
-  @ViewChild('modalProductos') modalProductos!: NgxCustomModalComponent;
-  modalOptionsProductos: ModalOptions = {
-    closeOnOutsideClick: false,
-    hideCloseButton: true,
-    closeOnEscape: false
-  };
-
-  // Orden, filtro y paginación para productos de una compra en particular
-  MAX_ITEMS_PER_PAGE_productos = 10;
-  currentPage_productos = 1;
-  itemsPerPage_productos = this.MAX_ITEMS_PER_PAGE;
-  itemsInPage_productos = this.itemsPerPage;
-  pageSize_productos: number = 0;
-
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _compraService: ComprasProveedorService, private _tokenService: TokenService) {
 
@@ -103,7 +93,42 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
       this.filtrosCompras['transactionType.name'].value = 'Venta';
       this.filtrosCompras['person.uuid'].value = this.cliente.person?.uuid;
       this.obtenerCompras();
+      this.obtenerProductos();
     }
+  }
+
+  obtenerProductos() {
+    let filtros: any = {
+      'transactionProducts.transaction.transactionType.name': { value: 'Venta', op: '=', contiene: false },
+      'transactionProducts.transaction.person.uuid': { value: this.cliente.person.uuid, op: '=', contiene: false }
+    }
+    let orden: any = {
+      'name': 'asc'
+    };
+    const params: any = {};
+    params.order_by = orden;
+    params.filters = filtros;
+    params.distinct = true;
+    params.with = [];
+
+    this.subscription.add(
+      this._indexService.getProductosTotalesComprados(params, this.rol).subscribe({
+        next: res => {
+          console.log(res);
+          this.productosTotales = res.data;
+          this._tokenService.setToken(res.token);
+          this.spinner.hide();
+          // this.compras = res.data;
+          // this.modificarPaginacion(res);
+          // this.iniciarPaginadoresProductos();
+        },
+        error: error => {
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
   }
 
   cambiarOrdenamiento(column: string) {
@@ -129,9 +154,10 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getComprasClientesWithParam(params, this.rol).subscribe({
         next: res => {
-          //console.log(res);
+          console.log(res);
           this.compras = res.data;
           this.modificarPaginacion(res);
+          this.iniciarPaginadoresProductos();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -156,6 +182,18 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     }
   }
 
+  iniciarPaginadoresProductos() {
+    this.compras.forEach(compra => {
+      if (!this.paginadores[compra.uuid]) {
+        this.paginadores[compra.uuid] = new Paginador(compra.transaction_products?.length);
+        if (this.paginadores[compra.uuid].totalItems <= this.paginadores[compra.uuid].itemsPerPage) {
+          this.paginadores[compra.uuid].itemsInPage = this.paginadores[compra.uuid].totalItems;
+        }
+        // // console.log('PAGINADOR UUID: ' + compra.uuid);
+        // console.log(this.paginadores[compra.uuid]);
+      }
+    });
+  }
 
   toggleFilter() {
     this.showFilterCompras = !this.showFilterCompras;
@@ -175,27 +213,47 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     return total.toFixed(2);
   }
 
-  verProductos(data: any) {
-    //console.log(data);
-    this.productosView = data.transaction_products;
-    //console.log(this.productosView);
-    if (this.productosView.length <= this.itemsPerPage_productos) {
-      this.itemsInPage_productos = this.productosView.length;
+  // verProductos(data: any) {
+  //   //console.log(data);
+  //   this.productosView = data.transaction_products;
+  //   //console.log(this.productosView);
+  //   if (this.productosView.length <= this.itemsPerPage_productos) {
+  //     this.itemsInPage_productos = this.productosView.length;
+  //   }
+  //   this.modalProductos.options = this.modalOptionsProductos;
+  //   this.modalProductos.open();
+  // }
+
+  public onPageChange(uuid: string, pageNum: number): void {
+    if (this.paginadores[uuid]) {
+      this.paginadores[uuid].currentPage = pageNum;
+      // this.paginadores[uuid].itemsInPage = this.paginadores[uuid].itemsPerPage;
+      this.paginadores[uuid].pageSize = this.paginadores[uuid].itemsPerPage * (pageNum - 1);
+
     }
-    this.modalProductos.options = this.modalOptionsProductos;
-    this.modalProductos.open();
+  }
+  cambiarPaginacion(uuid: string) {
+    this.onPageChange(uuid, 1);
   }
 
-  cerrarModalProductos() {
-    this.modalProductos.close();
+  toggleProductos(data: any) {
+    this.productosExpandido[data.uuid] = !this.productosExpandido[data.uuid];
   }
 
-  public onPageChange(pageNum: number): void {
-    this.currentPage_productos = pageNum;
-    this.pageSize_productos = this.itemsPerPage_productos * (pageNum - 1);
+  toggleTodos() {
+    this.expandirTodo = !this.expandirTodo;
+    this.compras.forEach(compra => {
+      this.productosExpandido[compra.uuid] = this.expandirTodo;
+    });
   }
-  cambiarPaginacion() {
-    this.onPageChange(1);
+
+  onProductoSeleccionado(productoSeleccionado: any) {
+    if (productoSeleccionado) {
+      this.filtrosCompras['transactionProducts.product.uuid'] = { value: productoSeleccionado.uuid, op: '=', contiene: false };
+    } else {
+      delete this.filtrosCompras['transactionProducts.product.uuid'];
+    }
+    this.obtenerCompras();
   }
 
 }

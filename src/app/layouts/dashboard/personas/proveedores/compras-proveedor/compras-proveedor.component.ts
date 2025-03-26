@@ -138,7 +138,7 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
 
   obtenerProductos() {
     let filtros: any = {
-      'transactionProducts.transaction.transactionType.name"': { value: 'Compra', op: '=', contiene: false },
+      'transactionProducts.transaction.transactionType.name': { value: 'Compra', op: '=', contiene: false },
       'transactionProducts.transaction.person.uuid': { value: this.proveedor.person.uuid, op: '=', contiene: false }
     }
     let orden: any = {
@@ -147,19 +147,19 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     const params: any = {};
     params.order_by = orden;
     params.filters = filtros;
-    params.distinct = true;
+    params.distinct = 'true';
     params.with = [];
 
     this.subscription.add(
       this._indexService.getProductosTotalesComprados(params, this.rol).subscribe({
         next: res => {
           console.log(res);
-          // this.compras = res.data;
           this.productosTotales = res.data;
-          // this.modificarPaginacion(res);
-          // this.iniciarPaginadoresProductos();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
+          // this.iniciarPaginadoresProductos();
+          // this.compras = res.data;
+          // this.modificarPaginacion(res);
         },
         error: error => {
           this._swalService.toastError('top-right', error.error.message);
@@ -219,15 +219,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
 
   toggleProductos(data: any) {
     this.productosExpandido[data.uuid] = !this.productosExpandido[data.uuid];
-    // Si no existe un paginador para este `uuid`, lo creamos
-    // if (!this.paginadores[data.uuid]) {
-    //   this.paginadores[data.uuid] = {
-    //     currentPage: 1,
-    //     itemsPerPage: 5,
-    //     totalItems: this.compras.find(c => c.uuid === data.uuid)?.transaction.transaction_products.length || 0
-    //   };
-    // }
-    // this.verProductos(data);
   }
 
   toggleTodos() {
@@ -238,8 +229,12 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
   }
 
   onProductoSeleccionado(productoSeleccionado: any) {
-    console.log("Producto seleccionado:", productoSeleccionado);
-    // Aquí puedes manipular la información como necesites
+    if (productoSeleccionado) {
+      this.filtrosCompras['transaction.transactionProducts.product.uuid'] = { value: productoSeleccionado.uuid, op: '=', contiene: false };
+    } else {
+      delete this.filtrosCompras['transaction.transactionProducts.product.uuid'];
+    }
+    this.obtenerCompras();
   }
 
 }
