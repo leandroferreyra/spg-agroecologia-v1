@@ -175,6 +175,12 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
   }
 
+  getProductos(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: params });
+  }
 
   getCuentasProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

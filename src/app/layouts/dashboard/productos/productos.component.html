@@ -1,0 +1,356 @@
+<div class="relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
+    <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
+        [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
+
+    <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[250px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
+        [ngClass]="{ '!block': isShowMailMenu }">
+
+        <!-- PANEL IZQUIERDO -->
+
+        <div class="flex h-full flex-col pb-16">
+
+            <div class="flex items-center justify-between text-md mb-3">
+                <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
+                    <icon-plus class="mx-auto mb-1" />
+                    Agregar producto
+                </button>
+
+                <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" (click)="mostrarFiltros()"
+                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                    <icon-settings class="mx-auto mb-1" />
+                    Filtros avanzados
+                </button>
+            </div>
+
+            <!-- <ng-scrollbar class="relative h-full grow" appearance="compact"> -->
+            <div class="table-responsive">
+                <table class="table-hover">
+                    <tbody>
+                        @for(data of filtrarDatos() ; let index = $index ;track data.uuid) {
+                        <tr style="cursor: pointer;" [ngClass]="{'bg-blue-200': selectedProducto?.uuid === data.uuid}">
+                            <td (click)="showDataProducto(data)">{{ data.name }}
+                            </td>
+                            <td>
+                                <div hlMenu class="dropdown">
+                                    <button type="button" hlMenuButton>
+                                        <icon-horizontal-dots class="rotate-90 opacity-70" />
+                                    </button>
+                                    <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
+                                        <li>
+                                            <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                (click)="openModalProducto('EDIT', data)">Editar</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                (click)="openSwalEliminar(data)">Eliminar</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <!-- </ng-scrollbar> -->
+
+            <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
+                <div class="group relative">
+                    <input type="text" placeholder="Buscar producto..." [(ngModel)]="busquedaPorNombreSimple"
+                        (input)="filtroSimpleInput()" class="peer form-input ltr:pr-8 rtl:pl-8" />
+                    <div
+                        class="absolute top-1/2 -translate-y-1/2 peer-focus:text-primary ltr:right-[11px] rtl:left-[11px]">
+                        <icon-search />
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 mt-2">
+                    <label class="w-12 h-6 relative">
+                        <input type="checkbox"
+                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                            id="custom_switch_checkbox2" [(ngModel)]="busqueda_contiene" (change)="filtrarDatos()" />
+                        <span for="custom_switch_checkbox2"
+                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                        </span>
+                    </label>
+                    <span>Contiene</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div class="panel h-full flex-1 overflow-x-hidden p-0">
+
+        <!-- MENU ICONO OCULTO RESPONSIVE -->
+        <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
+            <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
+                Producto @if(selectedProducto) {
+                {{selectedProducto.name}}
+                }
+            </h5>
+
+            <div class="flex w-full items-center justify-between sm:w-auto">
+                <div class="flex items-center ltr:mr-4 rtl:ml-4">
+                    <button type="button" class="block hover:text-primary ltr:mr-3 rtl:ml-3 xl:hidden"
+                        (click)="isShowMailMenu = !isShowMailMenu">
+                        <icon-menu />
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="">
+
+            <div class="mt-3 flex flex-wrap">
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales' }"
+                    (click)="tab1 = 'datos-generales'">
+                    <!-- <icon-user class="mr-3" /> -->
+                    Datos generales
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componentes' }"
+                    (click)="tab1 = 'componentes'">
+                    <!-- <icon-user class="mr-3" /> -->
+                    Componentes
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'reemplazos' }"
+                    (click)="tab1 = 'reemplazos'">
+                    <!-- <icon-user class="mr-3" /> -->
+                    Reemplazos
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'proveedores' }"
+                    (click)="tab1 = 'proveedores'">
+                    Proveedores
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'stocks' }"
+                    (click)="tab1 = 'stocks'">
+                    Stock
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'compras' }"
+                    (click)="tab1 = 'compras'">
+                    Compras
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'vinculos' }"
+                    (click)="tab1 = 'vinculos'">
+                    Vínculos
+                </a>
+            </div>
+
+            <div class="flex-1 text-sm">
+                <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
+                    <!-- <h4 class="mb-4 text-2xl font-semibold"></h4> -->
+                    @if (productos.length > 0) {
+                    <form [formGroup]="productoForm" class="p-4">
+                        <div class="flex flex-col sm:flex-row">
+                            <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+
+                                <div>
+                                    <label for="nombre">Nombre</label>
+                                    <input id="nombre" type="text" placeholder="" class="form-control"
+                                        formControlName="nombre" />
+                                </div>
+                                <div>
+                                    <label for="codigo">Código</label>
+                                    <input id="codigo" type="text" placeholder="" class="form-control"
+                                        formControlName="codigo" />
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        @if (isEdicion) {
+                        <div class="row mt-3">
+                            <div class="col-12 d-flex justify-content-center">
+                                <button type="button" class="btn btn-wd btn-primary mr-4"
+                                    (click)="confirmarEdicion()">Confirmar</button>
+                                <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                    (click)="cancelarEdicion()">Cancelar</button>
+                            </div>
+                        </div>
+                        }
+
+                    </form>
+                    }
+
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'componentes'">
+                    <app-contactos [persona]="selectedProducto" [rol]="actual_role">
+                    </app-contactos>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'reemplazos'">
+                    <app-contactos-persona [persona]="selectedProducto" [rol]="actual_role">
+                    </app-contactos-persona>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'proveedores'">
+                    <app-cuentas-bancarias [proveedor]="selectedProducto" [rol]="actual_role">
+                    </app-cuentas-bancarias>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'stock'">
+                    <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
+                    </app-compras-proveedor>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'compras'">
+                    <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
+                    </app-compras-proveedor>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'vinculos'">
+                    <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
+                    </app-compras-proveedor>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div>
+    <ngx-custom-modal #modalProducto class=" modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <div class="position-relative text-center w-100">
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
+            </div>
+        </ng-template>
+
+        <ng-template #modalBody>
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <button class="btn btn-primary mr-3" (click)="confirmarNuevoProducto()">
+                        Confirmar
+                    </button>
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cerrarModal()">Cancelar</button>
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+</ngx-spinner>
+
+
+
+
+<div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasRight"
+    aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <!-- <h5 class="offcanvas-title" id="offcanvasRightLabel">Filtros avanzados</h5> -->
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close">
+        </button>
+    </div>
+    <div class="offcanvas-body">
+
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 d-flex justify-content-center">
+                <div class="max-w-[50rem] mt-3 w-full shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-[#e0e6ed] 
+                    dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none mx-auto">
+                    <div class="py-4 px-4">
+
+                        <!-- Tipo de Persona -->
+                        <div class="mb-3 text-center">
+                            <label class="font-semibold text-gray-700 d-block">Tipo de Persona:</label>
+                            <div class="d-flex justify-content-center gap-3">
+                                <div class="form-check">
+                                    <label class="inline-flex items-center" for="radioTodos">
+                                        <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                            id="radioTodos" value="todos" [(ngModel)]="filtros.tipoPersona"
+                                            (change)="cleanFilters()">
+                                        <span class="ml-2 cursor-pointer">Todos</span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <label class="inline-flex items-center" for="radioFisica">
+                                        <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                            id="radioFisica" value="fisica" [(ngModel)]="filtros.tipoPersona"
+                                            (change)="cleanFilters()">
+                                        <span class="ml-2 cursor-pointer">Física</span>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <label class="inline-flex items-center" for="radioJuridica">
+                                        <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                            id="radioJuridica" value="juridica" [(ngModel)]="filtros.tipoPersona"
+                                            (change)="cleanFilters()">
+                                        <span class="ml-2 cursor-pointer">Jurídica</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos en una sola fila -->
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            @if(this.filtros.tipoPersona === 'fisica' || this.filtros.tipoPersona === 'todos') {
+                            <div class="flex-grow-1">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" class="form-control" [(ngModel)]="filtros.nombre">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="apellido">Apellido</label>
+                                <input type="text" id="apellido" class="form-control" [(ngModel)]="filtros.apellido">
+                            </div>
+                            }
+                            @if(this.filtros.tipoPersona === 'juridica' || this.filtros.tipoPersona === 'todos') {
+                            <div class="flex-grow-1">
+                                <label for="razon">Razón Social</label>
+                                <input type="text" id="razon" class="form-control" [(ngModel)]="filtros.razon">
+                            </div>
+                            }
+                            <div class="flex-grow-1">
+                                <label for="sigla">Sigla</label>
+                                <input type="text" id="sigla" class="form-control" [(ngModel)]="filtros.sigla">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="cuit">Cuit / Dni</label>
+                                <input type="text" id="cuit" class="form-control" [(ngModel)]="filtros.cuit">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <button class="mt-2 btn btn-primary" (click)="limpiarFiltros()">
+                Limpiar filtros avanzados
+            </button>
+
+        </div>
+
+
+
+    </div>
+</div>

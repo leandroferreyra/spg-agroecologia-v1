@@ -78,7 +78,7 @@ function getMenuByRole(role: string) {
         case 'ADMIN':
         case 'ADMINISTRACION':
             return [
-                { label: 'Productos', route: '/dashboard' },
+                { label: 'Productos', route: '/productos' },
                 { label: 'Producción', route: '/produccion' },
                 { label: 'Compras', route: '/users' },
                 { label: 'Ventas', route: '/settings' },
