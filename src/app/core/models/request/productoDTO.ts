@@ -1,0 +1,28 @@
+export class ProductoDTO {
+
+    name!: string;
+    code!: string;
+    product_type_uuid!: string;
+    comments!: string;
+    measure_uuid!: string;
+    product_category_uuid!: string;
+    possible_product_state_uuid!: string;
+    vat_percent!: string;
+    country_uuid!: string;
+    mercosur_nomenclature!: string;
+    assign_serial_number!: boolean;
+    has_serial_number!: boolean;
+    traceable!: boolean;
+    salable!: boolean;
+    sales_name!: string;
+    controllable!: boolean;
+    control_description!: string;
+    with: string[] = [];
+    actual_role!: string;
+
+
+    constructor() {
+
+    }
+
+}

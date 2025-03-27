@@ -178,7 +178,13 @@ export class IndexService {
   getProductos(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams();
-    params = params.append('actual_role', rol);
+    params = params.append('actual_role', rol)
+      .append("with[]", "productType")
+      .append("with[]", "productCategory")
+      .append("with[]", "productStates")
+      .append("with[]", "measure")
+      .append("with[]", "country")
+      .append("with[]", "stocks");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: params });
   }
 

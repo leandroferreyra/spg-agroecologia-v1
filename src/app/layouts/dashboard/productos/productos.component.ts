@@ -32,6 +32,8 @@ import { ComprasProveedorComponent } from '../personas/proveedores/compras-prove
 import { CuentasBancariasComponent } from '../personas/proveedores/cuentas-bancarias/cuentas-bancarias.component';
 import { ContactosPersonaComponent } from '../personas/shared/contactos-persona/contactos-persona.component';
 import { ContactosComponent } from '../personas/shared/contactos/contactos.component';
+import { ProductoDTO } from 'src/app/core/models/request/productoDTO';
+import { ProductoService } from 'src/app/core/services/producto.service';
 
 @Component({
   selector: 'app-productos',
@@ -55,6 +57,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   productosFiltrados: any[] = [];
   selectedProducto: any;
   productoForm!: FormGroup;
+  newProductoForm!: FormGroup;
 
   busqueda_contiene: boolean = true;
   isEdicion: boolean = false;
@@ -62,7 +65,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   // Orden y filtro para datos listado proveedores.
   filtros: any = {
-    'tipoPersona': 'todos'
+    'nombre_contiene': true,
+    'nomenclatura_contiene': true,
+    'lote_contiene': true
   };
   showFilter: boolean = false;
   filtroSimple: boolean = false;
@@ -86,26 +91,34 @@ export class ProductosComponent implements OnInit, OnDestroy {
   tituloModal: string = '';
 
   // Orden, filtro y paginación para buscar personas
-  showFilterPersonas: boolean = false;
-  MAX_ITEMS_PER_PAGE_buscar = 5;
-  currentPage_buscar = 1;
-  last_page_buscar = 1;
-  itemsPerPage_buscar = this.MAX_ITEMS_PER_PAGE_buscar;
-  itemsInPage_buscar = this.itemsPerPage_buscar;
-  pageSize_buscar: number = 0;
-  total_rows_buscar: number = 0;
-  filtrosContactos_buscar: any = {
-    'firstname': { value: '', op: 'LIKE', contiene: true },
-    'lastname': { value: '', op: 'LIKE', contiene: true },
-    'document_number': { value: '', op: 'LIKE', contiene: true },
-    'cuit': { value: '', op: 'LIKE', contiene: true },
-    'company_name': { value: '', op: 'LIKE', contiene: true }
-  };
-  ordenamiento_buscar: any = {
-  };
+  // showFilterPersonas: boolean = false;
+  // MAX_ITEMS_PER_PAGE_buscar = 5;
+  // currentPage_buscar = 1;
+  // last_page_buscar = 1;
+  // itemsPerPage_buscar = this.MAX_ITEMS_PER_PAGE_buscar;
+  // itemsInPage_buscar = this.itemsPerPage_buscar;
+  // pageSize_buscar: number = 0;
+  // total_rows_buscar: number = 0;
+  // filtrosContactos_buscar: any = {
+  //   'firstname': { value: '', op: 'LIKE', contiene: true },
+  //   'lastname': { value: '', op: 'LIKE', contiene: true },
+  //   'document_number': { value: '', op: 'LIKE', contiene: true },
+  //   'cuit': { value: '', op: 'LIKE', contiene: true },
+  //   'company_name': { value: '', op: 'LIKE', contiene: true }
+  // };
+  // ordenamiento_buscar: any = {
+  // };
+
+  // Catalogos
+  paises: any[] = [];
+  categorias: any[] = [];
+  estados: any[] = [];
+  proveedores: any[] = [];
+  tipoProductos: any[] = [];
+  measures: any[] = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
-    private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
+    private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService) {
     this.initStore();
   }
@@ -135,9 +148,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    // this.inicializarFormEdit();
     this.obtenerProductos();
-    // this.obtenerCatalogos();
+    this.obtenerCatalogos();
   }
 
   obtenerProductos(alta: boolean = false) {
@@ -163,29 +175,101 @@ export class ProductosComponent implements OnInit, OnDestroy {
     )
   }
 
+  obtenerCatalogos() {
+    forkJoin({
+      paises: this._catalogoService.getPaises(),
+      categorias: this._catalogoService.getCategorias(this.actual_role),
+      estados: this._catalogoService.getPosiblesEstadosProductos(this.actual_role),
+      tipoProductos: this._catalogoService.getTipoProductos(this.actual_role),
+      measures: this._catalogoService.getMeasures(this.actual_role),
+      proveedores: this._indexService.getProveedores(this.actual_role)
+    }).subscribe({
+      next: res => {
+        this.paises = res.paises.data;
+        this.categorias = res.categorias.data;
+        this.estados = res.estados.data;
+        this.tipoProductos = res.tipoProductos.data;
+        this.measures = res.measures.data;
+        this.proveedores = res.proveedores.data;
+        this.proveedores = this.proveedores.map(proveedor => ({
+          ...proveedor,
+          nombreCompleto: this.getNombreProveedor(proveedor)
+        }));
+      },
+      error: error => {
+        console.error('Error cargando catalogos:', error);
+      }
+    });
+  }
 
-  // inicializarForm(producto?: any) {
-  //   console.log(producto);
-  //   if (producto) {
-  //     this.selectedProducto = producto;
-  //   }
-  //   if (this.isEdicion) {
-  //     this.inicializarFormEdit(producto);
-  //   } else {
-  //     this.inicializarFormNew();
-  //   }
-  // }
+  getNombreProveedor(proveedor: any): string {
+    if (!proveedor || !proveedor.person) return '';
+    if (proveedor.person?.human) {
+      return proveedor.person?.human?.firstname + ' ' + proveedor.person?.human?.lastname;
+    } else if (proveedor.person?.legal_entity) {
+      return proveedor.person?.legal_entity?.company_name;
+    }
+    return ''; // En caso de que no tenga ninguno de los dos
+  }
+
   inicializarFormEdit(producto: any) {
     this.selectedProducto = producto;
     this.productoForm = new FormGroup({
       nombre: new FormControl({ value: producto?.name, disabled: !this.isEdicion }, [Validators.required]),
       codigo: new FormControl({ value: producto?.code, disabled: !this.isEdicion }, [Validators.required]),
+      tipoProducto: new FormControl({ value: producto?.product_type?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      categoria: new FormControl({ value: producto?.product_category?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      estado: new FormControl({ value: producto?.current_state?.state?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      nomenclatura: new FormControl({ value: producto?.mercosur_nomenclature, disabled: !this.isEdicion }, [Validators.required]),
+      unidad: new FormControl({ value: producto?.measure?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      iva: new FormControl({ value: producto?.vat_percent, disabled: !this.isEdicion }, [Validators.required]),
+      pais: new FormControl({ value: producto?.country?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      asignaNumSerie: new FormControl({ value: producto?.assign_serial_number, disabled: !this.isEdicion }, [Validators.required]),
+      tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: !this.isEdicion }, [Validators.required]),
+      trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
+      vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
+      controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, [Validators.required]),
+      comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, [Validators.required]),
+      nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, [Validators.required]),
+      descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, [Validators.required]),
+      stock_available: new FormControl({ value: producto?.stock_data?.available, disabled: true }, []),
+      stock_initial: new FormControl({ value: producto?.stock_data?.initial_stock, disabled: true }, []),
+      stock_minimum: new FormControl({ value: producto?.stock_data?.minimum, disabled: true }, []),
+      stock_observed: new FormControl({ value: producto?.stock_data?.observed, disabled: true }, []),
+      stock_optimum: new FormControl({ value: producto?.stock_data?.optimum, disabled: true }, []),
+      stock_quantity_sold: new FormControl({ value: producto?.stock_data?.quantity_sold, disabled: true }, []),
+      stock_reserved: new FormControl({ value: producto?.stock_data?.reserved, disabled: true }, []),
+      stock_samples: new FormControl({ value: producto?.stock_data?.samples, disabled: true }, []),
     });
+    // Habilitar todos los controles si es edición
+    if (this.isEdicion) {
+      Object.keys(this.productoForm.controls).forEach(key => {
+        if (key !== 'stock_available' && key !== 'stock_initial' && key !== 'stock_minimum' && key !== 'stock_observed' &&
+          key !== 'stock_optimum' && key !== 'stock_quantity_sold' && key !== 'stock_reserved' && key !== 'stock_samples') {
+          this.productoForm.controls[key].enable();
+        }
+      });
+    }
   }
   inicializarFormNew() {
-    this.productoForm = new FormGroup({
-      nombre: new FormControl({ value: null, disabled: true }, [Validators.required]),
-      codigo: new FormControl({ value: null, disabled: true }, [Validators.required]),
+    this.newProductoForm = new FormGroup({
+      nombre: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      codigo: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      tipoProducto: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      categoria: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      estado: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      nomenclatura: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      comentarios: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      nombreVenta: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      descripcionControl: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      asignaNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
+      tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
+      trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
+      vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
+      controlable: new FormControl({ value: false, disabled: false }, [Validators.required])
     });
   }
 
@@ -199,53 +283,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.inicializarFormEdit(this.selectedProducto);
   }
 
-  confirmarEdicion() {
-    if (this.productoForm.valid) {
-      this.spinner.show();
-      let proveedor = new ProveedorDTO();
-      this.armarDTOEdicion(proveedor);
-      // console.log(proveedor);
-      this.subscription.add(
-        this._proveedoresService.editProveedor(this.selectedProducto.uuid, proveedor).subscribe({
-          next: res => {
-            // console.log(res);
-            this.productos = [...this.productos.map(p =>
-              p.uuid === res.data.uuid ? res.data : p
-            )];
-            this.productosFiltrados = this.productos;
-            this.inicializarFormEdit(res.data);
-            this.isEdicion = false;
-            this.swalService.toastSuccess('top-right', "Usuario actualizado.");
-            this.spinner.hide();
-          },
-          error: error => {
-            this.spinner.hide();
-            this.swalService.toastError('top-right', error.error.message);
-            console.error(error);
-          }
-        })
-      )
-    }
-  }
-  armarDTOEdicion(proveedor: ProveedorDTO) {
-    // console.log(this.newProveedorForm);
-    proveedor.actual_role = this.actual_role;
-    proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.documentType", "person.legalEntity"];
-    proveedor.batch_prefix = this.productoForm.get('sigla')?.value;
-    proveedor.comments = this.productoForm.get('comentarios')?.value;
-    proveedor.perception = !!this.productoForm.get('percepcionRG3337')?.value;
-    proveedor.vat_percent = this.productoForm.get('percepcionIVA')?.value;
-    proveedor.withholding = !!this.productoForm.get('percepcionIIBB')?.value;
-    let person = new Person();
-    person.street_name = this.productoForm.get('calle')?.value;
-    person.door_number = this.productoForm.get('numero')?.value;
-    person.address_detail = this.productoForm.get('detalleDireccion')?.value;
-    person.city_uuid = this.productoForm.get('ciudad')?.value;
-    person.possible_person_state_uuid = this.productoForm.get('estado')?.value;
-    person.state_comments = this.productoForm.get('estadoComentario')?.value;
-    proveedor.person = person;
-  }
 
   filtroSimpleInput() {
     // Si ingresa acá es porque busca por búsqueda simple, por lo que se desactivas los filtros.
@@ -268,58 +305,18 @@ export class ProductosComponent implements OnInit, OnDestroy {
       })
     } else if (this.showFilter) {
       // Es búsqueda avanzada
-      if (this.filtros.tipoPersona === 'fisica') {
-        resultados = this.productosFiltrados.filter(dato => {
-          return dato.person?.human
-        })
-
-      } else if (this.filtros.tipoPersona === 'juridica') {
-        resultados = this.productosFiltrados.filter(dato => {
-          return dato.person?.legal_entity
-        })
-      } else {
-        // todos
-        resultados = this.productos;
-      }
       if (this.filtros.nombre) {
         resultados = resultados.filter(dato => {
-          return dato.person?.human?.firstname?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
-        })
-      }
-      if (this.filtros.apellido) {
-        resultados = resultados.filter(dato => {
-          return dato.person?.human?.lastname?.toLowerCase().includes(this.filtros.apellido.toLowerCase());
-        })
-      }
-      if (this.filtros.razon) {
-        resultados = resultados.filter(dato => {
-          return dato.person?.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
-        })
-      }
-      if (this.filtros.sigla) {
-        resultados = resultados.filter(dato => {
-          return dato.batch_prefix?.toLowerCase().includes(this.filtros.sigla.toLowerCase());
-        })
-      }
-      if (this.filtros.cuit) {
-        // Acá filtra por cuit o dni, por lo que debe chequear dos cosas, primero con que filtro se está aplicando (todos, fisica o jurídica)
-        // y luego, en caso de ser 'todos', chequear si es fisica o jurídica para poder saber de donde sacar la info.
-        resultados = resultados.filter(dato => {
-          if (this.filtros.tipoPersona === 'todos') {
-            if (dato.person?.human) {
-              return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-                dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-            } else {
-              // Es juridica
-              return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-            }
-          } else if (this.filtros.tipoPersona === 'fisica') {
-            return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-              dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+          if (this.filtros.nombre_contiene) {
+            return dato.name?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
           } else {
-            // Filtrado por jurídica
-            return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
+            return dato.name?.toLowerCase().startsWith(this.filtros.nombre.toLowerCase());
           }
+        })
+      }
+      if (this.filtros.codigo) {
+        resultados = resultados.filter(dato => {
+          return dato.code.toLowerCase().includes(this.filtros.codigo.toLowerCase());
         })
       }
     }
@@ -350,10 +347,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
     })
   }
 
-  eliminarProducto(proveedor: any) {
+  eliminarProducto(producto: any) {
     this.spinner.show();
     this.subscription.add(
-      this._proveedoresService.eliminarProveedor(proveedor.uuid, this.actual_role.toUpperCase()).subscribe({
+      this._productoService.deleteProducto(producto.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
           this.obtenerProductos();
           this.tokenService.setToken(res.token);
@@ -374,7 +371,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
 
-
   openModalProducto(type: string, producto?: any) {
     if (type === 'NEW') {
       this.isEdicion = false;
@@ -388,53 +384,80 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Edición producto';
       this.inicializarFormEdit(producto);
     }
-
   }
 
-  confirmarNuevoProducto() {
+  confirmarProducto(form: FormGroup) {
     this.isSubmit = true;
-    if (this.productoForm.valid) {
+    if (form.valid) {
       this.spinner.show();
-      let proveedor = new ProveedorDTO();
-      this.armarDtoNuevoProveedor(proveedor);
-      // console.log(proveedor);
-      this.subscription.add(
-        this._proveedoresService.saveProveedor(proveedor).subscribe({
-          next: res => {
-            this.spinner.hide();
-            this.obtenerProductos(true);
-            this.cerrarModal();
-            this.showDataProducto(res.data);
-          },
-          error: error => {
-            this.spinner.hide();
-            this.swalService.toastError('top-right', error.error.message)
-            console.error(error);
-          }
-        })
-      )
+      let producto = new ProductoDTO();
+      this.armarDTOProducto(producto, form);
+      // console.log(producto);
+      if (!this.isEdicion) {
+        this.subscription.add(
+          this._productoService.saveProducto(producto).subscribe({
+            next: res => {
+              this.spinner.hide();
+              this.obtenerProductos(true);
+              this.cerrarModal();
+              this.showDataProducto(res.data);
+            },
+            error: error => {
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message)
+              console.error(error);
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._productoService.editProducto(this.selectedProducto.uuid, producto).subscribe({
+            next: res => {
+              // console.log(res);
+              this.productos = [...this.productos.map(p =>
+                p.uuid === res.data.uuid ? res.data : p
+              )];
+              this.productosFiltrados = this.productos;
+              this.isEdicion = false;
+              this.inicializarFormEdit(res.data);
+              this.swalService.toastSuccess('top-right', "Usuario actualizado.");
+              this.spinner.hide();
+            },
+            error: error => {
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+            }
+          })
+        )
+      }
     }
   }
 
-  armarDtoNuevoProveedor(proveedor: ProveedorDTO) {
-    proveedor.actual_role = this.actual_role;
-    proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.documentType", "person.legalEntity"];
-    // proveedor.batch_prefix = this.newProveedorForm.get('sigla')?.value;
-    // proveedor.comments = this.newProveedorForm.get('comentarios')?.value;
-    // proveedor.perception = !!this.newProveedorForm.get('percepcionRG3337')?.value;
-    // proveedor.vat_percent = this.newProveedorForm.get('percepcionIVA')?.value;
-    // proveedor.withholding = !!this.newProveedorForm.get('percepcionIIBB')?.value;
-    // let person = new Person();
-    // person.street_name = this.newProveedorForm.get('calle')?.value;
-    // person.door_number = this.newProveedorForm.get('numero')?.value;
-    // person.address_detail = this.newProveedorForm.get('detalleDireccion')?.value;
-    // person.city_uuid = this.newProveedorForm.get('ciudad')?.value;
-    // person.possible_person_state_uuid = this.newProveedorForm.get('estado')?.value;
-    // person.state_comments = this.newProveedorForm.get('estadoComentario')?.value;
+  armarDTOProducto(producto: ProductoDTO, form: FormGroup) {
+    producto.actual_role = this.actual_role;
+    producto.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
+    producto.name = form.get('nombre')?.value;
+    producto.code = form.get('codigo')?.value;
+    producto.product_type_uuid = form.get('tipoProducto')?.value;
+    producto.product_category_uuid = form.get('categoria')?.value;
+    producto.possible_product_state_uuid = form.get('estado')?.value;
+    producto.comments = form.get('comentarios')?.value;
+    producto.measure_uuid = form.get('unidad')?.value;
+    producto.vat_percent = form.get('iva')?.value;
+    producto.country_uuid = form.get('pais')?.value;
+    producto.mercosur_nomenclature = form.get('nomenclatura')?.value;
+    producto.assign_serial_number = form.get('asignaNumSerie')?.value;
+    producto.has_serial_number = form.get('tieneNumSerie')?.value;
+    producto.traceable = form.get('trazable')?.value;
+    producto.salable = form.get('vendible')?.value;
+    producto.sales_name = form.get('nombreVenta')?.value;
+    producto.controllable = form.get('controlable')?.value;
+    producto.control_description = form.get('descripcionControl')?.value;
 
-    // proveedor.person = person;
-    this.cleanObject(proveedor);
+    if (!this.isEdicion) {
+      this.cleanObject(producto);
+    }
   }
 
   // Se eliminan los nulos.
@@ -460,18 +483,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
   limpiarFiltros() {
     // this.showFilter = false;
     this.filtros = {
-      tipoPersona: 'todos'
+      'nombre_contiene': true,
+      'nomenclatura_contiene': true,
+      'lote_contiene': true
     };
   }
-
-  // toggleFilter() {
-  //   this.showFilter = !this.showFilter;
-  //   if (!this.showFilter) {
-  //     this.filtros = {
-  //       tipoPersona: 'todos'
-  //     };
-  //   }
-  // }
 
   cleanFilters() {
     this.filtros.nombre = '';
@@ -480,44 +496,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.filtros.sigla = '';
     this.filtros.cuit = '';
   }
-
-  // modificarPaginacionBusqueda(res: any) {
-  //   this.total_rows_buscar = res.meta.total;
-  //   this.last_page_buscar = res.meta.last_page;
-  //   if (this.personas.length <= this.itemsPerPage_buscar) {
-  //     if (res.meta?.current_page === res.meta?.last_page) {
-  //       this.itemsInPage_buscar = this.total_rows_buscar;
-  //     } else {
-  //       this.itemsInPage_buscar = this.currentPage_buscar * this.itemsPerPage_buscar;
-  //     }
-  //   }
-  // }
-
-  // altaNuevoProveedor() {
-  //   this.altaPersona = true;
-  // }
-
-  toggleFilter() {
-    this.showFilterPersonas = !this.showFilterPersonas;
-    if (!this.showFilterPersonas) {
-      this.filtrosContactos_buscar.firstname = { value: '', op: 'LIKE', contiene: true };
-      this.filtrosContactos_buscar.lastname = { value: '', op: 'LIKE', contiene: true };
-      this.filtrosContactos_buscar.company_name = { value: '', op: 'LIKE', contiene: true };
-      this.filtrosContactos_buscar.document_number = { value: '', op: 'LIKE', contiene: true };
-      this.filtrosContactos_buscar.cuit = { value: '', op: 'LIKE', contiene: true };
-      // this.obtenerPersonas();
-    }
-  }
-
-  agregarProveedorAFormulario(dato: any) {
-    // if (!this.isProveedor(dato)) {
-    //   this.inicializarNuevoFormularioProveedor(dato);
-    //   this.altaPersona = true; // Muestra formulario
-    // } else {
-    //   this.swalService.toastError('top-right', 'La persona ya es proveedor');
-    // }
-  }
-
 
   getDropdownClass(index: number) {
     let mitad = this.productosFiltrados.length / 2;

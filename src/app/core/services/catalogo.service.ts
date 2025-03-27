@@ -17,8 +17,12 @@ export class CatalogoService {
   apiPermisos = '/permissions';
   apiDocumentos = '/document_types';
   apiPosiblesEstados = '/possible_person_states';
+  apiPosiblesEstadosProductos = '/possible_product_states';
   apiCondicionIva = '/vat_conditions';
   apiTiposDetalleContacto = '/contact_detail_types';
+  apiCategorias = '/product_categories';
+  apiTipoProductos = '/product_types';
+  apiMeasures = '/measures';
 
   constructor(private http: HttpClient) { }
 
@@ -32,6 +36,8 @@ export class CatalogoService {
     let params = new HttpParams().append('order_by[0][]', 'name').append('order_by[0][]', 'ASC');
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPaises, { headers, params });
   }
+
+
 
   getDocumentos(): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': this.appKey });
@@ -73,6 +79,13 @@ export class CatalogoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPosiblesEstados, { headers, params: params });
   }
 
+  getPosiblesEstadosProductos(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPosiblesEstadosProductos, { headers, params: params });
+  }
+
   getCondicionIva(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams();
@@ -85,6 +98,28 @@ export class CatalogoService {
     let params = new HttpParams();
     params = params.append('actual_role', rol);
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposDetalleContacto, { headers, params: params });
+  }
+
+  getCategorias(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCategorias, { headers, params: params });
+  }
+
+
+  getTipoProductos(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTipoProductos, { headers, params: params });
+  }
+
+  getMeasures(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMeasures, { headers, params: params });
   }
 
 }
