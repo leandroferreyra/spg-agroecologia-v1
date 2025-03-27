@@ -304,16 +304,74 @@
                             </div>
                         </div>
 
-                        <label for="nombre" class="mt-4">STOCKS</label>
+                        <label for="nombre" class="mt-4">Stock</label>
                         <div class="flex flex-col sm:flex-row">
                             <div class="grid flex-1 grid-cols-1 sm:grid-cols-4 gap-3">
                                 <div>
                                     <div class="flex">
                                         <div
                                             class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Disponible
+                                            Disponibles
                                         </div>
                                         <input type="text" formControlName="stock_available"
+                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex">
+                                        <div
+                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
+                                            Reservados
+                                        </div>
+                                        <input type="text" formControlName="stock_reserved"
+                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
+                                    </div>
+                                </div>
+
+
+                                <div>
+                                    <div class="flex">
+                                        <div
+                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
+                                            Muestras
+                                        </div>
+                                        <input type="text" formControlName="stock_samples"
+                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
+                                    </div>
+                                </div>
+
+
+                                <div>
+                                    <div class="flex">
+                                        <div
+                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
+                                            Observados
+                                        </div>
+                                        <input type="text" formControlName="stock_observed"
+                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex">
+                                        <div
+                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
+                                            Mínimo
+                                        </div>
+                                        <input type="text" formControlName="stock_minimum"
+                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
+                                    </div>
+                                </div>
+
+
+                                <div>
+                                    <div class="flex">
+                                        <div
+                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
+                                            Óptimo
+                                        </div>
+                                        <input type="text" formControlName="stock_optimum"
                                             class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
                                     </div>
                                 </div>
@@ -333,39 +391,6 @@
                                     <div class="flex">
                                         <div
                                             class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Mínimo
-                                        </div>
-                                        <input type="text" formControlName="stock_minimum"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Observado
-                                        </div>
-                                        <input type="text" formControlName="stock_observed"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Óptimo
-                                        </div>
-                                        <input type="text" formControlName="stock_optimum"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
                                             Vendido
                                         </div>
                                         <input type="text" formControlName="stock_quantity_sold"
@@ -373,27 +398,7 @@
                                     </div>
                                 </div>
 
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Reservado
-                                        </div>
-                                        <input type="text" formControlName="stock_reserved"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
 
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Ejemplos
-                                        </div>
-                                        <input type="text" formControlName="stock_samples"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
