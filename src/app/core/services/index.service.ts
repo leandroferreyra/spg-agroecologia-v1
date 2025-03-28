@@ -184,6 +184,7 @@ export class IndexService {
       .append("with[]", "productStates")
       .append("with[]", "measure")
       .append("with[]", "country")
+      .append("with[]", "suppliers")
       .append("with[]", "stocks");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: params });
   }

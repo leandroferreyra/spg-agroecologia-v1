@@ -345,7 +345,51 @@ export class ProductosComponent implements OnInit, OnDestroy {
       }
       if (this.filtros.codigo) {
         resultados = resultados.filter(dato => {
-          return dato.code.toLowerCase().includes(this.filtros.codigo.toLowerCase());
+          return dato.code?.toLowerCase().includes(this.filtros.codigo.toLowerCase());
+        })
+      }
+      if (this.filtros.tipoProducto) {
+        resultados = resultados.filter(dato => {
+          return dato.product_type?.uuid === this.filtros.tipoProducto;
+        })
+      }
+      if (this.filtros.categoria) {
+        resultados = resultados.filter(dato => {
+          return dato.product_category?.uuid === this.filtros.categoria;
+        })
+      }
+      if (this.filtros.estado) {
+        resultados = resultados.filter(dato => {
+          return dato.current_state?.state?.uuid === this.filtros.estado;
+        })
+      }
+      if (this.filtros.nomenclatura) {
+        resultados = resultados.filter(dato => {
+          if (this.filtros.nomenclatura_contiene) {
+            return dato.mercosur_nomenclature?.toLowerCase().includes(this.filtros.nomenclatura.toLowerCase());
+          } else {
+            return dato.mercosur_nomenclature?.toLowerCase().startsWith(this.filtros.nomenclatura.toLowerCase());
+          }
+        })
+      }
+      if (this.filtros.unidad) {
+        resultados = resultados.filter(dato => {
+          return dato.measure?.uuid === this.filtros.unidad;
+        })
+      }
+      if (this.filtros.trazable) {
+        resultados = resultados.filter(dato => {
+          return dato.traceable === 1;
+        })
+      }
+      if (this.filtros.asigna) {
+        resultados = resultados.filter(dato => {
+          return dato.assign_serial_number === 1;
+        })
+      }
+      if (this.filtros.proveedor) {
+        resultados = resultados.filter(dato => {
+          return dato.suppliers?.find((p: any) => p.uuid === this.filtros.proveedor);
         })
       }
     }
