@@ -15,49 +15,58 @@
                     Agregar producto
                 </button>
 
-                <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" (click)="mostrarFiltros()"
+                <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
                     <icon-settings class="mx-auto mb-1" />
                     Filtros avanzados
                 </button>
             </div>
 
-            <!-- <ng-scrollbar class="relative h-full grow" appearance="compact"> -->
-            <div class="table-responsive">
-                <table class="table-hover">
-                    <tbody>
-                        @for(data of filtrarDatos() ; let index = $index ;track data.uuid) {
-                        <tr style="cursor: pointer;" [ngClass]="{'bg-blue-200': selectedProducto?.uuid === data.uuid}">
-                            <td (click)="showDataProducto(data)">{{ data.name }}
-                            </td>
-                            <td>
-                                <div hlMenu class="dropdown">
-                                    <button type="button" hlMenuButton>
-                                        <icon-horizontal-dots class="rotate-90 opacity-70" />
-                                    </button>
-                                    <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
-                                        <li>
-                                            <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                (click)="openModalProducto('EDIT', data)">Editar</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                (click)="openSwalEliminar(data)">Eliminar</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table-hover">
+                        <tbody>
+                            @for(data of productos ; let index = $index ;track data.uuid) {
+                            <tr style="cursor: pointer;"
+                                [ngClass]="{'bg-blue-200': selectedProducto?.uuid === data.uuid}">
+                                <td (click)="showDataProducto(data)">{{ data.name }}
+                                </td>
+                                <td>
+                                    <div hlMenu class="dropdown">
+                                        <button type="button" hlMenuButton>
+                                            <icon-horizontal-dots class="rotate-90 opacity-70" />
+                                        </button>
+                                        <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
+                                            <li>
+                                                <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                    (click)="openModalProducto('EDIT', data)">Editar</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                    (click)="openSwalEliminar(data)">Eliminar</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-center">
+                    <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
+                        [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                        (pageChange)="obtenerProductos()">
+                    </ngb-pagination>
+                </div>
             </div>
             <!-- </ng-scrollbar> -->
 
             <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
                 <div class="group relative">
-                    <input type="text" placeholder="Buscar producto..." [(ngModel)]="busquedaPorNombreSimple"
-                        (input)="filtroSimpleInput()" class="peer form-input ltr:pr-8 rtl:pl-8" />
+                    <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtros.name.value"
+                        (input)="obtenerProductosPorFiltroSimple()" class="peer form-input ltr:pr-8 rtl:pl-8" />
                     <div
                         class="absolute top-1/2 -translate-y-1/2 peer-focus:text-primary ltr:right-[11px] rtl:left-[11px]">
                         <icon-search />
@@ -68,7 +77,8 @@
                     <label class="w-12 h-6 relative">
                         <input type="checkbox"
                             class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id="custom_switch_checkbox2" [(ngModel)]="busqueda_contiene" (change)="filtrarDatos()" />
+                            id="custom_switch_checkbox2" [(ngModel)]="filtros.name.contiene"
+                            (change)="obtenerProductos();" />
                         <span for="custom_switch_checkbox2"
                             class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                         </span>
@@ -658,20 +668,19 @@
 
 
 
-
 <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasRight"
     aria-labelledby="offcanvasRightLabel">
     <div class="offcanvas-header">
-        <!-- <h5 class="offcanvas-title" id="offcanvasRightLabel">Filtros avanzados</h5> -->
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close">
         </button>
     </div>
+
     <div class="offcanvas-body">
 
         <div class="row d-flex justify-content-center">
             <div class="col-12 d-flex justify-content-center">
                 <div class="max-w-[50rem] mt-3 w-full shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-[#e0e6ed] 
-                    dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none mx-auto">
+                        dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none mx-auto">
                     <div class="py-4 px-4">
 
                         <!-- Campos en una sola fila -->
@@ -680,14 +689,15 @@
                             <div style="width: 100%;">
                                 <label for="switchRight">Nombre</label>
                                 <div class="flex">
-                                    <input id="switchRight" type="text" placeholder="" [(ngModel)]="filtros.nombre"
+                                    <input id="switchRight" type="text" placeholder="" [(ngModel)]="filtros.name.value"
+                                        (input)="obtenerProductosPorFiltroAvanzado()"
                                         class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
                                     <div
                                         class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
                                         <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                                            <input type="checkbox"
+                                            <input type="checkbox" (change)="obtenerProductosPorFiltroAvanzado()"
                                                 class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                                id="custom_switch_checkbox2" [(ngModel)]="filtros.nombre_contiene" />
+                                                id="custom_switch_checkbox2" [(ngModel)]="filtros.name.contiene" />
                                             <span
                                                 class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
                                         </label>
@@ -698,7 +708,8 @@
 
                             <div class="flex-grow-1">
                                 <label for="codigo">Código</label>
-                                <input type="text" id="codigo" class="form-control" [(ngModel)]="filtros.codigo">
+                                <input type="text" id="codigo" class="form-control" [(ngModel)]="filtros.code.value"
+                                    (input)="obtenerProductosPorFiltroAvanzado()">
                             </div>
 
                             <div class="flex-grow-1">
@@ -822,4 +833,5 @@
 
 
     </div>
+
 </div>

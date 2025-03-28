@@ -30,7 +30,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtros: any = {
-    'producto.uuid': { value: '', op: '=', contiene: false }
+    'product.uuid': { value: '', op: '=', contiene: false }
   };
   showFilterCompras: boolean = false;
   ordenamiento: any = {
@@ -51,7 +51,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     if (changes['producto'] && changes['producto'].currentValue) {
       this.spinner.show();
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
-      this.filtros['producto.uuid'].value = this.producto.uuid;
+      this.filtros['product.uuid'].value = this.producto.uuid;
       this.obtenerComponentes();
     }
   }

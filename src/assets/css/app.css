@@ -62,3 +62,22 @@ ng-select.has-error .ng-select-container {
 .color-gris {
     color: #ada8a8 !important;
 }
+
+.table-container {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+}
+
+.table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.table-responsive {
+    height: 100%;
+}
+
+.fixed-bottom {
+    flex-shrink: 0;
+}

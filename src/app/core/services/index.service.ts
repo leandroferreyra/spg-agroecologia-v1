@@ -64,7 +64,7 @@ export class IndexService {
         if (paramsObj.filters[key].contiene) {
           params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key].value}%`);
         } else {
-          params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
+          params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}%`);
         }
       }
     });
@@ -177,18 +177,9 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
   }
 
-  getProductos(rol: string): Observable<AuthResponse> {
+  getProductos(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let params = new HttpParams();
-    params = params.append('actual_role', rol)
-      .append("with[]", "productType")
-      .append("with[]", "productCategory")
-      .append("with[]", "productStates")
-      .append("with[]", "measure")
-      .append("with[]", "country")
-      .append("with[]", "suppliers")
-      .append("with[]", "stocks");
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: params });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getCuentasProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
