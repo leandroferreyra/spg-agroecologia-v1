@@ -77,7 +77,15 @@ export class ProductosComponent implements OnInit, OnDestroy {
   // Orden y filtro
   filtros: any = {
     'name': { value: '', op: 'LIKE', contiene: true },
-    'code': { value: '', op: 'LIKE', contiene: true }
+    'code': { value: '', op: 'LIKE', contiene: true },
+    'productType.uuid': { value: '', op: '=', contiene: false },
+    'productCategory.uuid': { value: '', op: '=', contiene: false },
+    'mercosur_nomenclature': { value: '', op: 'LIKE', contiene: true },
+    'measure.uuid': { value: '', op: '=', contiene: false },
+    'stocks.batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
+    'supplier.uuid': { value: '', op: '=', contiene: false },
+    'traceable': { value: '', op: '=', contiene: false },
+    'assign_serial_number': { value: '', op: '=', contiene: false }
   };
   // showFilter: boolean = false;
   ordenamiento: any = {
@@ -579,17 +587,17 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   // mostrarFiltrosAvanzados() {
-    // this.showFilter = true;
-    // Se limpia el filtro simple por las dudas que haya escrito algo
-    // if (this.filtros['name'].value) {
-    //   this.filtros['name'].value = '';
-    //   this.obtenerProductos();
-    // }
+  // this.showFilter = true;
+  // Se limpia el filtro simple por las dudas que haya escrito algo
+  // if (this.filtros['name'].value) {
+  //   this.filtros['name'].value = '';
+  //   this.obtenerProductos();
+  // }
 
-    // Desactivo filtros simples
-    // this.filtroSimple = false;
-    // this.busquedaPorNombreSimple = '';
-    // this.busqueda_contiene = false;
+  // Desactivo filtros simples
+  // this.filtroSimple = false;
+  // this.busquedaPorNombreSimple = '';
+  // this.busqueda_contiene = false;
   // }
 
   limpiarFiltros() {
@@ -614,6 +622,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
     // TODO: limpiar todos los filtros avanzado y dejar solo el por nombre
     // this.showFilter = false;
     this.filtros['code'].value = '';
+    this.filtros['productType.uuid'].value = '';
+    this.filtros['productCategory.uuid'].value = '';
+    this.filtros['mercosur_nomenclature'].value = '';
+    this.filtros['measure.uuid'].value = '';
+    this.filtros['stocks.batch.batch_identification'].value = '';
+    this.filtros['supplier.uuid'].value = '';
+    this.filtros['traceable'].value = '';
+    this.filtros['assign_serial_number'].value = '';
     this.obtenerProductos();
   }
 
