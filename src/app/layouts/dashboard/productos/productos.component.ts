@@ -34,6 +34,7 @@ import { ContactosPersonaComponent } from '../personas/shared/contactos-persona/
 import { ContactosComponent } from '../personas/shared/contactos/contactos.component';
 import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoDTO';
 import { ProductoService } from 'src/app/core/services/producto.service';
+import { ComponentesComponent } from './componentes/componentes.component';
 
 @Component({
   selector: 'app-productos',
@@ -41,7 +42,7 @@ import { ProductoService } from 'src/app/core/services/producto.service';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule
+    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -89,25 +90,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     closeOnEscape: false
   };
   tituloModal: string = '';
-
-  // Orden, filtro y paginación para buscar personas
-  // showFilterPersonas: boolean = false;
-  // MAX_ITEMS_PER_PAGE_buscar = 5;
-  // currentPage_buscar = 1;
-  // last_page_buscar = 1;
-  // itemsPerPage_buscar = this.MAX_ITEMS_PER_PAGE_buscar;
-  // itemsInPage_buscar = this.itemsPerPage_buscar;
-  // pageSize_buscar: number = 0;
-  // total_rows_buscar: number = 0;
-  // filtrosContactos_buscar: any = {
-  //   'firstname': { value: '', op: 'LIKE', contiene: true },
-  //   'lastname': { value: '', op: 'LIKE', contiene: true },
-  //   'document_number': { value: '', op: 'LIKE', contiene: true },
-  //   'cuit': { value: '', op: 'LIKE', contiene: true },
-  //   'company_name': { value: '', op: 'LIKE', contiene: true }
-  // };
-  // ordenamiento_buscar: any = {
-  // };
 
   // Catalogos
   paises: any[] = [];
@@ -391,6 +373,15 @@ export class ProductosComponent implements OnInit, OnDestroy {
         resultados = resultados.filter(dato => {
           return dato.suppliers?.find((p: any) => p.uuid === this.filtros.proveedor);
         })
+      }
+      if (this.filtros.lote) {
+        // resultados = resultados.filter(dato => {
+        //   if (this.filtros.lote_contiene) {
+        //     return dato.mercosur_nomenclature?.toLowerCase().includes(this.filtros.lote.toLowerCase());
+        //   } else {
+        //     return dato.mercosur_nomenclature?.toLowerCase().startsWith(this.filtros.lote.toLowerCase());
+        //   }
+        // })
       }
     }
 
