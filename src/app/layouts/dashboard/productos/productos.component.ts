@@ -55,12 +55,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   actual_role: string = '';
   productos: any[] = [];
-  // productosFiltrados: any[] = [];
   selectedProducto: any;
   productoForm!: FormGroup;
   newProductoForm!: FormGroup;
 
-  // busqueda_contiene: boolean = true;
   isEdicion: boolean = false;
   isShowMailMenu = false;
 
@@ -87,19 +85,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
     'traceable': { value: '', op: '=', contiene: false },
     'assign_serial_number': { value: '', op: '=', contiene: false }
   };
-  // showFilter: boolean = false;
   ordenamiento: any = {
     'name': 'asc'
   };
-  // Orden y filtro para datos listado proveedores.
-  // filtros: any = {
-  //   'nombre_contiene': true,
-  //   'nomenclatura_contiene': true,
-  //   'lote_contiene': true
-  // };
-  // showFilter: boolean = false;
-  // filtroSimple: boolean = false;
-  // busquedaPorNombreSimple: string = '';
+
   isSubmit = false;
 
   iconArrowUp = faArrowUp;
@@ -145,7 +134,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
     if (this.offcanvasElement) {
       this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
-        console.log('El offcanvas se ha cerrado');
+        // console.log('El offcanvas se ha cerrado');
         // Aquí puedes ejecutar cualquier acción adicional al cierre
       });
     }
@@ -341,100 +330,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.inicializarFormEdit(this.selectedProducto);
   }
 
-
-  // filtroSimpleInput() {
-  //   // Si ingresa acá es porque busca por búsqueda simple, por lo que se desactivas los filtros.
-  //   this.filtroSimple = true;
-  //   this.limpiarFiltros();
-  // }
-
-  // filtrarDatos() {
-  //   let resultados = this.productosFiltrados;
-
-  //   if (this.filtroSimple) {
-  //     // Escribió en el input simple
-  //     resultados = this.productosFiltrados.filter(dato => {
-  //       let nombre = dato.name?.toLowerCase();
-  //       if (this.busqueda_contiene) {
-  //         return nombre.includes(this.busquedaPorNombreSimple.toLowerCase());
-  //       } else {
-  //         return nombre.startsWith(this.busquedaPorNombreSimple.toLowerCase());
-  //       }
-  //     })
-  //   } else if (this.showFilter) {
-  //     // Es búsqueda avanzada
-  //     if (this.filtros.nombre) {
-  //       resultados = resultados.filter(dato => {
-  //         if (this.filtros.nombre_contiene) {
-  //           return dato.name?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
-  //         } else {
-  //           return dato.name?.toLowerCase().startsWith(this.filtros.nombre.toLowerCase());
-  //         }
-  //       })
-  //     }
-  //     if (this.filtros.codigo) {
-  //       resultados = resultados.filter(dato => {
-  //         return dato.code?.toLowerCase().includes(this.filtros.codigo.toLowerCase());
-  //       })
-  //     }
-  //     if (this.filtros.tipoProducto) {
-  //       resultados = resultados.filter(dato => {
-  //         return dato.product_type?.uuid === this.filtros.tipoProducto;
-  //       })
-  //     }
-  //     if (this.filtros.categoria) {
-  //       resultados = resultados.filter(dato => {
-  //         return dato.product_category?.uuid === this.filtros.categoria;
-  //       })
-  //     }
-  //     if (this.filtros.estado) {
-  //       resultados = resultados.filter(dato => {
-  //         return dato.current_state?.state?.uuid === this.filtros.estado;
-  //       })
-  //     }
-  //     if (this.filtros.nomenclatura) {
-  //       resultados = resultados.filter(dato => {
-  //         if (this.filtros.nomenclatura_contiene) {
-  //           return dato.mercosur_nomenclature?.toLowerCase().includes(this.filtros.nomenclatura.toLowerCase());
-  //         } else {
-  //           return dato.mercosur_nomenclature?.toLowerCase().startsWith(this.filtros.nomenclatura.toLowerCase());
-  //         }
-  //       })
-  //     }
-  //     if (this.filtros.unidad) {
-  //       resultados = resultados.filter(dato => {
-  //         return dato.measure?.uuid === this.filtros.unidad;
-  //       })
-  //     }
-  //     if (this.filtros.trazable) {
-  //       resultados = resultados.filter(dato => {
-  //         return dato.traceable === 1;
-  //       })
-  //     }
-  //     if (this.filtros.asigna) {
-  //       resultados = resultados.filter(dato => {
-  //         return dato.assign_serial_number === 1;
-  //       })
-  //     }
-  //     if (this.filtros.proveedor) {
-  //       resultados = resultados.filter(dato => {
-  //         return dato.suppliers?.find((p: any) => p.uuid === this.filtros.proveedor);
-  //       })
-  //     }
-  //     if (this.filtros.lote) {
-  //       // resultados = resultados.filter(dato => {
-  //       //   if (this.filtros.lote_contiene) {
-  //       //     return dato.mercosur_nomenclature?.toLowerCase().includes(this.filtros.lote.toLowerCase());
-  //       //   } else {
-  //       //     return dato.mercosur_nomenclature?.toLowerCase().startsWith(this.filtros.lote.toLowerCase());
-  //       //   }
-  //       // })
-  //     }
-  //   }
-
-  //   return resultados;
-  // }
-
   openSwalEliminar(producto: any) {
     Swal.fire({
       title: '',
@@ -551,7 +446,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     producto.code = form.get('codigo')?.value;
     producto.product_type_uuid = form.get('tipoProducto')?.value;
     producto.product_category_uuid = form.get('categoria')?.value;
-    // producto.possible_product_state_uuid = form.get('estado')?.value;
     let estadoProducto = new ProductState();
     estadoProducto.possible_product_state_uuid = form.get('estado')?.value;
     estadoProducto.comments = form.get('estadoComentario')?.value;
@@ -586,41 +480,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
     });
   }
 
-  // mostrarFiltrosAvanzados() {
-  // this.showFilter = true;
-  // Se limpia el filtro simple por las dudas que haya escrito algo
-  // if (this.filtros['name'].value) {
-  //   this.filtros['name'].value = '';
-  //   this.obtenerProductos();
-  // }
-
-  // Desactivo filtros simples
-  // this.filtroSimple = false;
-  // this.busquedaPorNombreSimple = '';
-  // this.busqueda_contiene = false;
-  // }
-
-  limpiarFiltros() {
-    // this.showFilter = false;
-    this.filtros = {};
-  }
-
-  // cleanFilters() {
-  //   this.filtros.nombre = '';
-  //   this.filtros.apellido = '';
-  //   this.filtros.razon = '';
-  //   this.filtros.sigla = '';
-  //   this.filtros.cuit = '';
-  // }
-
   getDropdownClass(index: number) {
     let mitad = this.productos.length / 2;
     return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
   }
 
   obtenerProductosPorFiltroSimple() {
-    // TODO: limpiar todos los filtros avanzado y dejar solo el por nombre
-    // this.showFilter = false;
     this.filtros['code'].value = '';
     this.filtros['productType.uuid'].value = '';
     this.filtros['productCategory.uuid'].value = '';
@@ -637,6 +502,19 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.obtenerProductos();
   }
 
+  limpiarFiltros() {
+    this.filtros['name'].value = '';
+    this.filtros['code'].value = '';
+    this.filtros['productType.uuid'].value = '';
+    this.filtros['productCategory.uuid'].value = '';
+    this.filtros['mercosur_nomenclature'].value = '';
+    this.filtros['measure.uuid'].value = '';
+    this.filtros['stocks.batch.batch_identification'].value = '';
+    this.filtros['supplier.uuid'].value = '';
+    this.filtros['traceable'].value = '';
+    this.filtros['assign_serial_number'].value = '';
+    this.obtenerProductos();
+  }
 
 
 }
