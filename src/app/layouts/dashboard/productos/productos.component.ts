@@ -32,7 +32,7 @@ import { ComprasProveedorComponent } from '../personas/proveedores/compras-prove
 import { CuentasBancariasComponent } from '../personas/proveedores/cuentas-bancarias/cuentas-bancarias.component';
 import { ContactosPersonaComponent } from '../personas/shared/contactos-persona/contactos-persona.component';
 import { ContactosComponent } from '../personas/shared/contactos/contactos.component';
-import { ProductoDTO } from 'src/app/core/models/request/productoDTO';
+import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoDTO';
 import { ProductoService } from 'src/app/core/services/producto.service';
 
 @Component({
@@ -220,6 +220,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       tipoProducto: new FormControl({ value: producto?.product_type?.uuid, disabled: !this.isEdicion }, [Validators.required]),
       categoria: new FormControl({ value: producto?.product_category?.uuid, disabled: !this.isEdicion }, [Validators.required]),
       estado: new FormControl({ value: producto?.current_state?.state?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      estadoComentario: new FormControl({ value: producto?.current_state?.comments, disabled: !this.isEdicion }, []),
       nomenclatura: new FormControl({ value: producto?.mercosur_nomenclature, disabled: !this.isEdicion }, [Validators.required]),
       unidad: new FormControl({ value: producto?.measure?.uuid, disabled: !this.isEdicion }, [Validators.required]),
       iva: new FormControl({ value: producto?.vat_percent, disabled: !this.isEdicion }, [Validators.required]),
@@ -229,9 +230,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
       trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
       vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
       controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, [Validators.required]),
+      descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
       comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, [Validators.required]),
       nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, [Validators.required]),
-      descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, [Validators.required]),
       stock_available: new FormControl({ value: producto?.stock_data?.available, disabled: true }, []),
       stock_reserved: new FormControl({ value: producto?.stock_data?.reserved, disabled: true }, []),
       stock_samples: new FormControl({ value: producto?.stock_data?.samples, disabled: true }, []),
@@ -249,8 +250,24 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.productoForm.controls[key].enable();
         }
       });
+      // Deshabilita la descripción si no es controlable
+      if (this.productoForm.get('controlable')?.value === 0) {
+        this.productoForm.get('descripcionControl')?.disable();
+      }
     }
+    this.onFormEditChange();
   }
+  onFormEditChange() {
+    this.productoForm.get('controlable')!.valueChanges.subscribe(
+      (value) => {
+        if (value) {
+          this.productoForm.get('descripcionControl')?.enable();
+        } else {
+          this.productoForm.get('descripcionControl')?.disable();
+        }
+      });
+  }
+
   inicializarFormNew() {
     this.newProductoForm = new FormGroup({
       nombre: new FormControl({ value: null, disabled: false }, [Validators.required]),
@@ -258,19 +275,31 @@ export class ProductosComponent implements OnInit, OnDestroy {
       tipoProducto: new FormControl({ value: null, disabled: false }, [Validators.required]),
       categoria: new FormControl({ value: null, disabled: false }, [Validators.required]),
       estado: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      estadoComentario: new FormControl({ value: null, disabled: false }, []),
       nomenclatura: new FormControl({ value: null, disabled: false }, [Validators.required]),
       pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
       unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
       iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
       comentarios: new FormControl({ value: null, disabled: false }, [Validators.required]),
       nombreVenta: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      descripcionControl: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      descripcionControl: new FormControl({ value: null, disabled: true }, []),
       asignaNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
       tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
       trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
       vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
       controlable: new FormControl({ value: false, disabled: false }, [Validators.required])
     });
+    this.onNewFormEdit();
+  }
+  onNewFormEdit() {
+    this.newProductoForm.get('controlable')!.valueChanges.subscribe(
+      (value) => {
+        if (value) {
+          this.newProductoForm.get('descripcionControl')?.enable();
+        } else {
+          this.newProductoForm.get('descripcionControl')?.disable();
+        }
+      });
   }
 
   showDataProducto(producto: any) {
@@ -441,7 +470,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
     producto.code = form.get('codigo')?.value;
     producto.product_type_uuid = form.get('tipoProducto')?.value;
     producto.product_category_uuid = form.get('categoria')?.value;
-    producto.possible_product_state_uuid = form.get('estado')?.value;
+    // producto.possible_product_state_uuid = form.get('estado')?.value;
+    let estadoProducto = new ProductState();
+    estadoProducto.possible_product_state_uuid = form.get('estado')?.value;
+    estadoProducto.comments = form.get('estadoComentario')?.value;
+    producto.product_state = estadoProducto;
     producto.comments = form.get('comentarios')?.value;
     producto.measure_uuid = form.get('unidad')?.value;
     producto.vat_percent = form.get('iva')?.value;

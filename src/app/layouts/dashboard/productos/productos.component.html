@@ -167,12 +167,12 @@
                         <div class="flex flex-col sm:flex-row">
                             <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
-                                <div>
+                                <div (keydown.enter)="confirmarProducto(productoForm)">
                                     <label for="nombre">Nombre</label>
                                     <input id="nombre" type="text" placeholder="" class="form-control"
                                         formControlName="nombre" />
                                 </div>
-                                <div>
+                                <div (keydown.enter)="confirmarProducto(productoForm)">
                                     <label for="codigo">Código</label>
                                     <input id="codigo" type="text" placeholder="" class="form-control"
                                         formControlName="codigo" />
@@ -181,36 +181,43 @@
                                     <label for="tipoProducto">Tipo de producto</label>
                                     <ng-select [items]="tipoProductos" bindLabel="name" bindValue="uuid"
                                         clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                        notFoundText="No hay tipos de producto" placeholder=""
+                                        notFoundText="No hay tipos de producto" placeholder="" [selectOnTab]="true"
                                         class="w-1/3 min-w-[200px]" formControlName="tipoProducto"></ng-select>
                                 </div>
                                 <div>
                                     <label for="categoria">Categoría</label>
                                     <ng-select [items]="categorias" bindLabel="name" bindValue="uuid"
-                                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                        notFoundText="No hay categorías" placeholder="" class="w-1/3 min-w-[200px]"
-                                        formControlName="categoria"></ng-select>
+                                        [selectOnTab]="true" clearAllText="Limpiar" style="width: 100%"
+                                        [virtualScroll]="true" notFoundText="No hay categorías" placeholder=""
+                                        class="w-1/3 min-w-[200px]" formControlName="categoria"></ng-select>
                                 </div>
                                 <div>
                                     <label for="estado">Estado</label>
-                                    <ng-select [items]="estados" bindLabel="name" bindValue="uuid"
+                                    <ng-select [items]="estados" bindLabel="name" bindValue="uuid" [selectOnTab]="true"
                                         clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                         notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
                                         formControlName="estado"></ng-select>
                                 </div>
+
                                 <div>
+                                    <label for="estadoComentario">Comentario del estado</label>
+                                    <textarea class="form-control" id="estadoComentario"
+                                        formControlName="estadoComentario" rows="1"></textarea>
+                                </div>
+
+                                <div (keydown.enter)="confirmarProducto(productoForm)">
                                     <label for="nomenclatura">Nomenclatura Mercosur (Pos. Arancelaria)</label>
                                     <input id="nomenclatura" type="text" placeholder="" class="form-control"
                                         formControlName="nomenclatura" />
                                 </div>
                                 <div>
                                     <label for="unidad">Unidad</label>
-                                    <ng-select [items]="measures" bindLabel="name" bindValue="uuid"
+                                    <ng-select [items]="measures" bindLabel="name" bindValue="uuid" [selectOnTab]="true"
                                         clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                         notFoundText="No hay unidades" placeholder="" class="w-1/3 min-w-[200px]"
                                         formControlName="unidad"></ng-select>
                                 </div>
-                                <div>
+                                <div (keydown.enter)="confirmarProducto(productoForm)">
                                     <label for="iva">IVA (%)</label>
                                     <input id="iva" type="text" placeholder="" class="form-control"
                                         formControlName="iva" />
@@ -220,7 +227,8 @@
                                     <label for="pais">País</label>
                                     <ng-select [items]="paises" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                         style="width: 100%" [virtualScroll]="true" notFoundText="No hay países"
-                                        placeholder="" class="w-1/3 min-w-[200px]" formControlName="pais"></ng-select>
+                                        [selectOnTab]="true" placeholder="" class="w-1/3 min-w-[200px]"
+                                        formControlName="pais"></ng-select>
                                 </div>
 
                                 <div>
@@ -229,18 +237,11 @@
                                         rows="1"></textarea>
                                 </div>
 
-                                <div>
+                                <div (keydown.enter)="confirmarProducto(productoForm)">
                                     <label for="nombreVenta">Nombre de venta</label>
                                     <input id="nombreVenta" type="text" placeholder="" class="form-control"
                                         formControlName="nombreVenta" />
                                 </div>
-
-                                <div>
-                                    <label for="descripcionControl">Descripción control</label>
-                                    <textarea class="form-control" id="descripcionControl"
-                                        formControlName="descripcionControl" rows="1"></textarea>
-                                </div>
-
 
                                 <div class="flex items-center gap-2 mt-2">
                                     <label class="w-12 h-6 relative">
@@ -300,6 +301,13 @@
                                         </span>
                                     </label>
                                     <span>Controlable</span>
+                                </div>
+
+
+                                <div>
+                                    <label for="descripcionControl">Descripción control</label>
+                                    <textarea class="form-control" id="descripcionControl"
+                                        formControlName="descripcionControl" rows="1"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -472,13 +480,13 @@
                 <div class="flex flex-col sm:flex-row">
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
-                        <div
+                        <div (keydown.enter)="confirmarProducto(productoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nombre">Nombre</label>
                             <input id="nombre" type="text" placeholder="" class="form-control"
                                 formControlName="nombre" />
                         </div>
-                        <div
+                        <div (keydown.enter)="confirmarProducto(productoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['codigo'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="codigo">Código</label>
                             <input id="codigo" type="text" placeholder="" class="form-control"
@@ -489,6 +497,7 @@
                             <ng-select [items]="tipoProductos" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay tipos de producto"
                                 placeholder="" class="w-1/3 min-w-[200px]" formControlName="tipoProducto"
+                                [selectOnTab]="true"
                                 [ngClass]="isSubmit ? newProductoForm.controls['tipoProducto'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
                         <div>
@@ -496,16 +505,25 @@
                             <ng-select [items]="categorias" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay categorías"
                                 placeholder="" class="w-1/3 min-w-[200px]" formControlName="categoria"
+                                [selectOnTab]="true"
                                 [ngClass]="isSubmit ? newProductoForm.controls['categoria'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
                         <div>
                             <label for="estado">Estado</label>
                             <ng-select [items]="estados" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay estados" placeholder=""
-                                class="w-1/3 min-w-[200px]" formControlName="estado"
+                                class="w-1/3 min-w-[200px]" formControlName="estado" [selectOnTab]="true"
                                 [ngClass]="isSubmit ? newProductoForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
+
                         <div
+                            [ngClass]="isSubmit ? newProductoForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="estadoComentario">Comentario del estado</label>
+                            <textarea class="form-control" id="estadoComentario" formControlName="estadoComentario"
+                                rows="1"></textarea>
+                        </div>
+
+                        <div (keydown.enter)="confirmarProducto(productoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['nomenclatura'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nomenclatura">Nomenclatura Mercosur (Pos. Arancelaria)</label>
                             <input id="nomenclatura" type="text" placeholder="" class="form-control"
@@ -515,10 +533,10 @@
                             <label for="unidad">Unidad</label>
                             <ng-select [items]="measures" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay unidades" placeholder=""
-                                class="w-1/3 min-w-[200px]" formControlName="unidad"
+                                class="w-1/3 min-w-[200px]" formControlName="unidad" [selectOnTab]="true"
                                 [ngClass]="isSubmit ? newProductoForm.controls['unidad'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
-                        <div
+                        <div (keydown.enter)="confirmarProducto(productoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['iva'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="iva">IVA (%)</label>
                             <input id="iva" type="text" placeholder="" class="form-control" formControlName="iva" />
@@ -528,7 +546,7 @@
                             <label for="pais">País</label>
                             <ng-select [items]="paises" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay países" placeholder=""
-                                class="w-1/3 min-w-[200px]" formControlName="pais"
+                                class="w-1/3 min-w-[200px]" formControlName="pais" [selectOnTab]="true"
                                 [ngClass]="isSubmit ? newProductoForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
 
@@ -539,18 +557,11 @@
                                 rows="1"></textarea>
                         </div>
 
-                        <div
+                        <div (keydown.enter)="confirmarProducto(productoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['nombreVenta'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nombreVenta">Nombre de venta</label>
                             <input id="nombreVenta" type="text" placeholder="" class="form-control"
                                 formControlName="nombreVenta" />
-                        </div>
-
-                        <div
-                            [ngClass]="isSubmit ? newProductoForm.controls['descripcionControl'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="descripcionControl">Descripción control</label>
-                            <textarea class="form-control" id="descripcionControl" formControlName="descripcionControl"
-                                rows="1"></textarea>
                         </div>
 
                         <div class="flex items-center gap-2 mt-2"
@@ -613,6 +624,13 @@
                                 </span>
                             </label>
                             <span>Controlable</span>
+                        </div>
+
+                        <div
+                            [ngClass]="isSubmit ? newProductoForm.controls['descripcionControl'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="descripcionControl">Descripción control</label>
+                            <textarea class="form-control" id="descripcionControl" formControlName="descripcionControl"
+                                rows="1"></textarea>
                         </div>
 
                     </div>

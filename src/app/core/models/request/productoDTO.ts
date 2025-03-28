@@ -17,6 +17,7 @@ export class ProductoDTO {
     sales_name!: string;
     controllable!: boolean;
     control_description!: string;
+    product_state!: ProductState;
     with: string[] = [];
     actual_role!: string;
 
@@ -25,4 +26,10 @@ export class ProductoDTO {
 
     }
 
+}
+
+export class ProductState {
+
+    possible_product_state_uuid!: string;
+    comments!: string;
 }
