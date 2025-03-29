@@ -78,10 +78,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
     'code': { value: '', op: 'LIKE', contiene: true },
     'productType.uuid': { value: '', op: '=', contiene: false },
     'productCategory.uuid': { value: '', op: '=', contiene: false },
+    'productStates.possibleProductState.uuid': { value: '', op: '=', contiene: false },
     'mercosur_nomenclature': { value: '', op: 'LIKE', contiene: true },
     'measure.uuid': { value: '', op: '=', contiene: false },
     'stocks.batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
-    'supplier.uuid': { value: '', op: '=', contiene: false },
+    'suppliers.uuid': { value: '', op: '=', contiene: false },
     'traceable': { value: '', op: '=', contiene: false },
     'assign_serial_number': { value: '', op: '=', contiene: false }
   };
@@ -492,7 +493,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.filtros['mercosur_nomenclature'].value = '';
     this.filtros['measure.uuid'].value = '';
     this.filtros['stocks.batch.batch_identification'].value = '';
-    this.filtros['supplier.uuid'].value = '';
+    this.filtros['suppliers.uuid'].value = '';
     this.filtros['traceable'].value = '';
     this.filtros['assign_serial_number'].value = '';
     this.obtenerProductos();
@@ -510,7 +511,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.filtros['mercosur_nomenclature'].value = '';
     this.filtros['measure.uuid'].value = '';
     this.filtros['stocks.batch.batch_identification'].value = '';
-    this.filtros['supplier.uuid'].value = '';
+    this.filtros['suppliers.uuid'].value = '';
     this.filtros['traceable'].value = '';
     this.filtros['assign_serial_number'].value = '';
     this.obtenerProductos();

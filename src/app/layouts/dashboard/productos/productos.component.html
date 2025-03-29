@@ -734,7 +734,9 @@
                                 <label for="estado">Estado actual</label>
                                 <ng-select [items]="estados" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                     style="width: 100%" [virtualScroll]="true" notFoundText="No hay estados"
-                                    class="w-1/3 min-w-[200px]" [(ngModel)]="filtros.estado"></ng-select>
+                                    class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['productStates.possibleProductState.uuid'].value"
+                                    (change)="obtenerProductosPorFiltroAvanzado()">
+                                </ng-select>
                             </div>
 
                             <div style="width: 100%;">
@@ -817,7 +819,7 @@
                                 <ng-select [items]="proveedores" bindLabel="nombreCompleto" bindValue="uuid"
                                     clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                     notFoundText="No hay proveedores" placeholder="Proveedor"
-                                    class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['supplier.uuid'].value"
+                                    class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['suppliers.uuid'].value"
                                     (change)="obtenerProductosPorFiltroAvanzado()"></ng-select>
                             </div>
 
