@@ -96,7 +96,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
   iconArrowDown = faArrowDown;
   iconArrowLeft = faArrowLeft;
 
-
   tab1: string = 'datos-generales';
 
   // Referencia al modal para crear y editar países.
@@ -131,11 +130,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // this.offcanvasElement = document.getElementById('offcanvasRight');
-
     if (this.offcanvasElement) {
       this.offcanvasElement.nativeElement.addEventListener('hidden.bs.offcanvas', () => {
-        // console.log('El offcanvas se ha cerrado');
         // Aquí puedes ejecutar cualquier acción adicional al cierre
       });
     }
@@ -166,7 +162,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProductos(params, this.actual_role).subscribe({
         next: res => {
-          console.log(res);
+          // console.log(res);
           this.productos = res.data;
           if (!alta && this.productos.length > 0) {
             this.inicializarFormEdit(this.productos[0]);
@@ -250,7 +246,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
       controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, [Validators.required]),
       descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
-      comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, [Validators.required]),
+      comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, []),
       nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, [Validators.required]),
       stock_available: new FormControl({ value: producto?.stock_data?.available, disabled: true }, []),
       stock_reserved: new FormControl({ value: producto?.stock_data?.reserved, disabled: true }, []),
@@ -299,7 +295,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
       unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
       iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      comentarios: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      comentarios: new FormControl({ value: null, disabled: false }, []),
       nombreVenta: new FormControl({ value: null, disabled: false }, [Validators.required]),
       descripcionControl: new FormControl({ value: null, disabled: true }, []),
       asignaNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
@@ -308,9 +304,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
       vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
       controlable: new FormControl({ value: false, disabled: false }, [Validators.required])
     });
-    this.onNewFormEdit();
+    this.onNewForm();
   }
-  onNewFormEdit() {
+  onNewForm() {
     this.newProductoForm.get('controlable')!.valueChanges.subscribe(
       (value) => {
         if (value) {
@@ -399,7 +395,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let producto = new ProductoDTO();
       this.armarDTOProducto(producto, form);
-      // console.log(producto);
       if (!this.isEdicion) {
         this.subscription.add(
           this._productoService.saveProducto(producto).subscribe({
