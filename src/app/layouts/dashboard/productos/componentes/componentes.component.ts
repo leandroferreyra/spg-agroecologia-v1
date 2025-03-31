@@ -102,11 +102,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         next: res => {
           console.log(res);
           this.componentes = res.data;
-          this.componentes.sort((a, b) => {
-            const isAProceso = a.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
-            const isBProceso = b.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
-            return isAProceso - isBProceso;
-          });
+          this.orderProcesosPrimero();
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -118,6 +114,14 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  orderProcesosPrimero() {
+    this.componentes.sort((a, b) => {
+      const isAProceso = a.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
+      const isBProceso = b.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
+      return isAProceso - isBProceso;
+    });
   }
 
   modificarPaginacion(res: any) {
@@ -132,6 +136,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     }
   }
 
+  disableProducto = (item: any): boolean => {
+    return item.uuid === this.producto.uuid;
+  };
+
   obtenerCatalogos() {
     forkJoin({
       proveedores: this._indexService.getProveedores(this.rol),
@@ -144,6 +152,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           nombreCompleto: this.bindName(proveedor)
         }));
         this.productos = res.productos.data;
+        this.productos = this.productos.map(p => ({
+          ...p,
+          disabled: p.uuid === this.producto.uuid // Solo deshabilita el que coincide
+        }));
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
