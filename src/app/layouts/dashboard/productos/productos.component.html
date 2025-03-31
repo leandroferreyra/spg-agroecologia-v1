@@ -134,6 +134,14 @@
 
                 <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componente-de' }"
+                    (click)="tab1 = 'componente-de'">
+                    <!-- <icon-user class="mr-3" /> -->
+                    Componente de
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'reemplazos' }"
                     (click)="tab1 = 'reemplazos'">
                     <!-- <icon-user class="mr-3" /> -->
@@ -443,29 +451,34 @@
                     </app-componentes>
                 </div>
 
+                <div *ngIf="tab1.toLowerCase() === 'componente-de'">
+                    <app-componente-de [producto]="selectedProducto" [rol]="actual_role">
+                    </app-componente-de>
+                </div>
+
                 <div *ngIf="tab1.toLowerCase() === 'reemplazos'">
-                    <app-contactos-persona [persona]="selectedProducto" [rol]="actual_role">
-                    </app-contactos-persona>
+                    <!-- <app-contactos-persona [persona]="selectedProducto" [rol]="actual_role">
+                    </app-contactos-persona> -->
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'proveedores'">
-                    <app-cuentas-bancarias [proveedor]="selectedProducto" [rol]="actual_role">
-                    </app-cuentas-bancarias>
+                    <!-- <app-cuentas-bancarias [proveedor]="selectedProducto" [rol]="actual_role">
+                    </app-cuentas-bancarias> -->
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'stock'">
-                    <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
-                    </app-compras-proveedor>
+                    <!-- <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
+                    </app-compras-proveedor> -->
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'compras'">
-                    <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
-                    </app-compras-proveedor>
+                    <!-- <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
+                    </app-compras-proveedor> -->
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'vinculos'">
-                    <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
-                    </app-compras-proveedor>
+                    <!-- <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
+                    </app-compras-proveedor> -->
                 </div>
 
             </div>
@@ -734,7 +747,8 @@
                                 <label for="estado">Estado actual</label>
                                 <ng-select [items]="estados" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                     style="width: 100%" [virtualScroll]="true" notFoundText="No hay estados"
-                                    class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['productStates.possibleProductState.uuid'].value"
+                                    class="w-1/3 min-w-[200px]"
+                                    [(ngModel)]="filtros['productStates.possibleProductState.uuid'].value"
                                     (change)="obtenerProductosPorFiltroAvanzado()">
                                 </ng-select>
                             </div>

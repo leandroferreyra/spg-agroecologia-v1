@@ -1,14 +1,28 @@
-import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { NgxSpinnerService } from 'ngx-spinner';
-import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { NgxTippyModule } from 'ngx-tippy-wrapper';
+import { forkJoin, Subscription } from 'rxjs';
+import { ComponenteDTO } from 'src/app/core/models/request/componenteDTO';
+import { ComponentesService } from 'src/app/core/services/componentes.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-componentes',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
+    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent],
   templateUrl: './componentes.component.html',
   styleUrl: './componentes.component.css'
 })
@@ -30,14 +44,31 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtros: any = {
-    'product.uuid': { value: '', op: '=', contiene: false }
+    'product->parent_product_uuid': { value: '', op: '=', contiene: false }
   };
   showFilterCompras: boolean = false;
   ordenamiento: any = {
   };
 
+  componenteForm!: FormGroup;
+  tituloModal: string = '';
+  isSubmit = false;
+  isEdicion = false;
+
+  // Referencia al modal para crear y editar países.
+  @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
+  modalOptions: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: false
+  };
+
+  // Catalogos
+  proveedores: any[] = [];
+  productos: any[] = [];
+
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _tokenService: TokenService) {
+    private _tokenService: TokenService, private _componenteService: ComponentesService) {
   }
 
   ngOnInit(): void {
@@ -51,15 +82,16 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     if (changes['producto'] && changes['producto'].currentValue) {
       this.spinner.show();
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
-      this.filtros['product.uuid'].value = this.producto.uuid;
+      this.filtros['product->parent_product_uuid'].value = this.producto.uuid;
       this.obtenerComponentes();
+      this.obtenerCatalogos();
     }
   }
 
   obtenerComponentes() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = [];
+    params.with = ["childProduct", "childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -93,6 +125,181 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         this.itemsInPage = this.currentPage * this.itemsPerPage;
       }
     }
+  }
+
+  obtenerCatalogos() {
+    forkJoin({
+      proveedores: this._indexService.getProveedores(this.rol),
+      productos: this._indexService.getProductosWithParam(null, this.rol)
+    }).subscribe({
+      next: res => {
+        this.proveedores = res.proveedores.data;
+        this.proveedores = this.proveedores.map(proveedor => ({
+          ...proveedor,
+          nombreCompleto: this.bindName(proveedor)
+        }));
+        this.productos = res.productos.data;
+      },
+      error: error => {
+        console.error('Error cargando catalogos:', error);
+      }
+    });
+  }
+
+  openModalComponente(type: string, dato?: any) {
+    if (type === 'NEW') {
+      this.isEdicion = false;
+      this.tituloModal = 'Nuevo componente';
+      this.componenteForm = new FormGroup({
+        // parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
+        child_product_uuid: new FormControl(null, Validators.required),
+        quantity: new FormControl(null, Validators.required),
+        supplier_uuid: new FormControl(null, Validators.required)
+      });
+    } else {
+      this.isEdicion = true;
+      this.tituloModal = 'Edición componente';
+      this.componenteForm = new FormGroup({
+        uuid: new FormControl(dato.uuid),
+        parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
+        child_product_uuid: new FormControl(dato.child_product?.uuid, []),
+        quantity: new FormControl(dato.quantity, Validators.required),
+        supplier_uuid: new FormControl(dato.supplier?.uuid, Validators.required)
+      });
+    }
+    this.modalComponente.options = this.modalOptions;
+    this.modalComponente.open();
+  }
+
+
+  cerrarModal() {
+    this.isSubmit = false;
+    this.modalComponente.close();
+  }
+
+  confirmarComponente() {
+    this.isSubmit = true;
+    if (this.componenteForm.valid) {
+      this.spinner.show();
+      let componente = new ComponenteDTO();
+      this.armarDTOComponente(componente);
+      if (!this.isEdicion) {
+        this.subscription.add(
+          this._componenteService.saveComponente(componente).subscribe({
+            next: res => {
+              this.spinner.hide();
+              this.obtenerComponentes();
+              this.cerrarModal();
+            },
+            error: error => {
+              this.spinner.hide();
+              this._swalService.toastError('top-right', error.error.message)
+              console.error(error);
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._componenteService.editComponente(this.componenteForm.get('uuid')?.value, componente).subscribe({
+            next: res => {
+              this.obtenerComponentes();
+              this.isEdicion = false;
+              this.cerrarModal();
+              this._swalService.toastSuccess('top-right', "Usuario actualizado.");
+              this.spinner.hide();
+            },
+            error: error => {
+              this.spinner.hide();
+              this._swalService.toastError('top-right', error.error.message);
+              console.error(error);
+            }
+          })
+        )
+      }
+    }
+  }
+  armarDTOComponente(componente: ComponenteDTO) {
+    componente.actual_role = this.rol;
+    componente.with = ["childProduct", "childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
+    componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value;
+    componente['product->parent_product_uuid'] = this.producto.uuid;
+    componente.quantity = this.componenteForm.get('quantity')?.value;
+    componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
+    if (!this.isEdicion) {
+      this.cleanObject(componente);
+    }
+  }
+  // Se eliminan los nulos.
+  private cleanObject(obj: any): void {
+    Object.keys(obj).forEach(key => {
+      if (obj[key] && typeof obj[key] === 'object') {
+        this.cleanObject(obj[key]); // Limpiar objetos anidados
+      }
+      if (obj[key] == null) {
+        delete obj[key]; // Eliminar propiedades nulas o undefined
+      }
+    });
+  }
+
+  openSwalEliminar(componente: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el componente ${componente.child_product.name}?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarComponente(componente);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarComponente(componente: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._componenteService.deleteComponent(componente.uuid, this.rol.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerComponentes();
+          this._tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this._swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  getNombreCompletoProveedor(data: any): string {
+    if (!data.supplier?.person) return 'Proveedor sin nombre';
+    if (data.supplier.person.human) {
+      return data.supplier.person.human.firstname + ' ' + data.supplier.person.human.lastname;
+    } else if (data.supplier.person.legal_entity) {
+      return data.supplier.person.legal_entity.company_name;
+    }
+    return 'Proveedor desconocido';
+  }
+
+  bindName(data: any): string {
+    if (!data.person) return '';
+    if (data.person.human) {
+      return data.person.human.firstname + ' ' + data.person.human.lastname;
+    } else if (data.person.legal_entity) {
+      return data.person.legal_entity.company_name;
+    }
+    return '';
   }
 
 

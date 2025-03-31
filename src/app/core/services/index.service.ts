@@ -42,43 +42,46 @@ export class IndexService {
 
   getNewParams(paramsObj: any, rol?: string): HttpParams {
     let params = new HttpParams();
-    // Paging 
-    paramsObj.paging && (params = params.append('paging', paramsObj.paging));
-    paramsObj.page && (params = params.append('page', paramsObj.page));
-    // para cada elemento de paramsObj.with, agregar un with[]
-    paramsObj.with.forEach((element: any) => {
-      params = params.append('with[]', element);
-    });
-    // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
-    Object.keys(paramsObj.order_by).forEach((key, index) => {
-      if (paramsObj.order_by[key] !== '') {
-        params = params.append(`order_by[${index}][]`, key);
-        params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
-      }
-    });
-    // para cada elemento de paramsObj.filters, agregar un filters[]
-    Object.keys(paramsObj.filters).forEach((key, index) => {
-      if (paramsObj.filters[key] && paramsObj.filters[key].value !== '' && paramsObj.filters[key].value !== null) {
-        params = params.append(`filters[${index}][]`, key);
-        params = params.append(`filters[${index}][]`, paramsObj.filters[key].op);
-        if (paramsObj.filters[key].contiene) {
-          params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key].value}%`);
-        } else {
-          if (paramsObj.filters[key].op === 'LIKE') {
-            // Acá ingresa cuando es una búsqueda por string y el contiene es false es decir, debería ser un startWith 
-            params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}%`);
+    if (paramsObj) {
+      // Paging 
+      paramsObj.paging && (params = params.append('paging', paramsObj.paging));
+      paramsObj.page && (params = params.append('page', paramsObj.page));
+      // para cada elemento de paramsObj.with, agregar un with[]
+      paramsObj.with.forEach((element: any) => {
+        params = params.append('with[]', element);
+      });
+      // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
+      Object.keys(paramsObj.order_by).forEach((key, index) => {
+        if (paramsObj.order_by[key] !== '') {
+          params = params.append(`order_by[${index}][]`, key);
+          params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+        }
+      });
+      // para cada elemento de paramsObj.filters, agregar un filters[]
+      Object.keys(paramsObj.filters).forEach((key, index) => {
+        if (paramsObj.filters[key] && paramsObj.filters[key].value !== '' && paramsObj.filters[key].value !== null) {
+          params = params.append(`filters[${index}][]`, key);
+          params = params.append(`filters[${index}][]`, paramsObj.filters[key].op);
+          if (paramsObj.filters[key].contiene) {
+            params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key].value}%`);
           } else {
-            // Acá no es LIKE por lo que seguro es un = y busca por uuid.
-            params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
+            if (paramsObj.filters[key].op === 'LIKE') {
+              // Acá ingresa cuando es una búsqueda por string y el contiene es false es decir, debería ser un startWith 
+              params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}%`);
+            } else {
+              // Acá no es LIKE por lo que seguro es un = y busca por uuid.
+              params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
+            }
           }
         }
+      });
+
+      if (paramsObj.distinct !== null && paramsObj.distinct !== undefined) {
+        params = params.append('distinct', paramsObj.distinct);
       }
-    });
+    }
     if (rol) {
       params = params.append('actual_role', rol);
-    }
-    if (paramsObj.distinct !== null && paramsObj.distinct !== undefined) {
-      params = params.append('distinct', paramsObj.distinct);
     }
     return params;
   }
@@ -183,7 +186,15 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
   }
 
-  getProductos(paramsObj: any, rol: string): Observable<AuthResponse> {
+
+  // getProductos(rol: string): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   let params = new HttpParams();
+  //   params = params.append('actual_role', rol)
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: params });
+  // }
+
+  getProductosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: this.getNewParams(paramsObj, rol) });
   }

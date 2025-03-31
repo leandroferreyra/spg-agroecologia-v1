@@ -1,10 +1,10 @@
 <div class="panel pb-0">
 
-    <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
+    <!-- <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
         <button type="button" ngxTippy="Agregar componente" (click)="openModalComponente('NEW')">
             <icon-plus />
         </button>
-    </div>
+    </div> -->
 
     <div class="row mb-2">
         <div class="col-6">
@@ -53,9 +53,9 @@
                             Proveedor
                         </span>
                     </th>
-                    <th>
+                    <!-- <th>
                         Acciones
-                    </th>
+                    </th> -->
                 </tr>
             </thead>
             <tbody>
@@ -63,12 +63,12 @@
                 data.uuid) {
                 <tr>
                     <td class="whitespace-nowrap">{{ index+1}} </td>
-                    <td class="whitespace-nowrap">{{ data.child_product.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.parent_product.name}} </td>
                     <td class="whitespace-nowrap">{{ data.quantity}} </td>
                     <td class="whitespace-nowrap"> 0 </td>
                     <td class="whitespace-nowrap"> 0 </td>
                     <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
-                    <td>
+                    <!-- <td>
                         <div class="flex items-center">
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
@@ -82,7 +82,7 @@
                                 </button>
                             </div>
                         </div>
-                    </td>
+                    </td> -->
                 </tr>
                 }
             </tbody>
@@ -120,7 +120,7 @@
 
 
 <!-- MODAL DATO DE CONTACTO -->
-<div>
+<!-- <div>
     <ngx-custom-modal #modalComponente class="modal-top animate extra-large-modal animate-fade-in">
         <ng-template #modalHeader>
             <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
@@ -172,4 +172,4 @@
             </div>
         </ng-template>
     </ngx-custom-modal>
-</div>
+</div> -->

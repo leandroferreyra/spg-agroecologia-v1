@@ -34,6 +34,7 @@ import { ContactosComponent } from '../personas/shared/contactos/contactos.compo
 import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoDTO';
 import { ProductoService } from 'src/app/core/services/producto.service';
 import { ComponentesComponent } from './componentes/componentes.component';
+import { ComponenteDeComponent } from './componente-de/componente-de.component';
 
 @Component({
   selector: 'app-productos',
@@ -41,7 +42,7 @@ import { ComponentesComponent } from './componentes/componentes.component';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent
+    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -160,7 +161,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     params.filters = this.filtros;
 
     this.subscription.add(
-      this._indexService.getProductos(params, this.actual_role).subscribe({
+      this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
           // console.log(res);
           this.productos = res.data;
