@@ -102,6 +102,11 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         next: res => {
           console.log(res);
           this.componentes = res.data;
+          this.componentes.sort((a, b) => {
+            const isAProceso = a.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
+            const isBProceso = b.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
+            return isAProceso - isBProceso;
+          });
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();

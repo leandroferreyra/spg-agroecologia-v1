@@ -63,7 +63,12 @@
                 data.uuid) {
                 <tr>
                     <td class="whitespace-nowrap">{{ index+1}} </td>
-                    <td class="whitespace-nowrap">{{ data.child_product.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.child_product.name}}
+                        <span *ngIf="data.child_product.product_type.name === 'Procesos IP LADIE'"
+                            class="badge bg-warning text-white ms-2">
+                            PROCESO
+                        </span>
+                    </td>
                     <td class="whitespace-nowrap">{{ data.quantity}} </td>
                     <td class="whitespace-nowrap"> 0 </td>
                     <td class="whitespace-nowrap"> 0 </td>
