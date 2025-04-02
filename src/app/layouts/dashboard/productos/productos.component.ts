@@ -159,6 +159,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtros;
+    
+    if (!this.filtros['productStates.possibleProductState.uuid'].value) {
+      delete params.filters['productStates.datetime_to'];
+    } else {
+      params.filters['productStates.datetime_to'] = { value: 'null', op: '=', contiene: false };
+    }
 
     this.subscription.add(
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
