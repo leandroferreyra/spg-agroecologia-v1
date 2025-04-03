@@ -189,11 +189,12 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     } else {
       this.isEdicion = true;
       this.tituloModal = 'Edición componente';
+      this.placeholderCantidad = 'Cantidad en ' + dato.child_product.measure?.name;
       this.componenteForm = new FormGroup({
         uuid: new FormControl(dato.uuid),
         parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
         child_product_uuid: new FormControl(dato.child_product?.uuid, []),
-        quantity: new FormControl(dato.quantity, Validators.required),
+        quantity: new FormControl(this.mostrarCantidad(dato), Validators.required),
         supplier_uuid: new FormControl(dato.supplier?.uuid, [])
       });
     }
@@ -267,7 +268,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
   armarDTOComponente(componente: ComponenteDTO) {
     componente.actual_role = this.rol;
-    componente.with = ["childProduct", "childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
+    componente.with = ["childProduct", "childProduct.productType", "childProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
     componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value;
     componente['product->parent_product_uuid'] = this.producto.uuid;
     componente.quantity = this.componenteForm.get('quantity')?.value;
