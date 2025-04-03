@@ -101,7 +101,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          console.log(this.componentes);
           this.orderProcesosPrimero();
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
