@@ -165,6 +165,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.productos = res.data;
+          console.log(this.productos);
           if (this.productos.length === 0) {
             this.swalService.toastSuccess('center', 'No existen productos.');
           }
@@ -252,14 +253,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
       descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
       comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, []),
       nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, [Validators.required]),
-      stock_available: new FormControl({ value: producto?.stock_data?.available, disabled: true }, []),
-      stock_reserved: new FormControl({ value: producto?.stock_data?.reserved, disabled: true }, []),
-      stock_samples: new FormControl({ value: producto?.stock_data?.samples, disabled: true }, []),
-      stock_observed: new FormControl({ value: producto?.stock_data?.observed, disabled: true }, []),
-      stock_minimum: new FormControl({ value: producto?.stock_data?.minimum, disabled: true }, []),
-      stock_optimum: new FormControl({ value: producto?.stock_data?.optimum, disabled: true }, []),
-      stock_initial: new FormControl({ value: producto?.stock_data?.initial_stock, disabled: true }, []),
-      stock_quantity_sold: new FormControl({ value: producto?.stock_data?.quantity_sold, disabled: true }, []),
+      stock_available: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.available), disabled: true }, []),
+      stock_reserved: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.reserved), disabled: true }, []),
+      stock_samples: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.samples), disabled: true }, []),
+      stock_observed: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.observed), disabled: true }, []),
+      stock_minimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.minimum), disabled: true }, []),
+      stock_optimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.optimum), disabled: true }, []),
+      stock_initial: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.initial_stock), disabled: true }, []),
+      stock_quantity_sold: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.quantity_sold), disabled: true }, []),
     });
     // Habilitar todos los controles si es edición
     if (this.isEdicion) {
@@ -285,6 +286,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.productoForm.get('descripcionControl')?.disable();
         }
       });
+  }
+
+  mostrarCantidad(data: any, stock: string) {
+    if (data.measure?.is_integer === 1) {
+      return (+stock)?.toFixed(0);
+    } else {
+      return (+stock)?.toFixed(2);
+    }
   }
 
   inicializarFormNew() {

@@ -91,7 +91,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   obtenerComponentes() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["childProduct", "childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
+    params.with = ["childProduct", "childProduct.productType", "childProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -101,6 +101,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          console.log(this.componentes);
           this.orderProcesosPrimero();
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
@@ -315,6 +316,14 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       return data.person.legal_entity.company_name;
     }
     return '';
+  }
+
+  mostrarCantidad(data: any) {
+    if (data.child_product?.measure?.is_integer === 1) {
+      return (+data.quantity)?.toFixed(0);
+    } else {
+      return (+data.quantity)?.toFixed(2);
+    }
   }
 
 
