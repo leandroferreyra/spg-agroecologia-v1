@@ -168,10 +168,9 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this.isEdicion = false;
       this.tituloModal = 'Nuevo componente';
       this.componenteForm = new FormGroup({
-        // parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
         child_product_uuid: new FormControl(null, Validators.required),
         quantity: new FormControl(null, Validators.required),
-        supplier_uuid: new FormControl(null, Validators.required)
+        supplier_uuid: new FormControl(null, [])
       });
     } else {
       this.isEdicion = true;
@@ -300,13 +299,13 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   getNombreCompletoProveedor(data: any): string {
-    if (!data.supplier?.person) return 'Proveedor sin nombre';
+    if (!data.supplier?.person) return '';
     if (data.supplier.person.human) {
       return data.supplier.person.human.firstname + ' ' + data.supplier.person.human.lastname;
     } else if (data.supplier.person.legal_entity) {
       return data.supplier.person.legal_entity.company_name;
     }
-    return 'Proveedor desconocido';
+    return '';
   }
 
   bindName(data: any): string {
