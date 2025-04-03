@@ -67,6 +67,8 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   proveedores: any[] = [];
   productos: any[] = [];
 
+  placeholderCantidad: string = '';
+
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private _componenteService: ComponentesService) {
   }
@@ -101,6 +103,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          console.log(this.componentes);
           this.orderProcesosPrimero();
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
@@ -136,7 +139,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   disableProducto = (item: any): boolean => {
-    console.log(item);
     const existeProcesoIPLADIE = this.componentes.some(
       (comp) => comp.child_product?.product_type?.name === "Procesos IP LADIE"
     );
@@ -147,7 +149,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   obtenerCatalogos() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["productType"];
+    params.with = ["productType", "measure"];
     params.paging = null;
     params.page = null;
     params.order_by = {};
@@ -181,7 +183,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Nuevo componente';
       this.componenteForm = new FormGroup({
         child_product_uuid: new FormControl(null, Validators.required),
-        quantity: new FormControl(null, Validators.required),
+        quantity: new FormControl({ value: null, disabled: true }, Validators.required),
         supplier_uuid: new FormControl(null, [])
       });
     } else {
@@ -195,13 +197,30 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         supplier_uuid: new FormControl(dato.supplier?.uuid, [])
       });
     }
+    this.onFormChange();
     this.modalComponente.options = this.modalOptions;
     this.modalComponente.open();
+  }
+
+  onFormChange() {
+    this.componenteForm.get('child_product_uuid')!.valueChanges.subscribe(
+      (value) => {
+        console.log(value);
+        if (value) {
+          this.componenteForm.get('quantity')?.enable();
+          this.componenteForm.get('quantity')?.setValue('');
+          this.placeholderCantidad = 'Cantidad en ' + value.measure?.name;
+        } else {
+          this.componenteForm.get('quantity')?.disable();
+          this.placeholderCantidad = '';
+        }
+      });
   }
 
 
   cerrarModal() {
     this.isSubmit = false;
+    this.placeholderCantidad = '';
     this.modalComponente.close();
   }
 
@@ -249,7 +268,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   armarDTOComponente(componente: ComponenteDTO) {
     componente.actual_role = this.rol;
     componente.with = ["childProduct", "childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
-    componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value;
+    componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value.uuid;
     componente['product->parent_product_uuid'] = this.producto.uuid;
     componente.quantity = this.componenteForm.get('quantity')?.value;
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
