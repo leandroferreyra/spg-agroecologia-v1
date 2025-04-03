@@ -80,6 +80,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     'productType.uuid': { value: '', op: '=', contiene: false },
     'productCategory.uuid': { value: '', op: '=', contiene: false },
     'productStates.possibleProductState.uuid': { value: '', op: '=', contiene: false },
+    // 'productStates.datetime_to': { value: '', op: '=', contiene: false },
     'mercosur_nomenclature': { value: '', op: 'LIKE', contiene: true },
     'measure.uuid': { value: '', op: '=', contiene: false },
     'stocks.batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
@@ -159,18 +160,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtros;
-    
-    if (!this.filtros['productStates.possibleProductState.uuid'].value) {
-      delete params.filters['productStates.datetime_to'];
-    } else {
-      params.filters['productStates.datetime_to'] = { value: 'null', op: '=', contiene: false };
-    }
 
     this.subscription.add(
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
           this.productos = res.data;
+          console.log(this.productos);
           if (!alta && this.productos.length > 0) {
             this.inicializarFormEdit(this.productos[0]);
           }
@@ -498,10 +493,17 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.filtros['suppliers.uuid'].value = '';
     this.filtros['traceable'].value = '';
     this.filtros['assign_serial_number'].value = '';
+    this.filtros['productStates.possibleProductState.uuid'].value = '';
+    delete this.filtros['productStates.datetime_to'];
     this.obtenerProductos();
   }
 
   obtenerProductosPorFiltroAvanzado() {
+    if (this.filtros['productStates.possibleProductState.uuid'].value !== null && this.filtros['productStates.possibleProductState.uuid'].value !== '') {
+      this.filtros['productStates.datetime_to'] = { value: 'null', op: '=', contiene: false };
+    } else {
+      delete this.filtros['productStates.datetime_to'];
+    }
     this.obtenerProductos();
   }
 
@@ -516,6 +518,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.filtros['suppliers.uuid'].value = '';
     this.filtros['traceable'].value = '';
     this.filtros['assign_serial_number'].value = '';
+    this.filtros['productStates.possibleProductState.uuid'].value = '';
+    delete this.filtros['productStates.datetime_to'];
     this.obtenerProductos();
   }
 
