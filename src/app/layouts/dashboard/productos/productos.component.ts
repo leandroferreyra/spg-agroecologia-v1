@@ -165,7 +165,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.productos = res.data;
-          console.log(this.productos);
+          if (this.productos.length === 0) {
+            this.swalService.toastSuccess('center', 'No existen productos.');
+          }
           if (!alta && this.productos.length > 0) {
             this.inicializarFormEdit(this.productos[0]);
           }

@@ -97,7 +97,8 @@
         <!-- MENU ICONO OCULTO RESPONSIVE -->
         <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
             <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
-                Producto @if(selectedProducto) {
+                Producto
+                @if(productos.length > 0 && selectedProducto) {
                 {{selectedProducto.name}}
                 }
             </h5>
@@ -832,8 +833,8 @@
                                 <label for="proveedor">Proveedor</label>
                                 <ng-select [items]="proveedores" bindLabel="nombreCompleto" bindValue="uuid"
                                     clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                    notFoundText="No hay proveedores"
-                                    class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['suppliers.uuid'].value"
+                                    notFoundText="No hay proveedores" class="w-1/3 min-w-[200px]"
+                                    [(ngModel)]="filtros['suppliers.uuid'].value"
                                     (change)="obtenerProductosPorFiltroAvanzado()"></ng-select>
                             </div>
 
