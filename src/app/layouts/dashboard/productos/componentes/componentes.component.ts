@@ -180,7 +180,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
         child_product_uuid: new FormControl(dato.child_product?.uuid, []),
         quantity: new FormControl(dato.quantity, Validators.required),
-        supplier_uuid: new FormControl(dato.supplier?.uuid, Validators.required)
+        supplier_uuid: new FormControl(dato.supplier?.uuid, [])
       });
     }
     this.modalComponente.options = this.modalOptions;
