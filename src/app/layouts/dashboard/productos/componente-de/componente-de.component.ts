@@ -70,7 +70,7 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
   obtenerComponentes() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["parentProduct", "supplier.person.human", "supplier.person.legalEntity"];
+    params.with = ["parentProduct", "parentProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -107,13 +107,21 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
   }
 
   getNombreCompletoProveedor(data: any): string {
-    if (!data.supplier?.person) return 'Proveedor sin nombre';
+    if (!data.supplier?.person) return '';
     if (data.supplier.person.human) {
       return data.supplier.person.human.firstname + ' ' + data.supplier.person.human.lastname;
     } else if (data.supplier.person.legal_entity) {
       return data.supplier.person.legal_entity.company_name;
     }
-    return 'Proveedor desconocido';
+    return '';
+  }
+
+  mostrarCantidad(data: any) {
+    if (data.parent_product?.measure?.is_integer === 1) {
+      return (+data.quantity)?.toFixed(0);
+    } else {
+      return (+data.quantity)?.toFixed(2);
+    }
   }
 
 }
