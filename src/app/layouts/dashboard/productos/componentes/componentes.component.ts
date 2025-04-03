@@ -205,11 +205,11 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   onFormChange() {
     this.componenteForm.get('child_product_uuid')!.valueChanges.subscribe(
       (value) => {
-        console.log(value);
         if (value) {
+          let producto = this.productos.find(p => p.uuid === value);
           this.componenteForm.get('quantity')?.enable();
           this.componenteForm.get('quantity')?.setValue('');
-          this.placeholderCantidad = 'Cantidad en ' + value.measure?.name;
+          this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
         } else {
           this.componenteForm.get('quantity')?.disable();
           this.placeholderCantidad = '';

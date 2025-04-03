@@ -140,7 +140,7 @@
 
                             <div class="mb-2">
                                 <label>Componente</label>
-                                <ng-select [items]="productos" bindLabel="name" 
+                                <ng-select [items]="productos" bindLabel="name" bindValue="uuid"
                                     formControlName="child_product_uuid" [virtualScroll]="true" [appendTo]="'body'"
                                     [ngClass]="isSubmit ? componenteForm.controls['child_product_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
@@ -149,7 +149,8 @@
                             <div class="mb-2"
                                 [ngClass]="isSubmit ? componenteForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Cantidad</label>
-                                <input type="text" class="form-control" formControlName="quantity" [placeholder]="placeholderCantidad">
+                                <input type="text" class="form-control" formControlName="quantity"
+                                    [placeholder]="placeholderCantidad">
                             </div>
 
                             <div class="flex-grow-1">
