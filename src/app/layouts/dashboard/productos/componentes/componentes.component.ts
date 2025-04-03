@@ -137,13 +137,26 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   disableProducto = (item: any): boolean => {
-    return item.uuid === this.producto.uuid;
+    console.log(item);
+    const existeProcesoIPLADIE = this.componentes.some(
+      (comp) => comp.child_product?.product_type?.name === "Procesos IP LADIE"
+    );
+    return item.uuid === this.producto.uuid || (existeProcesoIPLADIE && item.product_type.name === 'Procesos IP LADIE');
   };
 
+
   obtenerCatalogos() {
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = ["productType"];
+    params.paging = null;
+    params.page = null;
+    params.order_by = {};
+    params.filters = {};
+
     forkJoin({
       proveedores: this._indexService.getProveedores(this.rol),
-      productos: this._indexService.getProductosWithParam(null, this.rol)
+      productos: this._indexService.getProductosWithParam(params, this.rol)
     }).subscribe({
       next: res => {
         this.proveedores = res.proveedores.data;
@@ -154,7 +167,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         this.productos = res.productos.data;
         this.productos = this.productos.map(p => ({
           ...p,
-          disabled: p.uuid === this.producto.uuid // Solo deshabilita el que coincide
+          disabled: this.disableProducto(p) // Solo deshabilita el que coincide
         }));
       },
       error: error => {
