@@ -268,7 +268,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   armarDTOComponente(componente: ComponenteDTO) {
     componente.actual_role = this.rol;
     componente.with = ["childProduct", "childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
-    componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value.uuid;
+    componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value;
     componente['product->parent_product_uuid'] = this.producto.uuid;
     componente.quantity = this.componenteForm.get('quantity')?.value;
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
