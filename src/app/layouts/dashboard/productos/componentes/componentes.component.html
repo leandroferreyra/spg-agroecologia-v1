@@ -61,7 +61,10 @@
             <tbody>
                 @for(data of componentes | slice: pageSize | slice: 0:itemsPerPage ; let index = $index; track
                 data.uuid) {
-                <tr>
+                <tr [ngClass]="{
+                      'tr-assign-serial': data.child_product.assign_serial_number === 1,
+                      'tr-has-serial': data.child_product.has_serial_number === 1
+                    }">
                     <td class="whitespace-nowrap">{{ index+1}} </td>
                     <td class="whitespace-nowrap">{{ data.child_product.name}}
                         <span *ngIf="data.child_product.product_type.name === 'Procesos IP LADIE'"
@@ -70,8 +73,8 @@
                         </span>
                     </td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
-                    <td class="whitespace-nowrap"> $ 0.00 </td>
-                    <td class="whitespace-nowrap"> $ 0.00 </td>
+                    <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
+                    <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
                     <td>
                         <div class="flex items-center">
