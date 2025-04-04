@@ -404,6 +404,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
   confirmarProducto(form: FormGroup) {
     this.isSubmit = true;
     if (form.valid) {
+      if ((form.get('asignaNumSerie')?.value === 1 || form.get('asignaNumSerie')?.value === true) &&
+        (form.get('tieneNumSerie')?.value === 1 || form.get('tieneNumSerie')?.value === true)) {
+        this.swalService.toastError('top-right', 'No es posible asignar y tener número de serie al mismo tiempo.');
+        return;
+      }
       this.spinner.show();
       let producto = new ProductoDTO();
       this.armarDTOProducto(producto, form);
