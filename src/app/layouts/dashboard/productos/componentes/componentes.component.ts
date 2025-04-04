@@ -12,6 +12,7 @@ import { ComponentesService } from 'src/app/core/services/componentes.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { IconCircleCheckComponent } from 'src/app/shared/icon/icon-circle-check';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
@@ -22,7 +23,7 @@ import Swal from 'sweetalert2';
   selector: 'app-componentes',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
-    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent],
+    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, IconCircleCheckComponent],
   templateUrl: './componentes.component.html',
   styleUrl: './componentes.component.css'
 })
@@ -44,7 +45,8 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtros: any = {
-    'product->parent_product_uuid': { value: '', op: '=', contiene: false }
+    'product->parent_product_uuid': { value: '', op: '=', contiene: false },
+    // 'productType.name': { value: 'Procesos IP LADIE', op: '<>', contiene: false }
   };
   showFilterCompras: boolean = false;
   ordenamiento: any = {
@@ -66,8 +68,12 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   // Catalogos
   proveedores: any[] = [];
   productos: any[] = [];
+  procesos: any[] = [];
 
   placeholderCantidad: string = '';
+
+  procesoActivo: any;
+  isEdicionProceso: boolean = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private _componenteService: ComponentesService) {
@@ -155,9 +161,19 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     params.order_by = {};
     params.filters = {};
 
+    const paramsProcesos: any = {};
+    paramsProcesos.with = ["productType", "measure"];
+    paramsProcesos.paging = null;
+    paramsProcesos.page = null;
+    paramsProcesos.order_by = {};
+    paramsProcesos.filters = {
+      'productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
+    };
+
     forkJoin({
       proveedores: this._indexService.getProveedores(this.rol),
-      productos: this._indexService.getProductosWithParam(params, this.rol)
+      productos: this._indexService.getProductosWithParam(params, this.rol),
+      procesos: this._indexService.getProductosWithParam(paramsProcesos, this.rol)
     }).subscribe({
       next: res => {
         this.proveedores = res.proveedores.data;
@@ -170,6 +186,8 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           ...p,
           disabled: this.disableProducto(p) // Solo deshabilita el que coincide
         }));
+        this.procesos = res.procesos.data;
+        console.log(this.procesos);
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -356,6 +374,33 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     } else {
       return (+data.quantity)?.toFixed(2);
     }
+  }
+
+  editarProceso() {
+    this.isEdicionProceso = true;
+  }
+
+  guardarProceso() {
+    this.isEdicionProceso = false;
+    let componente = new ComponenteDTO();
+    componente.actual_role = this.rol;
+    componente.with = [];
+    componente['product->child_product_uuid'] = this.procesoActivo;
+    componente['product->parent_product_uuid'] = this.producto.uuid;
+    componente.quantity = 1;
+    this.cleanObject(componente);
+    this.subscription.add(
+      this._componenteService.saveComponente(componente).subscribe({
+        next: res => {
+          console.log(res);
+        },
+        error: error => {
+          this.spinner.hide();
+          this._swalService.toastError('top-right', error.error.message)
+          console.error(error);
+        }
+      })
+    )
   }
 
 

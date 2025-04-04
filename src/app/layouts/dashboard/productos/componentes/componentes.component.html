@@ -6,6 +6,36 @@
         </button>
     </div>
 
+
+    <div class="d-flex align-items-center gap-2 mt-3 mb-3">
+        <label class="mb-0">Proceso:</label>
+        <ng-select [items]="procesos" bindLabel="name" bindValue="uuid" [virtualScroll]="true" [appendTo]="'body'"
+            class="w-auto" style="min-width: 50%;" [(ngModel)]="procesoActivo" [disabled]="!isEdicionProceso"
+            [clearable]="false" notFoundText="No hay procesos">
+        </ng-select>
+        <div class="flex items-center">
+            @if (!isEdicionProceso) {
+            <div>
+                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar" (click)="editarProceso();">
+                    <icon-pencil />
+                </button>
+            </div>
+
+            }@else {
+            <div>
+                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Guardar" (click)="guardarProceso();">
+                    <icon-circle-check />
+                </button>
+            </div>
+            }
+            <div>
+                <button type="button" ngxTippy="Eliminar">
+                    <icon-trash-lines />
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="row mb-2">
         <div class="col-6">
             <span *ngIf="componentes && componentes.length > 0" class="float-md-start color-gris">
