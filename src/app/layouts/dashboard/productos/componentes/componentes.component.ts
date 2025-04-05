@@ -187,6 +187,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           disabled: this.disableProducto(p) // Solo deshabilita el que coincide
         }));
         this.procesos = res.procesos.data;
+        console.log(this.productos);
         console.log(this.procesos);
       },
       error: error => {
@@ -403,5 +404,19 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     )
   }
 
+  eliminarProcesoActivo() {
+    this.subscription.add(
+      this._componenteService.deleteComponent(this.procesoActivo, this.rol.toUpperCase()).subscribe({
+        next: res => {
+          this.procesoActivo = '';
+          this._tokenService.setToken(res.token);
+        },
+        error: error => {
+          console.error(error);
+          this._swalService.toastError('top-right', error.error.message);
+        }
+      })
+    )
+  }
 
 }

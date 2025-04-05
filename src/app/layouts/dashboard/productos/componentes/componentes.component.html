@@ -23,13 +23,13 @@
 
             }@else {
             <div>
-                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Guardar" (click)="guardarProceso();">
+                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Guardar" (click)="guardarProceso();" [disabled]="!procesoActivo">
                     <icon-circle-check />
                 </button>
             </div>
             }
             <div>
-                <button type="button" ngxTippy="Eliminar">
+                <button type="button" ngxTippy="Eliminar" (click)="eliminarProcesoActivo();" [disabled]="!procesoActivo">
                     <icon-trash-lines />
                 </button>
             </div>
