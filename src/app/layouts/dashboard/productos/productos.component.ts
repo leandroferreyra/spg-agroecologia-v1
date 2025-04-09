@@ -440,7 +440,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
               )];
               this.isEdicion = false;
               this.inicializarFormEdit(res.data);
-              this.swalService.toastSuccess('top-right', "Usuario actualizado.");
+              this.swalService.toastSuccess('top-right', "Producto actualizado.");
               this.spinner.hide();
             },
             error: error => {

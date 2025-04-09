@@ -165,13 +165,12 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     params.filters = {};
 
     const paramsProcesos: any = {};
-    paramsProcesos.with = ["productType", "measure"];
+    paramsProcesos.with = [];
     paramsProcesos.paging = null;
     paramsProcesos.page = null;
     paramsProcesos.order_by = {};
     paramsProcesos.filters = {
-      'product->parent_product_uuid': { value: this.producto.uuid, op: '=', contiene: false },
-      'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
+      'productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
     };
 
     forkJoin({
