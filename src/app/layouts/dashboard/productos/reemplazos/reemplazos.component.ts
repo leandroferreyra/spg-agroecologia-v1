@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { forkJoin, Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { ComponenteDTO } from 'src/app/core/models/request/componenteDTO';
+import { ReemplazoDTO } from 'src/app/core/models/request/reemplazoDTO';
 import { ComponentesService } from 'src/app/core/services/componentes.service';
 import { IndexService } from 'src/app/core/services/index.service';
+import { ReemplazoService } from 'src/app/core/services/reemplazos.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { IconCircleCheckComponent } from 'src/app/shared/icon/icon-circle-check';
@@ -20,18 +22,18 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-componentes',
+  selector: 'app-reemplazos',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
     NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, IconCircleCheckComponent],
-  templateUrl: './componentes.component.html',
-  styleUrl: './componentes.component.css'
+  templateUrl: './reemplazos.component.html',
+  styleUrl: './reemplazos.component.css'
 })
-export class ComponentesComponent implements OnInit, OnDestroy {
+export class ReemplazosComponent implements OnInit, OnDestroy {
 
   @Input() producto: any;
   @Input() rol!: string;
-  componentes: any[] = [];
+  reemplazos: any[] = [];
 
   private subscription: Subscription = new Subscription();
 
@@ -45,20 +47,19 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtros: any = {
-    'product->parent_product_uuid': { value: '', op: '=', contiene: false },
-    'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '!=', contiene: false },
+    'product->child_product_uuid': { value: '', op: '=', contiene: false },
   };
   showFilterCompras: boolean = false;
   ordenamiento: any = {
   };
 
-  componenteForm!: FormGroup;
+  reemplazoForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
 
   // Referencia al modal para crear y editar países.
-  @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
+  @ViewChild('modalReemplazos') modalReemplazos!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -76,7 +77,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   isEdicionProceso: boolean = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _tokenService: TokenService, private _componenteService: ComponentesService) {
+    private _tokenService: TokenService, private _reemplazoService: ReemplazoService) {
   }
 
   ngOnInit(): void {
@@ -90,30 +91,29 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     if (changes['producto'] && changes['producto'].currentValue) {
       this.spinner.show();
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
-      this.filtros['product->parent_product_uuid'].value = this.producto.uuid;
-      this.obtenerComponentes();
+      this.filtros['product->child_product_uuid'].value = this.producto.uuid;
+      this.obtenerReemplazos();
       this.obtenerCatalogos();
     }
   }
 
-  obtenerComponentes() {
+  obtenerReemplazos() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["childProduct", "childProduct.productType", "childProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
+    params.with = ["product", "replacement"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtros;
 
     this.subscription.add(
-      this._indexService.getComponentesWithParam(params, this.rol).subscribe({
+      this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
         next: res => {
-          this.componentes = res.data;
-          if (this.componentes.length === 0) {
-            this._swalService.toastSuccess('center', 'El producto no posee componentes.');
+          this.reemplazos = res.data;
+          if (this.reemplazos.length === 0) {
+            this._swalService.toastSuccess('center', 'El producto no posee reemplazos.');
           }
-          console.log(this.componentes);
-          // this.orderProcesosPrimero();
+          console.log(this.reemplazos);
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -127,18 +127,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     )
   }
 
-  // orderProcesosPrimero() {
-  //   this.componentes.sort((a, b) => {
-  //     const isAProceso = a.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
-  //     const isBProceso = b.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
-  //     return isAProceso - isBProceso;
-  //   });
-  // }
-
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
-    if (this.componentes.length <= this.itemsPerPage) {
+    if (this.reemplazos.length <= this.itemsPerPage) {
       if (res.meta?.current_page === res.meta?.last_page) {
         this.itemsInPage = this.total_rows;
       } else {
@@ -146,13 +138,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       }
     }
   }
-
-  disableProducto = (item: any): boolean => {
-    const existeProcesoIPLADIE = this.componentes.some(
-      (comp) => comp.child_product?.product_type?.name === "Procesos IP LADIE"
-    );
-    return item.uuid === this.producto.uuid || (existeProcesoIPLADIE && item.product_type.name === 'Procesos IP LADIE');
-  };
 
 
   obtenerCatalogos() {
@@ -164,35 +149,18 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     params.order_by = {};
     params.filters = {};
 
-    const paramsProcesos: any = {};
-    paramsProcesos.with = ["productType", "measure"];
-    paramsProcesos.paging = null;
-    paramsProcesos.page = null;
-    paramsProcesos.order_by = {};
-    paramsProcesos.filters = {
-      'product->parent_product_uuid': { value: this.producto.uuid, op: '=', contiene: false },
-      'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
-    };
+
 
     forkJoin({
-      proveedores: this._indexService.getProveedores(this.rol),
       productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid),
-      procesos: this._indexService.getProductosWithParam(paramsProcesos, this.rol)
     }).subscribe({
       next: res => {
-        this.proveedores = res.proveedores.data;
-        this.proveedores = this.proveedores.map(proveedor => ({
-          ...proveedor,
-          nombreCompleto: this.bindName(proveedor)
-        }));
         this.productos = res.productos.data;
         // this.productos = this.productos.map(p => ({
         //   ...p,
         //   disabled: this.disableProducto(p) // Solo deshabilita el que coincide
         // }));
-        this.procesos = res.procesos.data;
-        // console.log(this.productos);
-        // console.log(this.procesos);
+
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -200,42 +168,38 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     });
   }
 
-  openModalComponente(type: string, dato?: any) {
+  openmodalReemplazos(type: string, dato?: any) {
     if (type === 'NEW') {
       this.isEdicion = false;
-      this.tituloModal = 'Nuevo componente';
-      this.componenteForm = new FormGroup({
-        child_product_uuid: new FormControl(null, Validators.required),
-        quantity: new FormControl({ value: null, disabled: true }, Validators.required),
-        supplier_uuid: new FormControl(null, [])
+      this.tituloModal = 'Nuevo reemplazo';
+      this.reemplazoForm = new FormGroup({
+        replacement_uuid: new FormControl(null, Validators.required)
       });
     } else {
       this.isEdicion = true;
-      this.tituloModal = 'Edición componente';
+      this.tituloModal = 'Edición reemplazo';
       this.placeholderCantidad = 'Cantidad en ' + dato.child_product.measure?.name;
-      this.componenteForm = new FormGroup({
+      this.reemplazoForm = new FormGroup({
         uuid: new FormControl(dato.uuid),
         parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
-        child_product_uuid: new FormControl(dato.child_product?.uuid, []),
-        quantity: new FormControl(this.mostrarCantidad(dato), Validators.required),
-        supplier_uuid: new FormControl(dato.supplier?.uuid, [])
+        replacement_uuid: new FormControl(dato.child_product?.uuid, [])
       });
     }
     this.onFormChange();
-    this.modalComponente.options = this.modalOptions;
-    this.modalComponente.open();
+    this.modalReemplazos.options = this.modalOptions;
+    this.modalReemplazos.open();
   }
 
   onFormChange() {
-    this.componenteForm.get('child_product_uuid')!.valueChanges.subscribe(
+    this.reemplazoForm.get('child_product_uuid')!.valueChanges.subscribe(
       (value) => {
         if (value) {
           let producto = this.productos.find(p => p.uuid === value);
-          this.componenteForm.get('quantity')?.enable();
-          this.componenteForm.get('quantity')?.setValue('');
+          this.reemplazoForm.get('quantity')?.enable();
+          this.reemplazoForm.get('quantity')?.setValue('');
           this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
         } else {
-          this.componenteForm.get('quantity')?.disable();
+          this.reemplazoForm.get('quantity')?.disable();
           this.placeholderCantidad = '';
         }
       });
@@ -245,21 +209,21 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   cerrarModal() {
     this.isSubmit = false;
     this.placeholderCantidad = '';
-    this.modalComponente.close();
+    this.modalReemplazos.close();
   }
 
-  confirmarComponente() {
+  confirmarReemplazo() {
     this.isSubmit = true;
-    if (this.componenteForm.valid) {
+    if (this.reemplazoForm.valid) {
       this.spinner.show();
-      let componente = new ComponenteDTO();
-      this.armarDTOComponente(componente);
+      let reemplazo = new ReemplazoDTO();
+      this.armarDTOReemplazo(reemplazo);
       if (!this.isEdicion) {
         this.subscription.add(
-          this._componenteService.saveComponente(componente).subscribe({
+          this._reemplazoService.saveReemplazo(reemplazo).subscribe({
             next: res => {
               this.spinner.hide();
-              this.obtenerComponentes();
+              this.obtenerReemplazos();
               this.cerrarModal();
             },
             error: error => {
@@ -271,9 +235,9 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         )
       } else {
         this.subscription.add(
-          this._componenteService.editComponente(this.componenteForm.get('uuid')?.value, componente).subscribe({
+          this._reemplazoService.editReemplazo(this.reemplazoForm.get('uuid')?.value, reemplazo).subscribe({
             next: res => {
-              this.obtenerComponentes();
+              this.obtenerReemplazos();
               this.isEdicion = false;
               this.cerrarModal();
               this._swalService.toastSuccess('top-right', "Usuario actualizado.");
@@ -289,15 +253,13 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       }
     }
   }
-  armarDTOComponente(componente: ComponenteDTO) {
-    componente.actual_role = this.rol;
-    componente.with = ["childProduct", "childProduct.productType", "childProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
-    componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value;
-    componente['product->parent_product_uuid'] = this.producto.uuid;
-    componente.quantity = this.componenteForm.get('quantity')?.value;
-    componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
+  armarDTOReemplazo(reemplazo: ReemplazoDTO) {
+    reemplazo.actual_role = this.rol;
+    reemplazo.with = [];
+    reemplazo.product_uuid = this.reemplazoForm.get('child_product_uuid')?.value;
+    reemplazo['product->replacement_uuid'] = this.producto.uuid;
     if (!this.isEdicion) {
-      this.cleanObject(componente);
+      this.cleanObject(reemplazo);
     }
   }
   // Se eliminan los nulos.
@@ -312,10 +274,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     });
   }
 
-  openSwalEliminar(componente: any) {
+  openSwalEliminar(reemplazo: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el componente ${componente.child_product.name}?`,
+      text: `¿Desea eliminar el reemplazo ${reemplazo}?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -328,19 +290,19 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eliminarComponente(componente);
+        this.eliminarReemplazo(reemplazo);
       } else if (result.isDenied) {
 
       }
     })
   }
 
-  eliminarComponente(componente: any) {
+  eliminarReemplazo(reemplazo: any) {
     this.spinner.show();
     this.subscription.add(
-      this._componenteService.deleteComponent(componente.uuid, this.rol.toUpperCase()).subscribe({
+      this._reemplazoService.deleteReemplazo(reemplazo.uuid, this.rol.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerComponentes();
+          this.obtenerReemplazos();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -353,74 +315,74 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     )
   }
 
-  getNombreCompletoProveedor(data: any): string {
-    if (!data.supplier?.person) return '';
-    if (data.supplier.person.human) {
-      return data.supplier.person.human.firstname + ' ' + data.supplier.person.human.lastname;
-    } else if (data.supplier.person.legal_entity) {
-      return data.supplier.person.legal_entity.company_name;
-    }
-    return '';
-  }
+  // getNombreCompletoProveedor(data: any): string {
+  //   if (!data.supplier?.person) return '';
+  //   if (data.supplier.person.human) {
+  //     return data.supplier.person.human.firstname + ' ' + data.supplier.person.human.lastname;
+  //   } else if (data.supplier.person.legal_entity) {
+  //     return data.supplier.person.legal_entity.company_name;
+  //   }
+  //   return '';
+  // }
 
-  bindName(data: any): string {
-    if (!data.person) return '';
-    if (data.person.human) {
-      return data.person.human.firstname + ' ' + data.person.human.lastname;
-    } else if (data.person.legal_entity) {
-      return data.person.legal_entity.company_name;
-    }
-    return '';
-  }
+  // bindName(data: any): string {
+  //   if (!data.person) return '';
+  //   if (data.person.human) {
+  //     return data.person.human.firstname + ' ' + data.person.human.lastname;
+  //   } else if (data.person.legal_entity) {
+  //     return data.person.legal_entity.company_name;
+  //   }
+  //   return '';
+  // }
 
-  mostrarCantidad(data: any) {
-    if (data.child_product?.measure?.is_integer === 1) {
-      return (+data.quantity)?.toFixed(0);
-    } else {
-      return (+data.quantity)?.toFixed(2);
-    }
-  }
+  // mostrarCantidad(data: any) {
+  //   if (data.child_product?.measure?.is_integer === 1) {
+  //     return (+data.quantity)?.toFixed(0);
+  //   } else {
+  //     return (+data.quantity)?.toFixed(2);
+  //   }
+  // }
 
-  editarProceso() {
-    this.isEdicionProceso = true;
-  }
+  // editarProceso() {
+  //   this.isEdicionProceso = true;
+  // }
 
-  guardarProceso() {
-    this.isEdicionProceso = false;
-    let componente = new ComponenteDTO();
-    componente.actual_role = this.rol;
-    componente.with = [];
-    componente['product->child_product_uuid'] = this.procesoActivo;
-    componente['product->parent_product_uuid'] = this.producto.uuid;
-    componente.quantity = 1;
-    this.cleanObject(componente);
-    this.subscription.add(
-      this._componenteService.saveComponente(componente).subscribe({
-        next: res => {
-          console.log(res);
-        },
-        error: error => {
-          this.spinner.hide();
-          this._swalService.toastError('top-right', error.error.message)
-          console.error(error);
-        }
-      })
-    )
-  }
+  // guardarProceso() {
+  //   this.isEdicionProceso = false;
+  //   let componente = new ComponenteDTO();
+  //   componente.actual_role = this.rol;
+  //   componente.with = [];
+  //   componente['product->child_product_uuid'] = this.procesoActivo;
+  //   componente['product->parent_product_uuid'] = this.producto.uuid;
+  //   componente.quantity = 1;
+  //   this.cleanObject(componente);
+  //   this.subscription.add(
+  //     this._componenteService.saveComponente(componente).subscribe({
+  //       next: res => {
+  //         console.log(res);
+  //       },
+  //       error: error => {
+  //         this.spinner.hide();
+  //         this._swalService.toastError('top-right', error.error.message)
+  //         console.error(error);
+  //       }
+  //     })
+  //   )
+  // }
 
-  eliminarProcesoActivo() {
-    this.subscription.add(
-      this._componenteService.deleteComponent(this.procesoActivo, this.rol.toUpperCase()).subscribe({
-        next: res => {
-          this.procesoActivo = '';
-          this._tokenService.setToken(res.token);
-        },
-        error: error => {
-          console.error(error);
-          this._swalService.toastError('top-right', error.error.message);
-        }
-      })
-    )
-  }
+  // eliminarProcesoActivo() {
+  //   this.subscription.add(
+  //     this._componenteService.deleteComponent(this.procesoActivo, this.rol.toUpperCase()).subscribe({
+  //       next: res => {
+  //         this.procesoActivo = '';
+  //         this._tokenService.setToken(res.token);
+  //       },
+  //       error: error => {
+  //         console.error(error);
+  //         this._swalService.toastError('top-right', error.error.message);
+  //       }
+  //     })
+  //   )
+  // }
 
 }

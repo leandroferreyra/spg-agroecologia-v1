@@ -80,6 +80,9 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          if (this.componentes.length === 0) {
+            this._swalService.toastSuccess('center', 'El producto no es componente de ningún otro producto.');
+          }
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();

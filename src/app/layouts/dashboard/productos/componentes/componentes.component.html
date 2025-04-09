@@ -173,7 +173,7 @@
 
                             <div class="mb-2">
                                 <label>Componente</label>
-                                <ng-select [items]="productos" bindLabel="name" bindValue="uuid"
+                                <ng-select [items]="productos" bindLabel="name" bindValue="uuid" notFoundText="No hay componentes"
                                     formControlName="child_product_uuid" [virtualScroll]="true" [appendTo]="'body'"
                                     [ngClass]="isSubmit ? componenteForm.controls['child_product_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>

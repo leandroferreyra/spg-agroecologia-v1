@@ -35,6 +35,7 @@ import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoD
 import { ProductoService } from 'src/app/core/services/producto.service';
 import { ComponentesComponent } from './componentes/componentes.component';
 import { ComponenteDeComponent } from './componente-de/componente-de.component';
+import { ReemplazosComponent } from './reemplazos/reemplazos.component';
 
 @Component({
   selector: 'app-productos',
@@ -42,7 +43,8 @@ import { ComponenteDeComponent } from './componente-de/componente-de.component';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent
+    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
+    ReemplazosComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',

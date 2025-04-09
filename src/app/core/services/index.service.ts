@@ -37,6 +37,7 @@ export class IndexService {
   apiProductos = '/products';
 
   apiComponentes = '/components';
+  apiReemplazos = '/replacements';
 
   constructor(private http: HttpClient) { }
 
@@ -186,17 +187,14 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
   }
 
-
-  // getProductos(rol: string): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   let params = new HttpParams();
-  //   params = params.append('actual_role', rol)
-  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: params });
-  // }
-
   getProductosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getProductosPosiblesWithParam(paramsObj: any, rol: string, uuidProducto: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuidProducto + '/possible_components', { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getCuentasProveedorWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
@@ -253,6 +251,11 @@ export class IndexService {
   getComponentesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiComponentes, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getReemplazosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiReemplazos, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
 }
