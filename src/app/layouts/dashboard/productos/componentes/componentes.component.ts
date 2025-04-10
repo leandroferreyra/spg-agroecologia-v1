@@ -178,7 +178,8 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     paramsComponenteProceso.page = null;
     paramsComponenteProceso.order_by = {};
     paramsComponenteProceso.filters = {
-      'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
+      'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false },
+      'product->parent_product_uuid': { value: this.producto.uuid, op: '=', contiene: false }
     };
 
     forkJoin({
@@ -200,11 +201,9 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         }));
         this.procesos = res.procesos.data;
         this.componenteProceso = res.componenteProceso.data;
-        if (this.componenteProceso.length > 0) {
-          this.procesoActivo = this.componenteProceso[0].child_product?.uuid;
-        }
-        console.log(this.procesos);
-        console.log(this.componenteProceso);
+        this.procesoActivo = this.componenteProceso.length > 0 ? this.componenteProceso[0].child_product?.uuid : null;
+        console.log("procesos", this.procesos);
+        console.log("componenteProceso", this.componenteProceso);
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
