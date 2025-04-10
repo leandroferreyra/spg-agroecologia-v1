@@ -10,12 +10,13 @@
         <div class="flex h-full flex-col pb-16">
 
             <div class="flex items-center justify-between text-md mb-3">
-                <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
+                <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')"
+                    [disabled]="isEdicion">
                     <icon-plus class="mx-auto mb-1" />
                     Agregar producto
                 </button>
 
-                <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas"
+                <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" [disabled]="isEdicion"
                     data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
                     <icon-settings class="mx-auto mb-1" />
                     Filtros avanzados

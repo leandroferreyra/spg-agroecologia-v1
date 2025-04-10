@@ -171,6 +171,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
             this.swalService.toastSuccess('center', 'No existen productos.');
           }
           if (!alta && this.productos.length > 0) {
+            this.isEdicion = false;
             this.inicializarFormEdit(this.productos[0]);
           }
           this.modificarPaginacion(res);
@@ -390,7 +391,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   openModalProducto(type: string, producto?: any) {
     if (type === 'NEW') {
-      this.isEdicion = false;
+      if (this.isEdicion) {
+        this.isEdicion = false;
+        this.inicializarFormEdit(this.selectedProducto); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
+      }
       this.tituloModal = 'Nuevo producto';
       this.inicializarFormNew();
       this.modalProducto.options = this.modalOptions;
