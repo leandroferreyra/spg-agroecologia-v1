@@ -69,6 +69,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   proveedores: any[] = [];
   productos: any[] = [];
   procesos: any[] = [];
+  componenteProceso: any[] = [];
 
   placeholderCantidad: string = '';
 
@@ -89,10 +90,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['producto'] && changes['producto'].currentValue) {
       this.spinner.show();
+      this.isEdicionProceso = false;
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['product->parent_product_uuid'].value = this.producto.uuid;
       this.obtenerComponentes();
-      this.obtenerCatalogos();
     }
   }
 
@@ -112,10 +113,11 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           if (this.componentes.length === 0) {
             this._swalService.toastSuccess('center', 'El producto no posee componentes.');
           }
-          console.log(this.componentes);
+          // console.log(this.componentes);
           // this.orderProcesosPrimero();
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
+          this.obtenerCatalogos();
           this.spinner.hide();
         },
         error: error => {
@@ -126,14 +128,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       })
     )
   }
-
-  // orderProcesosPrimero() {
-  //   this.componentes.sort((a, b) => {
-  //     const isAProceso = a.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
-  //     const isBProceso = b.child_product.product_type?.name === 'Procesos IP LADIE' ? -1 : 1;
-  //     return isAProceso - isBProceso;
-  //   });
-  // }
 
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
@@ -148,11 +142,16 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   disableProducto = (item: any): boolean => {
-    const existeProcesoIPLADIE = this.componentes.some(
-      (comp) => comp.child_product?.product_type?.name === "Procesos IP LADIE"
-    );
-    return item.uuid === this.producto.uuid || (existeProcesoIPLADIE && item.product_type.name === 'Procesos IP LADIE');
+    return (item.uuid === this.producto.uuid) || this.esComponente(item);
   };
+
+  esComponente(item: any) {
+    if (this.componentes.length > 0) {
+      const idsComponentes = new Set(this.componentes.map(c => c.child_product.uuid));
+      return idsComponentes.has(item.uuid)
+    }
+    return false;
+  }
 
 
   obtenerCatalogos() {
@@ -165,7 +164,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     params.filters = {};
 
     const paramsProcesos: any = {};
-    paramsProcesos.with = ["components"];
+    paramsProcesos.with = [];
     paramsProcesos.paging = null;
     paramsProcesos.page = null;
     paramsProcesos.order_by = {};
@@ -173,10 +172,20 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       'productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
     };
 
+    const paramsComponenteProceso: any = {};
+    paramsComponenteProceso.with = ["childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
+    paramsComponenteProceso.paging = null;
+    paramsComponenteProceso.page = null;
+    paramsComponenteProceso.order_by = {};
+    paramsComponenteProceso.filters = {
+      'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
+    };
+
     forkJoin({
       proveedores: this._indexService.getProveedores(this.rol),
       productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid),
-      procesos: this._indexService.getProductosWithParam(paramsProcesos, this.rol)
+      procesos: this._indexService.getProductosWithParam(paramsProcesos, this.rol),
+      componenteProceso: this._indexService.getComponentesWithParam(paramsComponenteProceso, this.rol),
     }).subscribe({
       next: res => {
         this.proveedores = res.proveedores.data;
@@ -185,18 +194,17 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           nombreCompleto: this.bindName(proveedor)
         }));
         this.productos = res.productos.data;
-        // this.productos = this.productos.map(p => ({
-        //   ...p,
-        //   disabled: this.disableProducto(p) // Solo deshabilita el que coincide
-        // }));
+        this.productos = this.productos.map(p => ({
+          ...p,
+          disabled: this.disableProducto(p) // Solo deshabilita el que coincide
+        }));
         this.procesos = res.procesos.data;
-        if (this.procesos.length === 1) {
-          this.procesoActivo = this.procesos[0].uuid;
-          console.log(this.procesos);
-          console.log(this.procesoActivo);
+        this.componenteProceso = res.componenteProceso.data;
+        if (this.componenteProceso.length > 0) {
+          this.procesoActivo = this.componenteProceso[0].child_product?.uuid;
         }
-        // console.log(this.productos);
-        // console.log(this.procesos);
+        console.log(this.procesos);
+        console.log(this.componenteProceso);
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -214,11 +222,9 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         supplier_uuid: new FormControl(null, [])
       });
     } else {
-      this.productos.push(dato.child_product);
       this.isEdicion = true;
       this.tituloModal = 'Edición componente';
       this.placeholderCantidad = 'Cantidad en ' + dato.child_product.measure?.name;
-      console.log(this.productos);
       this.componenteForm = new FormGroup({
         uuid: new FormControl(dato.uuid),
         parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
@@ -391,6 +397,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     this.isEdicionProceso = true;
   }
 
+  cancelarEdicion() {
+    this.isEdicionProceso = false;
+  }
+
   guardarProceso() {
     this.isEdicionProceso = false;
     let componente = new ComponenteDTO();
@@ -414,19 +424,22 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     )
   }
 
+
   eliminarProcesoActivo() {
-    this.subscription.add(
-      this._componenteService.deleteComponent(this.procesoActivo, this.rol.toUpperCase()).subscribe({
-        next: res => {
-          this.procesoActivo = '';
-          this._tokenService.setToken(res.token);
-        },
-        error: error => {
-          console.error(error);
-          this._swalService.toastError('top-right', error.error.message);
-        }
-      })
-    )
+    if (this.componenteProceso.length > 0) {
+      this.subscription.add(
+        this._componenteService.deleteComponent(this.componenteProceso[0].uuid, this.rol.toUpperCase()).subscribe({
+          next: res => {
+            this.procesoActivo = '';
+            this._tokenService.setToken(res.token);
+          },
+          error: error => {
+            console.error(error);
+            this._swalService.toastError('top-right', error.error.message);
+          }
+        })
+      )
+    }
   }
 
 }

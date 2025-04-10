@@ -23,16 +23,25 @@
 
             }@else {
             <div>
-                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Guardar" (click)="guardarProceso();" [disabled]="!procesoActivo">
+                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Guardar" (click)="guardarProceso();"
+                    [disabled]="!procesoActivo">
                     <icon-circle-check />
                 </button>
             </div>
             }
             <div>
-                <button type="button" ngxTippy="Eliminar" (click)="eliminarProcesoActivo();" [disabled]="!procesoActivo">
+                <button type="button" ngxTippy="Eliminar" (click)="eliminarProcesoActivo();"
+                    [disabled]="!procesoActivo">
                     <icon-trash-lines />
                 </button>
             </div>
+            @if(isEdicionProceso) {
+            <div class="ml-2">
+                <button type="button" (click)="cancelarEdicion();">
+                    Cancelar edición
+                </button>
+            </div>
+            }
         </div>
     </div>
 
@@ -61,11 +70,6 @@
                     <th style="cursor: pointer;">
                         <span style="display: inline-flex; align-items: center; gap: 10px;">
                             Componente
-                        </span>
-                    </th>
-                    <th style="cursor: pointer;">
-                        <span style="display: inline-flex; align-items: center; gap: 10px;">
-                            uuid
                         </span>
                     </th>
                     <th style="cursor: pointer;">
@@ -102,7 +106,6 @@
                     }">
                     <td class="whitespace-nowrap">{{ index+1}} </td>
                     <td class="whitespace-nowrap">{{ data.child_product.name}}</td>
-                    <td class="whitespace-nowrap">{{ data.uuid}}</td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
@@ -174,8 +177,9 @@
 
                             <div class="mb-2">
                                 <label>Componente</label>
-                                <ng-select [items]="productos" bindLabel="name" bindValue="uuid" notFoundText="No hay componentes"
-                                    formControlName="child_product_uuid" [virtualScroll]="true" [appendTo]="'body'"
+                                <ng-select [items]="productos" bindLabel="name" bindValue="uuid"
+                                    notFoundText="No hay componentes" formControlName="child_product_uuid"
+                                    [virtualScroll]="true" [appendTo]="'body'"
                                     [ngClass]="isSubmit ? componenteForm.controls['child_product_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
                             </div>
