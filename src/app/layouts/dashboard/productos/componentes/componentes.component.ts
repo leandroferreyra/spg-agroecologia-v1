@@ -165,7 +165,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     params.filters = {};
 
     const paramsProcesos: any = {};
-    paramsProcesos.with = [];
+    paramsProcesos.with = ["components"];
     paramsProcesos.paging = null;
     paramsProcesos.page = null;
     paramsProcesos.order_by = {};
@@ -190,6 +190,11 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         //   disabled: this.disableProducto(p) // Solo deshabilita el que coincide
         // }));
         this.procesos = res.procesos.data;
+        if (this.procesos.length === 1) {
+          this.procesoActivo = this.procesos[0].uuid;
+          console.log(this.procesos);
+          console.log(this.procesoActivo);
+        }
         // console.log(this.productos);
         // console.log(this.procesos);
       },
@@ -209,9 +214,11 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         supplier_uuid: new FormControl(null, [])
       });
     } else {
+      this.productos.push(dato.child_product);
       this.isEdicion = true;
       this.tituloModal = 'Edición componente';
       this.placeholderCantidad = 'Cantidad en ' + dato.child_product.measure?.name;
+      console.log(this.productos);
       this.componenteForm = new FormGroup({
         uuid: new FormControl(dato.uuid),
         parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),

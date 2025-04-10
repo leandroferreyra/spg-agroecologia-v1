@@ -65,6 +65,11 @@
                     </th>
                     <th style="cursor: pointer;">
                         <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            uuid
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
                             Cantidad
                         </span>
                     </th>
@@ -96,12 +101,8 @@
                       'tr-has-serial': data.child_product.has_serial_number === 1
                     }">
                     <td class="whitespace-nowrap">{{ index+1}} </td>
-                    <td class="whitespace-nowrap">{{ data.child_product.name}}
-                        <!-- <span *ngIf="data.child_product.product_type.name === 'Procesos IP LADIE'"
-                            class="badge bg-warning text-white ms-2">
-                            PROCESO
-                        </span> -->
-                    </td>
+                    <td class="whitespace-nowrap">{{ data.child_product.name}}</td>
+                    <td class="whitespace-nowrap">{{ data.uuid}}</td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
