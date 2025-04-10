@@ -11,13 +11,17 @@
 
             <div class="flex items-center justify-between text-md mb-3">
                 <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')"
-                    [disabled]="isEdicion">
+                    [disabled]="isEdicion" [ngClass]="{
+                        'text-gray-400 cursor-not-allowed': isEdicion
+                      }">
                     <icon-plus class="mx-auto mb-1" />
                     Agregar producto
                 </button>
 
                 <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" [disabled]="isEdicion"
-                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" [ngClass]="{
+                        'text-gray-400 cursor-not-allowed': isEdicion
+                      }">
                     <icon-settings class="mx-auto mb-1" />
                     Filtros avanzados
                 </button>
