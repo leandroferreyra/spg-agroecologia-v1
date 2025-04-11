@@ -111,11 +111,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          if (this.componentes.length === 0) {
-            this._swalService.toastSuccess('center', 'El producto no posee componentes.');
-          }
-          // console.log(this.componentes);
-          // this.orderProcesosPrimero();
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.obtenerCatalogos();
