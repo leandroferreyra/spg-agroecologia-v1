@@ -74,6 +74,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   placeholderCantidad: string = '';
 
   procesoActivo: any;
+  procesoActivoActual: any;
   isEdicionProceso: boolean = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
@@ -202,8 +203,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         this.procesos = res.procesos.data;
         this.componenteProceso = res.componenteProceso.data;
         this.procesoActivo = this.componenteProceso.length > 0 ? this.componenteProceso[0].child_product?.uuid : null;
-        console.log("procesos", this.procesos);
-        console.log("componenteProceso", this.componenteProceso);
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -394,10 +393,12 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   editarProceso() {
     this.isEdicionProceso = true;
+    this.procesoActivoActual = this.procesoActivo;
   }
 
   cancelarEdicion() {
     this.isEdicionProceso = false;
+    this.procesoActivo = this.procesoActivoActual
   }
 
   guardarProceso() {
@@ -413,6 +414,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._componenteService.saveComponente(componente).subscribe({
         next: res => {
           console.log(res);
+          this.componenteProceso.push(res.data);
         },
         error: error => {
           this.spinner.hide();
