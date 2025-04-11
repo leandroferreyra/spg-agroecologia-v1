@@ -509,13 +509,13 @@
                 <div class="flex flex-col sm:flex-row">
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
-                        <div (keydown.enter)="confirmarProducto(productoForm)"
+                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nombre">Nombre</label>
                             <input id="nombre" type="text" placeholder="" class="form-control"
                                 formControlName="nombre" />
                         </div>
-                        <div (keydown.enter)="confirmarProducto(productoForm)"
+                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['codigo'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="codigo">Código</label>
                             <input id="codigo" type="text" placeholder="" class="form-control"
@@ -552,7 +552,7 @@
                                 rows="1"></textarea>
                         </div>
 
-                        <div (keydown.enter)="confirmarProducto(productoForm)"
+                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['nomenclatura'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nomenclatura">Nomenclatura Mercosur (Pos. Arancelaria)</label>
                             <input id="nomenclatura" type="text" placeholder="" class="form-control"
@@ -565,7 +565,7 @@
                                 class="w-1/3 min-w-[200px]" formControlName="unidad" [selectOnTab]="true"
                                 [ngClass]="isSubmit ? newProductoForm.controls['unidad'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
-                        <div (keydown.enter)="confirmarProducto(productoForm)"
+                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['iva'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="iva">IVA (%)</label>
                             <input id="iva" type="text" placeholder="" class="form-control" formControlName="iva" />
@@ -586,7 +586,7 @@
                                 rows="1"></textarea>
                         </div>
 
-                        <div (keydown.enter)="confirmarProducto(productoForm)"
+                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['nombreVenta'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nombreVenta">Nombre de venta</label>
                             <input id="nombreVenta" type="text" placeholder="" class="form-control"

@@ -413,7 +413,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._componenteService.saveComponente(componente).subscribe({
         next: res => {
-          console.log(res);
           this.componenteProceso.push(res.data);
         },
         error: error => {
