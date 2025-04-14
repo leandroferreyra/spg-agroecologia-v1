@@ -110,7 +110,6 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
       this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
         next: res => {
           this.reemplazos = res.data;
-          console.log(this.reemplazos);
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.obtenerCatalogos();
@@ -154,7 +153,6 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: res => {
         this.productos = res.productos.data;
-        console.log(this.productos);
         this.productos = this.productos.map(p => ({
           ...p,
           disabled: this.disableProducto(p) // Solo deshabilita el que coincide

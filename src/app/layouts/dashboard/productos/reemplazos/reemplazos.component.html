@@ -33,6 +33,11 @@
                             Producto reemplazo
                         </span>
                     </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Precio unitario
+                        </span>
+                    </th>
                     <th>
                         Acciones
                     </th>
@@ -44,6 +49,7 @@
                 <tr>
                     <td class="whitespace-nowrap">{{ index+1}} </td>
                     <td class="whitespace-nowrap">{{ data.replacement.name }} </td>
+                    <td class="whitespace-nowrap">$ {{ data.unit_price }} </td>
                     <td>
                         <div class="flex items-center">
                             <!-- <div>
