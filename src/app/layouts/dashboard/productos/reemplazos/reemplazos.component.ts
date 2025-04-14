@@ -47,7 +47,7 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   filtros: any = {
-    'product->child_product_uuid': { value: '', op: '=', contiene: false },
+    'product_uuid': { value: '', op: '=', contiene: false },
   };
   showFilterCompras: boolean = false;
   ordenamiento: any = {
@@ -91,7 +91,7 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
     if (changes['producto'] && changes['producto'].currentValue) {
       this.spinner.show();
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
-      this.filtros['product->child_product_uuid'].value = this.producto.uuid;
+      this.filtros['product_uuid'].value = this.producto.uuid;
       this.obtenerReemplazos();
       this.obtenerCatalogos();
     }
@@ -110,10 +110,6 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
       this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
         next: res => {
           this.reemplazos = res.data;
-          if (this.reemplazos.length === 0) {
-            this._swalService.toastSuccess('center', 'El producto no posee reemplazos.');
-          }
-          console.log(this.reemplazos);
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
