@@ -1,7 +1,7 @@
 <div class="panel pb-0">
 
     <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
-        <button type="button" ngxTippy="Agregar reemplazo" (click)="openmodalReemplazos('NEW')">
+        <button type="button" ngxTippy="Agregar reemplazo" (click)="openModalReemplazos('NEW')">
             <icon-plus />
         </button>
     </div>
@@ -28,6 +28,11 @@
                             Orden
                         </span>
                     </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Producto reemplazo
+                        </span>
+                    </th>
                     <th>
                         Acciones
                     </th>
@@ -38,14 +43,15 @@
                 {
                 <tr>
                     <td class="whitespace-nowrap">{{ index+1}} </td>
+                    <td class="whitespace-nowrap">{{ data.replacement.name }} </td>
                     <td>
                         <div class="flex items-center">
-                            <div>
+                            <!-- <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                    (click)="openmodalReemplazos('EDIT', data)">
+                                    (click)="openModalReemplazos('EDIT', data)">
                                     <icon-pencil />
                                 </button>
-                            </div>
+                            </div> -->
                             <div>
                                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                     <icon-trash-lines />
@@ -91,7 +97,7 @@
 
 <!-- MODAL DATO DE CONTACTO -->
 <div>
-    <ngx-custom-modal #modalReemplazo class="modal-top animate extra-large-modal animate-fade-in">
+    <ngx-custom-modal #modalReemplazos class="modal-top animate extra-large-modal animate-fade-in">
         <ng-template #modalHeader>
             <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
         </ng-template>
@@ -103,14 +109,14 @@
                     <div class="col-md-12">
                         <form [formGroup]="reemplazoForm" (keydown.enter)="confirmarReemplazo()">
 
-                            <!-- <div class="mb-2">
-                                <label>Componente</label>
+                            <div class="mb-2">
+                                <label>Productos</label>
                                 <ng-select [items]="productos" bindLabel="name" bindValue="uuid"
-                                    notFoundText="No hay componentes" formControlName="child_product_uuid"
+                                    notFoundText="No hay productos" formControlName="replacement_uuid"
                                     [virtualScroll]="true" [appendTo]="'body'"
-                                    [ngClass]="isSubmit ? componenteForm.controls['child_product_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                    [ngClass]="isSubmit ? reemplazoForm.controls['replacement_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
-                            </div> -->
+                            </div>
 
 
                             <div class="row mt-2">

@@ -10,7 +10,7 @@ import { ReemplazoDTO } from '../models/request/reemplazoDTO';
 })
 export class ReemplazoService {
 
-  private apiReemplazo = '/replacement';
+  private apiReemplazo = '/replacements';
 
   constructor(private http: HttpClient) { }
 

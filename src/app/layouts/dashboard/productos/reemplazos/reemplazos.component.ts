@@ -93,7 +93,7 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['product_uuid'].value = this.producto.uuid;
       this.obtenerReemplazos();
-      this.obtenerCatalogos();
+      // this.obtenerCatalogos();
     }
   }
 
@@ -110,8 +110,10 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
       this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
         next: res => {
           this.reemplazos = res.data;
+          console.log(this.reemplazos);
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
+          this.obtenerCatalogos();
           this.spinner.hide();
         },
         error: error => {
@@ -143,19 +145,20 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
     params.paging = null;
     params.page = null;
     params.order_by = {};
-    params.filters = {};
-
-
+    params.filters = {
+      'uuid': { value: this.producto.uuid, op: '!=', contiene: false },
+    };
 
     forkJoin({
       productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid),
     }).subscribe({
       next: res => {
         this.productos = res.productos.data;
-        // this.productos = this.productos.map(p => ({
-        //   ...p,
-        //   disabled: this.disableProducto(p) // Solo deshabilita el que coincide
-        // }));
+        console.log(this.productos);
+        this.productos = this.productos.map(p => ({
+          ...p,
+          disabled: this.disableProducto(p) // Solo deshabilita el que coincide
+        }));
 
       },
       error: error => {
@@ -164,7 +167,19 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
     });
   }
 
-  openmodalReemplazos(type: string, dato?: any) {
+  disableProducto = (item: any): boolean => {
+    return (item.uuid === this.producto.uuid) || this.esComponente(item);
+  };
+
+  esComponente(item: any) {
+    if (this.reemplazos.length > 0) {
+      const idsComponentes = new Set(this.reemplazos.map(c => c.replacement.uuid));
+      return idsComponentes.has(item.uuid)
+    }
+    return false;
+  }
+
+  openModalReemplazos(type: string, dato?: any) {
     if (type === 'NEW') {
       this.isEdicion = false;
       this.tituloModal = 'Nuevo reemplazo';
@@ -187,18 +202,7 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
   }
 
   onFormChange() {
-    this.reemplazoForm.get('child_product_uuid')!.valueChanges.subscribe(
-      (value) => {
-        if (value) {
-          let producto = this.productos.find(p => p.uuid === value);
-          this.reemplazoForm.get('quantity')?.enable();
-          this.reemplazoForm.get('quantity')?.setValue('');
-          this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
-        } else {
-          this.reemplazoForm.get('quantity')?.disable();
-          this.placeholderCantidad = '';
-        }
-      });
+
   }
 
 
@@ -252,8 +256,8 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
   armarDTOReemplazo(reemplazo: ReemplazoDTO) {
     reemplazo.actual_role = this.rol;
     reemplazo.with = [];
-    reemplazo.product_uuid = this.reemplazoForm.get('child_product_uuid')?.value;
-    reemplazo['product->replacement_uuid'] = this.producto.uuid;
+    reemplazo.product_uuid = this.producto.uuid;
+    reemplazo['product->replacement_uuid'] = this.reemplazoForm.get('replacement_uuid')?.value;
     if (!this.isEdicion) {
       this.cleanObject(reemplazo);
     }
@@ -273,7 +277,7 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
   openSwalEliminar(reemplazo: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el reemplazo ${reemplazo}?`,
+      text: `¿Desea eliminar el reemplazo ${reemplazo.replacement.name}?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
