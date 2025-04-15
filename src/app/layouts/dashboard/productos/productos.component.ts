@@ -37,6 +37,9 @@ import { ComponentesComponent } from './componentes/componentes.component';
 import { ComponenteDeComponent } from './componente-de/componente-de.component';
 import { ReemplazosComponent } from './reemplazos/reemplazos.component';
 import { ProveedoresProductoComponent } from './proveedores-producto/proveedores-producto.component';
+import { StocksComponent } from './stocks/stocks.component';
+import { ComprasProductoComponent } from './compras-producto/compras-producto.component';
+import { VinculosComponent } from './vinculos/vinculos.component';
 
 @Component({
   selector: 'app-productos',
@@ -45,7 +48,7 @@ import { ProveedoresProductoComponent } from './proveedores-producto/proveedores
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
-    ReemplazosComponent, ProveedoresProductoComponent
+    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',

@@ -143,21 +143,24 @@
                 <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componente-de',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }" (click)="!isTabDisabled && (tab1 = 'componente-de')">
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && (tab1 = 'componente-de')">
                     Componente de
                 </a>
 
                 <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'reemplazos',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }" (click)="!isTabDisabled && (tab1 = 'reemplazos')">
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && (tab1 = 'reemplazos')">
                     Reemplazos
                 </a>
 
                 <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'proveedores',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }" (click)="!isTabDisabled && (tab1 = 'proveedores')">
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && (tab1 = 'proveedores')">
                     Proveedores
                 </a>
 
@@ -178,7 +181,8 @@
                 <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'vinculos',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }" (click)="!isTabDisabled && (tab1 = 'vinculos')">
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && (tab1 = 'vinculos')">
                     Vínculos
                 </a>
             </div>
@@ -472,19 +476,19 @@
                     </app-proveedores-producto>
                 </div>
 
-                <div *ngIf="tab1.toLowerCase() === 'stock'">
-                    <!-- <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
-                    </app-compras-proveedor> -->
+                <div *ngIf="tab1.toLowerCase() === 'stocks'">
+                    <app-stocks>
+                    </app-stocks>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'compras'">
-                    <!-- <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
-                    </app-compras-proveedor> -->
+                    <app-compras-producto>
+                    </app-compras-producto>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'vinculos'">
-                    <!-- <app-compras-proveedor [proveedor]="selectedProducto" [rol]="actual_role">
-                    </app-compras-proveedor> -->
+                    <app-vinculos>
+                    </app-vinculos>
                 </div>
 
             </div>
