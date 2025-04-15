@@ -70,11 +70,13 @@
             <tbody>
                 @for(data of compras | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                 <tr>
-                    <td class="whitespace-nowrap">{{ data.transaction?.transaction_datetime}} </td>
+                    <!-- Que la fecha se muestre en formato dd/mm/yyyy -->
+                    <td class="whitespace-nowrap">{{ data.transaction?.transaction_datetime | date:'dd/MM/yyyy' }} </td>
                     <td class="whitespace-nowrap">{{ data.transaction?.transaction_documents[0]?.prefix_number }} -
                         {{
                         data.transaction?.transaction_documents[0]?.document_number }} </td>
-                    <td class="whitespace-nowrap"> {{ data.total }} </td>
+                    <!-- Que el total se muestre con 2 decimales -->
+                    <td class="whitespace-nowrap"> {{ data.total | number:'1.2-2' }} </td>
                     <td class="whitespace-nowrap"> {{ data.batch.batch_identification}} </td>
                     <td>
                         @if (productosExpandido[data.uuid]) {

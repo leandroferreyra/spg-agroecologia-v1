@@ -116,6 +116,10 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtrosCompras;
+    // si existe this.filtrosCompras['transaction.transactionProducts.product.uuid']
+    if (this.filtrosCompras['transaction.transactionProducts.product.uuid']) {
+      params.distinct = 'true';
+    }
 
     this.subscription.add(
       this._indexService.getComprasProveedorWithParam(params, this.rol).subscribe({
