@@ -1,10 +1,17 @@
-<div class="panel pb-0">
-    <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between">
+<div class="panel pb-4">
+
+    <div class="mb-2 flex flex-col md:flex-row md:items-center justify-between">
         <button type="button" ngxTippy="Agregar persona de contacto" (click)="openModalContacto('NEW')">
             <icon-plus />
         </button>
     </div>
 
+    @if (contactos.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee personas de contacto</strong></span>
+    </div>
+    } @else {
     <div class="row mb-2">
         <div class="col-6">
             <span *ngIf="contactos && contactos.length > 0" class="float-md-start color-gris">
@@ -52,10 +59,10 @@
                     <td>
                         <div class="flex items-center">
                             <!-- <div>
-                                <button class="mr-2" type="button" ngxTippy="Información" (click)="showDataContacto(data)">
-                                        <icon-info-circle />
-                                    </button>
-                            </div> -->
+                                    <button class="mr-2" type="button" ngxTippy="Información" (click)="showDataContacto(data)">
+                                            <icon-info-circle />
+                                        </button>
+                                </div> -->
                             <div>
                                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                     <icon-trash-lines />
@@ -95,6 +102,9 @@
 
         </div>
     </div>
+
+    }
+
 
 </div>
 

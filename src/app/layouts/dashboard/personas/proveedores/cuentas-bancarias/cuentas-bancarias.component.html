@@ -1,6 +1,6 @@
-<div class="panel pb-0">
+<div class="panel pb-4">
 
-    <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between">
+    <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
         <!-- Botón Agregar Cuenta Bancaria -->
         <button type="button" ngxTippy="Agregar cuenta bancaria" (click)="openModalNuevaCuenta('NEW')">
             <icon-plus />
@@ -20,7 +20,12 @@
     </div>
 
 
-
+    @if (cuentasBancarias.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee cuentas bancarias</strong></span>
+    </div>
+    } @else {
     <div class="row mb-2">
         <div class="col-6">
             <span *ngIf="cuentasBancarias && cuentasBancarias.length > 0" class="float-md-start color-gris">
@@ -87,7 +92,8 @@
                             (input)="obtenerCuentasBancariasDeProveedor()" />
                     </td>
                     <td>
-                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtrosCuentasBancarias.cbu.value"
+                        <input type="text" class="form-control campo-busqueda"
+                            [(ngModel)]="filtrosCuentasBancarias.cbu.value"
                             (input)="obtenerCuentasBancariasDeProveedor()" />
                     </td>
                     <td></td>
@@ -151,6 +157,8 @@
 
         </div>
     </div>
+    }
+
 </div>
 
 
