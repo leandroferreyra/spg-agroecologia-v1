@@ -65,6 +65,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   lastSelectedProvinciaUuid: any = null;
 
   isShowMailMenu = false;
+  isTabDisabled = false;
 
   // Orden y filtro para datos listado proveedores.
   filtros: any = {

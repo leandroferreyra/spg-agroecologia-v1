@@ -81,3 +81,7 @@ ng-select.has-error .ng-select-container {
 .fixed-bottom {
     flex-shrink: 0;
 }
+
+.tab-disabled {
+    opacity: 0.5;
+}

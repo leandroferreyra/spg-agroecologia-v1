@@ -65,7 +65,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   isEdicion: boolean = false;
   isShowMailMenu = false;
-
+  isTabDisabled = false;
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 8;
@@ -170,6 +170,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.productos = res.data;
           if (this.productos.length === 0) {
             this.swalService.toastSuccess('center', 'No existen productos.');
+            this.isTabDisabled = true;
+          } else {
+            this.isTabDisabled = false;
           }
           if (!alta && this.productos.length > 0) {
             this.isEdicion = false;

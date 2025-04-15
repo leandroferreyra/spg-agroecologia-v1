@@ -118,7 +118,6 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales' }"
                         (click)="tab1 = 'datos-generales'">
-                        <!-- <icon-user class="mr-3" /> -->
                         Datos generales
                     </a>
 
@@ -126,7 +125,6 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-de-contacto' }"
                         (click)="tab1 = 'datos-de-contacto'">
-                        <!-- <icon-user class="mr-3" /> -->
                         Datos de contacto
                     </a>
 
@@ -134,7 +132,6 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'personas-de-contacto' }"
                         (click)="tab1 = 'personas-de-contacto'">
-                        <!-- <icon-user class="mr-3" /> -->
                         Personas de contacto
                     </a>
 
@@ -142,7 +139,6 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'cuentas-bancarias' }"
                         (click)="tab1 = 'cuentas-bancarias'">
-
                         Cuentas bancarias
                     </a>
 
@@ -156,7 +152,6 @@
 
                 <div class="flex-1 text-sm">
                     <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
-                        <!-- <h4 class="mb-4 text-2xl font-semibold"></h4> -->
                         <form [formGroup]="proveedorForm" class="p-4">
                             <div class="flex flex-col sm:flex-row">
                                 <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
@@ -513,9 +508,6 @@
                                 <input type="text" class="form-control campo-busqueda"
                                     [(ngModel)]="filtrosContactos_buscar.cuit.value" (input)="obtenerPersonas()" />
                             </td>
-                            <!-- <td></td>
-                            <td></td>
-                            <td></td> -->
                         </tr>
                         }
                         @for(data of (personas | slice: 0:itemsPerPage_buscar) ; track data.uuid) {
@@ -529,13 +521,6 @@
                             }
                             <td class="whitespace-nowrap">{{ data.cuit }} </td>
                             <td class="whitespace-nowrap">
-                                <!-- <div class="form-check form-check-inline">
-                                    <label class="form-check-label flex items-center gap-2">
-                                        <input class="form-checkbox" type="checkbox" [checked]="isProveedor(data)">
-                                        <span class="form-check-sign"></span>
-                                    </label>
-                                </div> -->
-
                                 <div class="flex items-center gap-2 mt-2">
                                     <label class="w-12 h-6 relative">
                                         <input type="checkbox"
@@ -548,12 +533,6 @@
                                 </div>
                             </td>
                             <td class="whitespace-nowrap">
-                                <!-- <div class="form-check form-check-inline">
-                                    <label class="form-check-label flex items-center gap-2">
-                                        <input class="form-checkbox" type="checkbox" [checked]="isCliente(data)">
-                                        <span class="form-check-sign"></span>
-                                    </label>
-                                </div> -->
                                 <div class="flex items-center gap-2 mt-2">
                                     <label class="w-12 h-6 relative">
                                         <input type="checkbox"
