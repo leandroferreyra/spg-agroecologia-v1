@@ -512,6 +512,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
     if (resultados.length === 0) {
       this.isTabDisabled = true;
+      this.tab1 = 'datos-generales';
     } else {
       this.isTabDisabled = false;
     }

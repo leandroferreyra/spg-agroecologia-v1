@@ -457,8 +457,10 @@
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'componentes'">
+                    @if (productos.length > 0) {
                     <app-componentes [producto]="selectedProducto" [rol]="actual_role">
                     </app-componentes>
+                    }
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'componente-de'">

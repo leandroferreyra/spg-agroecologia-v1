@@ -174,6 +174,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
           if (this.productos.length === 0) {
             this.swalService.toastSuccess('center', 'No existen productos.');
             this.isTabDisabled = true;
+            this.tab1 = 'datos-generales';
           } else {
             this.isTabDisabled = false;
           }
