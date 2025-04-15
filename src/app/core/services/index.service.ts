@@ -258,4 +258,9 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiReemplazos, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
+  getProovedoresByProductoWithParam(paramsObj: any, rol: string, uuid: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
 }

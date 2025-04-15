@@ -468,8 +468,8 @@
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'proveedores'">
-                    <!-- <app-cuentas-bancarias [proveedor]="selectedProducto" [rol]="actual_role">
-                    </app-cuentas-bancarias> -->
+                    <app-proveedores-producto [producto]="selectedProducto" [rol]="actual_role">
+                    </app-proveedores-producto>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'stock'">
