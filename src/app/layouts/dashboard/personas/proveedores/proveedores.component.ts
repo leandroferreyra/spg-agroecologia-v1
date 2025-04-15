@@ -510,6 +510,11 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       }
     }
 
+    if (resultados.length === 0) {
+      this.isTabDisabled = true;
+    } else {
+      this.isTabDisabled = false;
+    }
     return resultados;
   }
 
