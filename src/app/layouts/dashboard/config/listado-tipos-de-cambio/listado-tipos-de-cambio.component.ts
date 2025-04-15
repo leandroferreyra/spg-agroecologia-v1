@@ -248,7 +248,7 @@ export class ListadoTiposDeCambioComponent implements OnInit, OnDestroy {
   }
 
   getUuidFromFilterCurrencyName() {
-    const monedaEncontrada = this.monedas.find(moneda => moneda.name === this.filtros.currency_name.value);
+    const monedaEncontrada = this.monedas.find(moneda => moneda.name === this.filtros['currency.name'].value);
     return monedaEncontrada?.uuid;
   }
 

@@ -37,6 +37,9 @@ import { ComponentesComponent } from './componentes/componentes.component';
 import { ComponenteDeComponent } from './componente-de/componente-de.component';
 import { ReemplazosComponent } from './reemplazos/reemplazos.component';
 import { ProveedoresProductoComponent } from './proveedores-producto/proveedores-producto.component';
+import { StocksComponent } from './stocks/stocks.component';
+import { ComprasProductoComponent } from './compras-producto/compras-producto.component';
+import { VinculosComponent } from './vinculos/vinculos.component';
 
 @Component({
   selector: 'app-productos',
@@ -45,7 +48,7 @@ import { ProveedoresProductoComponent } from './proveedores-producto/proveedores
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
-    ReemplazosComponent, ProveedoresProductoComponent
+    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -65,7 +68,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   isEdicion: boolean = false;
   isShowMailMenu = false;
-
+  isTabDisabled = false;
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 8;
@@ -170,6 +173,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.productos = res.data;
           if (this.productos.length === 0) {
             this.swalService.toastSuccess('center', 'No existen productos.');
+            this.isTabDisabled = true;
+          } else {
+            this.isTabDisabled = false;
           }
           if (!alta && this.productos.length > 0) {
             this.isEdicion = false;

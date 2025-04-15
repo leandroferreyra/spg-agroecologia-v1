@@ -65,6 +65,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   lastSelectedProvinciaUuid: any = null;
 
   isShowMailMenu = false;
+  isTabDisabled = false;
 
   // Orden y filtro para datos listado proveedores.
   filtros: any = {
@@ -509,6 +510,11 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       }
     }
 
+    if (resultados.length === 0) {
+      this.isTabDisabled = true;
+    } else {
+      this.isTabDisabled = false;
+    }
     return resultados;
   }
 

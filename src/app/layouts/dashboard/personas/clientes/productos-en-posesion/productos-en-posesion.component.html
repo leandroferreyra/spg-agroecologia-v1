@@ -1,6 +1,12 @@
-<div class="panel mt-6 pb-0">
+<div class="panel pb-4">
 
 
+    @if (productos.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee productos en posesión</strong></span>
+    </div>
+    } @else {
     <div class="row mb-2">
         <div class="col-6">
             <span *ngIf="productos && productos.length > 0" class="float-md-start color-gris">
@@ -58,8 +64,10 @@
                 <tr>
                     <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.code}} </td>
                     <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.name}} </td>
-                    <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.product_type?.name}} </td>
-                    <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.product_category?.name}} </td>
+                    <td class="whitespace-nowrap">{{
+                        data.sale_products[0]?.transaction_product?.product?.product_type?.name}} </td>
+                    <td class="whitespace-nowrap">{{
+                        data.sale_products[0]?.transaction_product?.product?.product_category?.name}} </td>
                     <td class="whitespace-nowrap">{{ data.serial_number}} </td>
                     <td class="whitespace-nowrap">{{ data.current_owner.datetime_from}} </td>
                 </tr>
@@ -94,6 +102,6 @@
 
         </div>
     </div>
-
+    }
 
 </div>

@@ -114,13 +114,9 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProductosTotalesComprados(params, this.rol).subscribe({
         next: res => {
-          console.log(res);
           this.productosTotales = res.data;
           this._tokenService.setToken(res.token);
           this.spinner.hide();
-          // this.compras = res.data;
-          // this.modificarPaginacion(res);
-          // this.iniciarPaginadoresProductos();
         },
         error: error => {
           this._swalService.toastError('top-right', error.error.message);

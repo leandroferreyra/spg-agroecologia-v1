@@ -159,7 +159,6 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getCuentasProveedorWithParam(params, this.rol).subscribe({
         next: res => {
-          console.log(res);
           this.cuentasBancarias = res.data;
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);

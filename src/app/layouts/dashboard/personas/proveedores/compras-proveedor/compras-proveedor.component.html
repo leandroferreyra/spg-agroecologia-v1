@@ -1,4 +1,4 @@
-<div class="panel mt-6 pb-0">
+<div class="panel pb-4">
 
     <div class="flex justify-between items-center w-full mb-3">
         <!-- Select a la izquierda -->
@@ -24,7 +24,12 @@
         </div>
     </div>
 
-
+    @if (compras.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee compras</strong></span>
+    </div>
+    } @else {
     <div class="row mb-2">
         <div class="col-6">
             <span *ngIf="compras && compras.length > 0" class="float-md-start color-gris">
@@ -124,60 +129,9 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- <div class="row mt-4">
-
-                            <div class="col">
-
-                                <span
-                                    *ngIf="data.transaction.transaction_products && data.transaction.transaction_products.length > 0"
-                                    class="float-md-start color-gris">
-                                    Página: {{ paginadores[data.uuid].currentPage}}/{{numPages.pageCount }}
-                                </span>
-
-                            </div>
-
-                            <div class="col">
-                                <ngb-pagination class="ngb-pagination float-md-start"
-                                    [collectionSize]="paginadores[data.uuid].totalItems"
-                                    [pageSize]="paginadores[data.uuid].itemsPerPage"
-                                    [(page)]="paginadores[data.uuid].currentPage" [maxSize]="2" [rotate]="true"
-                                    #numPages [boundaryLinks]="true" (pageChange)="onPageChange(data.uuid, $event)">
-                                </ngb-pagination>
-
-                                <div class="row align-items-center float-md-end">
-                                    <div class="col-auto">
-                                        <label for="paginacion">Ítems por página:</label>
-                                    </div>
-                                    <div class="col-auto">
-                                        <select id="paginacion-{{ data.uuid }}" class="form-control"
-                                            (change)="cambiarPaginacion(data.uuid)"
-                                            [(ngModel)]="paginadores[data.uuid].itemsPerPage">
-                                            <option value=5>5</option>
-                                            <option value=10>10</option>
-                                            <option value=20>20</option>
-                                            <option value=50>50</option>
-                                            <option value=100>100</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <span
-                                    *ngIf="data.transaction.transaction_products && data.transaction.transaction_products.length > 0"
-                                    class="float-md-end color-gris">
-                                    Ítems: {{ paginadores[data.uuid].itemsInPage}}/{{ paginadores[data.uuid].totalItems
-                                    }}
-                                </span>
-                            </div>
-
-
-                        </div> -->
                     </td>
                 </tr>
                 }
-
                 }
             </tbody>
         </table>
@@ -209,5 +163,6 @@
 
         </div>
     </div>
+    }
 
 </div>

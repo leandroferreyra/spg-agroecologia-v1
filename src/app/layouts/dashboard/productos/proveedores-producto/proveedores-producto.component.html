@@ -13,6 +13,12 @@
         </div>
     </div> -->
 
+    @if(proveedores.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee proveedores</strong></span>
+    </div>
+    } @else {
     <div class="table-responsive">
         <table class="table-hover">
             <thead>
@@ -57,32 +63,34 @@
         </table>
 
         <!-- <div class="row mt-4">
-            <div class="col">
-                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                    [boundaryLinks]="true" (pageChange)="obtenerProveedores()" />
-            </div>
-
-            <div class="col">
-                <div class="row align-items-center float-md-end">
-                    <div class="col-auto">
-                        <label for="paginacion">Ítems por página:</label>
-                    </div>
-                    <div class="col-auto">
-                        <select id="paginacion" class="form-control" (change)="obtenerProveedores()"
-                            [(ngModel)]="itemsPerPage">
-                            <option value=5>5</option>
-                            <option value=10>10</option>
-                            <option value=20>20</option>
-                            <option value=50>50</option>
-                            <option value=100>100</option>
-                        </select>
+                <div class="col">
+                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                        [boundaryLinks]="true" (pageChange)="obtenerProveedores()" />
+                </div>
+    
+                <div class="col">
+                    <div class="row align-items-center float-md-end">
+                        <div class="col-auto">
+                            <label for="paginacion">Ítems por página:</label>
+                        </div>
+                        <div class="col-auto">
+                            <select id="paginacion" class="form-control" (change)="obtenerProveedores()"
+                                [(ngModel)]="itemsPerPage">
+                                <option value=5>5</option>
+                                <option value=10>10</option>
+                                <option value=20>20</option>
+                                <option value=50>50</option>
+                                <option value=100>100</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-        </div> -->
+    
+            </div> -->
 
     </div>
+    }
+
 
 </div>
