@@ -56,6 +56,11 @@ export const DASHBOARD_ROUTES: Routes = [
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
             },
             {
+                path: 'tipos-productos',
+                loadComponent: () => import('./config/listado-tipos-de-productos/listado-tipos-de-productos.component').then(m => m.ListadoTiposDeProductosComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }
+            },
+            {
                 path: 'cuentas-bancarias',
                 loadComponent: () => import('./config/listado-cuentas-bancarias/listado-cuentas-bancarias.component').then(m => m.ListadoCuentasBancariasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'] }

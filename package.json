@@ -33,6 +33,7 @@
     "bootstrap": "^5.3.3",
     "flatpickr": "^4.6.13",
     "headlessui-angular": "^0.0.9",
+    "ngx-color": "^8.0.3",
     "ngx-custom-modal": "^18.0.2",
     "ngx-lightbox": "^3.0.0",
     "ngx-scrollbar": "^15.1.2",

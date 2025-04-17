@@ -35,6 +35,7 @@ export class IndexService {
   apiProductosAdquiridos = '/transaction_products';
   apiProductosEnPosesion = '/product_instances';
   apiProductos = '/products';
+  apiTiposProductos = '/product_types';
 
   apiComponentes = '/components';
   apiReemplazos = '/replacements';
@@ -107,6 +108,11 @@ export class IndexService {
   getBancosWithParams(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiBancos, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getTiposProductosWithParams(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposProductos, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getPaisesWithParams(paramsObj: any): Observable<AuthResponse> {
