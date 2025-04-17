@@ -72,9 +72,9 @@
             <tbody>
                 @for(data of compras | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                 <tr>
-                    <td class="whitespace-nowrap">{{ data.transaction_datetime}} </td>
+                    <td class="whitespace-nowrap">{{ data.transaction_datetime | date:'dd/MM/yyyy' }} </td>
                     <td class="whitespace-nowrap">{{ data.current_state.state}} </td>
-                    <td class="whitespace-nowrap">{{ getTotal(data)}} </td>
+                    <td class="whitespace-nowrap">{{ getTotal(data) | number:'1.2-2' }} </td>
                     <td>
                         @if (productosExpandido[data.uuid]) {
                         <span class="badge badge-outline-info" (click)="toggleProductos(data)" style="cursor: pointer;">
