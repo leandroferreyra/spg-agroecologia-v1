@@ -36,7 +36,7 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   actual_role: string = '';
 
-  color: string = '#FF0000';
+  color: string = '';
   showPicker: boolean = false; tiposProductos: any[] = [];
 
   tiposProductosForm!: FormGroup;
@@ -55,11 +55,20 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    // 'name': { value: '', op: 'LIKE', contiene: true }
+    'name': { value: '', op: 'LIKE', contiene: true },
+    'code': { value: '', op: 'LIKE', contiene: true },
+    'is_process': { value: '', op: '=', contiene: false },
+    'product_compound': { value: '', op: '=', contiene: false },
+    'product_must_be_traceable': { value: '', op: '=', contiene: false },
+    'stock_controlled': { value: '', op: '=', contiene: false },
+    'can_be_provided': { value: '', op: '=', contiene: false },
+    'can_be_purchased': { value: '', op: '=', contiene: false },
+    'can_be_produced': { value: '', op: '=', contiene: false }
   };
   showFilter: boolean = false;
   ordenamiento: any = {
-    'name': 'asc'
+    'name': 'asc',
+    'code': 'asc'
   };
 
   iconArrowUp = faArrowUp;
@@ -102,6 +111,21 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
+
+
+    // const filtrosProcesados: any = {};
+
+    // for (const key in this.filtros) {
+    //   if (!this.filtros.hasOwnProperty(key)) continue;
+
+    //   filtrosProcesados[key] = { ...this.filtros[key] };
+
+    //   if (key === 'is_process' || key === 'product_compound') {
+    //     if (this.filtros[key].value !== '') {
+    //       filtrosProcesados[key].value = this.filtros[key].value === true ? 1 : 0;
+    //     }
+    //   }
+    // }
     params.filters = this.filtros;
 
     this.subscription.add(
@@ -151,14 +175,14 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
       name: new FormControl(tipoProducto ? tipoProducto.name : null, [Validators.required]),
       code: new FormControl(tipoProducto ? tipoProducto.code : null, [Validators.required]),
       is_process: new FormControl(tipoProducto ? tipoProducto.is_process : false, []),
-      description: new FormControl(tipoProducto ? tipoProducto.description : null, [Validators.required]),
+      description: new FormControl(tipoProducto ? tipoProducto.description : null, []),
       color: new FormControl(tipoProducto ? tipoProducto.color : null, [Validators.required]),
-      product_compound: new FormControl(tipoProducto ? tipoProducto.product_compound : false, []),
-      product_must_be_traceable: new FormControl(tipoProducto ? tipoProducto.product_must_be_traceable : false, []),
-      stock_controlled: new FormControl(tipoProducto ? tipoProducto.stock_controlled : false, []),
-      can_be_provided: new FormControl(tipoProducto ? tipoProducto.can_be_provided : false, []),
-      can_be_purchased: new FormControl(tipoProducto ? tipoProducto.can_be_purchased : false, []),
-      can_be_produced: new FormControl(tipoProducto ? tipoProducto.can_be_produced : false, []),
+      product_compound: new FormControl(tipoProducto ? tipoProducto.product_compound : false, [Validators.required]),
+      product_must_be_traceable: new FormControl(tipoProducto ? tipoProducto.product_must_be_traceable : false, [Validators.required]),
+      stock_controlled: new FormControl(tipoProducto ? tipoProducto.stock_controlled : false, [Validators.required]),
+      can_be_provided: new FormControl(tipoProducto ? tipoProducto.can_be_provided : false, [Validators.required]),
+      can_be_purchased: new FormControl(tipoProducto ? tipoProducto.can_be_purchased : false, [Validators.required]),
+      can_be_produced: new FormControl(tipoProducto ? tipoProducto.can_be_produced : false, [Validators.required]),
     });
   }
 
@@ -272,7 +296,15 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {
-        'name': { value: '', op: 'LIKE', contiene: true }
+        'name': { value: '', op: 'LIKE', contiene: true },
+        'code': { value: '', op: 'LIKE', contiene: true },
+        'is_process': { value: '', op: '=', contiene: false },
+        'product_compound': { value: '', op: '=', contiene: false },
+        'product_must_be_traceable': { value: '', op: '=', contiene: false },
+        'stock_controlled': { value: '', op: '=', contiene: false },
+        'can_be_provided': { value: '', op: '=', contiene: false },
+        'can_be_purchased': { value: '', op: '=', contiene: false },
+        'can_be_produced': { value: '', op: '=', contiene: false },
       };
       this.obtenerTiposProductos();
     }
