@@ -1,1 +1,101 @@
-<p>stocks works!</p>
+<div class="panel pb-4">
+
+    <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
+        <!-- Botón Agregar Cuenta Bancaria -->
+        <!-- <button type="button" ngxTippy="Agregar cuenta bancaria" (click)="openModalNuevaCuenta('NEW')">
+            <icon-plus />
+        </button> -->
+
+        <!-- Contenedor del Switch -->
+        <div class="flex items-center gap-2">
+            <span>Mostrar agotados</span>
+            <label class="w-12 h-6 relative">
+                <input type="checkbox" class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                    id="custom_switch_checkbox2" />
+                <span for="custom_switch_checkbox2"
+                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                </span>
+            </label>
+        </div>
+    </div>
+
+    @if (stocks.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> El producto no posee stocks</strong></span>
+    </div>
+    } @else {
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="stocks && stocks.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="stocks && stocks.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Producto
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Cantidad inicial
+                        </span>
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of stocks | slice: pageSize | slice: 0:itemsPerPage ; let index = $index; track
+                data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.product.name}} </td>
+                    <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4">
+            <div class="col">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerStocks()" />
+            </div>
+
+            <div class="col">
+                <div class="row align-items-center float-md-end">
+                    <div class="col-auto">
+                        <label for="paginacion">Ítems por página:</label>
+                    </div>
+                    <div class="col-auto">
+                        <select id="paginacion" class="form-control" (change)="obtenerStocks()"
+                            [(ngModel)]="itemsPerPage">
+                            <option value=5>5</option>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    }
+
+</div>

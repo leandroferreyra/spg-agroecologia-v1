@@ -479,7 +479,7 @@
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'stocks'">
-                    <app-stocks>
+                    <app-stocks [producto]="selectedProducto" [rol]="actual_role">
                     </app-stocks>
                 </div>
 

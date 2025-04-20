@@ -48,7 +48,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     'product->parent_product_uuid': { value: '', op: '=', contiene: false },
     'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '!=', contiene: false },
   };
-  showFilterCompras: boolean = false;
   ordenamiento: any = {
   };
 
