@@ -54,11 +54,13 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   componenteForm!: FormGroup;
   tituloModal: string = '';
+  tituloModalProceso: string = '';
   isSubmit = false;
   isEdicion = false;
 
-  // Referencia al modal para crear y editar países.
+  // Referencia al modal.
   @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
+  @ViewChild('modalProceso') modalProceso!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -74,7 +76,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   placeholderCantidad: string = '';
 
   procesoActivo: any;
-  procesoActivoActual: any;
+  // procesoActivoActual: any;
   isEdicionProceso: boolean = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
@@ -95,6 +97,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['product->parent_product_uuid'].value = this.producto.uuid;
       this.obtenerComponentes();
+      this.obtenerProcesoActivo();
     }
   }
 
@@ -111,11 +114,38 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          console.log(this.componentes);
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.obtenerCatalogos();
           this.spinner.hide();
+        },
+        error: error => {
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  obtenerProcesoActivo() {
+    const paramsComponenteProceso: any = {};
+    paramsComponenteProceso.with = ["childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
+    paramsComponenteProceso.paging = null;
+    paramsComponenteProceso.page = null;
+    paramsComponenteProceso.order_by = {};
+    paramsComponenteProceso.filters = {
+      'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false },
+      'product->parent_product_uuid': { value: this.producto.uuid, op: '=', contiene: false }
+    };
+
+    this.subscription.add(
+      this._indexService.getComponentesWithParam(paramsComponenteProceso, this.rol).subscribe({
+        next: res => {
+          this.componenteProceso = res.data;
+          // console.log(this.componenteProceso);
+          this.procesoActivo = this.componenteProceso.length > 0 ? this.componenteProceso[0].child_product?.uuid : null;
+          this._tokenService.setToken(res.token);
         },
         error: error => {
           this._swalService.toastError('top-right', error.error.message);
@@ -169,21 +199,21 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       'productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
     };
 
-    const paramsComponenteProceso: any = {};
-    paramsComponenteProceso.with = ["childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
-    paramsComponenteProceso.paging = null;
-    paramsComponenteProceso.page = null;
-    paramsComponenteProceso.order_by = {};
-    paramsComponenteProceso.filters = {
-      'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false },
-      'product->parent_product_uuid': { value: this.producto.uuid, op: '=', contiene: false }
-    };
+    // const paramsComponenteProceso: any = {};
+    // paramsComponenteProceso.with = ["childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
+    // paramsComponenteProceso.paging = null;
+    // paramsComponenteProceso.page = null;
+    // paramsComponenteProceso.order_by = {};
+    // paramsComponenteProceso.filters = {
+    //   'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false },
+    //   'product->parent_product_uuid': { value: this.producto.uuid, op: '=', contiene: false }
+    // };
 
     forkJoin({
       proveedores: this._indexService.getProveedores(this.rol),
       productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid),
       procesos: this._indexService.getProductosWithParam(paramsProcesos, this.rol),
-      componenteProceso: this._indexService.getComponentesWithParam(paramsComponenteProceso, this.rol),
+      // componenteProceso: this._indexService.getComponentesWithParam(paramsComponenteProceso, this.rol),
     }).subscribe({
       next: res => {
         this.proveedores = res.proveedores.data;
@@ -196,9 +226,9 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           ...p,
           disabled: this.disableProducto(p) // Solo deshabilita el que coincide
         }));
+        console.log(this.productos);
         this.procesos = res.procesos.data;
-        this.componenteProceso = res.componenteProceso.data;
-        this.procesoActivo = this.componenteProceso.length > 0 ? this.componenteProceso[0].child_product?.uuid : null;
+
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -387,17 +417,36 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     }
   }
 
-  editarProceso() {
-    this.isEdicionProceso = true;
-    this.procesoActivoActual = this.procesoActivo;
+
+
+  openModalProceso(type: string, dato?: any) {
+    if (type === 'NEW') {
+      this.tituloModalProceso = 'Nuevo proceso';
+    } else {
+      this.tituloModalProceso = 'Edición proceso';
+    }
+    this.procesoActivo = this.componenteProceso.length > 0 ? this.componenteProceso[0].child_product?.uuid : null;
+    this.modalProceso.options = this.modalOptions;
+    this.modalProceso.open();
   }
 
-  cancelarEdicion() {
-    this.isEdicionProceso = false;
-    this.procesoActivo = this.procesoActivoActual
+  cerrarModalProceso() {
+    this.modalProceso.close();
   }
+
+  // editarProceso() {
+  //   this.isEdicionProceso = true;
+  //   this.procesoActivoActual = this.procesoActivo;
+  //   this.cerrarModalProceso();
+  // }
+
+  // cancelarEdicion() {
+  //   this.isEdicionProceso = false;
+  //   this.procesoActivo = this.procesoActivoActual
+  // }
 
   guardarProceso() {
+    this.spinner.show();
     this.isEdicionProceso = false;
     let componente = new ComponenteDTO();
     componente.actual_role = this.rol;
@@ -409,7 +458,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._componenteService.saveComponente(componente).subscribe({
         next: res => {
-          this.componenteProceso.push(res.data);
+          // this.componenteProceso.push(res.data);
+          this.obtenerProcesoActivo();
+          this.cerrarModalProceso();
+          this.spinner.hide();
         },
         error: error => {
           this.spinner.hide();
@@ -420,22 +472,52 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     )
   }
 
+  openSwalEliminarProcesoActivo() {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el proceso ${this.componenteProceso[0].child_product.name}?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarProcesoActivo();
+      } else if (result.isDenied) {
 
+      }
+    })
+  }
   eliminarProcesoActivo() {
     if (this.componenteProceso.length > 0) {
+      this.spinner.show();
       this.subscription.add(
         this._componenteService.deleteComponent(this.componenteProceso[0].uuid, this.rol.toUpperCase()).subscribe({
           next: res => {
+            this.obtenerProcesoActivo();
             this.procesoActivo = '';
             this._tokenService.setToken(res.token);
+            this.spinner.hide();
           },
           error: error => {
+            this.spinner.hide();
             console.error(error);
             this._swalService.toastError('top-right', error.error.message);
           }
         })
       )
     }
+  }
+
+  getComments(data: any) {
+    if (!data.child_product?.comments) return '';
+    return data.child_product?.comments.length > 32 ? data.child_product?.comments.slice(0, 32 - 2) + '…' : data.child_product?.comments;
   }
 
 }
