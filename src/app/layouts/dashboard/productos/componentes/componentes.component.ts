@@ -77,7 +77,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   procesoActivo: any;
   // procesoActivoActual: any;
-  isEdicionProceso: boolean = false;
+  // isEdicionProceso: boolean = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private _componenteService: ComponentesService) {
@@ -93,7 +93,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['producto'] && changes['producto'].currentValue) {
       this.spinner.show();
-      this.isEdicionProceso = false;
+      // this.isEdicionProceso = false;
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['product->parent_product_uuid'].value = this.producto.uuid;
       this.obtenerComponentes();
@@ -447,7 +447,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   guardarProceso() {
     this.spinner.show();
-    this.isEdicionProceso = false;
+    if (this.componenteProceso.length > 0) {
+      this.eliminarProcesoActivo();
+    }
+    // this.isEdicionProceso = false;
     let componente = new ComponenteDTO();
     componente.actual_role = this.rol;
     componente.with = [];
