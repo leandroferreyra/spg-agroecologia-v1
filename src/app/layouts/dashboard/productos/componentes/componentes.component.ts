@@ -142,7 +142,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(paramsComponenteProceso, this.rol).subscribe({
         next: res => {
           this.componenteProceso = res.data;
-          // console.log(this.componenteProceso);
           this.procesoActivo = this.componenteProceso.length > 0 ? this.componenteProceso[0].child_product?.uuid : null;
           this._tokenService.setToken(res.token);
         },
@@ -225,7 +224,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           ...p,
           disabled: this.disableProducto(p) // Solo deshabilita el que coincide
         }));
-        console.log(this.productos);
         this.procesos = res.procesos.data;
 
       },
