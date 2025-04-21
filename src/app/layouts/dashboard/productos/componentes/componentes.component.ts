@@ -414,8 +414,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
   openModalProceso(type: string, dato?: any) {
     if (type === 'NEW') {
       this.tituloModalProceso = 'Nuevo proceso';
@@ -431,45 +429,51 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     this.modalProceso.close();
   }
 
-  // editarProceso() {
-  //   this.isEdicionProceso = true;
-  //   this.procesoActivoActual = this.procesoActivo;
-  //   this.cerrarModalProceso();
-  // }
-
-  // cancelarEdicion() {
-  //   this.isEdicionProceso = false;
-  //   this.procesoActivo = this.procesoActivoActual
-  // }
-
   guardarProceso() {
     this.spinner.show();
-    if (this.componenteProceso.length > 0) {
-      this.eliminarProcesoActivo();
-    }
-    // this.isEdicionProceso = false;
     let componente = new ComponenteDTO();
-    componente.actual_role = this.rol;
-    componente.with = [];
-    componente['product->child_product_uuid'] = this.procesoActivo;
-    componente['product->parent_product_uuid'] = this.producto.uuid;
-    componente.quantity = 1;
-    this.cleanObject(componente);
-    this.subscription.add(
-      this._componenteService.saveComponente(componente).subscribe({
-        next: res => {
-          // this.componenteProceso.push(res.data);
-          this.obtenerProcesoActivo();
-          this.cerrarModalProceso();
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          this._swalService.toastError('top-right', error.error.message)
-          console.error(error);
-        }
-      })
-    )
+    if (this.componenteProceso.length > 0) {
+      componente.actual_role = this.rol;
+      componente.with = [];
+      componente['product->child_product_uuid'] = this.procesoActivo;
+      this.cleanObject(componente);
+      this.subscription.add(
+        this._componenteService.editComponente(this.componenteProceso[0].uuid, componente).subscribe({
+          next: res => {
+            this.obtenerProcesoActivo();
+            this.cerrarModalProceso();
+            this.spinner.hide();
+          },
+          error: error => {
+            this.spinner.hide();
+            this._swalService.toastError('top-right', error.error.message)
+            console.error(error);
+          }
+        })
+      )
+    } else {
+      componente.actual_role = this.rol;
+      componente.with = [];
+      componente['product->child_product_uuid'] = this.procesoActivo;
+      componente['product->parent_product_uuid'] = this.producto.uuid;
+      componente.quantity = 1;
+      this.cleanObject(componente);
+      this.subscription.add(
+        this._componenteService.saveComponente(componente).subscribe({
+          next: res => {
+            this.obtenerProcesoActivo();
+            this.cerrarModalProceso();
+            this.spinner.hide();
+          },
+          error: error => {
+            this.spinner.hide();
+            this._swalService.toastError('top-right', error.error.message)
+            console.error(error);
+          }
+        })
+      )
+    }
+
   }
 
   openSwalEliminarProcesoActivo() {
