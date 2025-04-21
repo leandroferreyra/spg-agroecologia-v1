@@ -1,13 +1,13 @@
 <div class="panel pb-4">
 
 
-
-    <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
-        <button type="button" ngxTippy="Agregar proceso" (click)="openModalProceso('NEW')"
-            [disabled]="componenteProceso.length > 0">
-            <icon-plus />
-        </button>
-    </div>
+    @if(componenteProceso.length > 0) {
+        <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
+            <button type="button" ngxTippy="Agregar proceso" (click)="openModalProceso('NEW')">
+                <icon-plus />
+            </button>
+        </div>
+    }
 
     @if (componenteProceso.length === 0) {
     <div
