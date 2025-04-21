@@ -271,7 +271,7 @@
 
                     <div class="row mt-3">
                         <div class="col-12 d-flex justify-content-center">
-                            <button type="button" class="btn btn-wd btn-primary mr-4"
+                            <button type="button" class="btn btn-wd btn-primary mr-4" [disabled]="componenteProceso.length > 0 && componenteProceso[0].child_product?.uuid === procesoActivo"
                                 (click)="guardarProceso()">Confirmar</button>
                             <button id="back-button-with-border" type="button" class="btn btn-wd"
                                 (click)="cerrarModalProceso()">Cancelar</button>

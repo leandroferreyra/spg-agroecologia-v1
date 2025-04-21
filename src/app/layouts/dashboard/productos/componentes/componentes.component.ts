@@ -97,6 +97,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this.filtros['product->parent_product_uuid'].value = this.producto.uuid;
       this.obtenerComponentes();
       this.obtenerProcesoActivo();
+      this.obtenerPosiblesProcesos();
     }
   }
 
@@ -125,6 +126,36 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  obtenerPosiblesProcesos() {
+    const paramsProcesos: any = {};
+    paramsProcesos.with = [];
+    paramsProcesos.paging = null;
+    paramsProcesos.page = null;
+    paramsProcesos.order_by = {};
+    paramsProcesos.filters = {
+      'productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
+    };
+
+    this.subscription.add(
+      this._indexService.getProductosWithParam(paramsProcesos, this.rol).subscribe({
+        next: res => {
+          this.procesos = res.data;
+          this.procesos = this.procesos.map(p => ({
+            ...p,
+            disabled: p.uuid === this.procesoActivo
+          }));
+        },
+        error: error => {
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
+
+
   }
 
   obtenerProcesoActivo() {
@@ -188,30 +219,9 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     params.order_by = {};
     params.filters = {};
 
-    const paramsProcesos: any = {};
-    paramsProcesos.with = [];
-    paramsProcesos.paging = null;
-    paramsProcesos.page = null;
-    paramsProcesos.order_by = {};
-    paramsProcesos.filters = {
-      'productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false }
-    };
-
-    // const paramsComponenteProceso: any = {};
-    // paramsComponenteProceso.with = ["childProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
-    // paramsComponenteProceso.paging = null;
-    // paramsComponenteProceso.page = null;
-    // paramsComponenteProceso.order_by = {};
-    // paramsComponenteProceso.filters = {
-    //   'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '=', contiene: false },
-    //   'product->parent_product_uuid': { value: this.producto.uuid, op: '=', contiene: false }
-    // };
-
     forkJoin({
       proveedores: this._indexService.getProveedores(this.rol),
-      productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid),
-      procesos: this._indexService.getProductosWithParam(paramsProcesos, this.rol),
-      // componenteProceso: this._indexService.getComponentesWithParam(paramsComponenteProceso, this.rol),
+      productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid)
     }).subscribe({
       next: res => {
         this.proveedores = res.proveedores.data;
@@ -224,8 +234,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           ...p,
           disabled: this.disableProducto(p) // Solo deshabilita el que coincide
         }));
-        this.procesos = res.procesos.data;
-
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -430,51 +438,63 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   guardarProceso() {
-    this.spinner.show();
-    let componente = new ComponenteDTO();
-    if (this.componenteProceso.length > 0) {
-      componente.actual_role = this.rol;
-      componente.with = [];
-      componente['product->child_product_uuid'] = this.procesoActivo;
-      this.cleanObject(componente);
-      this.subscription.add(
-        this._componenteService.editComponente(this.componenteProceso[0].uuid, componente).subscribe({
-          next: res => {
-            this.obtenerProcesoActivo();
-            this.cerrarModalProceso();
-            this.spinner.hide();
-          },
-          error: error => {
-            this.spinner.hide();
-            this._swalService.toastError('top-right', error.error.message)
-            console.error(error);
-          }
-        })
-      )
+    if (this.procesoActivo) {
+      this.spinner.show();
+      let componente = new ComponenteDTO();
+      if (this.componenteProceso.length > 0) {
+        componente.actual_role = this.rol;
+        componente.with = [];
+        componente['product->child_product_uuid'] = this.procesoActivo;
+        this.cleanObject(componente);
+        this.subscription.add(
+          this._componenteService.editComponente(this.componenteProceso[0].uuid, componente).subscribe({
+            next: res => {
+              this.obtenerProcesoActivo();
+              this.obtenerPosiblesProcesos();
+              this.cerrarModalProceso();
+              this.spinner.hide();
+            },
+            error: error => {
+              this.spinner.hide();
+              this._swalService.toastError('top-right', error.error.message)
+              console.error(error);
+            }
+          })
+        )
+      } else {
+        componente.actual_role = this.rol;
+        componente.with = [];
+        componente['product->child_product_uuid'] = this.procesoActivo;
+        componente['product->parent_product_uuid'] = this.producto.uuid;
+        componente.quantity = 1;
+        this.cleanObject(componente);
+        this.subscription.add(
+          this._componenteService.saveComponente(componente).subscribe({
+            next: res => {
+              this.obtenerProcesoActivo();
+              this.obtenerPosiblesProcesos();
+              this.cerrarModalProceso();
+              this.spinner.hide();
+            },
+            error: error => {
+              this.spinner.hide();
+              this._swalService.toastError('top-right', error.error.message)
+              console.error(error);
+            }
+          })
+        )
+      }
     } else {
-      componente.actual_role = this.rol;
-      componente.with = [];
-      componente['product->child_product_uuid'] = this.procesoActivo;
-      componente['product->parent_product_uuid'] = this.producto.uuid;
-      componente.quantity = 1;
-      this.cleanObject(componente);
-      this.subscription.add(
-        this._componenteService.saveComponente(componente).subscribe({
-          next: res => {
-            this.obtenerProcesoActivo();
-            this.cerrarModalProceso();
-            this.spinner.hide();
-          },
-          error: error => {
-            this.spinner.hide();
-            this._swalService.toastError('top-right', error.error.message)
-            console.error(error);
-          }
-        })
-      )
+      this._swalService.toastError('top-right', 'Debe elegir un proceso');
     }
-
   }
+
+  // isProcesoActual() {
+  //   if (this.componenteProceso.length > 0) {
+  //     return this.procesoActivo === this.componenteProceso[0].child_product?.uuid;
+  //   }
+  //   return false;
+  // }
 
   openSwalEliminarProcesoActivo() {
     Swal.fire({
@@ -505,6 +525,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         this._componenteService.deleteComponent(this.componenteProceso[0].uuid, this.rol.toUpperCase()).subscribe({
           next: res => {
             this.obtenerProcesoActivo();
+            this.obtenerPosiblesProcesos();
             this.procesoActivo = '';
             this._tokenService.setToken(res.token);
             this.spinner.hide();
