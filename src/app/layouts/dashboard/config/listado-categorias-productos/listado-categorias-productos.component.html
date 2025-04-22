@@ -107,14 +107,10 @@
                         <td>
                             <div class="flex items-center">
                                 <div>
-                                    @if (data.product_categories.length > 0) {
                                     <button type="button" ngxTippy="Mostrar sub-categorias" class="ltr:mr-3 rtl:ml-2"
                                         (click)="obtenerCategorias(data)">
                                         <icon-folder />
                                     </button>
-                                    } @else {
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2 min-w-[20px]"></button>
-                                    }
                                 </div>
                                 <div>
                                     <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
