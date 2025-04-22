@@ -1,5 +1,5 @@
 <div>
-    <div class="panel mt-6 pb-0">
+    <div class="panel pb-3">
 
         <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
             <h5 class="text-lg font-semibold dark:text-white-light min-w-0">Ubicaciones</h5>
@@ -45,6 +45,13 @@
         </ol>
         }
 
+        @if(ubicaciones.length == 0) {
+        <div
+            class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+            <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1">No existen
+                    ubicaciones</strong></span>
+        </div>
+        }@else {
         <div class="row mb-2">
             <div class="col-6">
                 <span *ngIf="ubicaciones && ubicaciones.length > 0" class="float-md-start color-gris">
@@ -58,17 +65,10 @@
             </div>
         </div>
 
-
         <div class="table-responsive">
 
             <table class="table-hover">
-                @if(ubicaciones.length == 0) {
-                <div
-                    class="flex items-center p-3.5 rounded text-info bg-info-light dark:bg-info-dark-light justify-content-center">
-                    <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1">No existen
-                            ubicaciones</strong></span>
-                </div>
-                }
+
                 <thead>
                     <tr>
                         <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
@@ -139,8 +139,8 @@
                             <label for="paginacion">Ítems por página:</label>
                         </div>
                         <div class="col-auto">
-                            <select id="paginacion" class="form-control"
-                                (change)="obtenerUbicaciones()" [(ngModel)]="itemsPerPage">
+                            <select id="paginacion" class="form-control" (change)="obtenerUbicaciones()"
+                                [(ngModel)]="itemsPerPage">
                                 <option value=5>5</option>
                                 <option value=10>10</option>
                                 <option value=20>20</option>
@@ -153,8 +153,7 @@
 
             </div>
         </div>
-
-
+        }
 
     </div>
 </div>
