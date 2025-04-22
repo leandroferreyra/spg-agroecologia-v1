@@ -75,8 +75,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   placeholderCantidad: string = '';
 
   procesoActivo: any;
-  // procesoActivoActual: any;
-  // isEdicionProceso: boolean = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private _componenteService: ComponentesService) {
@@ -92,7 +90,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['producto'] && changes['producto'].currentValue) {
       this.spinner.show();
-      // this.isEdicionProceso = false;
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['product->parent_product_uuid'].value = this.producto.uuid;
       this.obtenerComponentes();
@@ -543,6 +540,10 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   getComments(data: any) {
     if (!data.child_product?.comments) return '';
     return data.child_product?.comments.length > 32 ? data.child_product?.comments.slice(0, 32 - 2) + '…' : data.child_product?.comments;
+  }
+
+  isProductoCompuesto() {
+    return this.producto.product_type?.product_compound === 1;
   }
 
 }
