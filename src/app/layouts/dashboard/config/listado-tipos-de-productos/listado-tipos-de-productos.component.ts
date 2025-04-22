@@ -111,21 +111,6 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
-
-
-    // const filtrosProcesados: any = {};
-
-    // for (const key in this.filtros) {
-    //   if (!this.filtros.hasOwnProperty(key)) continue;
-
-    //   filtrosProcesados[key] = { ...this.filtros[key] };
-
-    //   if (key === 'is_process' || key === 'product_compound') {
-    //     if (this.filtros[key].value !== '') {
-    //       filtrosProcesados[key].value = this.filtros[key].value === true ? 1 : 0;
-    //     }
-    //   }
-    // }
     params.filters = this.filtros;
 
     this.subscription.add(
@@ -133,7 +118,6 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
         next: res => {
           this.spinner.hide();
           this.tiposProductos = res.data;
-          console.log(this.tiposProductos);
           this.modificarPaginacion(res);
         },
         error: error => {
@@ -327,8 +311,6 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
 
   onColorChange(event: any) {
     this.color = event.color.hex;
-    console.log(this.tiposProductosForm.get('color')?.value);
-    console.log(this.color);
     this.showPicker = false;
   }
 

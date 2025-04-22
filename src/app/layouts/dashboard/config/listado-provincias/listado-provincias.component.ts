@@ -98,10 +98,17 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.obtenerProvincias();
+    this.obtenerPaises();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  obtenerPaises() {
     this.subscription.add(
       this._catalogoService.getPaises().subscribe({
         next: res => {
-          // console.log(res);
           this.paises = res.data;
         },
         error: error => {
@@ -110,11 +117,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
         }
       })
     )
-    //this.initializeSortDirections(['country.name', 'name']);
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 
   obtenerProvincias() {
