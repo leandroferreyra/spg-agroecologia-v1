@@ -107,7 +107,6 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._catalogoService.getProvincias().subscribe({
         next: res => {
-          // console.log(res);
           this.provincias = res.data;
         },
         error: error => {
@@ -129,7 +128,6 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getCiudadesWithParams(params).subscribe({
         next: res => {
-          // console.log(res);
           this.ciudades = res.data;
           this.modificarPaginacion(res);
           this.spinner.hide();
@@ -137,7 +135,7 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
         },
         error: error => {
           this.spinner.hide();
-          console.log(error);
+          console.error(error);
         }
       })
     )
@@ -213,7 +211,6 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
         provincia: new FormControl(null, [Validators.required])
       });
     } else {
-      // console.log(pais);
       this.isEdicion = true;
       this.tituloModal = 'Edición ciudad';
       this.ciudadForm = new FormGroup({
@@ -306,7 +303,6 @@ export class ListadoCiudadesComponent implements OnInit, OnDestroy {
   }
 
   toggleFilter() {
-    // console.log(this.filtros);
     this.showFilter = !this.showFilter;
     if (!this.showFilter) {
       this.filtros = {

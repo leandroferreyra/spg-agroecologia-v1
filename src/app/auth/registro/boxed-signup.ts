@@ -67,7 +67,6 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
             documentos: this._catalogService.getDocumentos()
         }).subscribe({
             next: res => {
-                // console.log(res);
                 this.generos = res.generos.data;
                 this.paises = res.paises.data;
                 this.documentos = res.documentos.data;
@@ -169,14 +168,13 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                 this.subscription.add(
                     this._authService.register(registro).subscribe({
                         next: res => {
-                            console.log(res);
                             this.showSwalFire("¡Genial!. Se te ha enviado un e-mail a tu casilla de correo electrónico para confirmar tu cuenta. Recordá revisar SPAM.");
                             this.router.navigate(['auth/boxed-signin']);
                             this.spinner.hide();
                         },
                         error: error => {
                             this.spinner.hide();
-                            console.log(error);
+                            console.error(error);
                         }
                     })
                 )

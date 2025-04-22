@@ -84,7 +84,6 @@ export class StocksComponent implements OnInit, OnDestroy {
       this._indexService.getStocksWithParam(params, this.rol).subscribe({
         next: res => {
           this.stocks = res.data;
-          console.log(this.stocks);
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();

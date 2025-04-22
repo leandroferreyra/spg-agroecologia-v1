@@ -446,7 +446,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._productoService.editProducto(this.selectedProducto.uuid, producto).subscribe({
             next: res => {
-              // console.log(res);
               this.productos = [...this.productos.map(p =>
                 p.uuid === res.data.uuid ? res.data : p
               )];

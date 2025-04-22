@@ -124,7 +124,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
         next: res => {
           this.tokenService.setToken(res.token);
           this.roles = res.data;
-          // console.log(this.roles);
         },
         error: error => {
           console.error(error);
@@ -318,7 +317,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   }
 
   openModalRoles(usuario: any) {
-    // console.log(usuario);
     this.usuarioInEdicion = usuario;
     this.rolesForm = new FormGroup({});;
     this.roles.forEach(rol => {
@@ -337,7 +335,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   }
 
   confirmarRoles() {
-    // console.log(this.rolesForm);
     let agregaEstosRoles: string[] = [];
     this.roles.forEach(element => {
       let value = this.rolesForm.get(element.name)?.value;
@@ -352,7 +349,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this.userService.syncRolesUsuario(this.usuarioInEdicion.uuid, this.actual_role, agregaEstosRoles).subscribe({
           next: res => {
-            // console.log(res);
             let roles = this.convertirRolesEnObject(agregaEstosRoles);
             let usuario = this.usuarios.find(user => user.uuid === this.usuarioInEdicion.uuid);
             usuario.roles = roles; // Le asigno los nuevos roles para que se vea en pantalla.

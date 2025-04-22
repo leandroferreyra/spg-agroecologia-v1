@@ -202,7 +202,6 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
         alias: new FormControl(null, []),
       });
     } else {
-      // console.log(moneda);
       this.isEdicion = true;
       this.tituloModal = 'Edición cuenta';
       this.cuentaForm = new FormGroup({
@@ -234,7 +233,6 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
   }
 
   openSwalEliminar(cuenta: any) {
-    console.log(cuenta);
     Swal.fire({
       title: '',
       text: `¿Desea eliminar la cuenta ${cuenta.account_number}?`,
@@ -279,7 +277,6 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getMonedas(this.rol).subscribe({
         next: res => {
-          // console.log(res);
           this.monedas = res.data;
         },
         error: error => {
@@ -293,7 +290,6 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getBancos(this.rol).subscribe({
         next: res => {
-          // console.log(res);
           this.bancos = res.data;
         },
         error: error => {
@@ -307,7 +303,6 @@ export class CuentasBancariasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getTipoDeCuentas(this.rol).subscribe({
         next: res => {
-          // console.log(res);
           this.tiposDeCuenta = res.data;
         },
         error: error => {

@@ -113,7 +113,7 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
         },
         error: error => {
           this.spinner.hide();
-          console.log(error);
+          console.error(error);
         }
       })
     )
@@ -124,7 +124,6 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
   }
 
   openSwalEliminar(moneda: any) {
-    console.log(moneda);
     Swal.fire({
       title: '',
       text: `¿Desea eliminar la moneda ${moneda.name}?`,
@@ -175,7 +174,6 @@ export class ListadoMonedasComponent implements OnInit, OnDestroy {
         simbolo: new FormControl(null, [Validators.required]),
       });
     } else {
-      // console.log(moneda);
       this.isEdicion = true;
       this.tituloModal = 'Edición moneda';
       this.monedaForm = new FormGroup({

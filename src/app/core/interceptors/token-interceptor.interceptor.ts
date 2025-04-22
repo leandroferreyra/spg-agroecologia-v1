@@ -22,7 +22,6 @@ export const tokenInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(clonedRequest).pipe(
     tap({
       next: (event: any) => {
-        //console.log('Respuesta recibida:', event);
       }
     }),
     catchError((error: HttpErrorResponse) => {

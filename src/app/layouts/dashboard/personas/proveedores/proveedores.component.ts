@@ -143,7 +143,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
     if (offcanvasElement) {
       offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
-        // console.log('El offcanvas se ha cerrado');
         // Aquí puedes ejecutar cualquier acción adicional al cierre
       });
     }
@@ -166,7 +165,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProveedores(this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
           this.proveedores = res.data;
           this.proveedoresFiltrados = this.proveedores;
           if (!alta && this.proveedores.length > 0) {
@@ -185,8 +183,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
 
   inicializarForm(proveedor?: any) {
-    // console.log(this.posiblesEstados);
-    // console.log(proveedor?.person?.current_state?.uuid);
     if (proveedor) {
       if (proveedor.person.uuid != this.selectedProveedor?.person.uuid) {
         // Esto es para no llamar cuando hace el show y tambien hacerlo al editar. 
@@ -370,11 +366,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDTOEdicion(proveedor);
-      // console.log(proveedor);
       this.subscription.add(
         this._proveedoresService.editProveedor(this.selectedProveedor.uuid, proveedor).subscribe({
           next: res => {
-            // console.log(res);
             this.proveedores = [...this.proveedores.map(p =>
               p.uuid === res.data.uuid ? res.data : p
             )];
@@ -394,7 +388,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
   }
   armarDTOEdicion(proveedor: ProveedorDTO) {
-    // console.log(this.newProveedorForm);
     proveedor.actual_role = this.actual_role;
     proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.documentType", "person.legalEntity"];
@@ -680,7 +673,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       posiblesEstados: this._catalogoService.getPosiblesEstados(this.actual_role)
     }).subscribe({
       next: res => {
-        // console.log(res);
         this.generos = res.generos.data;
         this.paises = res.paises.data;
         this.documentos = res.documentos.data;
@@ -698,7 +690,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let proveedor = new ProveedorDTO();
       this.armarDtoNuevoProveedor(proveedor);
-      // console.log(proveedor);
       this.subscription.add(
         this._proveedoresService.saveProveedor(proveedor).subscribe({
           next: res => {
@@ -819,7 +810,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._indexService.getHumansWithParam(params, this.actual_role).subscribe({
           next: res => {
-            // console.log(res);
             this.personas = res.data;
             this.modificarPaginacionBusqueda(res);
             this.spinner.hide();
@@ -834,7 +824,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._indexService.getLegalEntitiesWithParam(params, this.actual_role).subscribe({
           next: res => {
-            // console.log(res);
             this.personas = res.data;
             this.modificarPaginacionBusqueda(res);
             this.spinner.hide();

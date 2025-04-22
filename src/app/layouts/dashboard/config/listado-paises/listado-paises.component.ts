@@ -111,7 +111,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
         },
         error: error => {
           this.spinner.hide();
-          console.log(error);
+          console.error(error);
         }
       })
     )

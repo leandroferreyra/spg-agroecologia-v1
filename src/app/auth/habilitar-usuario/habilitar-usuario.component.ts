@@ -27,7 +27,6 @@ export class HabilitarUsuarioComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log(this.uuid, this.token);
     this.spinner.show();
     this.route.params.subscribe(params => {
       this.uuid = params['uuid'];

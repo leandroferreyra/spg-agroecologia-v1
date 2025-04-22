@@ -94,7 +94,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.userService.getUser(this.actual_role, this.usuarioLogueado.uuid).subscribe({
         next: res => {
-          // console.log(res);
           this.usuarioLogueado = res.data;
           this.dataLoaded = true;
           this.inicializarForm();
@@ -118,12 +117,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       // tiposDocumento: this._catalogService.getDocumentos(),
     }).subscribe({
       next: res => {
-        // console.log(res);
         this.generos = res.generos.data;
         this.paises = res.paises.data;
         this.provincias = res.provincias.data.districts;
         this.ciudades = res.ciudades.data.cities;
-        // this.tipoDocumentos = res.tiposDocumento.data;
         this.spinner.hide();
       },
       error: error => {
@@ -249,7 +246,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this.humanService.updateHuman(this.usuarioLogueado.human.uuid, registro).subscribe({
           next: res => {
-            console.log(res);
             this._tokenService.setToken(res.token);
             if (this.usuarioLogueado.email !== registro.email) {
               this.authService.logout().subscribe({
@@ -352,7 +348,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this.authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
             next: res => {
-              // console.log(res);
               this.spinner.hide();
               this.closeModalCambioClave();
               this._tokenService.setToken(res.token);

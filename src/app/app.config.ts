@@ -1,11 +1,8 @@
 import { ApplicationConfig, LOCALE_ID, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
-import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.route';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors } from '@angular/common/http';
-// import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-// import { NgbDateCustomParserFormatter } from './core/pipes/NgbDateCustomParserFormatter';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HashLocationStrategy, LocationStrategy, registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { provideStore } from '@ngrx/store';
@@ -16,8 +13,6 @@ import { provideScrollbarOptions } from 'ngx-scrollbar';
 import { provideFlatpickrDefaults } from 'angularx-flatpickr';
 import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDateCustomParserFormatter } from './core/pipes/NgbDateCustomParserFormatter';
-// import { tokenInterceptorInterceptor } from './core/interceptors/token-interceptor.interceptor';
-
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -38,12 +33,9 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: () => {
         return () => {
-          // console.log('[AppConfig] Inicializando aplicación');
         };
       },
       multi: true
     }
   ]
 };
-
-// console.log('[AppConfig] Configuración cargada');

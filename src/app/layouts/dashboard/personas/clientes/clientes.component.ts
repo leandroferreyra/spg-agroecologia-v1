@@ -158,7 +158,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getClientes(this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
           this.clientes = res.data;
           this.clientesFiltrados = this.clientes;
           if (!alta && this.clientes.length > 0) {
@@ -372,11 +371,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let cliente = new ClienteDTO();
       this.armarDTOEdicion(cliente);
-      // console.log(cliente);
       this.subscription.add(
         this._clienteService.editCliente(this.selectedCliente.uuid, cliente).subscribe({
           next: res => {
-            // console.log(res);
             this.clientes = [...this.clientes.map(p =>
               p.uuid === res.data.uuid ? res.data : p
             )];
@@ -395,15 +392,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
     }
   }
   armarDTOEdicion(cliente: ClienteDTO) {
-    // console.log(this.newclienteForm);
     cliente.actual_role = this.actual_role;
     cliente.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.documentType", "person.legalEntity"];
-    // cliente.batch_prefix = this.clienteForm.get('sigla')?.value;
     cliente.comments = this.clienteForm.get('comentarios')?.value;
-    // cliente.perception = true; // TODO
     cliente.vat_percent = this.clienteForm.get('percepcionIVA')?.value;
-    // cliente.withholding = true; // TODO
     let person = new Person();
     person.street_name = this.clienteForm.get('calle')?.value;
     person.door_number = this.clienteForm.get('numero')?.value;
@@ -669,7 +662,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
       condicionIva: this._catalogoService.getCondicionIva(this.actual_role)
     }).subscribe({
       next: res => {
-        // console.log(res);
         this.generos = res.generos.data;
         this.paises = res.paises.data;
         this.documentos = res.documentos.data;
@@ -691,7 +683,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._clienteService.saveCliente(cliente).subscribe({
           next: res => {
-            // console.log(res);
             this.spinner.hide();
             this.obtenerClientes(true);
             this.cerrarModal();
@@ -790,7 +781,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._indexService.getHumansWithParam(params, this.actual_role).subscribe({
           next: res => {
-            // console.log(res);
             this.personas = res.data;
             this.modificarPaginacionBusqueda(res);
             this.spinner.hide();
@@ -805,7 +795,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._indexService.getLegalEntitiesWithParam(params, this.actual_role).subscribe({
           next: res => {
-            // console.log(res);
             this.personas = res.data;
             this.modificarPaginacionBusqueda(res);
             this.spinner.hide();

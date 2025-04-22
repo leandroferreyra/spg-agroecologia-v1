@@ -98,16 +98,12 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.obtenerCuentas();
-    // this.obtenerBancos();
-    // this.obtenerTiposDeCuenta();
-    // this.obtenerMonedas();
   }
 
   obtenerMonedas() {
     this.subscription.add(
       this._indexService.getMonedas(this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
           this.monedas = res.data;
         },
         error: error => {
@@ -121,7 +117,6 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getBancos(this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
           this.bancos = res.data;
         },
         error: error => {
@@ -135,7 +130,6 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getTipoDeCuentas(this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
           this.tiposDeCuenta = res.data;
         },
         error: error => {
@@ -158,13 +152,12 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
       this._indexService.getCuentasBancariasLadieWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.cuentasBancarias = res.data;
-          // console.log(this.cuentasBancarias);
           this.modificarPaginacion(res);
           this.spinner.hide();
         },
         error: error => {
           this.spinner.hide();
-          console.log(error);
+          console.error(error);
         }
       })
     )
@@ -175,7 +168,6 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
   }
 
   openSwalEliminar(cuenta: any) {
-    console.log(cuenta);
     Swal.fire({
       title: '',
       text: `¿Desea eliminar la cuenta ${cuenta.account_number}?`,
@@ -232,7 +224,6 @@ export class ListadoCuentasBancariasComponent implements OnInit, OnDestroy {
         alias: new FormControl(null, []),
       });
     } else {
-      // console.log(moneda);
       this.isEdicion = true;
       this.tituloModal = 'Edición cuenta';
       this.cuentaForm = new FormGroup({

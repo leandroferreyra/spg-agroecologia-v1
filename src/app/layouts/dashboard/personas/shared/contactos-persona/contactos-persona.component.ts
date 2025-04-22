@@ -188,7 +188,6 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   }
 
   saveHuman(contacto: HumanDTO) {
-    // console.log(contacto);
     this.subscription.add(
       this.humanService.saveHuman(contacto).subscribe({
         next: res => {
@@ -220,12 +219,9 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
   }
 
   procesarRespuesta(res: any) {
-    // console.log(res);
     this.cerrarModal();
     this._tokenService.setToken(res.token);
-    // this.obtenerPersonas();
     //Acá hay que guardar el contacto.  
-    // chequear si se puede usar el mismo método  agregarPersonaDeContacto
     this.agregarPersonaDeContacto(res.data);
   }
 
@@ -339,7 +335,6 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._indexService.getHumansWithParam(params, this.rol).subscribe({
           next: res => {
-            // console.log(res);
             this.personas = res.data;
             this.modificarPaginacionBusqueda(res);
             this.spinner.hide();
@@ -354,7 +349,6 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._indexService.getLegalEntitiesWithParam(params, this.rol).subscribe({
           next: res => {
-            // console.log(res);
             this.personas = res.data;
             this.modificarPaginacionBusqueda(res);
             this.spinner.hide();

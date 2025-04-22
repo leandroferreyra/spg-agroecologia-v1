@@ -206,28 +206,6 @@ export class ComprasClientesComponent implements OnInit, OnDestroy {
     return total.toFixed(2);
   }
 
-  // verProductos(data: any) {
-  //   //console.log(data);
-  //   this.productosView = data.transaction_products;
-  //   //console.log(this.productosView);
-  //   if (this.productosView.length <= this.itemsPerPage_productos) {
-  //     this.itemsInPage_productos = this.productosView.length;
-  //   }
-  //   this.modalProductos.options = this.modalOptionsProductos;
-  //   this.modalProductos.open();
-  // }
-
-  // public onPageChange(uuid: string, pageNum: number): void {
-  //   if (this.paginadores[uuid]) {
-  //     this.paginadores[uuid].currentPage = pageNum;
-  //     this.paginadores[uuid].pageSize = this.paginadores[uuid].itemsPerPage * (pageNum - 1);
-
-  //   }
-  // }
-  // cambiarPaginacion(uuid: string) {
-  //   this.onPageChange(uuid, 1);
-  // }
-
   toggleProductos(data: any) {
     this.productosExpandido[data.uuid] = !this.productosExpandido[data.uuid];
   }

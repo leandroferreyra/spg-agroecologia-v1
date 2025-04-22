@@ -34,10 +34,8 @@ export class AuthService {
   private apiVerifyUser = '/email/verify/';
   private apiRegister = '/register';
   private apiChangePassword = '/change_password';
-  // private apiUsers = '/users';
 
   constructor(private http: HttpClient, public storeData: Store<any>, private router: Router) {
-    // console.log('[AuthService] Constructor iniciado');
   }
 
   register(registro: RegistroDTO): Observable<AuthResponse> {
@@ -45,13 +43,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiRegister, JSON.stringify(registro), { headers });
   }
 
-  // registerByAdmin(registro: RegistroDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiRegister, JSON.stringify(registro), { headers });
-  // }
-
   login(login: LoginDTO): Observable<AuthResponse> {
-    // console.log('[AuthService] Iniciando petición de login');
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiLogin, JSON.stringify(login), { headers });
   }
@@ -91,15 +83,8 @@ export class AuthService {
     if (usuarioLogueado && usuarioLogueado.roles.length > 0) {
       return usuarioLogueado.roles;
     }
-    // let rol: Rol = new Rol();
-    // rol.name = 'NO_ROLE';
     return [];
   }
-
-  // hasRole(role: string): boolean {
-  //   const roles = this.getUserRoles();
-  //   return roles.some((r: Rol) => r.name === role);
-  // }
 
   hasAnyRole(expectedRoles: string[]): boolean {
     const roles = this.getUserRoles();
@@ -112,11 +97,6 @@ export class AuthService {
       .append('actual_role', actual_role)
     return this.http.put<any>(environment.baseUrl + this.apiChangePassword, JSON.stringify(changePasswordDTO), { headers, params });
   }
-
-  // getEmailInRegistro(uuid: string): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-  //   return this.http.get<AuthResponse>(`${environment.baseUrl}${this.apiUsers}/${uuid}/email`, { headers });
-  // }
 
   cambioRol(rol: any) {
     localStorage.setItem('userRole', rol);

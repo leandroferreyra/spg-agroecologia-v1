@@ -136,7 +136,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
         },
         error: error => {
           this.spinner.hide();
-          console.log(error);
+          console.error(error);
         }
       })
     );
@@ -207,7 +207,6 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
         pais: new FormControl(null, [Validators.required])
       });
     } else {
-      // console.log(pais);
       this.isEdicion = true;
       this.tituloModal = 'Edición provincia';
       this.provinciaForm = new FormGroup({
