@@ -552,7 +552,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   irAlProducto(event: any) {
-    this.inicializarFormEdit(event.child_product);
+    let producto = event.child_product ? event.child_product : event.parent_product;
+    this.inicializarFormEdit(producto);
     this.tab1 = 'datos-generales';
   }
 

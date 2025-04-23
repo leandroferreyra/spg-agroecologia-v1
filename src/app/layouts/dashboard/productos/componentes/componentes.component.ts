@@ -550,7 +550,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   goToProduct(data: any) {
     this.eventProducto.emit(data);
-
   }
 
 }

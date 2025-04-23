@@ -463,7 +463,7 @@
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'componente-de'">
-                    <app-componente-de [producto]="selectedProducto" [rol]="actual_role">
+                    <app-componente-de [producto]="selectedProducto" [rol]="actual_role" (eventProducto)="irAlProducto($event)">
                     </app-componente-de>
                 </div>
 

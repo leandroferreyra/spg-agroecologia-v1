@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -24,6 +24,8 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
   styleUrl: './componente-de.component.css'
 })
 export class ComponenteDeComponent implements OnInit, OnDestroy {
+
+  @Output() eventProducto = new EventEmitter<any>();
 
   @Input() producto: any;
   @Input() rol!: string;
@@ -121,6 +123,10 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
     } else {
       return (+data.quantity)?.toFixed(2);
     }
+  }
+
+  goToProduct(data: any) {
+    this.eventProducto.emit(data);
   }
 
 }
