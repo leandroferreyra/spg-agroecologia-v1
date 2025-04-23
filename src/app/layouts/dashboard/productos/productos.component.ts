@@ -71,7 +71,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 8;
+  MAX_ITEMS_PER_PAGE = 12;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;
@@ -551,5 +551,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.obtenerProductos();
   }
 
+  irAlProducto(event: any) {
+    this.inicializarFormEdit(event.child_product);
+    this.tab1 = 'datos-generales';
+  }
 
 }

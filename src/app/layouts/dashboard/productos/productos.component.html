@@ -2,12 +2,12 @@
     <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
         [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
 
-    <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[250px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
+    <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[400px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
         [ngClass]="{ '!block': isShowMailMenu }">
 
         <!-- PANEL IZQUIERDO -->
 
-        <div class="flex h-full flex-col pb-16">
+        <div class="flex h-full flex-col">
 
             <div class="flex items-center justify-between text-md mb-3">
                 <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')"
@@ -36,7 +36,7 @@
                                 [ngClass]="{'bg-blue-200': selectedProducto?.uuid === data.uuid}">
                                 <td (click)="showDataProducto(data)">{{ data.name }}
                                 </td>
-                                <td>
+                                <td class="w-0 whitespace-nowrap text-right align-middle">
                                     <div hlMenu class="dropdown">
                                         <button type="button" hlMenuButton>
                                             <icon-horizontal-dots class="rotate-90 opacity-70" />
@@ -57,17 +57,17 @@
                             }
                         </tbody>
                     </table>
-                </div>
+                </div>      
+            </div>
 
-                <div class="d-flex justify-content-center">
+            <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
+                <div class="d-flex justify-content-center mb-3">
                     <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
                         [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
                         (pageChange)="obtenerProductos()">
                     </ngb-pagination>
                 </div>
-            </div>
 
-            <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
                 <div class="group relative">
                     <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtros.name.value"
                         (input)="obtenerProductosPorFiltroSimple()" class="peer form-input ltr:pr-8 rtl:pl-8" />
@@ -457,7 +457,7 @@
 
                 <div *ngIf="tab1.toLowerCase() === 'componentes'">
                     @if (productos.length > 0) {
-                    <app-componentes [producto]="selectedProducto" [rol]="actual_role">
+                    <app-componentes [producto]="selectedProducto" [rol]="actual_role" (eventProducto)="irAlProducto($event)">
                     </app-componentes>
                     }
                 </div>

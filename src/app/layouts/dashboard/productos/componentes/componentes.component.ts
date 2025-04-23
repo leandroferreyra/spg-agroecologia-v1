@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -28,6 +28,8 @@ import Swal from 'sweetalert2';
   styleUrl: './componentes.component.css'
 })
 export class ComponentesComponent implements OnInit, OnDestroy {
+
+  @Output() eventProducto = new EventEmitter<any>();
 
   @Input() producto: any;
   @Input() rol!: string;
@@ -544,6 +546,11 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   isProductoCompuesto() {
     return this.producto.product_type?.product_compound === 1;
+  }
+
+  goToProduct(data: any) {
+    this.eventProducto.emit(data);
+
   }
 
 }

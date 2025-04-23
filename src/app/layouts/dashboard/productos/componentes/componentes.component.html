@@ -152,7 +152,8 @@
                           'tr-has-serial': data.child_product.has_serial_number === 1
                         }">
                     <td class="whitespace-nowrap">{{ index+1}} </td>
-                    <td class="whitespace-nowrap">{{ data.child_product.name}}</td>
+                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                        (click)="goToProduct(data)"> {{ data.child_product.name}}</td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
