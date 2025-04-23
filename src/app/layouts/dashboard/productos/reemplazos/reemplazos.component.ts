@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -30,6 +30,9 @@ import Swal from 'sweetalert2';
   styleUrl: './reemplazos.component.css'
 })
 export class ReemplazosComponent implements OnInit, OnDestroy {
+
+
+  @Output() eventProducto = new EventEmitter<any>();
 
   @Input() producto: any;
   @Input() rol!: string;
@@ -311,6 +314,10 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  goToProduct(data: any) {
+    this.eventProducto.emit(data);
   }
 
 }

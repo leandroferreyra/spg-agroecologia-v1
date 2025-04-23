@@ -13,8 +13,8 @@
         <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee reemplazos</strong></span>
     </div>
     } @else {
-    
-        <div class="row mb-2">
+
+    <div class="row mb-2">
         <div class="col-6">
             <span *ngIf="reemplazos && reemplazos.length > 0" class="float-md-start color-gris">
                 Página: {{ currentPage}}/{{numPages.pageCount }}
@@ -57,7 +57,9 @@
                 {
                 <tr>
                     <td class="whitespace-nowrap">{{ index+1}} </td>
-                    <td class="whitespace-nowrap">{{ data.replacement.name }} </td>
+                    <!-- <td class="whitespace-nowrap">{{ data.replacement.name }} </td> -->
+                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                        (click)="goToProduct(data.replacement)"> {{ data.replacement.name}}</td>
                     <td class="whitespace-nowrap">$ {{ data.unit_price }} </td>
                     <td>
                         <div class="flex items-center">
