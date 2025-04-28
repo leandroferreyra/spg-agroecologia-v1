@@ -1,8 +1,6 @@
 export class ClienteDTO {
-    // batch_prefix!: string;
+
     vat_percent!: string;
-    // withholding!: boolean;
-    // perception!: boolean;
     comments!: string;
     person!: Person;
     with: string[] = [];

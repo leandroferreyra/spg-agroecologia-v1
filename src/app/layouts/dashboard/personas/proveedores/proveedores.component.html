@@ -11,23 +11,28 @@
             <div class="flex h-full flex-col pb-16">
 
                 <div class="flex items-center justify-between text-md mb-3">
-                    <button type="button" class="hover:text-primary" (click)="openModalNuevoProveedor()">
+                    <button type="button" class="hover:text-primary" (click)="openModalNuevoProveedor()"
+                        [disabled]="isEdicion" [ngClass]="{'text-gray-400 cursor-not-allowed': isEdicion}">
                         <icon-plus class="mx-auto mb-1" />
                         Agregar proveedor
                     </button>
 
-                    <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas"
-                        (click)="mostrarFiltros()" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                    <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" [disabled]="isEdicion"
+                        data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"
+                        [ngClass]="{'text-gray-400 cursor-not-allowed': isEdicion}">
                         <icon-settings class="mx-auto mb-1" />
                         Filtros avanzados
                     </button>
                 </div>
 
-                <!-- <ng-scrollbar class="relative h-full grow" appearance="compact"> -->
+                <span *ngIf="proveedores && proveedores.length > 0" class="float-md-end color-gris">
+                    Proveedores: {{ total_rows }}
+                </span>
+
                 <div class="table-responsive">
                     <table class="table-hover">
                         <tbody>
-                            @for(data of filtrarDatos() ; let index = $index ;track data.uuid) {
+                            @for(data of proveedores ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;"
                                 [ngClass]="{'bg-blue-200': selectedProveedor?.uuid === data.uuid}">
                                 <td (click)="showDataProveedor(data)">{{ getName(data) }}
@@ -54,12 +59,19 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- </ng-scrollbar> -->
 
                 <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
+                    <div class="d-flex justify-content-center mb-3">
+                        <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
+                            [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                            (pageChange)="obtenerProveedores()">
+                        </ngb-pagination>
+                    </div>
+
                     <div class="group relative">
-                        <input type="text" placeholder="Buscar proveedor..." [(ngModel)]="busquedaPorNombreSimple"
-                            (input)="filtroSimpleInput()" class="peer form-input ltr:pr-8 rtl:pl-8" />
+                        <input type="text" placeholder="Buscar proveedor..." #filtroSimple
+                            (input)="obtenerProveedoresPorFiltroSimple(filtroSimple.value)"
+                            class="peer form-input ltr:pr-8 rtl:pl-8" />
                         <div
                             class="absolute top-1/2 -translate-y-1/2 peer-focus:text-primary ltr:right-[11px] rtl:left-[11px]">
                             <icon-search />
@@ -70,8 +82,8 @@
                         <label class="w-12 h-6 relative">
                             <input type="checkbox"
                                 class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                id="custom_switch_checkbox2" [(ngModel)]="busqueda_contiene"
-                                (change)="filtrarDatos()" />
+                                id="custom_switch_checkbox2" [(ngModel)]="filtros['person.human.firstname'].contiene"
+                                (change)="obtenerProveedores()" />
                             <span for="custom_switch_checkbox2"
                                 class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                             </span>
@@ -99,8 +111,6 @@
                     }
                     }
                 </h5>
-
-
 
                 <div class="flex w-full items-center justify-between sm:w-auto">
                     <div class="flex items-center ltr:mr-4 rtl:ml-4">
@@ -157,7 +167,7 @@
 
                 <div class="flex-1 text-sm">
                     <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
-                        @if (filtrarDatos().length > 0) {
+                        @if (proveedores.length > 0) {
                         <form [formGroup]="proveedorForm" class="p-4">
                             <div class="flex flex-col sm:flex-row">
                                 <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
@@ -299,23 +309,6 @@
                                         </label>
                                         <span>Percepción IIBB</span>
                                     </div>
-                                    <!-- 
-                                        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-                                            <div class="form-check form-check-inline">
-                                                <label class="form-check-label flex items-center gap-2">
-                                                    <input class="form-checkbox" type="checkbox"
-                                                        formControlName="percepcionRG3337">
-                                                    <span class="form-check-sign">Percepción R.G. 3337</span>
-                                                </label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <label class="form-check-label flex items-center gap-2">
-                                                    <input class="form-checkbox" type="checkbox"
-                                                        formControlName="percepcionIIBB">
-                                                    <span class="form-check-sign">Percepción IIBB</span>
-                                                </label>
-                                            </div>
-                                        </div> -->
                                 </div>
                             </div>
 
@@ -379,8 +372,6 @@
         </ng-template>
 
         <ng-template #modalBody>
-            <!-- <div class="container">
-                <div class="row justify-content-center"> -->
 
             <form [formGroup]="tipoPersonaForm">
                 <div class="row mb-4">
@@ -738,22 +729,6 @@
                                 </label>
                                 <span>Percepción IIBB</span>
                             </div>
-
-                            <!-- <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label flex items-center gap-2">
-                                        <input class="form-checkbox" type="checkbox" formControlName="percepcionRG3337">
-                                        <span class="form-check-sign">Percepción R.G. 3337</span>
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label flex items-center gap-2">
-                                        <input class="form-checkbox" type="checkbox" formControlName="percepcionIIBB">
-                                        <span class="form-check-sign">Percepción IIBB</span>
-                                    </label>
-                                </div>
-                            </div> -->
-
                         </div>
                     </div>
 
@@ -790,7 +765,6 @@
 <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasRight"
     aria-labelledby="offcanvasRightLabel">
     <div class="offcanvas-header">
-        <!-- <h5 class="offcanvas-title" id="offcanvasRightLabel">Filtros avanzados</h5> -->
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close">
         </button>
     </div>
@@ -809,24 +783,24 @@
                                 <div class="form-check">
                                     <label class="inline-flex items-center" for="radioTodos">
                                         <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                            id="radioTodos" value="todos" [(ngModel)]="filtros.tipoPersona"
-                                            (change)="cleanFilters()">
+                                            id="radioTodos" value="todos" [(ngModel)]="filtroTipoPersona"
+                                            (change)="changeTipoPersona(filtroSimple)">
                                         <span class="ml-2 cursor-pointer">Todos</span>
                                     </label>
                                 </div>
                                 <div class="form-check">
                                     <label class="inline-flex items-center" for="radioFisica">
                                         <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                            id="radioFisica" value="fisica" [(ngModel)]="filtros.tipoPersona"
-                                            (change)="cleanFilters()">
+                                            id="radioFisica" value="fisica" [(ngModel)]="filtroTipoPersona"
+                                            (change)="changeTipoPersona(filtroSimple)">
                                         <span class="ml-2 cursor-pointer">Física</span>
                                     </label>
                                 </div>
                                 <div class="form-check">
                                     <label class="inline-flex items-center" for="radioJuridica">
                                         <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                            id="radioJuridica" value="juridica" [(ngModel)]="filtros.tipoPersona"
-                                            (change)="cleanFilters()">
+                                            id="radioJuridica" value="juridica" [(ngModel)]="filtroTipoPersona"
+                                            (change)="changeTipoPersona(filtroSimple)">
                                         <span class="ml-2 cursor-pointer">Jurídica</span>
                                     </label>
                                 </div>
@@ -835,29 +809,45 @@
 
                         <!-- Campos en una sola fila -->
                         <div class="d-flex flex-wrap align-items-center gap-3">
-                            @if(this.filtros.tipoPersona === 'fisica' || this.filtros.tipoPersona === 'todos') {
+                            @if(this.filtroTipoPersona === 'fisica' || this.filtroTipoPersona === 'todos') {
                             <div class="flex-grow-1">
                                 <label for="nombre">Nombre</label>
-                                <input type="text" id="nombre" class="form-control" [(ngModel)]="filtros.nombre">
+                                <input type="text" id="nombre" class="form-control"
+                                    [(ngModel)]="filtros['person.human.firstname'].value"
+                                    (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
                             <div class="flex-grow-1">
                                 <label for="apellido">Apellido</label>
-                                <input type="text" id="apellido" class="form-control" [(ngModel)]="filtros.apellido">
+                                <input type="text" id="apellido" class="form-control"
+                                    [(ngModel)]="filtros['person.human.lastname'].value"
+                                    (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="dni">DNI</label>
+                                <input type="text" id="dni" class="form-control"
+                                    [(ngModel)]="filtros['person.human.document_number'].value"
+                                    (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
                             }
-                            @if(this.filtros.tipoPersona === 'juridica' || this.filtros.tipoPersona === 'todos') {
+                            @if(this.filtroTipoPersona === 'juridica' || this.filtroTipoPersona === 'todos') {
                             <div class="flex-grow-1">
                                 <label for="razon">Razón Social</label>
-                                <input type="text" id="razon" class="form-control" [(ngModel)]="filtros.razon">
+                                <input type="text" id="razon" class="form-control"
+                                    [(ngModel)]="filtros['person.legalEntity.company_name'].value"
+                                    (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="cuit">CUIT</label>
+                                <input type="text" id="cuit" class="form-control"
+                                    [(ngModel)]="filtros['person.legalEntity.cuit'].value"
+                                    (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
                             }
                             <div class="flex-grow-1">
                                 <label for="sigla">Sigla</label>
-                                <input type="text" id="sigla" class="form-control" [(ngModel)]="filtros.sigla">
-                            </div>
-                            <div class="flex-grow-1">
-                                <label for="cuit">Cuit / Dni</label>
-                                <input type="text" id="cuit" class="form-control" [(ngModel)]="filtros.cuit">
+                                <input type="text" id="sigla" class="form-control"
+                                    [(ngModel)]="filtros['batch_prefix'].value"
+                                    (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
                         </div>
 

@@ -31,7 +31,8 @@ import { ComprasProveedorComponent } from './compras-proveedor/compras-proveedor
 import { ContactosComponent } from '../shared/contactos/contactos.component';
 import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos-persona.component';
 import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
-import { NgbPagination, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
 
 @Component({
   selector: 'app-proveedores',
@@ -68,9 +69,34 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
 
   // Orden y filtro para datos listado proveedores.
+  filtroTipoPersona: string = 'todos';
+  // Orden y filtro
   filtros: any = {
-    'tipoPersona': 'todos'
+    'operator': { value: '' },
+    'batch_prefix': { value: '', op: 'LIKE', contiene: true },
+    'person.human.uuid': { value: '', op: '!=', contiene: false },
+    'person.human.firstname': { value: '', op: 'LIKE', contiene: true },
+    'person.human.lastname': { value: '', op: 'LIKE', contiene: true },
+    'person.human.cuit': { value: '', op: 'LIKE', contiene: true },
+    'person.human.document_number': { value: '', op: 'LIKE', contiene: true },
+    'person.legalEntity.uuid': { value: '', op: '!=', contiene: false },
+    'person.legalEntity.company_name': { value: '', op: 'LIKE', contiene: true },
+    'person.legalEntity.cuit': { value: '', op: 'LIKE', contiene: true },
   };
+  ordenamiento: any = {
+
+  };
+  parametrosProvedores!: ParametrosIndex;
+
+  //Paginación
+  MAX_ITEMS_PER_PAGE = 8;
+  currentPage = 1;
+  last_page = 1;
+  itemsPerPage = this.MAX_ITEMS_PER_PAGE;
+  itemsInPage = this.itemsPerPage;
+  pageSize: number = 0;
+  total_rows: number = 0;
+
   showFilter: boolean = false;
   filtroSimple: boolean = false;
   busquedaPorNombreSimple: string = '';
@@ -79,7 +105,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
   iconArrowLeft = faArrowLeft;
-
 
   tab1: string = 'datos-generales';
 
@@ -162,14 +187,30 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   obtenerProveedores(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
+
+    this.parametrosProvedores = new ParametrosIndex();
+    this.parametrosProvedores.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender", "person.human.documentType", "person.human.user", "person.legalEntity"];
+    this.parametrosProvedores.page = this.currentPage;
+    this.parametrosProvedores.paging = this.itemsPerPage;
+    this.parametrosProvedores.order_by = this.ordenamiento;
+    this.parametrosProvedores.filters = this.filtros;
+
     this.subscription.add(
-      this._indexService.getProveedores(this.actual_role).subscribe({
+      this._indexService.getProveedoresWithParam(this.parametrosProvedores, this.actual_role).subscribe({
         next: res => {
           this.proveedores = res.data;
-          this.proveedoresFiltrados = this.proveedores;
+          if (this.proveedores.length === 0) {
+            this.swalService.toastSuccess('center', 'No existen clientes.');
+            this.isTabDisabled = true;
+            this.tab1 = 'datos-generales';
+          } else {
+            this.isTabDisabled = false;
+          }
           if (!alta && this.proveedores.length > 0) {
+            this.isEdicion = false;
             this.inicializarForm(this.proveedores[0]);
           }
+          this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -181,6 +222,17 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     )
   }
 
+  modificarPaginacion(res: any) {
+    this.total_rows = res.meta.total;
+    this.last_page = res.meta.last_page;
+    if (this.proveedores.length <= this.itemsPerPage) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage = this.total_rows;
+      } else {
+        this.itemsInPage = this.currentPage * this.itemsPerPage;
+      }
+    }
+  }
 
   inicializarForm(proveedor?: any) {
     if (proveedor) {
@@ -419,97 +471,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       person.legal_entity = legal_entity;
     }
     proveedor.person = person;
-  }
-
-  filtroSimpleInput() {
-    // Si ingresa acá es porque busca por búsqueda simple, por lo que se desactivas los filtros.
-    this.filtroSimple = true;
-    this.limpiarFiltros();
-  }
-
-  filtrarDatos() {
-    let resultados = this.proveedoresFiltrados;
-
-    if (this.filtroSimple) {
-      // Escribió en el input simple
-      resultados = this.proveedoresFiltrados.filter(dato => {
-        let nombreCompleto;
-        if (dato.person?.human) {
-          nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
-        } else {
-          nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
-        }
-        if (this.busqueda_contiene) {
-          return nombreCompleto.includes(this.busquedaPorNombreSimple.toLowerCase());
-        } else {
-          return nombreCompleto.startsWith(this.busquedaPorNombreSimple.toLowerCase());
-        }
-      })
-    } else if (this.showFilter) {
-      // Es búsqueda avanzada
-      if (this.filtros.tipoPersona === 'fisica') {
-        resultados = this.proveedoresFiltrados.filter(dato => {
-          return dato.person?.human
-        })
-
-      } else if (this.filtros.tipoPersona === 'juridica') {
-        resultados = this.proveedoresFiltrados.filter(dato => {
-          return dato.person?.legal_entity
-        })
-      } else {
-        // todos
-        resultados = this.proveedores;
-      }
-      if (this.filtros.nombre) {
-        resultados = resultados.filter(dato => {
-          return dato.person?.human?.firstname?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
-        })
-      }
-      if (this.filtros.apellido) {
-        resultados = resultados.filter(dato => {
-          return dato.person?.human?.lastname?.toLowerCase().includes(this.filtros.apellido.toLowerCase());
-        })
-      }
-      if (this.filtros.razon) {
-        resultados = resultados.filter(dato => {
-          return dato.person?.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
-        })
-      }
-      if (this.filtros.sigla) {
-        resultados = resultados.filter(dato => {
-          return dato.batch_prefix?.toLowerCase().includes(this.filtros.sigla.toLowerCase());
-        })
-      }
-      if (this.filtros.cuit) {
-        // Acá filtra por cuit o dni, por lo que debe chequear dos cosas, primero con que filtro se está aplicando (todos, fisica o jurídica)
-        // y luego, en caso de ser 'todos', chequear si es fisica o jurídica para poder saber de donde sacar la info.
-        resultados = resultados.filter(dato => {
-          if (this.filtros.tipoPersona === 'todos') {
-            if (dato.person?.human) {
-              return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-                dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-            } else {
-              // Es juridica
-              return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-            }
-          } else if (this.filtros.tipoPersona === 'fisica') {
-            return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-              dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-          } else {
-            // Filtrado por jurídica
-            return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-          }
-        })
-      }
-    }
-
-    if (resultados.length === 0) {
-      this.isTabDisabled = true;
-      this.tab1 = 'datos-generales';
-    } else {
-      this.isTabDisabled = false;
-    }
-    return resultados;
   }
 
   openSwalEliminar(proveedor: any) {
@@ -764,27 +725,41 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   limpiarFiltros() {
-    // this.showFilter = false;
-    this.filtros = {
-      tipoPersona: 'todos'
-    };
+    this.filtroTipoPersona = 'todos';
+    this.filtros['person.human.uuid'].value = '';
+    this.filtros['person.human.firstname'].value = '';
+    this.filtros['person.human.lastname'].value = '';
+    this.filtros['person.human.document_number'].value = '';
+    this.filtros['person.legalEntity.uuid'].value = '';
+    this.filtros['person.legalEntity.company_name'].value = '';
+    this.filtros['person.legalEntity.cuit'].value = '';
+    this.filtros['batch_prefix'].value = '';
+    this.filtros.operator.value = '';
+    this.obtenerProveedores();
   }
 
-  // toggleFilter() {
-  //   this.showFilter = !this.showFilter;
-  //   if (!this.showFilter) {
-  //     this.filtros = {
-  //       tipoPersona: 'todos'
-  //     };
-  //   }
-  // }
-
-  cleanFilters() {
-    this.filtros.nombre = '';
-    this.filtros.apellido = '';
-    this.filtros.razon = '';
-    this.filtros.sigla = '';
-    this.filtros.cuit = '';
+  changeTipoPersona(filtroInput: HTMLInputElement) {
+    filtroInput.value = '';
+    this.filtros['batch_prefix'].value = '';
+    this.filtros['person.human.firstname'].value = '';
+    this.filtros['person.human.lastname'].value = '';
+    this.filtros['person.human.cuit'].value = '';
+    this.filtros['person.human.document_number'].value = '';
+    this.filtros['person.legalEntity.company_name'].value = '';
+    this.filtros['person.legalEntity.cuit'].value = '';
+    this.filtros.operator.value = '';
+    if (this.filtroTipoPersona === 'todos') {
+      this.filtros['person.human.uuid'].value = '';
+      this.filtros['person.legalEntity.uuid'].value = '';
+    } else if (this.filtroTipoPersona === 'fisica') {
+      this.filtros['person.human.uuid'].value = 'null';
+      this.filtros['person.legalEntity.uuid'].value = '';
+    } else {
+      //jurídica
+      this.filtros['person.legalEntity.uuid'].value = 'null';
+      this.filtros['person.human.uuid'].value = '';
+    }
+    this.obtenerProveedores();
   }
 
   volver() {
@@ -886,6 +861,29 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   getDropdownClass(index: number) {
     let mitad = this.proveedoresFiltrados.length / 2;
     return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
+  }
+
+  obtenerProveedoresPorFiltroSimple(value: string) {
+    this.filtroTipoPersona = 'todos';
+    this.filtros['batch_prefix'].value = '';
+    this.filtros['person.human.uuid'].value = '';
+    this.filtros['person.human.firstname'].value = '';
+    this.filtros['person.human.lastname'].value = '';
+    this.filtros['person.human.document_number'].value = '';
+    this.filtros['person.legalEntity.uuid'].value = '';
+    this.filtros['person.legalEntity.cuit'].value = '';
+
+    this.filtros['person.human.firstname'].value = value;
+    this.filtros['person.human.lastname'].value = value;
+    this.filtros['person.legalEntity.company_name'].value = value;
+    this.filtros.operator.value = 'OR';
+    this.obtenerProveedores();
+  }
+
+  obtenerProveedoresPorFiltroAvanzado(filtroInput: HTMLInputElement) {
+    filtroInput.value = '';
+    this.filtros.operator.value = '';
+    this.obtenerProveedores();
   }
 
 }

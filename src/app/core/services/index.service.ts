@@ -63,17 +63,21 @@ export class IndexService {
       // para cada elemento de paramsObj.filters, agregar un filters[]
       Object.keys(paramsObj.filters).forEach((key, index) => {
         if (paramsObj.filters[key] && paramsObj.filters[key].value !== '' && paramsObj.filters[key].value !== null) {
-          params = params.append(`filters[${index}][]`, key);
-          params = params.append(`filters[${index}][]`, paramsObj.filters[key].op);
-          if (paramsObj.filters[key].contiene) {
-            params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key].value}%`);
+          if (key === 'operator') {
+            params = params.append(`filters[${index}]`, `${paramsObj.filters[key].value}`);
           } else {
-            if (paramsObj.filters[key].op === 'LIKE') {
-              // Acá ingresa cuando es una búsqueda por string y el contiene es false es decir, debería ser un startWith 
-              params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}%`);
+            params = params.append(`filters[${index}][]`, key);
+            params = params.append(`filters[${index}][]`, paramsObj.filters[key].op);
+            if (paramsObj.filters[key].contiene) {
+              params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key].value}%`);
             } else {
-              // Acá no es LIKE por lo que seguro es un = y busca por uuid.
-              params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
+              if (paramsObj.filters[key].op === 'LIKE') {
+                // Acá ingresa cuando es una búsqueda por string y el contiene es false es decir, debería ser un startWith 
+                params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}%`);
+              } else {
+                // Acá no es LIKE por lo que seguro es un = y busca por uuid.
+                params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
+              }
             }
           }
         }
@@ -193,6 +197,17 @@ export class IndexService {
       .append("with[]", "person.legalEntity");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: params });
   }
+
+  getProveedoresWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProveedores, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getClientesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
 
   getProductosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

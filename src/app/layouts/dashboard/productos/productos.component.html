@@ -27,6 +27,10 @@
                 </button>
             </div>
 
+            <span *ngIf="productos && productos.length > 0" class="float-md-end color-gris">
+                Productos: {{ total_rows }}
+            </span>
+
             <div class="table-container">
                 <div class="table-responsive">
                     <table class="table-hover">
@@ -57,7 +61,7 @@
                             }
                         </tbody>
                     </table>
-                </div>      
+                </div>
             </div>
 
             <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
@@ -89,7 +93,6 @@
                     </label>
                     <span>Contiene</span>
                 </div>
-
             </div>
 
         </div>
@@ -188,7 +191,6 @@
 
             <div class="flex-1 text-sm">
                 <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
-                    <!-- <h4 class="mb-4 text-2xl font-semibold"></h4> -->
                     @if (productos.length > 0) {
                     <form [formGroup]="productoForm" class="p-4">
                         <div class="flex flex-col sm:flex-row">
@@ -457,18 +459,21 @@
 
                 <div *ngIf="tab1.toLowerCase() === 'componentes'">
                     @if (productos.length > 0) {
-                    <app-componentes [producto]="selectedProducto" [rol]="actual_role" (eventProducto)="irAlProducto($event)">
+                    <app-componentes [producto]="selectedProducto" [rol]="actual_role"
+                        (eventProducto)="irAlProducto($event)">
                     </app-componentes>
                     }
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'componente-de'">
-                    <app-componente-de [producto]="selectedProducto" [rol]="actual_role" (eventProducto)="irAlProducto($event)">
+                    <app-componente-de [producto]="selectedProducto" [rol]="actual_role"
+                        (eventProducto)="irAlProducto($event)">
                     </app-componente-de>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'reemplazos'">
-                    <app-reemplazos [producto]="selectedProducto" [rol]="actual_role" (eventProducto)="irAlProducto($event)">
+                    <app-reemplazos [producto]="selectedProducto" [rol]="actual_role"
+                        (eventProducto)="irAlProducto($event)">
                     </app-reemplazos>
                 </div>
 

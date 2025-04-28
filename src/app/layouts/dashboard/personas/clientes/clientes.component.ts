@@ -52,8 +52,8 @@ export class ClientesComponent implements OnInit, OnDestroy {
   store: any;
   private subscription: Subscription = new Subscription();
   actual_role: string = '';
+
   clientes: any[] = [];
-  clientesFiltrados: any[] = [];
   selectedCliente: any;
   newClienteForm!: FormGroup;
   clienteForm!: FormGroup;
@@ -68,19 +68,34 @@ export class ClientesComponent implements OnInit, OnDestroy {
   isShowMailMenu = false;
   isTabDisabled = false;
 
+  showFilter: boolean = false;
+  filtroTipoPersona: string = 'todos';
   // Orden y filtro
   filtros: any = {
-    tipoPersona: 'todos'
+    'operator': { value: '' },
+    'person.human.uuid': { value: '', op: '!=', contiene: false },
+    'person.human.firstname': { value: '', op: 'LIKE', contiene: true },
+    'person.human.lastname': { value: '', op: 'LIKE', contiene: true },
+    'person.human.cuit': { value: '', op: 'LIKE', contiene: true },
+    'person.human.document_number': { value: '', op: 'LIKE', contiene: true },
+    'person.legalEntity.uuid': { value: '', op: '!=', contiene: false },
+    'person.legalEntity.company_name': { value: '', op: 'LIKE', contiene: true },
+    'person.legalEntity.cuit': { value: '', op: 'LIKE', contiene: true },
   };
-  showFilter: boolean = false;
   ordenamiento: any = {
 
   };
 
-  filtroSimple: boolean = false;
-  busquedaPorNombreSimple: string = '';
-  isSubmit = false;
+  //Paginación
+  MAX_ITEMS_PER_PAGE = 8;
+  currentPage = 1;
+  last_page = 1;
+  itemsPerPage = this.MAX_ITEMS_PER_PAGE;
+  itemsInPage = this.itemsPerPage;
+  pageSize: number = 0;
+  total_rows: number = 0;
 
+  isSubmit = false;
   tab1: string = 'datos-generales';
 
   // Referencia al modal para crear y editar países.
@@ -126,7 +141,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   iconArrowLeft = faArrowLeft;
 
-
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _clienteService: ClientesService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService) {
@@ -147,7 +161,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.inicializarForm();
+    // this.inicializarForm();
     this.obtenerClientes();
     this.obtenerCatalogos();
   }
@@ -155,14 +169,31 @@ export class ClientesComponent implements OnInit, OnDestroy {
   obtenerClientes(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
+
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender", "person.human.documentType", "person.human.user", "person.legalEntity"];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = this.ordenamiento;
+    params.filters = this.filtros;
+
     this.subscription.add(
-      this._indexService.getClientes(this.actual_role).subscribe({
+      this._indexService.getClientesWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.clientes = res.data;
-          this.clientesFiltrados = this.clientes;
+          if (this.clientes.length === 0) {
+            this.swalService.toastSuccess('center', 'No existen clientes.');
+            this.isTabDisabled = true;
+            this.tab1 = 'datos-generales';
+          } else {
+            this.isTabDisabled = false;
+          }
           if (!alta && this.clientes.length > 0) {
+            this.isEdicion = false;
             this.inicializarForm(this.clientes[0]);
           }
+          this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -174,25 +205,29 @@ export class ClientesComponent implements OnInit, OnDestroy {
     )
   }
 
-  mostrarFiltros() {
-    this.showFilter = true;
-    // Desactivo filtros simples
-    this.filtroSimple = false;
-    this.busquedaPorNombreSimple = '';
-    this.busqueda_contiene = false;
-  }
-
-  filtroSimpleInput() {
-    // Si ingresa acá es porque busca por búsqueda simple, por lo que se desactivas los filtros.
-    this.filtroSimple = true;
-    this.limpiarFiltros();
+  modificarPaginacion(res: any) {
+    this.total_rows = res.meta.total;
+    this.last_page = res.meta.last_page;
+    if (this.clientes.length <= this.itemsPerPage) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage = this.total_rows;
+      } else {
+        this.itemsInPage = this.currentPage * this.itemsPerPage;
+      }
+    }
   }
 
   limpiarFiltros() {
-    // this.showFilter = false;
-    this.filtros = {
-      tipoPersona: 'todos'
-    };
+    this.filtros.operator.value = '';
+    this.filtroTipoPersona = 'todos';
+    this.filtros['person.human.uuid'].value = '';
+    this.filtros['person.human.firstname'].value = '';
+    this.filtros['person.human.lastname'].value = '';
+    this.filtros['person.human.document_number'].value = '';
+    this.filtros['person.legalEntity.uuid'].value = '';
+    this.filtros['person.legalEntity.company_name'].value = '';
+    this.filtros['person.legalEntity.cuit'].value = '';
+    this.obtenerClientes();
   }
 
   inicializarForm(cliente?: any) {
@@ -377,7 +412,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
             this.clientes = [...this.clientes.map(p =>
               p.uuid === res.data.uuid ? res.data : p
             )];
-            this.clientesFiltrados = this.clientes;
             this.inicializarForm(res.data);
             this.isEdicion = false;
             this.swalService.toastSuccess('top-right', "Usuario actualizado.");
@@ -418,91 +452,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
       person.legal_entity = legal_entity;
     }
     cliente.person = person;
-  }
-
-  filtrarDatos() {
-    let resultados = this.clientesFiltrados;
-
-    if (this.filtroSimple) {
-      // Escribió en el input simple
-      resultados = this.clientesFiltrados.filter(dato => {
-        let nombreCompleto;
-        if (dato.person?.human) {
-          nombreCompleto = (dato.person?.human?.firstname + ' ' + dato.person?.human?.lastname).toLocaleLowerCase();
-        } else {
-          nombreCompleto = dato.person?.legal_entity?.company_name.toLocaleLowerCase();
-        }
-        if (this.busqueda_contiene) {
-          return nombreCompleto.includes(this.busquedaPorNombreSimple.toLowerCase());
-        } else {
-          return nombreCompleto.startsWith(this.busquedaPorNombreSimple.toLowerCase());
-        }
-      })
-    } else if (this.showFilter) {
-      // Es búsqueda avanzada
-      if (this.filtros.tipoPersona === 'fisica') {
-        resultados = this.clientesFiltrados.filter(dato => {
-          return dato.person?.human
-        })
-
-      } else if (this.filtros.tipoPersona === 'juridica') {
-        resultados = this.clientesFiltrados.filter(dato => {
-          return dato.person?.legal_entity
-        })
-      } else {
-        // todos
-        resultados = this.clientes;
-      }
-      if (this.filtros.nombre) {
-        resultados = resultados.filter(dato => {
-          return dato.person?.human?.firstname?.toLowerCase().includes(this.filtros.nombre.toLowerCase());
-        })
-      }
-      if (this.filtros.apellido) {
-        resultados = resultados.filter(dato => {
-          return dato.person?.human?.lastname?.toLowerCase().includes(this.filtros.apellido.toLowerCase());
-        })
-      }
-      if (this.filtros.razon) {
-        resultados = resultados.filter(dato => {
-          return dato.person?.legal_entity?.company_name?.toLowerCase().includes(this.filtros.razon.toLowerCase());
-        })
-      }
-      if (this.filtros.sigla) {
-        resultados = resultados.filter(dato => {
-          return dato.batch_prefix?.toLowerCase().includes(this.filtros.sigla.toLowerCase());
-        })
-      }
-      if (this.filtros.cuit) {
-        // Acá filtra por cuit o dni, por lo que debe chequear dos cosas, primero con que filtro se está aplicando (todos, fisica o jurídica)
-        // y luego, en caso de ser 'todos', chequear si es fisica o jurídica para poder saber de donde sacar la info.
-        resultados = resultados.filter(dato => {
-          if (this.filtros.tipoPersona === 'todos') {
-            if (dato.person?.human) {
-              return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-                dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-            } else {
-              // Es juridica
-              return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-            }
-          } else if (this.filtros.tipoPersona === 'fisica') {
-            return dato.person?.human?.document_number?.toLowerCase().includes(this.filtros.cuit.toLowerCase()) ||
-              dato.person?.human?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-          } else {
-            // Filtrado por jurídica
-            return dato.person?.legal_entity?.cuit?.toLowerCase().includes(this.filtros.cuit.toLowerCase());
-          }
-        })
-      }
-    }
-
-    if (resultados.length === 0) {
-      this.isTabDisabled = true;
-      this.tab1 = 'datos-generales';
-    } else {
-      this.isTabDisabled = false;
-    }
-    return resultados;
   }
 
   openSwalEliminar(cliente: any) {
@@ -548,6 +497,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   cerrarModal() {
     this.isSubmit = false;
+    this.altaPersona = false;
     this.modalCliente.close();
   }
 
@@ -702,12 +652,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
     cliente.actual_role = this.actual_role;
     cliente.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
       "person.human.documentType", "person.legalEntity"];
-    // cliente.batch_prefix = this.newClienteForm.get('sigla')?.value;
     cliente.comments = this.newClienteForm.get('comentarios')?.value;
-    // cliente.perception = true; // TODO
     cliente.vat_percent = this.newClienteForm.get('percepcionIVA')?.value;
     cliente.vat_condition_uuid = this.newClienteForm.get('condicion')?.value;
-    // cliente.withholding = true; // TODO
     let person = new Person();
     person.street_name = this.newClienteForm.get('calle')?.value;
     person.door_number = this.newClienteForm.get('numero')?.value;
@@ -715,7 +662,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
     person.city_uuid = this.newClienteForm.get('ciudad')?.value;
     person.possible_person_state_uuid = this.newClienteForm.get('estado')?.value;
     person.state_comments = this.newClienteForm.get('estadoComentario')?.value;
-    if (this.newClienteForm.get('tipoPersona')?.value === 'fisica') {
+    if (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
       let human = new Human();
       human.firstname = this.newClienteForm.get('nombre')?.value;
       human.lastname = this.newClienteForm.get('apellido')?.value;
@@ -746,21 +693,27 @@ export class ClientesComponent implements OnInit, OnDestroy {
     });
   }
 
-
-  // toggleFilter() {
-  //   this.showFilter = !this.showFilter;
-  //   if (!this.showFilter) {
-  //     this.filtros = {
-  //       tipoPersona: 'todos'
-  //     };
-  //   }
-  // }
-
-  cleanFilters() {
-    this.filtros.nombre = '';
-    this.filtros.apellido = '';
-    this.filtros.razon = '';
-    this.filtros.cuit = '';
+  changeTipoPersona(filtroInput: HTMLInputElement) {
+    filtroInput.value = '';
+    this.filtros.operator.value = '';
+    this.filtros['person.human.firstname'].value = '';
+    this.filtros['person.human.lastname'].value = '';
+    this.filtros['person.human.cuit'].value = '';
+    this.filtros['person.human.document_number'].value = '';
+    this.filtros['person.legalEntity.company_name'].value = '';
+    this.filtros['person.legalEntity.cuit'].value = '';
+    if (this.filtroTipoPersona === 'todos') {
+      this.filtros['person.human.uuid'].value = '';
+      this.filtros['person.legalEntity.uuid'].value = '';
+    } else if (this.filtroTipoPersona === 'fisica') {
+      this.filtros['person.human.uuid'].value = 'null';
+      this.filtros['person.legalEntity.uuid'].value = '';
+    } else {
+      //jurídica
+      this.filtros['person.legalEntity.uuid'].value = 'null';
+      this.filtros['person.human.uuid'].value = '';
+    }
+    this.obtenerClientes();
   }
 
   obtenerPersonas() {
@@ -856,12 +809,30 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   volver() {
     this.altaPersona = false;
-    // this.contactoForm.reset();
   }
 
   getDropdownClass(index: number) {
-    let mitad = this.clientesFiltrados.length / 2;
+    let mitad = this.clientes.length / 2;
     return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
+  }
+
+  obtenerClientesPorFiltroSimple(value: string) {
+    this.filtroTipoPersona = 'todos';
+    this.filtros['person.human.uuid'].value = '';
+    this.filtros['person.human.firstname'].value = value;
+    this.filtros['person.human.lastname'].value = value;
+    this.filtros['person.human.document_number'].value = '';
+    this.filtros['person.legalEntity.uuid'].value = '';
+    this.filtros['person.legalEntity.cuit'].value = '';
+    this.filtros['person.legalEntity.company_name'].value = value;
+    this.filtros.operator.value = 'OR';
+    this.obtenerClientes();
+  }
+
+  obtenerClientesPorFiltroAvanzado(filtroInput: HTMLInputElement) {
+    filtroInput.value = '';
+    this.filtros.operator.value = '';
+    this.obtenerClientes();
   }
 
 }
