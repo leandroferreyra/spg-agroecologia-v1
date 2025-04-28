@@ -767,10 +767,6 @@
                                     [(ngModel)]="filtros['person.human.document_number'].value"
                                     (input)="obtenerClientesPorFiltroAvanzado(filtroSimple)">
                             </div>
-                            <!-- <div class="flex-grow-1">
-                                <label for="cuit">CUIT</label>
-                                <input type="text" id="cuit" class="form-control" [(ngModel)]="filtros['person.human.cuit'].value">
-                            </div> -->
                             }
                             @if(this.filtroTipoPersona === 'juridica' || this.filtroTipoPersona === 'todos') {
                             <div class="flex-grow-1">
@@ -779,21 +775,13 @@
                                     [(ngModel)]="filtros['person.legalEntity.company_name'].value"
                                     (input)="obtenerClientesPorFiltroAvanzado(filtroSimple)">
                             </div>
+                            }
                             <div class="flex-grow-1">
                                 <label for="cuit">CUIT</label>
-                                <input type="text" id="cuit" class="form-control"
+                                <input type="text" id="inputCuit" class="form-control"
                                     [(ngModel)]="filtros['person.legalEntity.cuit'].value"
-                                    (input)="obtenerClientesPorFiltroAvanzado(filtroSimple)">
+                                    (input)="obtenerClientesPorFiltroAvanzado(filtroSimple, true)">
                             </div>
-                            }
-                            <!-- <div class="flex-grow-1">
-                                <label for="sigla">Sigla</label>
-                                <input type="text" id="sigla" class="form-control" [(ngModel)]="filtros.sigla">
-                            </div> -->
-                            <!-- <div class="flex-grow-1">
-                                <label for="cuit">CUIT</label>
-                                <input type="text" id="cuit" class="form-control" [(ngModel)]="person.human.cuit">
-                            </div> -->
                         </div>
 
                     </div>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
@@ -98,6 +98,8 @@ export class ClientesComponent implements OnInit, OnDestroy {
   isSubmit = false;
   tab1: string = 'datos-generales';
 
+  inputCuitRef?: HTMLInputElement;
+
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCliente') modalCliente!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
@@ -153,6 +155,22 @@ export class ClientesComponent implements OnInit, OnDestroy {
       .subscribe((d) => {
         this.actual_role = d.userRole;
       });
+  }
+
+  ngAfterViewInit() {
+    const offcanvas = document.getElementById('offcanvasRight');
+    if (offcanvas) {
+      offcanvas.addEventListener('shown.bs.offcanvas', () => {
+        this.setInputCuitRef();
+      });
+    }
+  }
+  // Este método agarra el input una vez que el offcanvas está abierto
+  setInputCuitRef() {
+    const input = document.getElementById('inputCuit') as HTMLInputElement;
+    if (input) {
+      this.inputCuitRef = input;
+    }
   }
 
   ngOnDestroy(): void {
@@ -219,11 +237,15 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   limpiarFiltros() {
     this.filtros.operator.value = '';
+    if (this.inputCuitRef) {
+      this.inputCuitRef.value = '';
+    }
     this.filtroTipoPersona = 'todos';
     this.filtros['person.human.uuid'].value = '';
     this.filtros['person.human.firstname'].value = '';
     this.filtros['person.human.lastname'].value = '';
     this.filtros['person.human.document_number'].value = '';
+    this.filtros['person.human.cuit'].value = '';
     this.filtros['person.legalEntity.uuid'].value = '';
     this.filtros['person.legalEntity.company_name'].value = '';
     this.filtros['person.legalEntity.cuit'].value = '';
@@ -436,6 +458,8 @@ export class ClientesComponent implements OnInit, OnDestroy {
     person.door_number = this.clienteForm.get('numero')?.value;
     person.address_detail = this.clienteForm.get('detalleDireccion')?.value;
     person.city_uuid = this.clienteForm.get('ciudad')?.value;
+    person.possible_person_state_uuid = this.clienteForm.get('estado')?.value;
+    person.state_comments = this.clienteForm.get('estadoComentario')?.value;
     if (this.isHuman) {
       let human = new Human();
       human.firstname = this.clienteForm.get('nombre')?.value;
@@ -702,6 +726,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.filtros['person.human.document_number'].value = '';
     this.filtros['person.legalEntity.company_name'].value = '';
     this.filtros['person.legalEntity.cuit'].value = '';
+    if (this.inputCuitRef) {
+      this.inputCuitRef.value = '';
+    }
     if (this.filtroTipoPersona === 'todos') {
       this.filtros['person.human.uuid'].value = '';
       this.filtros['person.legalEntity.uuid'].value = '';
@@ -829,9 +856,23 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.obtenerClientes();
   }
 
-  obtenerClientesPorFiltroAvanzado(filtroInput: HTMLInputElement) {
+  obtenerClientesPorFiltroAvanzado(filtroInput: HTMLInputElement, isWithOR: boolean = false) {
     filtroInput.value = '';
-    this.filtros.operator.value = '';
+    if (isWithOR) {
+      if (this.filtroTipoPersona === 'todos') {
+        this.filtros.operator.value = 'OR';
+        this.filtros['person.human.cuit'].value = this.filtros['person.legalEntity.cuit'].value;
+      } else if (this.filtroTipoPersona === 'fisica') {
+        this.filtros['person.human.cuit'].value = this.filtros['person.legalEntity.cuit'].value;
+        this.filtros['person.legalEntity.cuit'].value = '';
+        this.filtros.operator.value = '';
+      } else {
+        // Nada porque es jurídica y ya se le asigna al cuit de la entidad legal.
+        this.filtros.operator.value = '';
+      }
+    } else {
+      this.filtros.operator.value = '';
+    }
     this.obtenerClientes();
   }
 

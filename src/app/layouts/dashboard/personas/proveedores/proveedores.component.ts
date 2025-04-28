@@ -149,6 +149,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   ordenamiento_buscar: any = {
   };
 
+  inputCuitRef?: HTMLInputElement;
+
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService) {
@@ -170,6 +173,17 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       offcanvasElement.addEventListener('hidden.bs.offcanvas', () => {
         // Aquí puedes ejecutar cualquier acción adicional al cierre
       });
+      offcanvasElement.addEventListener('shown.bs.offcanvas', () => {
+        this.setInputCuitRef();
+      });
+    }
+  }
+
+  // Este método agarra el input una vez que el offcanvas está abierto
+  setInputCuitRef() {
+    const input = document.getElementById('inputCuit') as HTMLInputElement;
+    if (input) {
+      this.inputCuitRef = input;
     }
   }
 
@@ -735,11 +749,17 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.filtros['person.legalEntity.cuit'].value = '';
     this.filtros['batch_prefix'].value = '';
     this.filtros.operator.value = '';
+    if (this.inputCuitRef) {
+      this.inputCuitRef.value = '';
+    }
     this.obtenerProveedores();
   }
 
   changeTipoPersona(filtroInput: HTMLInputElement) {
     filtroInput.value = '';
+    if (this.inputCuitRef) {
+      this.inputCuitRef.value = '';
+    }
     this.filtros['batch_prefix'].value = '';
     this.filtros['person.human.firstname'].value = '';
     this.filtros['person.human.lastname'].value = '';

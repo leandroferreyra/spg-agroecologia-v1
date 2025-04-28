@@ -836,16 +836,16 @@
                                     [(ngModel)]="filtros['person.legalEntity.company_name'].value"
                                     (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
+                            }
                             <div class="flex-grow-1">
                                 <label for="cuit">CUIT</label>
-                                <input type="text" id="cuit" class="form-control"
+                                <input type="text" id="inputCuit" class="form-control"
                                     [(ngModel)]="filtros['person.legalEntity.cuit'].value"
                                     (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
-                            }
                             <div class="flex-grow-1">
                                 <label for="sigla">Sigla</label>
-                                <input type="text" id="sigla" class="form-control"
+                                <input type="text" id="inputSigla" class="form-control"
                                     [(ngModel)]="filtros['batch_prefix'].value"
                                     (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
