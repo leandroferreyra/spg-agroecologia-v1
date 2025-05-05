@@ -11,7 +11,7 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Subscription, forkJoin } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, distinctUntilChanged, filter, finalize, forkJoin, map, switchMap, tap } from 'rxjs';
 import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
@@ -31,6 +31,7 @@ import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.
 import { CompraProveedorDTO } from 'src/app/core/models/request/compraProveedorDTO';
 import { FlatpickrDirective } from 'angularx-flatpickr';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
+import { CompraDTO, Transaction } from 'src/app/core/models/request/compraDTO';
 
 @Component({
   selector: 'app-compras',
@@ -104,6 +105,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   tab1: string = 'datos-generales';
 
+  proveedorInput$ = new Subject<string>();
+  proveedores$!: Observable<any[]>;
+  loadingProveedores = false;
+
+  productoInput$ = new Subject<string>();
+  productos$!: Observable<any[]>;
+  loadingProductos = false;
+
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
@@ -115,6 +124,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   // Catalogos
   tiposDocumentosContables: any[] = [];
+  posiblesEstadosTransaccion: any[] = [];
+  calificaciones: any[] = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -164,7 +175,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
-          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
           if (this.compras.length === 0) {
             this.swalService.toastSuccess('center', 'No existen compras.');
             this.isTabDisabled = true;
@@ -204,7 +214,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._comprasService.getCompraById(uuid, this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
+          console.log(res);
+          // this.inicializarFormEdit();
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -215,6 +226,32 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   obtenerProductosParaFiltro() {
+    // const params: any = {};
+    // params.with = [];
+    // params.paging = 10;
+    // params.page = 1;
+    // params.order_by = {};
+    // params.filters = {};
+
+    // this.productos$ = this.productoInput$.pipe(
+    //   debounceTime(300),
+    //   distinctUntilChanged(),
+    //   filter((term: string) => term !== null && term.trim().length >= 2),
+    //   tap(term => {
+    //     params.filters = {
+    //       'name': { value: term, op: 'LIKE', contiene: true }
+    //     };
+    //   }),
+    //   tap(() => this.loadingProductos = true),
+    //   switchMap(() => this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
+    //     map((res: any) => res.data.map((producto: any) => ({
+    //       name: producto.name,
+    //       uuid: producto.uuid
+    //     }))),
+    //     finalize(() => this.loadingProductos = false)
+    //   ))
+    // );
+
 
     const paramsProcesos: any = {};
     paramsProcesos.with = [];
@@ -241,11 +278,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   obtenerCatalogos() {
     forkJoin({
-      tiposDocumentosContables: this._catalogoService.getTiposDocumentosContables(this.actual_role)
+      tiposDocumentosContables: this._catalogoService.getTiposCompraDocumentosContables(this.actual_role),
+      posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccion(this.actual_role),
+      calificaciones: this._catalogoService.getCalificaciones(this.actual_role)
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
-
+        this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
+        this.calificaciones = res.calificaciones.data;
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -329,36 +369,22 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   inicializarFormNew() {
     this.newCompraForm = new FormGroup({
-      nombre: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      codigo: new FormControl({ value: null, disabled: false }, []),
-      tipoProducto: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      categoria: new FormControl({ value: null, disabled: false }, []),
-      estado: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      estadoComentario: new FormControl({ value: null, disabled: false }, []),
-      nomenclatura: new FormControl({ value: null, disabled: false }, []),
-      pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      comentarios: new FormControl({ value: null, disabled: false }, []),
-      nombreVenta: new FormControl({ value: null, disabled: false }, []),
-      descripcionControl: new FormControl({ value: null, disabled: true }, []),
-      asignaNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      controlable: new FormControl({ value: false, disabled: false }, [Validators.required])
+      qualification_option_uuid: new FormControl({ value: null, disabled: false }, []),
+      qualification_comments: new FormControl({ value: null, disabled: false }, []),
+      transaction_datetime: new FormControl({ value: null, disabled: false }, []),
+      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      vat_after_discount: new FormControl({ value: null, disabled: false }, []),
+      discount1: new FormControl({ value: null, disabled: false }, []),
+      discount2: new FormControl({ value: null, disabled: false }, []),
+      others: new FormControl({ value: null, disabled: false }, []),
+      perceptionIB: new FormControl({ value: null, disabled: false }, []),
+      perceptionRG3337: new FormControl({ value: null, disabled: false }, []),
+      possible_transaction_state_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
     });
     this.onNewForm();
   }
   onNewForm() {
-    this.newCompraForm.get('controlable')!.valueChanges.subscribe(
-      (value) => {
-        if (value) {
-          this.newCompraForm.get('descripcionControl')?.enable();
-        } else {
-          this.newCompraForm.get('descripcionControl')?.disable();
-        }
-      });
+
   }
 
   showName(dato: any) {
@@ -446,6 +472,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.inicializarFormEdit(this.selectedCompra); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
       }
       this.tituloModal = 'Nueva compra';
+      this.obtenerProveedores();
       this.inicializarFormNew();
       this.modalCompra.options = this.modalOptions;
       this.modalCompra.open();
@@ -457,20 +484,57 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
   }
 
-  confirmarProducto(form: FormGroup) {
+  obtenerProveedores() {
+    const params: any = {};
+    params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+      "person.human.documentType", "person.human.user", "person.legalEntity"];
+    params.paging = 10;
+    params.page = 1;
+    params.order_by = {};
+    params.filters = {};
+
+    this.proveedores$ = this.proveedorInput$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter((term: string) => term !== null && term.trim().length >= 2),
+      tap(term => {
+        params.filters = {
+          operator: { value: 'OR' },
+          'person.human.firstname': { value: term, op: 'LIKE', contiene: true },
+          'person.human.lastname': { value: term, op: 'LIKE', contiene: true },
+          'person.legalEntity.company_name': { value: term, op: 'LIKE', contiene: true }
+        };
+      }),
+      tap(() => this.loadingProveedores = true),
+      switchMap(() => this._indexService.getProveedoresWithParamAsync(params, this.actual_role).pipe(
+        map((res: any) => res.data.map((proveedor: any) => ({
+          ...proveedor,
+          nombreCompleto: this.bindName(proveedor)
+        }))),
+        finalize(() => this.loadingProveedores = false)
+      ))
+    );
+  }
+
+  bindName(data: any): string {
+    if (!data.person) return '';
+    if (data.person.human) {
+      return data.person.human.firstname + ' ' + data.person.human.lastname;
+    } else if (data.person.legal_entity) {
+      return data.person.legal_entity.company_name;
+    }
+    return '';
+  }
+
+  confirmarCompra(form: FormGroup) {
     this.isSubmit = true;
     if (form.valid) {
-      if ((form.get('asignaNumSerie')?.value === 1 || form.get('asignaNumSerie')?.value === true) &&
-        (form.get('tieneNumSerie')?.value === 1 || form.get('tieneNumSerie')?.value === true)) {
-        this.swalService.toastError('top-right', 'No es posible asignar y tener número de serie al mismo tiempo.');
-        return;
-      }
       this.spinner.show();
-      let producto = new CompraProveedorDTO();
-      // this.armarDTOProducto(producto, form);
+      let compra = new CompraDTO();
+      this.armarDTOCompra(compra, form);
       if (!this.isEdicion) {
         this.subscription.add(
-          this._comprasService.saveCompraProveedor(producto).subscribe({
+          this._comprasService.saveCompra(compra).subscribe({
             next: res => {
               this.spinner.hide();
               this.obtenerCompras(true);
@@ -486,7 +550,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         )
       } else {
         this.subscription.add(
-          this._comprasService.editCompraProveedor(this.selectedCompra.uuid, producto).subscribe({
+          this._comprasService.editCompra(this.selectedCompra.uuid, compra).subscribe({
             next: res => {
               this.compras = [...this.compras.map(p =>
                 p.uuid === res.data.uuid ? res.data : p
@@ -507,32 +571,26 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
   }
 
-  armarDTOProducto(producto: ProductoDTO, form: FormGroup) {
-    producto.actual_role = this.actual_role;
-    producto.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
-    producto.name = form.get('nombre')?.value;
-    producto.code = form.get('codigo')?.value;
-    producto.product_type_uuid = form.get('tipoProducto')?.value;
-    producto.product_category_uuid = form.get('categoria')?.value;
-    let estadoProducto = new ProductState();
-    estadoProducto.possible_product_state_uuid = form.get('estado')?.value;
-    estadoProducto.comments = form.get('estadoComentario')?.value;
-    producto.product_state = estadoProducto;
-    producto.comments = form.get('comentarios')?.value;
-    producto.measure_uuid = form.get('unidad')?.value;
-    producto.vat_percent = form.get('iva')?.value;
-    producto.country_uuid = form.get('pais')?.value;
-    producto.mercosur_nomenclature = form.get('nomenclatura')?.value;
-    producto.assign_serial_number = form.get('asignaNumSerie')?.value;
-    producto.has_serial_number = form.get('tieneNumSerie')?.value;
-    producto.traceable = form.get('trazable')?.value;
-    producto.salable = form.get('vendible')?.value;
-    producto.sales_name = form.get('nombreVenta')?.value;
-    producto.controllable = form.get('controlable')?.value;
-    producto.control_description = form.get('descripcionControl')?.value;
+  armarDTOCompra(compra: CompraDTO, form: FormGroup) {
+    compra.actual_role = this.actual_role;
+    compra.qualification_option_uuid = form.get('qualification_option_uuid')?.value;
+    compra.qualification_comments = form.get('qualification_comments')?.value;
+    let transaction = new Transaction();
+    transaction.person_uuid = form.get('person_uuid')?.value.person.uuid;
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    transaction.transaction_datetime = formattedDate;
+    transaction.vat_after_discount = false;
+    transaction.discount1 = form.get('discount1')?.value;
+    transaction.discount2 = form.get('discount2')?.value;
+    transaction.others = form.get('others')?.value;
+    transaction.perceptionIB = form.get('perceptionIB')?.value;
+    transaction.perceptionRG3337 = form.get('perceptionRG3337')?.value;
+    transaction.possible_transaction_state_uuid = form.get('possible_transaction_state_uuid')?.value;
+    compra.transaction = transaction;
 
     if (!this.isEdicion) {
-      this.cleanObject(producto);
+      this.cleanObject(compra);
     }
   }
 

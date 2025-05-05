@@ -126,13 +126,13 @@
             <div class="mt-3 flex flex-wrap">
 
 
-                <a href="javascript:;"
+                <!-- <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{'!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales',
                                  'cursor-not-allowed tab-disabled': isTabDisabled
                                 }" (click)="!isTabDisabled && (tab1 = 'datos-generales')">
                     Datos generales
-                </a>
+                </a> -->
 
                 <!-- <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
@@ -190,9 +190,8 @@
             </div>
 
             <div class="flex-1 text-sm">
-                <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
-                    @if (compras.length > 0) {
-                    <!-- <form [formGroup]="compraForm" class="p-4">
+                @if (compras.length > 0) {
+                <!-- <form [formGroup]="compraForm" class="p-4">
                         <div class="flex flex-col sm:flex-row">
                             <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
@@ -453,9 +452,7 @@
                         }
 
                     </form> -->
-                    }
-
-                </div>
+                }
 
                 <!-- <div *ngIf="tab1.toLowerCase() === 'componentes'">
                     @if (productos.length > 0) {
@@ -515,172 +512,90 @@
 
         <ng-template #modalBody>
 
-            <!-- <form [formGroup]="newCompraForm" class="p-4">
+            <form [formGroup]="newCompraForm" class="p-4">
                 <div class="flex flex-col sm:flex-row">
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
-                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="nombre">Nombre</label>
-                            <input id="nombre" type="text" placeholder="" class="form-control"
-                                formControlName="nombre" />
-                        </div>
-                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['codigo'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="codigo">Código</label>
-                            <input id="codigo" type="text" placeholder="" class="form-control"
-                                formControlName="codigo" />
-                        </div>
-                        <div>
-                            <label for="tipoProducto">Tipo de producto</label>
-                            <ng-select [items]="tipoProductos" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay tipos de producto"
-                                placeholder="" class="w-1/3 min-w-[200px]" formControlName="tipoProducto"
-                                [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newCompraForm.controls['tipoProducto'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
-                        <div>
-                            <label for="categoria">Categoría</label>
-                            <ng-select [items]="categorias" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay categorías"
-                                placeholder="" class="w-1/3 min-w-[200px]" formControlName="categoria"
-                                [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newCompraForm.controls['categoria'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
-                        <div>
-                            <label for="estado">Estado</label>
-                            <ng-select [items]="estados" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay estados" placeholder=""
-                                class="w-1/3 min-w-[200px]" formControlName="estado" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newCompraForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
-
                         <div
-                            [ngClass]="isSubmit ? newCompraForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="estadoComentario">Comentario del estado</label>
-                            <textarea class="form-control" id="estadoComentario" formControlName="estadoComentario"
-                                rows="1"></textarea>
-                        </div>
-
-                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['nomenclatura'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="nomenclatura">Nomenclatura Mercosur (Pos. Arancelaria)</label>
-                            <input id="nomenclatura" type="text" placeholder="" class="form-control"
-                                formControlName="nomenclatura" />
-                        </div>
-                        <div>
-                            <label for="unidad">Unidad</label>
-                            <ng-select [items]="measures" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay unidades" placeholder=""
-                                class="w-1/3 min-w-[200px]" formControlName="unidad" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newCompraForm.controls['unidad'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
-                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['iva'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="iva">IVA (%)</label>
-                            <input id="iva" type="text" placeholder="" class="form-control" formControlName="iva" />
+                            [ngClass]="isSubmit ? newCompraForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="person_uuid">Proveedor</label>
+                            <ng-select [items]="proveedores$ | async" bindLabel="nombreCompleto"
+                                [typeahead]="proveedorInput$" [loading]="loadingProveedores" [virtualScroll]="true"
+                                typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
+                                placeholder="Buscar proveedor..." formControlName="person_uuid"
+                                [ngClass]="isSubmit ? newCompraForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                            </ng-select>
                         </div>
 
                         <div>
-                            <label for="pais">País</label>
-                            <ng-select [items]="paises" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay países" placeholder=""
-                                class="w-1/3 min-w-[200px]" formControlName="pais" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newCompraForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                            <label>Estado transacción</label>
+                            <ng-select [items]="posiblesEstadosTransaccion" bindLabel="name" bindValue="uuid"
+                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
+                                formControlName="possible_transaction_state_uuid" [selectOnTab]="true"
+                                [ngClass]="isSubmit ? newCompraForm.controls['possible_transaction_state_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
-
+                        <div>
+                            <label>Calificación</label>
+                            <ng-select [items]="calificaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay calificaciones"
+                                placeholder="" class="w-1/3 min-w-[200px]" formControlName="qualification_option_uuid"
+                                [selectOnTab]="true" [appendTo]="'body'"
+                                [ngClass]="isSubmit ? newCompraForm.controls['qualification_option_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                        </div>
                         <div
-                            [ngClass]="isSubmit ? newCompraForm.controls['comentarios'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="comentarios">Comentarios</label>
-                            <textarea class="form-control" id="comentarios" formControlName="comentarios"
-                                rows="1"></textarea>
+                            [ngClass]="isSubmit ? newCompraForm.controls['qualification_comments'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Motivo de la calificación</label>
+                            <textarea class="form-control" id="qualification_comments"
+                                formControlName="qualification_comments" rows="1"></textarea>
                         </div>
 
-                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['nombreVenta'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="nombreVenta">Nombre de venta</label>
-                            <input id="nombreVenta" type="text" placeholder="" class="form-control"
-                                formControlName="nombreVenta" />
+                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['discount1'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="discount1">Descuento 1</label>
+                            <input id="discount1" type="text" placeholder="" class="form-control"
+                                formControlName="discount1" />
                         </div>
 
-                        <div class="flex items-center gap-2 mt-2"
-                            [ngClass]="isSubmit ? newCompraForm.controls['asignaNumSerie'].errors ? 'has-error' : 'has-success' : ''">
-                            <label class="w-12 h-6 relative">
-                                <input type="checkbox"
-                                    [ngClass]="isSubmit ? newCompraForm.controls['asignaNumSerie'].errors ? 'has-error' : 'has-success' : ''"
-                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="asignaNumSerie" />
-                                <span for="custom_switch_checkbox2"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
-                            </label>
-                            <span>Asigna número de serie</span>
+                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['discount2'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="discount2">Descuento 2</label>
+                            <input id="discount2" type="text" placeholder="" class="form-control"
+                                formControlName="discount2" />
                         </div>
 
-                        <div class="flex items-center gap-2 mt-2">
-                            <label class="w-12 h-6 relative">
-                                <input type="checkbox"
-                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="asignaNumSerie" />
-                                <span for="custom_switch_checkbox2"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
-                            </label>
-                            <span>Tiene número de serie</span>
+                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['others'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="others">Otros descuentos</label>
+                            <input id="others" type="text" placeholder="" class="form-control"
+                                formControlName="others" />
                         </div>
 
-                        <div class="flex items-center gap-2 mt-2">
-                            <label class="w-12 h-6 relative">
-                                <input type="checkbox"
-                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="trazable" />
-                                <span for="custom_switch_checkbox2"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
-                            </label>
-                            <span>Trazable</span>
+                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['perceptionIB'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="perceptionIB">Percepción IIBB</label>
+                            <input id="perceptionIB" type="text" placeholder="" class="form-control"
+                                formControlName="perceptionIB" />
                         </div>
 
-                        <div class="flex items-center gap-2 mt-2">
-                            <label class="w-12 h-6 relative">
-                                <input type="checkbox"
-                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="vendible" />
-                                <span for="custom_switch_checkbox2"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
-                            </label>
-                            <span>Vendible</span>
+                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['perceptionRG3337'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="perceptionRG3337">Percepción RG3337</label>
+                            <input id="perceptionRG3337" type="text" placeholder="" class="form-control"
+                                formControlName="perceptionRG3337" />
                         </div>
 
-                        <div class="flex items-center gap-2 mt-2">
-                            <label class="w-12 h-6 relative">
-                                <input type="checkbox"
-                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="controlable" />
-                                <span for="custom_switch_checkbox2"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
-                            </label>
-                            <span>Controlable</span>
-                        </div>
 
-                        <div
-                            [ngClass]="isSubmit ? newCompraForm.controls['descripcionControl'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="descripcionControl">Descripción control</label>
-                            <textarea class="form-control" id="descripcionControl" formControlName="descripcionControl"
-                                rows="1"></textarea>
-                        </div>
 
                     </div>
                 </div>
 
-            </form> -->
+            </form>
 
 
             <div class="row mt-3">
                 <div class="col-12 d-flex justify-content-center">
-                    <button class="btn btn-primary mr-3" (click)="confirmarProducto(newCompraForm)">
+                    <button class="btn btn-primary mr-3" (click)="confirmarCompra(newCompraForm)">
                         Confirmar
                     </button>
                     <button id="back-button-with-border" type="button" class="btn btn-wd"
@@ -707,356 +622,203 @@
     <div class="offcanvas-body">
 
         <div class="row d-flex justify-content-center">
-            <div class="col-12 d-flex justify-content-center">
-                <div class="max-w-[50rem] mt-3 w-full shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-[#e0e6ed] 
+
+            <!-- <div class="col-12 d-flex justify-content-center">
+                <div class="max-w-[55rem] mt-3 w-full shadow-[4px_6px_10px_-3px_#bfc9d4] rounded border border-[#e0e6ed] 
                         dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none mx-auto">
-                    <div class="py-4 px-4">
+                    <div class="px-3 py-2"> -->
 
-                        <!-- Campos en una sola fila -->
-                        <div class="d-flex flex-wrap align-items-center gap-3">
+            <!-- Campos en una sola fila -->
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <fieldset class="border border-gray-300 p-4 rounded-md">
+                    <legend class="text-lg font-semibold text-gray-700 px-2">Proveedor</legend>
+                    <div class="mb-3 text-center">
+                        <label class="font-semibold text-gray-700 d-block">Tipo de Persona:</label>
+                        <div class="d-flex justify-content-center gap-3">
+                            <div class="form-check">
+                                <label class="inline-flex items-center" for="radioTodos">
+                                    <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                        id="radioTodos" value="todos" [(ngModel)]="filtroTipoPersona"
+                                        (change)="changeTipoPersona()">
+                                    <span class="ml-2 cursor-pointer">Todos</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="inline-flex items-center" for="radioFisica">
+                                    <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                        id="radioFisica" value="fisica" [(ngModel)]="filtroTipoPersona"
+                                        (change)="changeTipoPersona()">
+                                    <span class="ml-2 cursor-pointer">Física</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="inline-flex items-center" for="radioJuridica">
+                                    <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                        id="radioJuridica" value="juridica" [(ngModel)]="filtroTipoPersona"
+                                        (change)="changeTipoPersona()">
+                                    <span class="ml-2 cursor-pointer">Jurídica</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div class="mb-3 text-center">
-                                <label class="font-semibold text-gray-700 d-block">Tipo de Persona:</label>
-                                <div class="d-flex justify-content-center gap-3">
-                                    <div class="form-check">
-                                        <label class="inline-flex items-center" for="radioTodos">
-                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                                id="radioTodos" value="todos" [(ngModel)]="filtroTipoPersona"
-                                                (change)="changeTipoPersona()">
-                                            <span class="ml-2 cursor-pointer">Todos</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <label class="inline-flex items-center" for="radioFisica">
-                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                                id="radioFisica" value="fisica" [(ngModel)]="filtroTipoPersona"
-                                                (change)="changeTipoPersona()">
-                                            <span class="ml-2 cursor-pointer">Física</span>
-                                        </label>
-                                    </div>
-                                    <div class="form-check">
-                                        <label class="inline-flex items-center" for="radioJuridica">
-                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
-                                                id="radioJuridica" value="juridica" [(ngModel)]="filtroTipoPersona"
-                                                (change)="changeTipoPersona()">
-                                            <span class="ml-2 cursor-pointer">Jurídica</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- <div class="d-flex flex-wrap align-items-center gap-3"> -->
-                            @if(this.filtroTipoPersona === 'fisica' || this.filtroTipoPersona === 'todos') {
-                            <div class="flex-grow-1">
-                                <label for="nombre">Nombre</label>
-                                <input type="text" id="nombre" class="form-control"
-                                    [(ngModel)]="filtros['transaction.person.human.firstname'].value"
-                                    (input)="obtenerComprasPorFiltroAvanzado()">
-                            </div>
-                            <div class="flex-grow-1">
-                                <label for="apellido">Apellido</label>
-                                <input type="text" id="apellido" class="form-control"
-                                    [(ngModel)]="filtros['transaction.person.human.lastname'].value"
-                                    (input)="obtenerComprasPorFiltroAvanzado()">
-                            </div>
-                            }
-                            @if(this.filtroTipoPersona === 'juridica' || this.filtroTipoPersona === 'todos') {
-                            <div class="flex-grow-1">
-                                <label for="razon">Razón Social</label>
-                                <input type="text" id="razon" class="form-control"
-                                    [(ngModel)]="filtros['transaction.person.legalEntity.company_name'].value"
-                                    (input)="obtenerComprasPorFiltroAvanzado()">
-                            </div>
-                            }
-                            <div class="col-md-12 pr-1 mb-3">
-                                <label>Fecha transacción desde</label>
-                                <input type="text" mwlFlatpickr [options]="{ 
+                    @if(this.filtroTipoPersona === 'fisica' || this.filtroTipoPersona === 'todos') {
+                    <div class="flex-grow-1">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" class="form-control"
+                            [(ngModel)]="filtros['transaction.person.human.firstname'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()">
+                    </div>
+                    <div class="flex-grow-1">
+                        <label for="apellido">Apellido</label>
+                        <input type="text" id="apellido" class="form-control"
+                            [(ngModel)]="filtros['transaction.person.human.lastname'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()">
+                    </div>
+                    }
+                    @if(this.filtroTipoPersona === 'juridica' || this.filtroTipoPersona === 'todos') {
+                    <div class="flex-grow-1">
+                        <label for="razon">Razón Social</label>
+                        <input type="text" id="razon" class="form-control"
+                            [(ngModel)]="filtros['transaction.person.legalEntity.company_name'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()">
+                    </div>
+                    }
+                </fieldset>
+                <div class="col-md-12 pr-1 mb-3">
+                    <label>Fecha transacción desde</label>
+                    <input type="text" mwlFlatpickr [options]="{ 
                                         enableTime: false, 
                                         dateFormat: 'Y-m-d',
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaTransacDesde"
-                                    (input)="obtenerComprasPorFiltroAvanzado()" />
-                            </div>
-                            <div class="col-md-12 pr-1 mb-3">
-                                <label>Fecha transacción hasta</label>
-                                <input type="text" mwlFlatpickr [options]="{ 
+                        (input)="obtenerComprasPorFiltroAvanzado()" />
+                </div>
+                <div class="col-md-12 pr-1 mb-3">
+                    <label>Fecha transacción hasta</label>
+                    <input type="text" mwlFlatpickr [options]="{ 
                                         enableTime: false, 
                                         dateFormat: 'Y-m-d',
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaTransacHasta"
-                                    (input)="obtenerComprasPorFiltroAvanzado()" />
-                            </div>
-                            <div class="flex-grow-1">
-                                <label>Tipo de comprobante contable</label>
-                                <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
-                                    clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                    notFoundText="No hay tipos de comprobantes contables" class="w-1/3 min-w-[200px]"
-                                    [(ngModel)]="filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
-                            </div>
-                            <div class="flex-grow-1">
-                                <label for="prefijo">Prefijo (comprobante contable)</label>
-                                <input type="text" id="prefijo" class="form-control"
-                                    [(ngModel)]="filtros['transaction.transactionDocuments.prefix_number'].value"
-                                    (input)="obtenerComprasPorFiltroAvanzado()">
-                            </div>
-                            <div class="flex-grow-1">
-                                <label for="documento">Número de documento (comprobante contable)</label>
-                                <input type="text" id="documento" class="form-control"
-                                    [(ngModel)]="filtros['transaction.transactionDocuments.document_number'].value"
-                                    (input)="obtenerComprasPorFiltroAvanzado()">
-                            </div>
-                            <div class="col-md-12 pr-1 mb-3">
-                                <label>Fecha factura desde</label>
-                                <input type="text" mwlFlatpickr [options]="{ 
+                        (input)="obtenerComprasPorFiltroAvanzado()" />
+                </div>
+                <div class="flex-grow-1">
+                    <label>Tipo de comprobante contable</label>
+                    <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
+                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                        notFoundText="No hay tipos de comprobantes contables" class="w-1/3 min-w-[200px]"
+                        [(ngModel)]="filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value"
+                        (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
+                </div>
+                <div class="flex-grow-1">
+                    <label for="prefijo">Prefijo (comprobante contable)</label>
+                    <input type="text" id="prefijo" class="form-control"
+                        [(ngModel)]="filtros['transaction.transactionDocuments.prefix_number'].value"
+                        (input)="obtenerComprasPorFiltroAvanzado()">
+                </div>
+                <div class="flex-grow-1">
+                    <label for="documento">Número de documento (comprobante contable)</label>
+                    <input type="text" id="documento" class="form-control"
+                        [(ngModel)]="filtros['transaction.transactionDocuments.document_number'].value"
+                        (input)="obtenerComprasPorFiltroAvanzado()">
+                </div>
+                <div class="col-md-12 pr-1 mb-3">
+                    <label>Fecha factura desde</label>
+                    <input type="text" mwlFlatpickr [options]="{ 
                                         enableTime: false, 
                                         dateFormat: 'Y-m-d',
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaFacturaDesde"
-                                    (input)="obtenerComprasPorFiltroAvanzado()" />
-                            </div>
-                            <div class="col-md-12 pr-1 mb-3">
-                                <label>Fecha factura hasta</label>
-                                <input type="text" mwlFlatpickr [options]="{ 
+                        (input)="obtenerComprasPorFiltroAvanzado()" />
+                </div>
+                <div class="col-md-12 pr-1 mb-3">
+                    <label>Fecha factura hasta</label>
+                    <input type="text" mwlFlatpickr [options]="{ 
                                         enableTime: false, 
                                         dateFormat: 'Y-m-d',
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaFacturaHasta"
-                                    (input)="obtenerComprasPorFiltroAvanzado()" />
-                            </div>
-                            <div style="width: 100%;">
-                                <label for="switchRight">Lote</label>
-                                <div class="flex">
-                                    <input id="switchRight" type="text" placeholder=""
-                                        [(ngModel)]="filtros['batch.batch_identification'].value"
-                                        (input)="obtenerComprasPorFiltroAvanzado()"
-                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
-                                    <div
-                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
-                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                                            <input type="checkbox"
-                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                                id="custom_switch_checkbox2"
-                                                [(ngModel)]="filtros['batch.batch_identification'].contiene"
-                                                (change)="obtenerComprasPorFiltroAvanzado()" />
-                                            <span
-                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
-                                        </label>
-                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="width: 100%;">
-                                <label for="switchRight">Nro de serie</label>
-                                <div class="flex">
-                                    <input id="switchRight" type="text" placeholder=""
-                                        [(ngModel)]="filtros['batch.stocks.productInstances.serial_number'].value"
-                                        (input)="obtenerComprasPorFiltroAvanzado()"
-                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
-                                    <div
-                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
-                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                                            <input type="checkbox"
-                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                                id="custom_switch_checkbox2"
-                                                [(ngModel)]="filtros['batch.stocks.productInstances.serial_number'].contiene"
-                                                (change)="obtenerComprasPorFiltroAvanzado()" />
-                                            <span
-                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
-                                        </label>
-                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1">
-                                <label>Producto
-                                    @if(cargandoProductos) {
-                                    <span
-                                        class="animate-spin border-[3px] border-transparent border-l-primary rounded-full w-6 h-6 inline-block align-middle m-auto mb-10"></span>
-                                    }
-                                </label>
-                                <ng-select [items]="productosParaFiltro" bindLabel="name" bindValue="uuid"
-                                    clearAllText="Limpiar" [virtualScroll]="true" notFoundText="No hay productos"
-                                    class="w-1/3 min-w-[100px] max-w-[330px]" style="width: 100%;"
-                                    [(ngModel)]="filtros['transaction.transactionProducts.product.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()">
-                                </ng-select>
-                            </div>
-
-
-
-                            <!-- </div> -->
-
-                            <!-- <div style="width: 100%;">
-                                <label for="switchRight">Nombre</label>
-                                <div class="flex">
-                                    <input id="switchRight" type="text" placeholder=""
-                                        (input)="obtenerComprasPorFiltroAvanzado()"
-                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
-                                    <div
-                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
-                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                                            <input type="checkbox" (change)="obtenerComprasPorFiltroAvanzado()"
-                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                                id="custom_switch_checkbox2" [(ngModel)]="filtros.name.contiene" />
-                                            <span
-                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
-                                        </label>
-                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
-                                    </div>
-                                </div>
-                            </div> -->
-
-                            <!-- <div class="flex-grow-1">
-                                <label for="codigo">Código</label>
-                                <input type="text" id="codigo" class="form-control" [(ngModel)]="filtros.code.value"
-                                    (input)="obtenerComprasPorFiltroAvanzado()">
-                            </div> -->
-
-                            <!-- <div class="flex-grow-1">
-                                <label for="tiposProducto">Tipos de producto</label>
-                                <ng-select [items]="tipoProductos" bindLabel="name" bindValue="uuid"
-                                    clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                    notFoundText="No hay tipos de productos" class="w-1/3 min-w-[200px]"
-                                    [(ngModel)]="filtros['productType.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
-                            </div> -->
-
-
-                            <!-- <div class="flex-grow-1">
-                                <label for="categorias">Categoría</label>
-                                <ng-select [items]="categorias" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                    style="width: 100%" [virtualScroll]="true" notFoundText="No hay categorías"
-                                    class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['productCategory.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
-                            </div> -->
-
-                            <!-- <div class="flex-grow-1">
-                                <label for="estado">Estado actual</label>
-                                <ng-select [items]="estados" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                    style="width: 100%" [virtualScroll]="true" notFoundText="No hay estados"
-                                    class="w-1/3 min-w-[200px]"
-                                    [(ngModel)]="filtros['productStates.possibleProductState.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()">
-                                </ng-select>
-                            </div> -->
-
-                            <!-- <div style="width: 100%;">
-                                <label for="switchRight">Nomenclatura Mercosur (Pos. Arancelaria)</label>
-                                <div class="flex">
-                                    <input id="switchRight" type="text" placeholder=""
-                                        [(ngModel)]="filtros.mercosur_nomenclature.value"
-                                        (input)="obtenerComprasPorFiltroAvanzado()"
-                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
-                                    <div
-                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
-                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                                            <input type="checkbox"
-                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                                id="custom_switch_checkbox2"
-                                                [(ngModel)]="filtros.mercosur_nomenclature.contiene"
-                                                (change)="obtenerComprasPorFiltroAvanzado()" />
-                                            <span
-                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
-                                        </label>
-                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
-                                    </div>
-                                </div>
-                            </div> -->
-
-                            <!-- <div class="flex-grow-1">
-                                <label for="unidad">Unidad</label>
-                                <ng-select [items]="measures" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                    style="width: 100%" [virtualScroll]="true" notFoundText="No hay unidades"
-                                    class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['measure.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
-                            </div> -->
-
-                            <!-- <div class="d-flex align-items-center">
-                                <label class="me-2">Trazable:</label>
-                                <div class="form-check mr-2">
-                                    <input class="form-check-input" type="radio" id="trazableSinFiltro" name="trazable"
-                                        value='' [(ngModel)]="filtros.traceable.value"
-                                        (change)="obtenerComprasPorFiltroAvanzado()">
-                                    <label class="form-check-label" for="trazableSinFiltro">Sin filtro</label>
-                                </div>
-                                <div class="form-check mr-2">
-                                    <input class="form-check-input" type="radio" id="trazableSi" name="trazable" value=1
-                                        [(ngModel)]="filtros.traceable.value"
-                                        (change)="obtenerComprasPorFiltroAvanzado()">
-                                    <label class="form-check-label" for="trazableSi">Sí</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="trazableNo" name="trazable" value=0
-                                        [(ngModel)]="filtros.traceable.value"
-                                        (change)="obtenerComprasPorFiltroAvanzado()">
-                                    <label class="form-check-label" for="trazableNo">No</label>
-                                </div>
-                            </div> -->
-
-                            <!-- <div class="d-flex align-items-center">
-                                <label class="me-2">Asigna n° de serie:</label>
-                                <div class="form-check mr-2">
-                                    <input class="form-check-input" type="radio" id="asignaSinFiltro" name="asigna"
-                                        value='' [(ngModel)]="filtros.assign_serial_number.value"
-                                        (change)="obtenerComprasPorFiltroAvanzado()">
-                                    <label class="form-check-label" for="asignaSinFiltro">Sin filtro</label>
-                                </div>
-                                <div class="form-check mr-2">
-                                    <input class="form-check-input" type="radio" id="asignaSi" name="asigna" value=1
-                                        [(ngModel)]="filtros.assign_serial_number.value"
-                                        (change)="obtenerComprasPorFiltroAvanzado()">
-                                    <label class="form-check-label" for="asignaSi">Sí</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" id="asignaNo" name="asigna" value=0
-                                        [(ngModel)]="filtros.assign_serial_number.value"
-                                        (change)="obtenerComprasPorFiltroAvanzado()">
-                                    <label class="form-check-label" for="asignaNo">No</label>
-                                </div>
-                            </div> -->
-
-                            <!-- <div class="flex-grow-1">
-                                <label for="proveedor">Proveedor</label>
-                                <ng-select [items]="proveedores" bindLabel="nombreCompleto" bindValue="uuid"
-                                    clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                    notFoundText="No hay proveedores" class="w-1/3 min-w-[200px]"
-                                    [(ngModel)]="filtros['suppliers.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
-                            </div> -->
-
-                            <!-- <div style="width: 100%;">
-                                <label for="switchRight">Lote</label>
-                                <div class="flex">
-                                    <input id="switchRight" type="text" placeholder=""
-                                        [(ngModel)]="filtros['stocks.batch.batch_identification'].value"
-                                        (input)="obtenerComprasPorFiltroAvanzado()"
-                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
-                                    <div
-                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
-                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                                            <input type="checkbox"
-                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                                id="custom_switch_checkbox2"
-                                                [(ngModel)]="filtros['stocks.batch.batch_identification'].contiene"
-                                                (change)="obtenerComprasPorFiltroAvanzado()" />
-                                            <span
-                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
-                                        </label>
-                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
-                                    </div>
-                                </div>
-                            </div> -->
-
+                        (input)="obtenerComprasPorFiltroAvanzado()" />
+                </div>
+                <div style="width: 100%;">
+                    <label for="switchRight">Lote</label>
+                    <div class="flex">
+                        <input id="switchRight" type="text" placeholder=""
+                            [(ngModel)]="filtros['batch.batch_identification'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()"
+                            class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
+                        <div
+                            class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                            <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                <input type="checkbox"
+                                    class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                    id="custom_switch_checkbox2"
+                                    [(ngModel)]="filtros['batch.batch_identification'].contiene"
+                                    (change)="obtenerComprasPorFiltroAvanzado()" />
+                                <span
+                                    class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                            </label>
+                            <span class="text-xs text-gray-600 ml-1">Contiene</span>
                         </div>
-
                     </div>
                 </div>
+                <div style="width: 100%;">
+                    <label for="switchRight">Nro de serie</label>
+                    <div class="flex">
+                        <input id="switchRight" type="text" placeholder=""
+                            [(ngModel)]="filtros['batch.stocks.productInstances.serial_number'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()"
+                            class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
+                        <div
+                            class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                            <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                <input type="checkbox"
+                                    class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                    id="custom_switch_checkbox2"
+                                    [(ngModel)]="filtros['batch.stocks.productInstances.serial_number'].contiene"
+                                    (change)="obtenerComprasPorFiltroAvanzado()" />
+                                <span
+                                    class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                            </label>
+                            <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <label>Producto
+                        @if(cargandoProductos) {
+                        <span
+                            class="animate-spin border-[3px] border-transparent border-l-primary rounded-full w-6 h-6 inline-block align-middle m-auto mb-10"></span>
+                        }
+                    </label>
+                    <ng-select [items]="productosParaFiltro" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                        [virtualScroll]="true" notFoundText="No hay productos" class="w-1/3 min-w-[100px] max-w-[330px]"
+                        style="width: 100%;" [(ngModel)]="filtros['transaction.transactionProducts.product.uuid'].value"
+                        (change)="obtenerComprasPorFiltroAvanzado()">
+                    </ng-select>
+                </div>
+
+                <!-- <div class="flex-grow-1">
+                    <label>Producto</label>
+                    <ng-select [items]="productos$ | async" bindLabel="name" bindValue="uuid"
+                        [typeahead]="productoInput$" [loading]="loadingProductos" [virtualScroll]="true"
+                        typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
+                        placeholder="Buscar producto..."
+                        [(ngModel)]="filtros['transaction.transactionProducts.product.uuid'].value">
+                    </ng-select>
+                </div> -->
+
             </div>
+
+            <!-- </div>
+                </div>
+            </div> -->
 
             <button class="mt-2 btn btn-primary" (click)="limpiarFiltros()">
                 Limpiar filtros avanzados

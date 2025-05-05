@@ -14,7 +14,7 @@ export class CompraDTO {
 export class Transaction {
     transaction_datetime!: string;
     person_uuid!: string;
-    vat_after_discount!: string;
+    vat_after_discount!: boolean;
     discount1!: string;
     discount2!: string;
     others!: string;

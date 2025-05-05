@@ -215,6 +215,11 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProveedores, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
+  getProveedoresWithParamAsync(paramsObj: any, rol: string): Observable<any[]> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<any[]>(environment.baseUrl + this.apiProveedores, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
   getClientesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: this.getNewParams(paramsObj, rol) });
@@ -225,6 +230,12 @@ export class IndexService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos, { headers, params: this.getNewParams(paramsObj, rol) });
   }
+
+  getProductosWithParamAsync(paramsObj: any, rol: string): Observable<any[]> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<any[]>(environment.baseUrl + this.apiProductos, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
 
   getProductosPosiblesWithParam(paramsObj: any, rol: string, uuidProducto: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

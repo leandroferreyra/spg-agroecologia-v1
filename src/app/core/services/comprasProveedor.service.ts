@@ -18,15 +18,15 @@ export class ComprasProveedorService {
   getCompraById(uuid: string, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
-      .set('actual_role', rol)
-      .set('with[]', "transaction.person.human")
-      .set('with[]', "transaction.person.legalEntity")
-      .set('with[]', "transaction.transactionDocuments.accountDocumentType")
-      .set('with[]', "transaction.transactionDocuments.currency")
-      .set('with[]', "transaction.transactionProducts.product.measure")
-      .set('with[]', "transaction.transactionProducts.controlUser")
-      .set('with[]', "batch")
-      .set('with[]', "qualificationOption")
+      .append('actual_role', rol)
+      .append('with[]', "transaction.person.human")
+      .append('with[]', "transaction.person.legalEntity")
+      .append('with[]', "transaction.transactionDocuments.accountDocumentType")
+      .append('with[]', "transaction.transactionDocuments.currency")
+      .append('with[]', "transaction.transactionProducts.product.measure")
+      .append('with[]', "transaction.transactionProducts.controlUser")
+      .append('with[]', "batch")
+      .append('with[]', "qualificationOption")
       ;
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, { headers, params });
   }
@@ -42,6 +42,11 @@ export class ComprasProveedorService {
   }
 
   editCompraProveedor(uuid: string, compra: CompraProveedorDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, JSON.stringify(compra), { headers });
+  }
+
+  editCompra(uuid: string, compra: CompraDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.put<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, JSON.stringify(compra), { headers });
   }
