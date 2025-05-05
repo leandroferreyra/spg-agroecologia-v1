@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowUp, faArrowDown, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faArrowDown, faArrowLeft, faC } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
@@ -12,9 +12,10 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription, forkJoin } from 'rxjs';
+import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
-import { ProveedoresService } from 'src/app/core/services/proveedores.service';
+import { ProductoService } from 'src/app/core/services/producto.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { toggleAnimation } from 'src/app/shared/animations';
@@ -31,18 +32,18 @@ import { ComprasProveedorComponent } from '../personas/proveedores/compras-prove
 import { CuentasBancariasComponent } from '../personas/proveedores/cuentas-bancarias/cuentas-bancarias.component';
 import { ContactosPersonaComponent } from '../personas/shared/contactos-persona/contactos-persona.component';
 import { ContactosComponent } from '../personas/shared/contactos/contactos.component';
-import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoDTO';
-import { ProductoService } from 'src/app/core/services/producto.service';
-import { ComponentesComponent } from './componentes/componentes.component';
-import { ComponenteDeComponent } from './componente-de/componente-de.component';
-import { ReemplazosComponent } from './reemplazos/reemplazos.component';
-import { ProveedoresProductoComponent } from './proveedores-producto/proveedores-producto.component';
-import { StocksComponent } from './stocks/stocks.component';
-import { ComprasProductoComponent } from './compras-producto/compras-producto.component';
-import { VinculosComponent } from './vinculos/vinculos.component';
+import { ComponenteDeComponent } from '../productos/componente-de/componente-de.component';
+import { ComponentesComponent } from '../productos/componentes/componentes.component';
+import { ComprasProductoComponent } from '../productos/compras-producto/compras-producto.component';
+import { ProveedoresProductoComponent } from '../productos/proveedores-producto/proveedores-producto.component';
+import { ReemplazosComponent } from '../productos/reemplazos/reemplazos.component';
+import { StocksComponent } from '../productos/stocks/stocks.component';
+import { VinculosComponent } from '../productos/vinculos/vinculos.component';
+import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.service';
+import { CompraProveedorDTO } from 'src/app/core/models/request/compraProveedorDTO';
 
 @Component({
-  selector: 'app-productos',
+  selector: 'app-compras',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
@@ -51,27 +52,31 @@ import { VinculosComponent } from './vinculos/vinculos.component';
     ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent
   ],
   animations: [toggleAnimation],
-  templateUrl: './productos.component.html',
-  styleUrl: './productos.component.css'
+  templateUrl: './compras.component.html',
+  styleUrl: './compras.component.css'
 })
-export class ProductosComponent implements OnInit, OnDestroy {
+export class ComprasComponent implements OnInit, OnDestroy {
   toggleDropdown = false;
   @ViewChild('offcanvasRight', { static: false }) offcanvasElement!: ElementRef;
 
   store: any;
   private subscription: Subscription = new Subscription();
   actual_role: string = '';
-  productos: any[] = [];
-  selectedProducto: any;
-  productoForm!: FormGroup;
-  newProductoForm!: FormGroup;
+  compras: any[] = [];
+  selectedCompra: any;
+  compraForm!: FormGroup;
+  newCompraForm!: FormGroup;
 
+  cargandoProductos: boolean = true;
+  filtroSimpleName: string = '';
+  filtroSimpleContiene: boolean = true;
+  filtroTipoPersona: string = 'todos';
   isEdicion: boolean = false;
   isShowMailMenu = false;
   isTabDisabled = false;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 9;
+  MAX_ITEMS_PER_PAGE = 10;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;
@@ -81,23 +86,20 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   // Orden y filtro
   filtros: any = {
-    'name': { value: '', op: 'LIKE', contiene: true },
-    'code': { value: '', op: 'LIKE', contiene: true },
-    'productType.uuid': { value: '', op: '=', contiene: false },
-    'productCategory.uuid': { value: '', op: '=', contiene: false },
-    'productStates.possibleProductState.uuid': { value: '', op: '=', contiene: false },
-    // 'productStates.datetime_to': { value: '', op: '=', contiene: false },
-    'mercosur_nomenclature': { value: '', op: 'LIKE', contiene: true },
-    'measure.uuid': { value: '', op: '=', contiene: false },
-    'stocks.batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
-    'suppliers.uuid': { value: '', op: '=', contiene: false },
-    'traceable': { value: '', op: '=', contiene: false },
-    'assign_serial_number': { value: '', op: '=', contiene: false }
+    'operator': { value: '' },
+    'transaction.person.human.lastname': { value: '', op: 'LIKE', contiene: true },
+    'transaction.person.human.firstname': { value: '', op: 'LIKE', contiene: true },
+    'transaction.person.legalEntity.company_name': { value: '', op: 'LIKE', contiene: true },
+    'transaction.person.human.uuid': { value: '', op: '!=', contiene: false },
+    'transaction.person.legalEntity.uuid': { value: '', op: '!=', contiene: false },
+    'transaction.transactionDocuments.prefix_number': { value: '', op: 'LIKE', contiene: true },
+    'transaction.transactionDocuments.document_number': { value: '', op: 'LIKE', contiene: true },
+    'transaction.transactionProducts.product.uuid': { value: '', op: '=', contiene: false },
   };
   ordenamiento: any = {
-    'name': 'asc'
   };
 
+  productosParaFiltro: [] = [];
   isSubmit = false;
 
   iconArrowUp = faArrowUp;
@@ -107,7 +109,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   tab1: string = 'datos-generales';
 
   // Referencia al modal para crear y editar países.
-  @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
+  @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -124,7 +126,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   measures: any[] = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
-    private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
+    private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService) {
     this.initStore();
   }
@@ -151,36 +153,38 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
-    this.obtenerProductos();
-    this.obtenerCatalogos();
+    this.obtenerCompras();
+    this.obtenerProductosParaFiltro();
+    // this.obtenerCatalogos();
   }
 
-  obtenerProductos(alta: boolean = false) {
+  obtenerCompras(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
+    params.with = ["transaction.person.human", "transaction.person.legalEntity", "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch'];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtros;
 
     this.subscription.add(
-      this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
+      this._indexService.getComprasProveedorWithParam(params, this.actual_role).subscribe({
         next: res => {
-          this.productos = res.data;
-          if (this.productos.length === 0) {
-            this.swalService.toastSuccess('center', 'No existen productos.');
+          this.compras = res.data;
+          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
+          if (this.compras.length === 0) {
+            this.swalService.toastSuccess('center', 'No existen compras.');
             this.isTabDisabled = true;
             this.tab1 = 'datos-generales';
           } else {
             this.isTabDisabled = false;
           }
-          if (!alta && this.productos.length > 0) {
+          if (!alta && this.compras.length > 0) {
             this.isEdicion = false;
-            this.inicializarFormEdit(this.productos[0]);
+            // this.inicializarFormEdit(this.compras[0]);
           }
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
@@ -196,7 +200,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
-    if (this.productos.length <= this.itemsPerPage) {
+    if (this.compras.length <= this.itemsPerPage) {
       if (res.meta?.current_page === res.meta?.last_page) {
         this.itemsInPage = this.total_rows;
       } else {
@@ -205,32 +209,57 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
   }
 
-  obtenerCatalogos() {
-    forkJoin({
-      paises: this._catalogoService.getPaises(),
-      categorias: this._catalogoService.getCategorias(this.actual_role),
-      estados: this._catalogoService.getPosiblesEstadosProductos(this.actual_role),
-      tipoProductos: this._catalogoService.getTipoProductos(this.actual_role),
-      measures: this._catalogoService.getMeasures(this.actual_role),
-      proveedores: this._indexService.getProveedores(this.actual_role)
-    }).subscribe({
-      next: res => {
-        this.paises = res.paises.data;
-        this.categorias = res.categorias.data;
-        this.estados = res.estados.data;
-        this.tipoProductos = res.tipoProductos.data;
-        this.measures = res.measures.data;
-        this.proveedores = res.proveedores.data;
-        this.proveedores = this.proveedores.map(proveedor => ({
-          ...proveedor,
-          nombreCompleto: this.getNombreProveedor(proveedor)
-        }));
-      },
-      error: error => {
-        console.error('Error cargando catalogos:', error);
-      }
-    });
+  obtenerProductosParaFiltro() {
+
+    const paramsProcesos: any = {};
+    paramsProcesos.with = [];
+    paramsProcesos.paging = null;
+    paramsProcesos.page = null;
+    paramsProcesos.order_by = {};
+    paramsProcesos.filters = {};
+
+    this.subscription.add(
+      this._indexService.getProductosWithParam(paramsProcesos, this.actual_role).subscribe({
+        next: res => {
+          this.productosParaFiltro = res.data;
+          this.cargandoProductos = false;
+        },
+        error: error => {
+          this.cargandoProductos = false;
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
   }
+
+  // obtenerCatalogos() {
+  //   forkJoin({
+  //     paises: this._catalogoService.getPaises(),
+  //     categorias: this._catalogoService.getCategorias(this.actual_role),
+  //     estados: this._catalogoService.getPosiblesEstadosProductos(this.actual_role),
+  //     tipoProductos: this._catalogoService.getTipoProductos(this.actual_role),
+  //     measures: this._catalogoService.getMeasures(this.actual_role),
+  //     proveedores: this._indexService.getProveedores(this.actual_role)
+  //   }).subscribe({
+  //     next: res => {
+  //       this.paises = res.paises.data;
+  //       this.categorias = res.categorias.data;
+  //       this.estados = res.estados.data;
+  //       this.tipoProductos = res.tipoProductos.data;
+  //       this.measures = res.measures.data;
+  //       this.proveedores = res.proveedores.data;
+  //       this.proveedores = this.proveedores.map(proveedor => ({
+  //         ...proveedor,
+  //         nombreCompleto: this.getNombreProveedor(proveedor)
+  //       }));
+  //     },
+  //     error: error => {
+  //       console.error('Error cargando catalogos:', error);
+  //     }
+  //   });
+  // }
 
   getNombreProveedor(proveedor: any): string {
     if (!proveedor || !proveedor.person) return '';
@@ -243,8 +272,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   inicializarFormEdit(producto: any) {
-    this.selectedProducto = producto;
-    this.productoForm = new FormGroup({
+    this.selectedCompra = producto;
+    this.compraForm = new FormGroup({
       nombre: new FormControl({ value: producto?.name, disabled: !this.isEdicion }, [Validators.required]),
       codigo: new FormControl({ value: producto?.code, disabled: !this.isEdicion }, []),
       tipoProducto: new FormControl({ value: producto?.product_type?.uuid, disabled: !this.isEdicion }, [Validators.required]),
@@ -274,26 +303,26 @@ export class ProductosComponent implements OnInit, OnDestroy {
     });
     // Habilitar todos los controles si es edición
     if (this.isEdicion) {
-      Object.keys(this.productoForm.controls).forEach(key => {
+      Object.keys(this.compraForm.controls).forEach(key => {
         if (key !== 'stock_available' && key !== 'stock_initial' && key !== 'stock_minimum' && key !== 'stock_observed' &&
           key !== 'stock_optimum' && key !== 'stock_quantity_sold' && key !== 'stock_reserved' && key !== 'stock_samples') {
-          this.productoForm.controls[key].enable();
+          this.compraForm.controls[key].enable();
         }
       });
       // Deshabilita la descripción si no es controlable
-      if (this.productoForm.get('controlable')?.value === 0) {
-        this.productoForm.get('descripcionControl')?.disable();
+      if (this.compraForm.get('controlable')?.value === 0) {
+        this.compraForm.get('descripcionControl')?.disable();
       }
     }
     this.onFormEditChange();
   }
   onFormEditChange() {
-    this.productoForm.get('controlable')!.valueChanges.subscribe(
+    this.compraForm.get('controlable')!.valueChanges.subscribe(
       (value) => {
         if (value) {
-          this.productoForm.get('descripcionControl')?.enable();
+          this.compraForm.get('descripcionControl')?.enable();
         } else {
-          this.productoForm.get('descripcionControl')?.disable();
+          this.compraForm.get('descripcionControl')?.disable();
         }
       });
   }
@@ -307,7 +336,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   inicializarFormNew() {
-    this.newProductoForm = new FormGroup({
+    this.newCompraForm = new FormGroup({
       nombre: new FormControl({ value: null, disabled: false }, [Validators.required]),
       codigo: new FormControl({ value: null, disabled: false }, []),
       tipoProducto: new FormControl({ value: null, disabled: false }, [Validators.required]),
@@ -330,30 +359,51 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.onNewForm();
   }
   onNewForm() {
-    this.newProductoForm.get('controlable')!.valueChanges.subscribe(
+    this.newCompraForm.get('controlable')!.valueChanges.subscribe(
       (value) => {
         if (value) {
-          this.newProductoForm.get('descripcionControl')?.enable();
+          this.newCompraForm.get('descripcionControl')?.enable();
         } else {
-          this.newProductoForm.get('descripcionControl')?.disable();
+          this.newCompraForm.get('descripcionControl')?.disable();
         }
       });
   }
 
-  showDataProducto(producto: any) {
+  showName(dato: any) {
+    if (dato.transaction?.person?.human) {
+      return dato.transaction?.person?.human.firstname + ' ' + dato.transaction?.person?.human.lastname;
+    } else {
+      return dato.transaction?.person?.legal_entity.company_name;
+    }
+  }
+
+  showFactura(dato: any) {
+    let factura = '';
+    if (dato.transaction?.transaction_documents?.length > 0) {
+      factura = dato.transaction?.transaction_documents[0].account_document_type.name + '-' + dato.transaction?.transaction_documents[0].document_number;
+    }
+    return factura;
+  }
+
+  showFecha(dato: any) {
+    const soloFecha = dato.transaction?.transaction_datetime?.substring(0, 10);
+    return soloFecha;
+  }
+
+  showDataCompra(compra: any) {
     this.isEdicion = false;
-    this.inicializarFormEdit(producto);
+    // this.inicializarFormEdit(compra);
   }
 
   cancelarEdicion() {
     this.isEdicion = false;
-    this.inicializarFormEdit(this.selectedProducto);
+    this.inicializarFormEdit(this.selectedCompra);
   }
 
-  openSwalEliminar(producto: any) {
+  openSwalEliminar(compra: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el producto ${producto.name}?`,
+      text: `¿Desea eliminar la compra seleccionada?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -366,19 +416,19 @@ export class ProductosComponent implements OnInit, OnDestroy {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eliminarProducto(producto);
+        this.eliminarCompra(compra);
       } else if (result.isDenied) {
 
       }
     })
   }
 
-  eliminarProducto(producto: any) {
+  eliminarCompra(compra: any) {
     this.spinner.show();
     this.subscription.add(
-      this._productoService.deleteProducto(producto.uuid, this.actual_role.toUpperCase()).subscribe({
+      this._comprasService.deleteCompra(compra.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerProductos();
+          this.obtenerCompras();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -393,20 +443,20 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   cerrarModal() {
     this.isSubmit = false;
-    this.modalProducto.close();
+    this.modalCompra.close();
   }
 
 
-  openModalProducto(type: string, producto?: any) {
+  openModalCompra(type: string, producto?: any) {
     if (type === 'NEW') {
       if (this.isEdicion) {
         this.isEdicion = false;
-        this.inicializarFormEdit(this.selectedProducto); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
+        this.inicializarFormEdit(this.selectedCompra); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
       }
       this.tituloModal = 'Nuevo producto';
       this.inicializarFormNew();
-      this.modalProducto.options = this.modalOptions;
-      this.modalProducto.open();
+      this.modalCompra.options = this.modalOptions;
+      this.modalCompra.open();
     } else {
       this.tab1 = 'datos-generales';
       this.isEdicion = true;
@@ -424,16 +474,16 @@ export class ProductosComponent implements OnInit, OnDestroy {
         return;
       }
       this.spinner.show();
-      let producto = new ProductoDTO();
-      this.armarDTOProducto(producto, form);
+      let producto = new CompraProveedorDTO();
+      // this.armarDTOProducto(producto, form);
       if (!this.isEdicion) {
         this.subscription.add(
-          this._productoService.saveProducto(producto).subscribe({
+          this._comprasService.saveCompra(producto).subscribe({
             next: res => {
               this.spinner.hide();
-              this.obtenerProductos(true);
+              this.obtenerCompras(true);
               this.cerrarModal();
-              this.showDataProducto(res.data);
+              this.showDataCompra(res.data);
             },
             error: error => {
               this.spinner.hide();
@@ -444,9 +494,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
         )
       } else {
         this.subscription.add(
-          this._productoService.editProducto(this.selectedProducto.uuid, producto).subscribe({
+          this._comprasService.editCompra(this.selectedCompra.uuid, producto).subscribe({
             next: res => {
-              this.productos = [...this.productos.map(p =>
+              this.compras = [...this.compras.map(p =>
                 p.uuid === res.data.uuid ? res.data : p
               )];
               this.isEdicion = false;
@@ -507,53 +557,85 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   getDropdownClass(index: number) {
-    let mitad = this.productos.length / 2;
+    let mitad = this.compras.length / 2;
     return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
   }
+  obtenerComprasPorFiltroSimple() {
+    this.filtroTipoPersona = 'todos';
+    this.filtros['transaction.person.human.uuid'].value = '';
+    this.filtros['transaction.person.legalEntity.uuid'].value = '';
+    this.filtros['transaction.transactionDocuments.prefix_number'].value = '';
+    this.filtros['transaction.transactionDocuments.document_number'].value = '';
+    this.filtros['transaction.transactionProducts.product.uuid'].value = '';
 
-  obtenerProductosPorFiltroSimple() {
-    this.filtros['code'].value = '';
-    this.filtros['productType.uuid'].value = '';
-    this.filtros['productCategory.uuid'].value = '';
-    this.filtros['mercosur_nomenclature'].value = '';
-    this.filtros['measure.uuid'].value = '';
-    this.filtros['stocks.batch.batch_identification'].value = '';
-    this.filtros['suppliers.uuid'].value = '';
-    this.filtros['traceable'].value = '';
-    this.filtros['assign_serial_number'].value = '';
-    this.filtros['productStates.possibleProductState.uuid'].value = '';
-    delete this.filtros['productStates.datetime_to'];
-    this.obtenerProductos();
+    this.filtros['transaction.person.human.firstname'].contiene = this.filtroSimpleContiene;
+    this.filtros['transaction.person.human.lastname'].contiene = this.filtroSimpleContiene;
+    this.filtros['transaction.person.legalEntity.company_name'].contiene = this.filtroSimpleContiene;
+
+    if (this.filtroSimpleName) {
+      this.filtros['transaction.person.human.firstname'].value = this.filtroSimpleName;
+      this.filtros['transaction.person.human.lastname'].value = this.filtroSimpleName;
+      this.filtros['transaction.person.legalEntity.company_name'].value = this.filtroSimpleName;
+      this.filtros.operator.value = 'OR';
+    } else {
+      this.filtros['transaction.person.human.firstname'].value = '';
+      this.filtros['transaction.person.human.lastname'].value = '';
+      this.filtros['transaction.person.legalEntity.company_name'].value = '';
+      this.filtros.operator.value = '';
+    }
+
+    this.obtenerCompras();
   }
 
-  obtenerProductosPorFiltroAvanzado() {
-    if (this.filtros['productStates.possibleProductState.uuid'].value !== null && this.filtros['productStates.possibleProductState.uuid'].value !== '') {
-      this.filtros['productStates.datetime_to'] = { value: 'null', op: '=', contiene: false };
-    } else {
-      delete this.filtros['productStates.datetime_to'];
-    }
-    this.obtenerProductos();
+  obtenerComprasPorFiltroAvanzado() {
+    this.filtroSimpleName = '';
+    this.filtroSimpleContiene = true;
+    this.filtros.operator.value = '';
+    this.obtenerCompras();
   }
 
   limpiarFiltros() {
-    this.filtros['name'].value = '';
-    this.filtros['code'].value = '';
-    this.filtros['productType.uuid'].value = '';
-    this.filtros['productCategory.uuid'].value = '';
-    this.filtros['mercosur_nomenclature'].value = '';
-    this.filtros['measure.uuid'].value = '';
-    this.filtros['stocks.batch.batch_identification'].value = '';
-    this.filtros['suppliers.uuid'].value = '';
-    this.filtros['traceable'].value = '';
-    this.filtros['assign_serial_number'].value = '';
-    this.filtros['productStates.possibleProductState.uuid'].value = '';
-    delete this.filtros['productStates.datetime_to'];
-    this.obtenerProductos();
+    this.filtroTipoPersona = 'todos';
+    this.filtros['transaction.person.human.uuid'].value = '';
+    this.filtros['transaction.person.legalEntity.uuid'].value = '';
+    this.filtros['transaction.person.human.firstname'].value = '';
+    this.filtros['transaction.person.human.lastname'].value = '';
+    this.filtros['transaction.person.legalEntity.company_name'].value = '';
+    this.filtros['transaction.transactionDocuments.prefix_number'].value = '';
+    this.filtros['transaction.transactionDocuments.document_number'].value = '';
+    this.filtros['transaction.transactionProducts.product.uuid'].value = '';
+
+    this.obtenerCompras();
   }
 
-  irAlProducto(event: any) {
-    this.inicializarFormEdit(event);
-    this.tab1 = 'datos-generales';
+  // irAlProducto(event: any) {
+  //   this.inicializarFormEdit(event);
+  //   this.tab1 = 'datos-generales';
+  // }
+
+  changeTipoPersona() {
+    this.filtroSimpleName = '';
+    this.filtroSimpleContiene = true;
+    this.filtros.operator.value = '';
+    this.filtros['transaction.person.human.firstname'].value = '';
+    this.filtros['transaction.person.human.lastname'].value = '';
+    this.filtros['transaction.person.legalEntity.company_name'].value = '';
+    this.filtros['transaction.transactionDocuments.prefix_number'].value = '';
+    this.filtros['transaction.transactionDocuments.document_number'].value = '';
+    this.filtros['transaction.transactionProducts.product.uuid'].value = '';
+
+    if (this.filtroTipoPersona === 'todos') {
+      this.filtros['transaction.person.human.uuid'].value = '';
+      this.filtros['transaction.person.legalEntity.uuid'].value = '';
+    } else if (this.filtroTipoPersona === 'fisica') {
+      this.filtros['transaction.person.human.uuid'].value = 'null';
+      this.filtros['transaction.person.legalEntity.uuid'].value = '';
+    } else {
+      //jurídica
+      this.filtros['transaction.person.human.uuid'].value = '';
+      this.filtros['transaction.person.legalEntity.uuid'].value = 'null';
+    }
+    this.obtenerCompras();
   }
 
 }

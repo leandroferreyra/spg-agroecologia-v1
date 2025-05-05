@@ -153,8 +153,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         }
       })
     )
-
-
   }
 
   obtenerProcesoActivo() {

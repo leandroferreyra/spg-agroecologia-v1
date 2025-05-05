@@ -1,0 +1,6 @@
+::ng-deep .ng-select .ng-value {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+  }

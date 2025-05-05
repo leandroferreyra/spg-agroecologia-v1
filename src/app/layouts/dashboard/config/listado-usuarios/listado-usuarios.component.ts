@@ -102,6 +102,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.userService.getUsers(this.actual_role).subscribe({
         next: res => {
+          console.log(res);
           this.spinner.hide();
           this.tokenService.setToken(res.token);
           this.usuarios = res.data;
@@ -122,6 +123,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.rolService.getRolesWithoutPermissions(this.actual_role).subscribe({
         next: res => {
+          console.log(res);
           this.tokenService.setToken(res.token);
           this.roles = res.data;
         },

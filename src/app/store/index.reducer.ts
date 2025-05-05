@@ -73,7 +73,7 @@ function getMenuByRole(role: string) {
             return [
                 { label: 'Productos', route: '/productos' },
                 { label: 'Producción', route: '/produccion' },
-                { label: 'Compras', route: '/users' },
+                { label: 'Compras', route: '/compras' },
                 { label: 'Ventas', route: '/settings' },
                 { label: 'Proveedores', route: '/proveedores' },
                 { label: 'Clientes', route: '/clientes' },

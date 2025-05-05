@@ -2,7 +2,7 @@
     <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
         [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
 
-    <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[500px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
+    <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[520px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
         [ngClass]="{ '!block': isShowMailMenu }">
 
         <!-- PANEL IZQUIERDO -->
@@ -10,12 +10,12 @@
         <div class="flex h-full flex-col">
 
             <div class="flex items-center justify-between text-md mb-3">
-                <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')"
-                    [disabled]="isEdicion" [ngClass]="{
+                <button type="button" class="hover:text-primary" (click)="openModalCompra('NEW')" [disabled]="isEdicion"
+                    [ngClass]="{
                         'text-gray-400 cursor-not-allowed': isEdicion
                       }">
                     <icon-plus class="mx-auto mb-1" />
-                    Agregar producto
+                    Agregar compra
                 </button>
 
                 <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" [disabled]="isEdicion"
@@ -27,18 +27,19 @@
                 </button>
             </div>
 
-            <span *ngIf="productos && productos.length > 0" class="float-md-end color-gris">
-                Productos: {{ total_rows }}
+            <span *ngIf="compras && compras.length > 0" class="float-md-end color-gris">
+                Compras: {{ total_rows }}
             </span>
 
             <div class="table-container">
                 <div class="table-responsive">
                     <table class="table-hover">
                         <tbody>
-                            @for(data of productos ; let index = $index ;track data.uuid) {
+                            @for(data of compras ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;"
-                                [ngClass]="{'bg-blue-200': selectedProducto?.uuid === data.uuid}">
-                                <td (click)="showDataProducto(data)">{{ data.name }}
+                                [ngClass]="{'bg-blue-200': selectedCompra?.uuid === data.uuid}">
+                                <td (click)="showDataCompra(data)">
+                                    <b>{{ showName(data) }}</b> - {{showFactura(data)}} - {{showFecha(data)}}
                                 </td>
                                 <td class="w-0 whitespace-nowrap text-right align-middle">
                                     <div hlMenu class="dropdown">
@@ -48,7 +49,7 @@
                                         <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
                                             <li>
                                                 <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                    (click)="openModalProducto('EDIT', data)">Editar</a>
+                                                    (click)="openModalCompra('EDIT', data)">Editar</a>
                                             </li>
                                             <li>
                                                 <a href="javascript:;" *hlMenuItem="let menuItem"
@@ -67,14 +68,13 @@
             <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
                 <div class="d-flex justify-content-center mb-3">
                     <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
-                        [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        (pageChange)="obtenerProductos()">
+                        [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages (pageChange)="obtenerCompras()">
                     </ngb-pagination>
                 </div>
 
                 <div class="group relative">
-                    <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtros.name.value"
-                        (input)="obtenerProductosPorFiltroSimple()" class="peer form-input ltr:pr-8 rtl:pl-8" />
+                    <input type="text" placeholder="Buscar compra..." [(ngModel)]="filtroSimpleName"
+                        (input)="obtenerComprasPorFiltroSimple()" class="peer form-input ltr:pr-8 rtl:pl-8" />
                     <div
                         class="absolute top-1/2 -translate-y-1/2 peer-focus:text-primary ltr:right-[11px] rtl:left-[11px]">
                         <icon-search />
@@ -85,8 +85,8 @@
                     <label class="w-12 h-6 relative">
                         <input type="checkbox"
                             class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id="custom_switch_checkbox2" [(ngModel)]="filtros.name.contiene"
-                            (change)="obtenerProductos();" />
+                            id="custom_switch_checkbox2" [(ngModel)]="filtroSimpleContiene"
+                            (change)="obtenerComprasPorFiltroSimple();" />
                         <span for="custom_switch_checkbox2"
                             class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                         </span>
@@ -104,9 +104,9 @@
         <!-- MENU ICONO OCULTO RESPONSIVE -->
         <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
             <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
-                Producto
-                @if(productos.length > 0 && selectedProducto) {
-                {{selectedProducto.name}}
+                Compra
+                @if(compras.length > 0 && selectedCompra) {
+                {{selectedCompra.name}}
                 }
             </h5>
 
@@ -134,7 +134,7 @@
                     Datos generales
                 </a>
 
-                <a href="javascript:;"
+                <!-- <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componentes',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
@@ -186,22 +186,22 @@
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
                     (click)="!isTabDisabled && (tab1 = 'vinculos')">
                     Vínculos
-                </a>
+                </a> -->
             </div>
 
             <div class="flex-1 text-sm">
                 <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
-                    @if (productos.length > 0) {
-                    <form [formGroup]="productoForm" class="p-4">
+                    @if (compras.length > 0) {
+                    <!-- <form [formGroup]="compraForm" class="p-4">
                         <div class="flex flex-col sm:flex-row">
                             <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
-                                <div (keydown.enter)="confirmarProducto(productoForm)">
+                                <div (keydown.enter)="confirmarProducto(compraForm)">
                                     <label for="nombre">Nombre</label>
                                     <input id="nombre" type="text" placeholder="" class="form-control"
                                         formControlName="nombre" />
                                 </div>
-                                <div (keydown.enter)="confirmarProducto(productoForm)">
+                                <div (keydown.enter)="confirmarProducto(compraForm)">
                                     <label for="codigo">Código</label>
                                     <input id="codigo" type="text" placeholder="" class="form-control"
                                         formControlName="codigo" />
@@ -234,7 +234,7 @@
                                         formControlName="estadoComentario" rows="1"></textarea>
                                 </div>
 
-                                <div (keydown.enter)="confirmarProducto(productoForm)">
+                                <div (keydown.enter)="confirmarProducto(compraForm)">
                                     <label for="nomenclatura">Nomenclatura Mercosur (Pos. Arancelaria)</label>
                                     <input id="nomenclatura" type="text" placeholder="" class="form-control"
                                         formControlName="nomenclatura" />
@@ -246,7 +246,7 @@
                                         notFoundText="No hay unidades" placeholder="" class="w-1/3 min-w-[200px]"
                                         formControlName="unidad"></ng-select>
                                 </div>
-                                <div (keydown.enter)="confirmarProducto(productoForm)">
+                                <div (keydown.enter)="confirmarProducto(compraForm)">
                                     <label for="iva">IVA (%)</label>
                                     <input id="iva" type="text" placeholder="" class="form-control"
                                         formControlName="iva" />
@@ -266,7 +266,7 @@
                                         rows="1"></textarea>
                                 </div>
 
-                                <div (keydown.enter)="confirmarProducto(productoForm)">
+                                <div (keydown.enter)="confirmarProducto(compraForm)">
                                     <label for="nombreVenta">Nombre de venta</label>
                                     <input id="nombreVenta" type="text" placeholder="" class="form-control"
                                         formControlName="nombreVenta" />
@@ -445,45 +445,45 @@
                         <div class="row mt-3">
                             <div class="col-12 d-flex justify-content-center">
                                 <button type="button" class="btn btn-wd btn-primary mr-4"
-                                    (click)="confirmarProducto(productoForm)">Confirmar</button>
+                                    (click)="confirmarProducto(compraForm)">Confirmar</button>
                                 <button id="back-button-with-border" type="button" class="btn btn-wd"
                                     (click)="cancelarEdicion()">Cancelar</button>
                             </div>
                         </div>
                         }
 
-                    </form>
+                    </form> -->
                     }
 
                 </div>
 
-                <div *ngIf="tab1.toLowerCase() === 'componentes'">
+                <!-- <div *ngIf="tab1.toLowerCase() === 'componentes'">
                     @if (productos.length > 0) {
-                    <app-componentes [producto]="selectedProducto" [rol]="actual_role"
+                    <app-componentes [producto]="selectedCompra" [rol]="actual_role"
                         (eventProducto)="irAlProducto($event)">
                     </app-componentes>
                     }
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'componente-de'">
-                    <app-componente-de [producto]="selectedProducto" [rol]="actual_role"
+                    <app-componente-de [producto]="selectedCompra" [rol]="actual_role"
                         (eventProducto)="irAlProducto($event)">
                     </app-componente-de>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'reemplazos'">
-                    <app-reemplazos [producto]="selectedProducto" [rol]="actual_role"
+                    <app-reemplazos [producto]="selectedCompra" [rol]="actual_role"
                         (eventProducto)="irAlProducto($event)">
                     </app-reemplazos>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'proveedores'">
-                    <app-proveedores-producto [producto]="selectedProducto" [rol]="actual_role">
+                    <app-proveedores-producto [producto]="selectedCompra" [rol]="actual_role">
                     </app-proveedores-producto>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'stocks'">
-                    <app-stocks [producto]="selectedProducto" [rol]="actual_role">
+                    <app-stocks [producto]="selectedCompra" [rol]="actual_role">
                     </app-stocks>
                 </div>
 
@@ -495,7 +495,7 @@
                 <div *ngIf="tab1.toLowerCase() === 'vinculos'">
                     <app-vinculos>
                     </app-vinculos>
-                </div>
+                </div> -->
 
             </div>
         </div>
@@ -506,7 +506,7 @@
 
 
 <div>
-    <ngx-custom-modal #modalProducto class=" modal-top extra-large-modal animate animate-fade-in">
+    <ngx-custom-modal #modalCompra class=" modal-top extra-large-modal animate animate-fade-in">
         <ng-template #modalHeader>
             <div class="position-relative text-center w-100">
                 <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
@@ -515,18 +515,18 @@
 
         <ng-template #modalBody>
 
-            <form [formGroup]="newProductoForm" class="p-4">
+            <!-- <form [formGroup]="newCompraForm" class="p-4">
                 <div class="flex flex-col sm:flex-row">
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
-                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
-                            [ngClass]="isSubmit ? newProductoForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
+                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nombre">Nombre</label>
                             <input id="nombre" type="text" placeholder="" class="form-control"
                                 formControlName="nombre" />
                         </div>
-                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
-                            [ngClass]="isSubmit ? newProductoForm.controls['codigo'].errors ? 'has-error' : 'has-success' : ''">
+                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['codigo'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="codigo">Código</label>
                             <input id="codigo" type="text" placeholder="" class="form-control"
                                 formControlName="codigo" />
@@ -537,7 +537,7 @@
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay tipos de producto"
                                 placeholder="" class="w-1/3 min-w-[200px]" formControlName="tipoProducto"
                                 [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newProductoForm.controls['tipoProducto'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                                [ngClass]="isSubmit ? newCompraForm.controls['tipoProducto'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
                         <div>
                             <label for="categoria">Categoría</label>
@@ -545,25 +545,25 @@
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay categorías"
                                 placeholder="" class="w-1/3 min-w-[200px]" formControlName="categoria"
                                 [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newProductoForm.controls['categoria'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                                [ngClass]="isSubmit ? newCompraForm.controls['categoria'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
                         <div>
                             <label for="estado">Estado</label>
                             <ng-select [items]="estados" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay estados" placeholder=""
                                 class="w-1/3 min-w-[200px]" formControlName="estado" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newProductoForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                                [ngClass]="isSubmit ? newCompraForm.controls['estado'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
 
                         <div
-                            [ngClass]="isSubmit ? newProductoForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
+                            [ngClass]="isSubmit ? newCompraForm.controls['estadoComentario'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="estadoComentario">Comentario del estado</label>
                             <textarea class="form-control" id="estadoComentario" formControlName="estadoComentario"
                                 rows="1"></textarea>
                         </div>
 
-                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
-                            [ngClass]="isSubmit ? newProductoForm.controls['nomenclatura'].errors ? 'has-error' : 'has-success' : ''">
+                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['nomenclatura'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nomenclatura">Nomenclatura Mercosur (Pos. Arancelaria)</label>
                             <input id="nomenclatura" type="text" placeholder="" class="form-control"
                                 formControlName="nomenclatura" />
@@ -573,10 +573,10 @@
                             <ng-select [items]="measures" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay unidades" placeholder=""
                                 class="w-1/3 min-w-[200px]" formControlName="unidad" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newProductoForm.controls['unidad'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                                [ngClass]="isSubmit ? newCompraForm.controls['unidad'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
-                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
-                            [ngClass]="isSubmit ? newProductoForm.controls['iva'].errors ? 'has-error' : 'has-success' : ''">
+                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['iva'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="iva">IVA (%)</label>
                             <input id="iva" type="text" placeholder="" class="form-control" formControlName="iva" />
                         </div>
@@ -586,28 +586,28 @@
                             <ng-select [items]="paises" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay países" placeholder=""
                                 class="w-1/3 min-w-[200px]" formControlName="pais" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newProductoForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                                [ngClass]="isSubmit ? newCompraForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
 
                         <div
-                            [ngClass]="isSubmit ? newProductoForm.controls['comentarios'].errors ? 'has-error' : 'has-success' : ''">
+                            [ngClass]="isSubmit ? newCompraForm.controls['comentarios'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="comentarios">Comentarios</label>
                             <textarea class="form-control" id="comentarios" formControlName="comentarios"
                                 rows="1"></textarea>
                         </div>
 
-                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
-                            [ngClass]="isSubmit ? newProductoForm.controls['nombreVenta'].errors ? 'has-error' : 'has-success' : ''">
+                        <div (keydown.enter)="confirmarProducto(newCompraForm)"
+                            [ngClass]="isSubmit ? newCompraForm.controls['nombreVenta'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="nombreVenta">Nombre de venta</label>
                             <input id="nombreVenta" type="text" placeholder="" class="form-control"
                                 formControlName="nombreVenta" />
                         </div>
 
                         <div class="flex items-center gap-2 mt-2"
-                            [ngClass]="isSubmit ? newProductoForm.controls['asignaNumSerie'].errors ? 'has-error' : 'has-success' : ''">
+                            [ngClass]="isSubmit ? newCompraForm.controls['asignaNumSerie'].errors ? 'has-error' : 'has-success' : ''">
                             <label class="w-12 h-6 relative">
                                 <input type="checkbox"
-                                    [ngClass]="isSubmit ? newProductoForm.controls['asignaNumSerie'].errors ? 'has-error' : 'has-success' : ''"
+                                    [ngClass]="isSubmit ? newCompraForm.controls['asignaNumSerie'].errors ? 'has-error' : 'has-success' : ''"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
                                     id="custom_switch_checkbox2" formControlName="asignaNumSerie" />
                                 <span for="custom_switch_checkbox2"
@@ -666,7 +666,7 @@
                         </div>
 
                         <div
-                            [ngClass]="isSubmit ? newProductoForm.controls['descripcionControl'].errors ? 'has-error' : 'has-success' : ''">
+                            [ngClass]="isSubmit ? newCompraForm.controls['descripcionControl'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="descripcionControl">Descripción control</label>
                             <textarea class="form-control" id="descripcionControl" formControlName="descripcionControl"
                                 rows="1"></textarea>
@@ -675,12 +675,12 @@
                     </div>
                 </div>
 
-            </form>
+            </form> -->
 
 
             <div class="row mt-3">
                 <div class="col-12 d-flex justify-content-center">
-                    <button class="btn btn-primary mr-3" (click)="confirmarProducto(newProductoForm)">
+                    <button class="btn btn-primary mr-3" (click)="confirmarProducto(newCompraForm)">
                         Confirmar
                     </button>
                     <button id="back-button-with-border" type="button" class="btn btn-wd"
@@ -715,16 +715,99 @@
                         <!-- Campos en una sola fila -->
                         <div class="d-flex flex-wrap align-items-center gap-3">
 
-                            <div style="width: 100%;">
+                            <div class="mb-3 text-center">
+                                <label class="font-semibold text-gray-700 d-block">Tipo de Persona:</label>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioTodos">
+                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                                id="radioTodos" value="todos" [(ngModel)]="filtroTipoPersona"
+                                                (change)="changeTipoPersona()">
+                                            <span class="ml-2 cursor-pointer">Todos</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioFisica">
+                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                                id="radioFisica" value="fisica" [(ngModel)]="filtroTipoPersona"
+                                                (change)="changeTipoPersona()">
+                                            <span class="ml-2 cursor-pointer">Física</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioJuridica">
+                                            <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                                id="radioJuridica" value="juridica" [(ngModel)]="filtroTipoPersona"
+                                                (change)="changeTipoPersona()">
+                                            <span class="ml-2 cursor-pointer">Jurídica</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="d-flex flex-wrap align-items-center gap-3"> -->
+                            @if(this.filtroTipoPersona === 'fisica' || this.filtroTipoPersona === 'todos') {
+                            <div class="flex-grow-1">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" class="form-control"
+                                    [(ngModel)]="filtros['transaction.person.human.firstname'].value"
+                                    (input)="obtenerComprasPorFiltroAvanzado()">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="apellido">Apellido</label>
+                                <input type="text" id="apellido" class="form-control"
+                                    [(ngModel)]="filtros['transaction.person.human.lastname'].value"
+                                    (input)="obtenerComprasPorFiltroAvanzado()">
+                            </div>
+                            }
+                            @if(this.filtroTipoPersona === 'juridica' || this.filtroTipoPersona === 'todos') {
+                            <div class="flex-grow-1">
+                                <label for="razon">Razón Social</label>
+                                <input type="text" id="razon" class="form-control"
+                                    [(ngModel)]="filtros['transaction.person.legalEntity.company_name'].value"
+                                    (input)="obtenerComprasPorFiltroAvanzado()">
+                            </div>
+                            }
+                            <div class="flex-grow-1">
+                                <label for="prefijo">Prefijo (comprobante contable)</label>
+                                <input type="text" id="prefijo" class="form-control"
+                                    [(ngModel)]="filtros['transaction.transactionDocuments.prefix_number'].value"
+                                    (input)="obtenerComprasPorFiltroAvanzado()">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="documento">Número de documento (comprobante contable)</label>
+                                <input type="text" id="documento" class="form-control"
+                                    [(ngModel)]="filtros['transaction.transactionDocuments.document_number'].value"
+                                    (input)="obtenerComprasPorFiltroAvanzado()">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label>Producto
+                                    @if(cargandoProductos) {
+                                    <span
+                                        class="animate-spin border-[3px] border-transparent border-l-primary rounded-full w-6 h-6 inline-block align-middle m-auto mb-10"></span>
+                                    }
+                                </label>
+                                <ng-select [items]="productosParaFiltro" bindLabel="name" bindValue="uuid"
+                                    clearAllText="Limpiar" [virtualScroll]="true" notFoundText="No hay productos"
+                                    class="w-1/3 min-w-[100px] max-w-[330px]" style="width: 100%;"
+                                    [(ngModel)]="filtros['transaction.transactionProducts.product.uuid'].value"
+                                    (change)="obtenerComprasPorFiltroAvanzado()">
+                                </ng-select>
+                                <!-- class="w-full max-w-[250px]" style="width: 100%;" -->
+
+                            </div>
+                            <!-- </div> -->
+
+                            <!-- <div style="width: 100%;">
                                 <label for="switchRight">Nombre</label>
                                 <div class="flex">
-                                    <input id="switchRight" type="text" placeholder="" [(ngModel)]="filtros.name.value"
-                                        (input)="obtenerProductosPorFiltroAvanzado()"
+                                    <input id="switchRight" type="text" placeholder=""
+                                        (input)="obtenerComprasPorFiltroAvanzado()"
                                         class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
                                     <div
                                         class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
                                         <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                                            <input type="checkbox" (change)="obtenerProductosPorFiltroAvanzado()"
+                                            <input type="checkbox" (change)="obtenerComprasPorFiltroAvanzado()"
                                                 class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                                 id="custom_switch_checkbox2" [(ngModel)]="filtros.name.contiene" />
                                             <span
@@ -733,48 +816,48 @@
                                         <span class="text-xs text-gray-600 ml-1">Contiene</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
-                            <div class="flex-grow-1">
+                            <!-- <div class="flex-grow-1">
                                 <label for="codigo">Código</label>
                                 <input type="text" id="codigo" class="form-control" [(ngModel)]="filtros.code.value"
-                                    (input)="obtenerProductosPorFiltroAvanzado()">
-                            </div>
+                                    (input)="obtenerComprasPorFiltroAvanzado()">
+                            </div> -->
 
-                            <div class="flex-grow-1">
+                            <!-- <div class="flex-grow-1">
                                 <label for="tiposProducto">Tipos de producto</label>
                                 <ng-select [items]="tipoProductos" bindLabel="name" bindValue="uuid"
                                     clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                     notFoundText="No hay tipos de productos" class="w-1/3 min-w-[200px]"
                                     [(ngModel)]="filtros['productType.uuid'].value"
-                                    (change)="obtenerProductosPorFiltroAvanzado()"></ng-select>
-                            </div>
+                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
+                            </div> -->
 
 
-                            <div class="flex-grow-1">
+                            <!-- <div class="flex-grow-1">
                                 <label for="categorias">Categoría</label>
                                 <ng-select [items]="categorias" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                     style="width: 100%" [virtualScroll]="true" notFoundText="No hay categorías"
                                     class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['productCategory.uuid'].value"
-                                    (change)="obtenerProductosPorFiltroAvanzado()"></ng-select>
-                            </div>
+                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
+                            </div> -->
 
-                            <div class="flex-grow-1">
+                            <!-- <div class="flex-grow-1">
                                 <label for="estado">Estado actual</label>
                                 <ng-select [items]="estados" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                     style="width: 100%" [virtualScroll]="true" notFoundText="No hay estados"
                                     class="w-1/3 min-w-[200px]"
                                     [(ngModel)]="filtros['productStates.possibleProductState.uuid'].value"
-                                    (change)="obtenerProductosPorFiltroAvanzado()">
+                                    (change)="obtenerComprasPorFiltroAvanzado()">
                                 </ng-select>
-                            </div>
+                            </div> -->
 
-                            <div style="width: 100%;">
+                            <!-- <div style="width: 100%;">
                                 <label for="switchRight">Nomenclatura Mercosur (Pos. Arancelaria)</label>
                                 <div class="flex">
                                     <input id="switchRight" type="text" placeholder=""
                                         [(ngModel)]="filtros.mercosur_nomenclature.value"
-                                        (input)="obtenerProductosPorFiltroAvanzado()"
+                                        (input)="obtenerComprasPorFiltroAvanzado()"
                                         class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
                                     <div
                                         class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
@@ -783,82 +866,82 @@
                                                 class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                                 id="custom_switch_checkbox2"
                                                 [(ngModel)]="filtros.mercosur_nomenclature.contiene"
-                                                (change)="obtenerProductosPorFiltroAvanzado()" />
+                                                (change)="obtenerComprasPorFiltroAvanzado()" />
                                             <span
                                                 class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
                                         </label>
                                         <span class="text-xs text-gray-600 ml-1">Contiene</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
-                            <div class="flex-grow-1">
+                            <!-- <div class="flex-grow-1">
                                 <label for="unidad">Unidad</label>
                                 <ng-select [items]="measures" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                     style="width: 100%" [virtualScroll]="true" notFoundText="No hay unidades"
                                     class="w-1/3 min-w-[200px]" [(ngModel)]="filtros['measure.uuid'].value"
-                                    (change)="obtenerProductosPorFiltroAvanzado()"></ng-select>
-                            </div>
+                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
+                            </div> -->
 
-                            <div class="d-flex align-items-center">
+                            <!-- <div class="d-flex align-items-center">
                                 <label class="me-2">Trazable:</label>
                                 <div class="form-check mr-2">
                                     <input class="form-check-input" type="radio" id="trazableSinFiltro" name="trazable"
                                         value='' [(ngModel)]="filtros.traceable.value"
-                                        (change)="obtenerProductosPorFiltroAvanzado()">
+                                        (change)="obtenerComprasPorFiltroAvanzado()">
                                     <label class="form-check-label" for="trazableSinFiltro">Sin filtro</label>
                                 </div>
                                 <div class="form-check mr-2">
                                     <input class="form-check-input" type="radio" id="trazableSi" name="trazable" value=1
                                         [(ngModel)]="filtros.traceable.value"
-                                        (change)="obtenerProductosPorFiltroAvanzado()">
+                                        (change)="obtenerComprasPorFiltroAvanzado()">
                                     <label class="form-check-label" for="trazableSi">Sí</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" id="trazableNo" name="trazable" value=0
                                         [(ngModel)]="filtros.traceable.value"
-                                        (change)="obtenerProductosPorFiltroAvanzado()">
+                                        (change)="obtenerComprasPorFiltroAvanzado()">
                                     <label class="form-check-label" for="trazableNo">No</label>
                                 </div>
-                            </div>
+                            </div> -->
 
-                            <div class="d-flex align-items-center">
+                            <!-- <div class="d-flex align-items-center">
                                 <label class="me-2">Asigna n° de serie:</label>
                                 <div class="form-check mr-2">
                                     <input class="form-check-input" type="radio" id="asignaSinFiltro" name="asigna"
                                         value='' [(ngModel)]="filtros.assign_serial_number.value"
-                                        (change)="obtenerProductosPorFiltroAvanzado()">
+                                        (change)="obtenerComprasPorFiltroAvanzado()">
                                     <label class="form-check-label" for="asignaSinFiltro">Sin filtro</label>
                                 </div>
                                 <div class="form-check mr-2">
                                     <input class="form-check-input" type="radio" id="asignaSi" name="asigna" value=1
                                         [(ngModel)]="filtros.assign_serial_number.value"
-                                        (change)="obtenerProductosPorFiltroAvanzado()">
+                                        (change)="obtenerComprasPorFiltroAvanzado()">
                                     <label class="form-check-label" for="asignaSi">Sí</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" id="asignaNo" name="asigna" value=0
                                         [(ngModel)]="filtros.assign_serial_number.value"
-                                        (change)="obtenerProductosPorFiltroAvanzado()">
+                                        (change)="obtenerComprasPorFiltroAvanzado()">
                                     <label class="form-check-label" for="asignaNo">No</label>
                                 </div>
-                            </div>
+                            </div> -->
 
-                            <div class="flex-grow-1">
+                            <!-- <div class="flex-grow-1">
                                 <label for="proveedor">Proveedor</label>
                                 <ng-select [items]="proveedores" bindLabel="nombreCompleto" bindValue="uuid"
                                     clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                     notFoundText="No hay proveedores" class="w-1/3 min-w-[200px]"
                                     [(ngModel)]="filtros['suppliers.uuid'].value"
-                                    (change)="obtenerProductosPorFiltroAvanzado()"></ng-select>
-                            </div>
+                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
+                            </div> -->
 
-                            <div style="width: 100%;">
+                            <!-- <div style="width: 100%;">
                                 <label for="switchRight">Lote</label>
                                 <div class="flex">
                                     <input id="switchRight" type="text" placeholder=""
                                         [(ngModel)]="filtros['stocks.batch.batch_identification'].value"
-                                        (input)="obtenerProductosPorFiltroAvanzado()"
+                                        (input)="obtenerComprasPorFiltroAvanzado()"
                                         class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
                                     <div
                                         class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
@@ -867,14 +950,14 @@
                                                 class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                                 id="custom_switch_checkbox2"
                                                 [(ngModel)]="filtros['stocks.batch.batch_identification'].contiene"
-                                                (change)="obtenerProductosPorFiltroAvanzado()" />
+                                                (change)="obtenerComprasPorFiltroAvanzado()" />
                                             <span
                                                 class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
                                         </label>
                                         <span class="text-xs text-gray-600 ml-1">Contiene</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                         </div>
 
