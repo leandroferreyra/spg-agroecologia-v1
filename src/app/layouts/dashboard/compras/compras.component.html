@@ -768,6 +768,26 @@
                                     (input)="obtenerComprasPorFiltroAvanzado()">
                             </div>
                             }
+                            <div class="col-md-12 pr-1 mb-3">
+                                <label>Fecha transacción desde</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'Y-m-d',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" [(ngModel)]="filtroFechaTransacDesde"
+                                    (input)="obtenerComprasPorFiltroAvanzado()" />
+                            </div>
+                            <div class="col-md-12 pr-1 mb-3">
+                                <label>Fecha transacción hasta</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'Y-m-d',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" [(ngModel)]="filtroFechaTransacHasta"
+                                    (input)="obtenerComprasPorFiltroAvanzado()" />
+                            </div>
                             <div class="flex-grow-1">
                                 <label>Tipo de comprobante contable</label>
                                 <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
@@ -788,21 +808,69 @@
                                     [(ngModel)]="filtros['transaction.transactionDocuments.document_number'].value"
                                     (input)="obtenerComprasPorFiltroAvanzado()">
                             </div>
-                            <div class="flex-grow-1">
-                                <label>Lote/Partida</label>
-                                <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
-                                    clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                    notFoundText="No hay lotes" class="w-1/3 min-w-[200px]"
-                                    [(ngModel)]="filtros['batch.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
+                            <div class="col-md-12 pr-1 mb-3">
+                                <label>Fecha factura desde</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'Y-m-d',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" [(ngModel)]="filtroFechaFacturaDesde"
+                                    (input)="obtenerComprasPorFiltroAvanzado()" />
                             </div>
-                            <div class="flex-grow-1">
-                                <label>Nro. de serie</label>
-                                <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
-                                    clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                    notFoundText="No hay número de series" class="w-1/3 min-w-[200px]"
-                                    [(ngModel)]="filtros['batch.stocks.productInstances.uuid'].value"
-                                    (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
+                            <div class="col-md-12 pr-1 mb-3">
+                                <label>Fecha factura hasta</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'Y-m-d',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" [(ngModel)]="filtroFechaFacturaHasta"
+                                    (input)="obtenerComprasPorFiltroAvanzado()" />
+                            </div>
+                            <div style="width: 100%;">
+                                <label for="switchRight">Lote</label>
+                                <div class="flex">
+                                    <input id="switchRight" type="text" placeholder=""
+                                        [(ngModel)]="filtros['batch.batch_identification'].value"
+                                        (input)="obtenerComprasPorFiltroAvanzado()"
+                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
+                                    <div
+                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                            <input type="checkbox"
+                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                                id="custom_switch_checkbox2"
+                                                [(ngModel)]="filtros['batch.batch_identification'].contiene"
+                                                (change)="obtenerComprasPorFiltroAvanzado()" />
+                                            <span
+                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                                        </label>
+                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="width: 100%;">
+                                <label for="switchRight">Nro de serie</label>
+                                <div class="flex">
+                                    <input id="switchRight" type="text" placeholder=""
+                                        [(ngModel)]="filtros['batch.stocks.productInstances.serial_number'].value"
+                                        (input)="obtenerComprasPorFiltroAvanzado()"
+                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
+                                    <div
+                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                            <input type="checkbox"
+                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                                id="custom_switch_checkbox2"
+                                                [(ngModel)]="filtros['batch.stocks.productInstances.serial_number'].contiene"
+                                                (change)="obtenerComprasPorFiltroAvanzado()" />
+                                            <span
+                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                                        </label>
+                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="flex-grow-1">
                                 <label>Producto

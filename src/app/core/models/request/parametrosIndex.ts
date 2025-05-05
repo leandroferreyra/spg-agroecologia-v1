@@ -5,6 +5,7 @@ export class ParametrosIndex {
     page!: number;
     order_by: any;
     filters: any;
+    extraDateFilters: any[] = [];
 
     constructor() {
 

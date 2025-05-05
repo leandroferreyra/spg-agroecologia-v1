@@ -15,8 +15,8 @@ import { Subscription, forkJoin } from 'rxjs';
 import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
-import { ProductoService } from 'src/app/core/services/producto.service';
 import { SwalService } from 'src/app/core/services/swal.service';
+import Swal from 'sweetalert2';
 import { TokenService } from 'src/app/core/services/token.service';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
@@ -27,29 +27,17 @@ import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import { IconUserComponent } from 'src/app/shared/icon/icon-user';
-import Swal from 'sweetalert2';
-import { ComprasProveedorComponent } from '../personas/proveedores/compras-proveedor/compras-proveedor.component';
-import { CuentasBancariasComponent } from '../personas/proveedores/cuentas-bancarias/cuentas-bancarias.component';
-import { ContactosPersonaComponent } from '../personas/shared/contactos-persona/contactos-persona.component';
-import { ContactosComponent } from '../personas/shared/contactos/contactos.component';
-import { ComponenteDeComponent } from '../productos/componente-de/componente-de.component';
-import { ComponentesComponent } from '../productos/componentes/componentes.component';
-import { ComprasProductoComponent } from '../productos/compras-producto/compras-producto.component';
-import { ProveedoresProductoComponent } from '../productos/proveedores-producto/proveedores-producto.component';
-import { ReemplazosComponent } from '../productos/reemplazos/reemplazos.component';
-import { StocksComponent } from '../productos/stocks/stocks.component';
-import { VinculosComponent } from '../productos/vinculos/vinculos.component';
 import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.service';
 import { CompraProveedorDTO } from 'src/app/core/models/request/compraProveedorDTO';
+import { FlatpickrDirective } from 'angularx-flatpickr';
+import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
 
 @Component({
   selector: 'app-compras',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
-    IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
-    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent
+    IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule, IconSettingsComponent,
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective
   ],
   animations: [toggleAnimation],
   templateUrl: './compras.component.html',
@@ -85,6 +73,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   // Orden y filtro
+  params = new ParametrosIndex();
+  filtroFechaTransacDesde!: string;
+  filtroFechaTransacHasta!: string;
+  filtroFechaFacturaDesde: string = '';
+  filtroFechaFacturaHasta: string = '';
   filtros: any = {
     'operator': { value: '' },
     'transaction.person.human.lastname': { value: '', op: 'LIKE', contiene: true },
@@ -96,8 +89,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
     'transaction.transactionDocuments.document_number': { value: '', op: 'LIKE', contiene: true },
     'transaction.transactionProducts.product.uuid': { value: '', op: '=', contiene: false },
     'transaction.transactionDocuments.accountDocumentType.uuid': { value: '', op: '=', contiene: false },
-    'batch.uuid': { value: '', op: '=', contiene: false },
-    'batch.stocks.productInstances.uuid': { value: '', op: '=', contiene: false },
+    'batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
+    'batch.stocks.productInstances.serial_number': { value: '', op: 'LIKE', contiene: true },
   };
   ordenamiento: any = {
   };
@@ -161,15 +154,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    const params: any = {};
-    params.with = ["transaction.person.human", "transaction.person.legalEntity", "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch'];
-    params.paging = this.itemsPerPage;
-    params.page = this.currentPage;
-    params.order_by = this.ordenamiento;
-    params.filters = this.filtros;
+    this.params.with = ["transaction.person.human", "transaction.person.legalEntity", "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch', 'batch.stocks.productInstances'];
+    this.params.paging = this.itemsPerPage;
+    this.params.page = this.currentPage;
+    this.params.order_by = this.ordenamiento;
+    this.params.filters = this.filtros;
 
     this.subscription.add(
-      this._indexService.getComprasProveedorWithParam(params, this.actual_role).subscribe({
+      this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
           console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
@@ -212,7 +204,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._comprasService.getCompraById(uuid, this.actual_role).subscribe({
         next: res => {
-          console.log(res);
+          // console.log(res);
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -253,7 +245,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
-        console.log("🚀 ~ ComprasComponent ~ obtenerCatalogos ~ this.tiposDocumentosContables:", this.tiposDocumentosContables)
 
       },
       error: error => {
@@ -454,14 +445,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.isEdicion = false;
         this.inicializarFormEdit(this.selectedCompra); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
       }
-      this.tituloModal = 'Nuevo producto';
+      this.tituloModal = 'Nueva compra';
       this.inicializarFormNew();
       this.modalCompra.options = this.modalOptions;
       this.modalCompra.open();
     } else {
       this.tab1 = 'datos-generales';
       this.isEdicion = true;
-      this.tituloModal = 'Edición producto';
+      this.tituloModal = 'Edición compra';
       this.inicializarFormEdit(producto);
     }
   }
@@ -569,9 +560,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.filtros['transaction.transactionDocuments.document_number'].value = '';
     this.filtros['transaction.transactionProducts.product.uuid'].value = '';
     this.filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
-    this.filtros['batch.uuid'].value = '';
-    this.filtros['batch.stocks.productInstances.uuid'].value = '';
-    
+    this.filtros['batch.batch_identification'].value = '';
+    this.filtros['batch.stocks.productInstances.serial_number'].value = '';
+    // Limpio las fechas
+    this.filtroFechaTransacDesde = '';
+    this.filtroFechaTransacHasta = '';
+    this.filtroFechaFacturaDesde = '';
+    this.filtroFechaFacturaHasta = '';
+    this.params.extraDateFilters = [];
+
     this.filtros['transaction.person.human.firstname'].contiene = this.filtroSimpleContiene;
     this.filtros['transaction.person.human.lastname'].contiene = this.filtroSimpleContiene;
     this.filtros['transaction.person.legalEntity.company_name'].contiene = this.filtroSimpleContiene;
@@ -595,6 +592,22 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.filtroSimpleName = '';
     this.filtroSimpleContiene = true;
     this.filtros.operator.value = '';
+    this.params.extraDateFilters = [];
+    // Manejar fechas
+    if (this.filtroFechaTransacDesde) {
+      this.params.extraDateFilters.push(['transaction.transaction_datetime', '>=', this.filtroFechaTransacDesde]);
+    }
+    if (this.filtroFechaTransacHasta) {
+      this.params.extraDateFilters.push(['transaction.transaction_datetime', '<=', this.filtroFechaTransacHasta]);
+    }
+    if (this.filtroFechaFacturaDesde) {
+      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '>=', this.filtroFechaFacturaDesde]);
+
+    }
+    if (this.filtroFechaFacturaHasta) {
+      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '<=', this.filtroFechaFacturaHasta]);
+
+    }
     this.obtenerCompras();
   }
 
@@ -609,8 +622,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.filtros['transaction.transactionDocuments.document_number'].value = '';
     this.filtros['transaction.transactionProducts.product.uuid'].value = '';
     this.filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
-    this.filtros['batch.uuid'].value = '';
-    this.filtros['batch.stocks.productInstances.uuid'].value = '';
+    this.filtros['batch.batch_identification'].value = '';
+    this.filtros['batch.stocks.productInstances.serial_number'].value = '';
+    // Limpio las fechas
+    this.filtroFechaTransacDesde = '';
+    this.filtroFechaTransacHasta = '';
+    this.filtroFechaFacturaDesde = '';
+    this.filtroFechaFacturaHasta = '';
+    this.params.extraDateFilters = [];
 
     this.obtenerCompras();
   }
@@ -631,9 +650,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.filtros['transaction.transactionDocuments.document_number'].value = '';
     this.filtros['transaction.transactionProducts.product.uuid'].value = '';
     this.filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
-    this.filtros['batch.uuid'].value = '';
-    this.filtros['batch.stocks.productInstances.uuid'].value = '';
-    
+    this.filtros['batch.batch_identification'].value = '';
+    this.filtros['batch.stocks.productInstances.serial_number'].value = '';
+    // Limpio las fechas
+    this.filtroFechaTransacDesde = '';
+    this.filtroFechaTransacHasta = '';
+    this.params.extraDateFilters = [];
+
     if (this.filtroTipoPersona === 'todos') {
       this.filtros['transaction.person.human.uuid'].value = '';
       this.filtros['transaction.person.legalEntity.uuid'].value = '';

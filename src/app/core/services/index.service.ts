@@ -75,13 +75,25 @@ export class IndexService {
                 // Acá ingresa cuando es una búsqueda por string y el contiene es false es decir, debería ser un startWith 
                 params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}%`);
               } else {
-                // Acá no es LIKE por lo que seguro es un = y busca por uuid.
+                // Acá no es LIKE por lo que seguro es un '=' o un '!=' y busca por uuid.
                 params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
               }
             }
           }
         }
       });
+
+      if (paramsObj.extraDateFilters && Array.isArray(paramsObj.extraDateFilters)) {
+        paramsObj.extraDateFilters.forEach((filtro: any[], index: number) => {
+          // Sumar los filtros extra luego de los existentes
+          const currentIndex = Math.ceil(params.keys().filter(k => k.startsWith('filters[')).length / 3);
+          params = params.append(`filters[${currentIndex}][]`, filtro[0]);
+          params = params.append(`filters[${currentIndex}][]`, filtro[1]);
+          params = params.append(`filters[${currentIndex}][]`, filtro[2]);
+        });
+      }
+
+
 
       if (paramsObj.distinct !== null && paramsObj.distinct !== undefined) {
         params = params.append('distinct', paramsObj.distinct);
