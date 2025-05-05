@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { CompraProveedorDTO } from '../models/request/compraProveedorDTO';
+import { CompraDTO } from '../models/request/compraDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -30,14 +31,19 @@ export class ComprasProveedorService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, { headers, params });
   }
 
-  saveCompra(cuenta: CompraProveedorDTO): Observable<AuthResponse> {
+  saveCompra(compra: CompraDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiCompras, JSON.stringify(cuenta), { headers });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiCompras, JSON.stringify(compra), { headers });
   }
 
-  editCompra(uuid: string, cuenta: CompraProveedorDTO): Observable<AuthResponse> {
+  saveCompraProveedor(compra: CompraProveedorDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, JSON.stringify(cuenta), { headers });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiCompras, JSON.stringify(compra), { headers });
+  }
+
+  editCompraProveedor(uuid: string, compra: CompraProveedorDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, JSON.stringify(compra), { headers });
   }
 
   deleteCompra(uuid: string, rolActual: string): Observable<AuthResponse> {

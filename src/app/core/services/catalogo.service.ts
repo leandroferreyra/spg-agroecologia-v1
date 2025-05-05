@@ -123,8 +123,7 @@ export class CatalogoService {
 
   getTiposDocumentosContables(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    let params = new HttpParams();
-    params = params.append('actual_role', rol);
+    let params = new HttpParams().append('actual_role', rol).append('filters[0][]', 'transactionType.name').append('filters[0][]', 'LIKE').append('filters[0][]', 'Compra');
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiDocumentosContables, { headers, params: params });
   }
 

@@ -470,7 +470,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       // this.armarDTOProducto(producto, form);
       if (!this.isEdicion) {
         this.subscription.add(
-          this._comprasService.saveCompra(producto).subscribe({
+          this._comprasService.saveCompraProveedor(producto).subscribe({
             next: res => {
               this.spinner.hide();
               this.obtenerCompras(true);
@@ -486,7 +486,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         )
       } else {
         this.subscription.add(
-          this._comprasService.editCompra(this.selectedCompra.uuid, producto).subscribe({
+          this._comprasService.editCompraProveedor(this.selectedCompra.uuid, producto).subscribe({
             next: res => {
               this.compras = [...this.compras.map(p =>
                 p.uuid === res.data.uuid ? res.data : p
