@@ -95,6 +95,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
     'transaction.transactionDocuments.prefix_number': { value: '', op: 'LIKE', contiene: true },
     'transaction.transactionDocuments.document_number': { value: '', op: 'LIKE', contiene: true },
     'transaction.transactionProducts.product.uuid': { value: '', op: '=', contiene: false },
+    'transaction.transactionDocuments.accountDocumentType.uuid': { value: '', op: '=', contiene: false },
+    'batch.uuid': { value: '', op: '=', contiene: false },
+    'batch.stocks.productInstances.uuid': { value: '', op: '=', contiene: false },
   };
   ordenamiento: any = {
   };
@@ -118,12 +121,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   tituloModal: string = '';
 
   // Catalogos
-  paises: any[] = [];
-  categorias: any[] = [];
-  estados: any[] = [];
-  proveedores: any[] = [];
-  tipoProductos: any[] = [];
-  measures: any[] = [];
+  tiposDocumentosContables: any[] = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -155,7 +153,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.obtenerCompras();
     this.obtenerProductosParaFiltro();
-    // this.obtenerCatalogos();
+    this.obtenerCatalogos();
   }
 
   obtenerCompras(alta: boolean = false) {
@@ -184,6 +182,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           }
           if (!alta && this.compras.length > 0) {
             this.isEdicion = false;
+            this.obtenerCompraPorId(this.compras[0].uuid);
             // this.inicializarFormEdit(this.compras[0]);
           }
           this.modificarPaginacion(res);
@@ -207,6 +206,20 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.itemsInPage = this.currentPage * this.itemsPerPage;
       }
     }
+  }
+
+  obtenerCompraPorId(uuid: string) {
+    this.subscription.add(
+      this._comprasService.getCompraById(uuid, this.actual_role).subscribe({
+        next: res => {
+          console.log(res);
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
   }
 
   obtenerProductosParaFiltro() {
@@ -234,32 +247,20 @@ export class ComprasComponent implements OnInit, OnDestroy {
     )
   }
 
-  // obtenerCatalogos() {
-  //   forkJoin({
-  //     paises: this._catalogoService.getPaises(),
-  //     categorias: this._catalogoService.getCategorias(this.actual_role),
-  //     estados: this._catalogoService.getPosiblesEstadosProductos(this.actual_role),
-  //     tipoProductos: this._catalogoService.getTipoProductos(this.actual_role),
-  //     measures: this._catalogoService.getMeasures(this.actual_role),
-  //     proveedores: this._indexService.getProveedores(this.actual_role)
-  //   }).subscribe({
-  //     next: res => {
-  //       this.paises = res.paises.data;
-  //       this.categorias = res.categorias.data;
-  //       this.estados = res.estados.data;
-  //       this.tipoProductos = res.tipoProductos.data;
-  //       this.measures = res.measures.data;
-  //       this.proveedores = res.proveedores.data;
-  //       this.proveedores = this.proveedores.map(proveedor => ({
-  //         ...proveedor,
-  //         nombreCompleto: this.getNombreProveedor(proveedor)
-  //       }));
-  //     },
-  //     error: error => {
-  //       console.error('Error cargando catalogos:', error);
-  //     }
-  //   });
-  // }
+  obtenerCatalogos() {
+    forkJoin({
+      tiposDocumentosContables: this._catalogoService.getTiposDocumentosContables(this.actual_role)
+    }).subscribe({
+      next: res => {
+        this.tiposDocumentosContables = res.tiposDocumentosContables.data;
+        console.log("🚀 ~ ComprasComponent ~ obtenerCatalogos ~ this.tiposDocumentosContables:", this.tiposDocumentosContables)
+
+      },
+      error: error => {
+        console.error('Error cargando catalogos:', error);
+      }
+    });
+  }
 
   getNombreProveedor(proveedor: any): string {
     if (!proveedor || !proveedor.person) return '';
@@ -567,7 +568,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.filtros['transaction.transactionDocuments.prefix_number'].value = '';
     this.filtros['transaction.transactionDocuments.document_number'].value = '';
     this.filtros['transaction.transactionProducts.product.uuid'].value = '';
-
+    this.filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
+    this.filtros['batch.uuid'].value = '';
+    this.filtros['batch.stocks.productInstances.uuid'].value = '';
+    
     this.filtros['transaction.person.human.firstname'].contiene = this.filtroSimpleContiene;
     this.filtros['transaction.person.human.lastname'].contiene = this.filtroSimpleContiene;
     this.filtros['transaction.person.legalEntity.company_name'].contiene = this.filtroSimpleContiene;
@@ -604,6 +608,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.filtros['transaction.transactionDocuments.prefix_number'].value = '';
     this.filtros['transaction.transactionDocuments.document_number'].value = '';
     this.filtros['transaction.transactionProducts.product.uuid'].value = '';
+    this.filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
+    this.filtros['batch.uuid'].value = '';
+    this.filtros['batch.stocks.productInstances.uuid'].value = '';
 
     this.obtenerCompras();
   }
@@ -623,7 +630,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.filtros['transaction.transactionDocuments.prefix_number'].value = '';
     this.filtros['transaction.transactionDocuments.document_number'].value = '';
     this.filtros['transaction.transactionProducts.product.uuid'].value = '';
-
+    this.filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
+    this.filtros['batch.uuid'].value = '';
+    this.filtros['batch.stocks.productInstances.uuid'].value = '';
+    
     if (this.filtroTipoPersona === 'todos') {
       this.filtros['transaction.person.human.uuid'].value = '';
       this.filtros['transaction.person.legalEntity.uuid'].value = '';

@@ -23,6 +23,7 @@ export class CatalogoService {
   apiCategorias = '/product_categories';
   apiTipoProductos = '/product_types';
   apiMeasures = '/measures';
+  apiDocumentosContables = '/account_document_types';
 
   constructor(private http: HttpClient) { }
 
@@ -118,6 +119,13 @@ export class CatalogoService {
     let params = new HttpParams();
     params = params.append('actual_role', rol);
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiMeasures, { headers, params: params });
+  }
+
+  getTiposDocumentosContables(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDocumentosContables, { headers, params: params });
   }
 
 }
