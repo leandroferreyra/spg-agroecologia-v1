@@ -38,7 +38,7 @@
                             @for(data of compras ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;"
                                 [ngClass]="{'bg-blue-200': selectedCompra?.uuid === data.uuid}">
-                                <td (click)="showDataCompra(data)">
+                                <td>
                                     <b>{{ showName(data) }}</b> - {{showFactura(data)}} - {{showFecha(data)}}
                                 </td>
                                 <td class="w-0 whitespace-nowrap text-right align-middle">
@@ -99,7 +99,7 @@
     </div>
 
     <!-- PANEL DERECHO -->
-    <div class="panel h-full flex-1 overflow-x-hidden p-0">
+    <div class="panel h-full flex-1 overflow-x-hidden p-2">
 
         <!-- MENU ICONO OCULTO RESPONSIVE -->
         <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
@@ -120,382 +120,126 @@
             </div>
         </div>
 
-        <!-- TABS -->
-        <div class="">
+        @if (selectedCompra) {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" [formGroup]="compraForm">
 
-            <div class="mt-3 flex flex-wrap">
-
-
-                <!-- <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{'!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales',
-                                 'cursor-not-allowed tab-disabled': isTabDisabled
-                                }" (click)="!isTabDisabled && (tab1 = 'datos-generales')">
-                    Datos generales
-                </a> -->
-
-                <!-- <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componentes',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'componentes')">
-                    Componentes
-                </a>
-
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componente-de',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'componente-de')">
-                    Componente de
-                </a>
-
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'reemplazos',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'reemplazos')">
-                    Reemplazos
-                </a>
-
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'proveedores',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'proveedores')">
-                    Proveedores
-                </a>
-
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'stocks',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }" (click)="!isTabDisabled && (tab1 = 'stocks')">
-                    Stock
-                </a>
-
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'compras',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }" (click)="!isTabDisabled && (tab1 = 'compras')">
-                    Compras
-                </a>
-
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'vinculos',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'vinculos')">
-                    Vínculos
-                </a> -->
-            </div>
-
-            <div class="flex-1 text-sm">
-                @if (compras.length > 0) {
-                <!-- <form [formGroup]="compraForm" class="p-4">
-                        <div class="flex flex-col sm:flex-row">
-                            <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
-
-                                <div (keydown.enter)="confirmarProducto(compraForm)">
-                                    <label for="nombre">Nombre</label>
-                                    <input id="nombre" type="text" placeholder="" class="form-control"
-                                        formControlName="nombre" />
-                                </div>
-                                <div (keydown.enter)="confirmarProducto(compraForm)">
-                                    <label for="codigo">Código</label>
-                                    <input id="codigo" type="text" placeholder="" class="form-control"
-                                        formControlName="codigo" />
-                                </div>
-                                <div>
-                                    <label for="tipoProducto">Tipo de producto</label>
-                                    <ng-select [items]="tipoProductos" bindLabel="name" bindValue="uuid"
-                                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                        notFoundText="No hay tipos de producto" placeholder="" [selectOnTab]="true"
-                                        class="w-1/3 min-w-[200px]" formControlName="tipoProducto"></ng-select>
-                                </div>
-                                <div>
-                                    <label for="categoria">Categoría</label>
-                                    <ng-select [items]="categorias" bindLabel="name" bindValue="uuid"
-                                        [selectOnTab]="true" clearAllText="Limpiar" style="width: 100%"
-                                        [virtualScroll]="true" notFoundText="No hay categorías" placeholder=""
-                                        class="w-1/3 min-w-[200px]" formControlName="categoria"></ng-select>
-                                </div>
-                                <div>
-                                    <label for="estado">Estado</label>
-                                    <ng-select [items]="estados" bindLabel="name" bindValue="uuid" [selectOnTab]="true"
-                                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                        notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
-                                        formControlName="estado"></ng-select>
-                                </div>
-
-                                <div>
-                                    <label for="estadoComentario">Comentario del estado</label>
-                                    <textarea class="form-control" id="estadoComentario"
-                                        formControlName="estadoComentario" rows="1"></textarea>
-                                </div>
-
-                                <div (keydown.enter)="confirmarProducto(compraForm)">
-                                    <label for="nomenclatura">Nomenclatura Mercosur (Pos. Arancelaria)</label>
-                                    <input id="nomenclatura" type="text" placeholder="" class="form-control"
-                                        formControlName="nomenclatura" />
-                                </div>
-                                <div>
-                                    <label for="unidad">Unidad</label>
-                                    <ng-select [items]="measures" bindLabel="name" bindValue="uuid" [selectOnTab]="true"
-                                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                        notFoundText="No hay unidades" placeholder="" class="w-1/3 min-w-[200px]"
-                                        formControlName="unidad"></ng-select>
-                                </div>
-                                <div (keydown.enter)="confirmarProducto(compraForm)">
-                                    <label for="iva">IVA (%)</label>
-                                    <input id="iva" type="text" placeholder="" class="form-control"
-                                        formControlName="iva" />
-                                </div>
-
-                                <div>
-                                    <label for="pais">País</label>
-                                    <ng-select [items]="paises" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                        style="width: 100%" [virtualScroll]="true" notFoundText="No hay países"
-                                        [selectOnTab]="true" placeholder="" class="w-1/3 min-w-[200px]"
-                                        formControlName="pais"></ng-select>
-                                </div>
-
-                                <div>
-                                    <label for="comentarios">Comentarios</label>
-                                    <textarea class="form-control" id="comentarios" formControlName="comentarios"
-                                        rows="1"></textarea>
-                                </div>
-
-                                <div (keydown.enter)="confirmarProducto(compraForm)">
-                                    <label for="nombreVenta">Nombre de venta</label>
-                                    <input id="nombreVenta" type="text" placeholder="" class="form-control"
-                                        formControlName="nombreVenta" />
-                                </div>
-
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="asignaNumSerie" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Asigna número de serie</span>
-                                </div>
-
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="tieneNumSerie" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Tiene número de serie</span>
-                                </div>
-
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="trazable" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Trazable</span>
-                                </div>
-
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="vendible" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Vendible</span>
-                                </div>
-
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="controlable" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Controlable</span>
-                                </div>
-
-
-                                <div>
-                                    <label for="descripcionControl">Descripción control</label>
-                                    <textarea class="form-control" id="descripcionControl"
-                                        formControlName="descripcionControl" rows="1"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <label for="nombre" class="mt-4">Stock</label>
-                        <div class="flex flex-col sm:flex-row">
-                            <div class="grid flex-1 grid-cols-1 sm:grid-cols-4 gap-3">
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Disponibles
-                                        </div>
-                                        <input type="text" formControlName="stock_available"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Reservados
-                                        </div>
-                                        <input type="text" formControlName="stock_reserved"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Muestras
-                                        </div>
-                                        <input type="text" formControlName="stock_samples"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Observados
-                                        </div>
-                                        <input type="text" formControlName="stock_observed"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Mínimo
-                                        </div>
-                                        <input type="text" formControlName="stock_minimum"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Óptimo
-                                        </div>
-                                        <input type="text" formControlName="stock_optimum"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Inicial
-                                        </div>
-                                        <input type="text" formControlName="stock_initial"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="flex">
-                                        <div
-                                            class="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                            Vendido
-                                        </div>
-                                        <input type="text" formControlName="stock_quantity_sold"
-                                            class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </div>
-
-
-
-                        @if (isEdicion) {
-                        <div class="row mt-3">
-                            <div class="col-12 d-flex justify-content-center">
-                                <button type="button" class="btn btn-wd btn-primary mr-4"
-                                    (click)="confirmarProducto(compraForm)">Confirmar</button>
-                                <button id="back-button-with-border" type="button" class="btn btn-wd"
-                                    (click)="cancelarEdicion()">Cancelar</button>
-                            </div>
-                        </div>
-                        }
-
-                    </form> -->
-                }
-
-                <!-- <div *ngIf="tab1.toLowerCase() === 'componentes'">
-                    @if (productos.length > 0) {
-                    <app-componentes [producto]="selectedCompra" [rol]="actual_role"
-                        (eventProducto)="irAlProducto($event)">
-                    </app-componentes>
+            <fieldset class="border border-gray-300 rounded p-4">
+                <legend class="text-lg font-semibold px-2">Proveedor</legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    @if(isPersonaFisica()) {
+                    <div>
+                        <label class="block font-medium">Nombre</label>
+                        <input type="text" class="form-control w-full" formControlName="nombre" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Apellido</label>
+                        <input type="text" class="form-control w-full" formControlName="apellido" />
+                    </div>
+                    } @else {
+                    <div>
+                        <label class="block font-medium">Razón social</label>
+                        <input type="text" class="form-control w-full" formControlName="razonSocial" />
+                    </div>
                     }
+                    <div>
+                        <label class="block font-medium">CUIT</label>
+                        <input type="text" class="form-control w-full" formControlName="cuit" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Calle</label>
+                        <input type="text" class="form-control w-full" formControlName="calle" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Número</label>
+                        <input type="text" class="form-control w-full" formControlName="numero" />
+                    </div>
                 </div>
+            </fieldset>
 
-                <div *ngIf="tab1.toLowerCase() === 'componente-de'">
-                    <app-componente-de [producto]="selectedCompra" [rol]="actual_role"
-                        (eventProducto)="irAlProducto($event)">
-                    </app-componente-de>
+            <fieldset class="border border-gray-300 rounded p-4">
+                <legend class="text-lg font-semibold px-2">Factura</legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium">Fecha de compra</label>
+                        <input type="text" class="form-control w-full" formControlName="fechaCompra" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Estado de compra</label>
+                        <input type="text" class="form-control w-full" formControlName="estadoCompra" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Tipo de comprobante</label>
+                        <input type="text" class="form-control w-full" formControlName="tipoComprobante" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Número de comprobante</label>
+                        <input type="text" class="form-control w-full" formControlName="numeroComprobante" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Moneda de la Compra</label>
+                        <input type="text" class="form-control w-full" formControlName="moneda" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Lote / Partida</label>
+                        <input type="text" class="form-control w-full" formControlName="lote" />
+                    </div>
                 </div>
+            </fieldset>
 
-                <div *ngIf="tab1.toLowerCase() === 'reemplazos'">
-                    <app-reemplazos [producto]="selectedCompra" [rol]="actual_role"
-                        (eventProducto)="irAlProducto($event)">
-                    </app-reemplazos>
+            <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
+                <legend class="text-lg font-semibold px-2"></legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium">Subtotal sin descuentos</label>
+                        <input type="text" class="form-control w-full" formControlName="subtotalSinDescuento" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Descuento 1</label>
+                        <input type="text" class="form-control w-full" formControlName="descuento1" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Descuento 2</label>
+                        <input type="text" class="form-control w-full" formControlName="descuento2" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Subtotal con descuentos</label>
+                        <input type="text" class="form-control w-full" formControlName="subtotalConDescuento" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Otros cargos</label>
+                        <input type="text" class="form-control w-full" formControlName="otrosCargos" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">IVA</label>
+                        <input type="text" class="form-control w-full" formControlName="iva" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Percepción IIBB</label>
+                        <input type="text" class="form-control w-full" formControlName="percepcionIIBB" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Percepción RG. 3337</label>
+                        <input type="text" class="form-control w-full" formControlName="percepcionRG3337" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Total</label>
+                        <input type="text" class="form-control w-full" formControlName="total" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Calificación</label>
+                        <input type="text" class="form-control w-full" formControlName="calificacion" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block font-medium">Observación de la calificación</label>
+                        <textarea class="form-control w-full" formControlName="calificacionComentarios"
+                            rows="2"></textarea>
+                    </div>
                 </div>
-
-                <div *ngIf="tab1.toLowerCase() === 'proveedores'">
-                    <app-proveedores-producto [producto]="selectedCompra" [rol]="actual_role">
-                    </app-proveedores-producto>
-                </div>
-
-                <div *ngIf="tab1.toLowerCase() === 'stocks'">
-                    <app-stocks [producto]="selectedCompra" [rol]="actual_role">
-                    </app-stocks>
-                </div>
-
-                <div *ngIf="tab1.toLowerCase() === 'compras'">
-                    <app-compras-producto>
-                    </app-compras-producto>
-                </div>
-
-                <div *ngIf="tab1.toLowerCase() === 'vinculos'">
-                    <app-vinculos>
-                    </app-vinculos>
-                </div> -->
-
-            </div>
+            </fieldset>
         </div>
+        }
+
+
 
     </div>
 
