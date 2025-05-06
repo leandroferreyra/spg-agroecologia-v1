@@ -15,6 +15,11 @@ module.exports = {
             center: true,
         },
         extend: {
+            // fontSize: {
+            //     base: '1.1rem',
+            //     sm: '0.75rem',
+            //     lg: '1.25rem',
+            // },
             colors: {
                 primary: {
                     DEFAULT: '#4361ee',

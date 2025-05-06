@@ -3,6 +3,9 @@
 
 @import 'tailwind.css';
 
+/* html {
+    @apply text-base font-nunito;
+} */
 
 #back-button-with-border {
     background: white;

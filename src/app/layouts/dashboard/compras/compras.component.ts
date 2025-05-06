@@ -11,7 +11,7 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Observable, Subject, Subscription, debounceTime, distinctUntilChanged, filter, finalize, forkJoin, map, switchMap, tap } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, distinctUntilChanged, filter, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -125,6 +125,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   posiblesEstadosTransaccion: any[] = [];
   calificaciones: any[] = [];
 
+  mostrarProductos = true;
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService) {
@@ -155,6 +157,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.obtenerCompras();
     this.obtenerProductosParaFiltro();
+    this.obtenerProveedores();
     this.obtenerCatalogos();
   }
 
@@ -184,7 +187,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
           if (!alta && this.compras.length > 0) {
             this.isEdicion = false;
             this.obtenerCompraPorId(this.compras[0]);
-            // this.inicializarFormEdit(this.compras[0]);
           }
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
@@ -258,6 +260,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
   onFormEditChange() {
 
+  }
+
+  getCalificacionTooltip() {
+    return this.selectedCompra?.qualification_option?.description;
   }
 
   getComentario() {
@@ -367,10 +373,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return soloFecha;
   }
 
-  // showDataCompra(compra: any) {
-  //   this.isEdicion = false;
-  //   // this.inicializarFormEdit(compra);
-  // }
+  showDataCompra(compra: any) {
+    this.isEdicion = false;
+    this.obtenerCompraPorId(compra.uuid);
+  }
 
   cancelarEdicion() {
     this.isEdicion = false;
@@ -424,14 +430,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
 
-  openModalCompra(type: string, producto?: any) {
+  openModalCompra(type: string, compra?: any) {
     if (type === 'NEW') {
       if (this.isEdicion) {
         this.isEdicion = false;
         this.inicializarFormEdit(); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
       }
       this.tituloModal = 'Nueva compra';
-      this.obtenerProveedores();
       this.inicializarFormNew();
       this.modalCompra.options = this.modalOptions;
       this.modalCompra.open();
@@ -439,7 +444,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.tab1 = 'datos-generales';
       this.isEdicion = true;
       this.tituloModal = 'Edición compra';
-      this.inicializarFormEdit();
+      this.obtenerCompraPorId(compra);
     }
   }
 
@@ -455,23 +460,27 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.proveedores$ = this.proveedorInput$.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      filter((term: string) => term !== null && term.trim().length >= 2),
-      tap(term => {
+      tap(() => this.loadingProveedores = true),
+      switchMap((term: string) => {
+        if (!term || term.trim().length < 2) {
+          this.loadingProveedores = false;
+          return of([]);
+        }
         params.filters = {
           operator: { value: 'OR' },
           'person.human.firstname': { value: term, op: 'LIKE', contiene: true },
           'person.human.lastname': { value: term, op: 'LIKE', contiene: true },
           'person.legalEntity.company_name': { value: term, op: 'LIKE', contiene: true }
         };
-      }),
-      tap(() => this.loadingProveedores = true),
-      switchMap(() => this._indexService.getProveedoresWithParamAsync(params, this.actual_role).pipe(
-        map((res: any) => res.data.map((proveedor: any) => ({
-          ...proveedor,
-          nombreCompleto: this.bindName(proveedor)
-        }))),
-        finalize(() => this.loadingProveedores = false)
-      ))
+
+        return this._indexService.getProveedoresWithParamAsync(params, this.actual_role).pipe(
+          map((res: any) => res.data.map((proveedor: any) => ({
+            ...proveedor,
+            nombreCompleto: this.bindName(proveedor)
+          }))),
+          finalize(() => this.loadingProveedores = false)
+        );
+      })
     );
   }
 
@@ -498,7 +507,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
               this.spinner.hide();
               this.obtenerCompras(true);
               this.cerrarModal();
-              // this.showDataCompra(res.data);
+              this.showDataCompra(res.data);
             },
             error: error => {
               this.spinner.hide();
@@ -686,6 +695,22 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.filtros['transaction.person.legalEntity.uuid'].value = 'null';
     }
     this.obtenerCompras();
+  }
+
+  toggleProductos() {
+    this.mostrarProductos = !this.mostrarProductos;
+  }
+
+  showCantidad(data: any) {
+    if (data.product?.measure?.is_integer === 1) {
+      return (+data.quantity).toFixed(0);
+    } else {
+      return (+data.quantity).toFixed(2);
+    }
+  }
+
+  isControlRealizado(data: any) {
+    return (data.product?.control_result !== null);
   }
 
 }

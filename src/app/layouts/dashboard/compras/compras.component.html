@@ -38,7 +38,7 @@
                             @for(data of compras ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;"
                                 [ngClass]="{'bg-blue-200': selectedCompra?.uuid === data.uuid}">
-                                <td>
+                                <td (click)="showDataCompra(data);">
                                     <b>{{ showName(data) }}</b> - {{showFactura(data)}} - {{showFecha(data)}}
                                 </td>
                                 <td class="w-0 whitespace-nowrap text-right align-middle">
@@ -227,7 +227,8 @@
                     </div>
                     <div>
                         <label class="block font-medium">Calificación</label>
-                        <input type="text" class="form-control w-full" formControlName="calificacion" />
+                        <input type="text" class="form-control w-full" formControlName="calificacion"
+                            [ngxTippy]="getCalificacionTooltip()" data-tippy-placement="top" />
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block font-medium">Observación de la calificación</label>
@@ -236,11 +237,79 @@
                     </div>
                 </div>
             </fieldset>
+
+
+            <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
+                <legend class="text-lg font-semibold px-2 flex justify-between items-center">
+                    <span class="flex items-center gap-2">
+                        Productos
+                        <button type="button" class="hover:text-primary" (click)="openModalCompra('NEW')">
+                            <icon-plus class="w-4 h-4" />
+                        </button>
+                    </span>
+
+                    <button type="button" (click)="toggleProductos()" class="text-sm text-blue-600 hover:underline">
+                        {{ mostrarProductos ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                </legend>
+
+
+                <div *ngIf="mostrarProductos" class="mt-4">
+                    <div class="table-responsive">
+                        <table class="table-hover">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-2 py-1">Código</th>
+                                    <th class="px-2 py-1">Nombre</th>
+                                    <th class="px-2 py-1">Cantidad adquirida</th>
+                                    <th class="px-2 py-1">Precio unitario</th>
+                                    <th class="px-2 py-1">IVA</th>
+                                    <th class="px-2 py-1">Precio total</th>
+                                    <th class="px-2 py-1">Controlable</th>
+                                    <th class="px-2 py-1">Descripción del control</th>
+                                    <th class="px-2 py-1">Control realizado</th>
+                                    <th class="px-2 py-1">Resultado del control</th>
+                                    <th class="px-2 py-1">Usuario del control</th>
+                                    <th class="px-2 py-1">Comentarios del control</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for(data of selectedCompra?.transaction?.transaction_products; track data.uuid) {
+                                <tr>
+                                    <td class="border px-2 py-1">{{ data.product.code }}</td>
+                                    <td class="border px-2 py-1">{{ data.product.name }}</td>
+                                    <td class="border px-2 py-1"> {{ showCantidad(data)}} </td>
+                                    <td class="border px-2 py-1">{{ data.unit_price }}</td>
+                                    <td class="border px-2 py-1">{{ data.product.vat_percent }}</td>
+                                    <td class="border px-2 py-1">{{ data.quantity * data.unit_price }}</td>
+                                    <td class="border px-2 py-1">{{ data.product.controllable }}</td>
+                                    <td class="border px-2 py-1">{{ data.product.control_description }}</td>
+                                    <td class="border px-2 py-1">
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <label class="w-12 h-6 relative">
+                                                <input type="checkbox"
+                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                                    id="custom_switch_checkbox2" [checked]=isControlRealizado(data)
+                                                    disabled />
+                                                <span for="custom_switch_checkbox2"
+                                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td class="border px-2 py-1">{{ data.product.control_result }}</td>
+                                    <td class="border px-2 py-1">{{ data.control_user.user_name }}</td>
+                                    <td class="border px-2 py-1">{{ data.control_comments }}</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </fieldset>
+
         </div>
         }
-
-
-
     </div>
 
 </div>
