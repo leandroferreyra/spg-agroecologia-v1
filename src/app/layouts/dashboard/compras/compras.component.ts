@@ -521,14 +521,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.productoControllable = false;
     this.productoForm = new FormGroup({
       transaction_uuid: new FormControl({ value: null, disabled: false }, []),
-      product_uuid: new FormControl({ value: null, disabled: false }, []),
-      quantity: new FormControl({ value: null, disabled: false }, []),
-      unit_price: new FormControl({ value: null, disabled: false }, []),
-      control_result: new FormControl({ value: null, disabled: false }, []),
+      product_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      quantity: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      unit_price: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      control_result: new FormControl({ value: null, disabled: false }, [Validators.required]),
       control_user_uuid: new FormControl({ value: null, disabled: false }, []),
       password: new FormControl({ value: null, disabled: false }, []),
       control_comments: new FormControl({ value: null, disabled: false }, []),
-      location_uuid: new FormControl({ value: null, disabled: false }, []),
+      location_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
       control_description: new FormControl({ value: null, disabled: true }, []),
     });
     this.onFormProductoChange();
@@ -546,6 +546,21 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.productoForm.get('control_result')!.valueChanges.subscribe(
       (value: any) => {
         console.log(value);
+        if (value) {
+          ['control_user_uuid', 'password', 'control_comments'].forEach((field) => {
+            const control = this.productoForm.get(field);
+            control?.setValidators(Validators.required);
+          });
+        } else {
+          ['control_user_uuid', 'password', 'control_comments'].forEach((field) => {
+            const control = this.productoForm.get(field);
+            control?.clearValidators();
+            control?.setErrors(null);
+          });
+        }
+        ['control_user_uuid', 'password', 'control_comments'].forEach((field) => {
+          this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+        });
       });
   }
 
@@ -811,20 +826,21 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   isControlRealizado(data: any) {
-    return (data.product?.control_result !== null);
+    return (data.control_result == 1);
   }
 
   confirmarAltaProducto() {
     this.isSubmit = true;
     if (this.productoForm.valid) {
+      this.spinner.show();
       let producto = new ProductoTransaccionDTO();
       producto.actual_role = this.actual_role;
       producto.with = [];
       producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
-      producto.product_uuid = this.productoForm.get('product_uuid')?.value.uuid;
+      producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
       producto.quantity = this.productoForm.get('quantity')?.value;
       producto.unit_price = this.productoForm.get('unit_price')?.value;
-      producto.control_result = this.productoForm.get('control_result')?.value;
+      producto.control_result = this.productoForm.get('control_result')?.value ?? false;
       if (producto.control_result) {
         producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
         producto.password = this.productoForm.get('password')?.value;
@@ -834,11 +850,17 @@ export class ComprasComponent implements OnInit, OnDestroy {
       console.log(producto);
       this._transactionProductService.saveTransactionProducto(producto).subscribe({
         next: res => {
+          this.cerrarModalAltaProducto();
+          this.isSubmit = false;
           console.log(res);
+          this.obtenerCompraPorId(this.selectedCompra);
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
           console.error(error);
+          this.spinner.hide();
         }
       })
     }
