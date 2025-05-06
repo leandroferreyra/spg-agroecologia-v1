@@ -30,6 +30,9 @@ import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.
 import { FlatpickrDirective } from 'angularx-flatpickr';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
 import { CompraDTO, Transaction } from 'src/app/core/models/request/compraDTO';
+import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTransaccionDTO';
+import { UserLoggedService } from 'src/app/core/services/user-logged.service';
+import { TransactionProductoService } from 'src/app/core/services/transactionProducto.service';
 
 @Component({
   selector: 'app-compras',
@@ -53,6 +56,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   selectedCompra: any;
   compraForm!: FormGroup;
   newCompraForm!: FormGroup;
+  productoForm!: FormGroup;
 
   cargandoProductos: boolean = true;
   filtroSimpleName: string = '';
@@ -111,8 +115,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
   productos$!: Observable<any[]>;
   loadingProductos = false;
 
+  productoControllable: boolean = false;
+
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
+  @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -124,12 +131,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
   tiposDocumentosContables: any[] = [];
   posiblesEstadosTransaccion: any[] = [];
   calificaciones: any[] = [];
+  ubicaciones: any[] = [];
 
   mostrarProductos = true;
+  usuarioLogueado: any;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService) {
+    private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
+    private _transactionProductService: TransactionProductoService) {
     this.initStore();
   }
 
@@ -155,9 +165,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.show();
+    this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.obtenerCompras();
     this.obtenerProductosParaFiltro();
     this.obtenerProveedores();
+    this.obtenerUbicaciones();
     this.obtenerCatalogos();
   }
 
@@ -241,7 +253,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       estadoCompra: new FormControl({ value: this.selectedCompra?.transaction?.current_state?.state, disabled: !this.isEdicion }, []),
       tipoComprobante: new FormControl({ value: this.getTipoComprobante(), disabled: !this.isEdicion }, []),
       numeroComprobante: new FormControl({ value: this.getNumeroComprobante(), disabled: !this.isEdicion }, []),
-      moneda: new FormControl({ value: this.getMoneda() , disabled: !this.isEdicion }, []),
+      moneda: new FormControl({ value: this.getMoneda(), disabled: !this.isEdicion }, []),
       lote: new FormControl({ value: this.selectedCompra?.batch?.batch_identification, disabled: !this.isEdicion }, []),
       // 
       subtotalSinDescuento: new FormControl({ value: this.selectedCompra?.transaction?.subtotal_before_discount, disabled: !this.isEdicion }, []),
@@ -268,7 +280,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
     return '';
   }
-  
+
   getTipoComprobante() {
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
       return this.selectedCompra?.transaction?.transaction_documents[0]?.account_document_type?.name;
@@ -313,7 +325,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   obtenerProductosParaFiltro() {
     const paramsProcesos: any = {};
-    paramsProcesos.with = [];
+    paramsProcesos.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
     paramsProcesos.paging = null;
     paramsProcesos.page = null;
     paramsProcesos.order_by = {};
@@ -330,6 +342,28 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.swalService.toastError('top-right', error.error.message);
           console.error(error);
           this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  obtenerUbicaciones() {
+    const params: any = {};
+    params.with = ["location.location.location.location"];
+    params.paging = null;
+    params.page = null;
+    params.order_by = {};
+    params.filters = {};
+
+    this.subscription.add(
+      this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
+        next: res => {
+          // console.log(res);
+          this.ubicaciones = res.data;
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
         }
       })
     )
@@ -468,6 +502,51 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Edición compra';
       this.obtenerCompraPorId(compra);
     }
+  }
+
+  openModalProducto(type: string) {
+    if (type === 'NEW') {
+      if (this.isEdicion) {
+        this.isEdicion = false;
+        // this.inicializarFormEdit(); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
+      }
+      this.tituloModal = 'Nuevo producto';
+      this.inicializarFormProducto();
+      this.modalProducto.options = this.modalOptions;
+      this.modalProducto.open();
+    }
+  }
+
+  inicializarFormProducto() {
+    this.productoControllable = false;
+    this.productoForm = new FormGroup({
+      transaction_uuid: new FormControl({ value: null, disabled: false }, []),
+      product_uuid: new FormControl({ value: null, disabled: false }, []),
+      quantity: new FormControl({ value: null, disabled: false }, []),
+      unit_price: new FormControl({ value: null, disabled: false }, []),
+      control_result: new FormControl({ value: null, disabled: false }, []),
+      control_user_uuid: new FormControl({ value: null, disabled: false }, []),
+      password: new FormControl({ value: null, disabled: false }, []),
+      control_comments: new FormControl({ value: null, disabled: false }, []),
+      location_uuid: new FormControl({ value: null, disabled: false }, []),
+      control_description: new FormControl({ value: null, disabled: true }, []),
+    });
+    this.onFormProductoChange();
+  }
+  onFormProductoChange() {
+    this.productoForm.get('product_uuid')!.valueChanges.subscribe(
+      (producto: any) => {
+        console.log(producto);
+        if (producto.controllable === 1) {
+          this.productoControllable = true;
+          this.productoForm.get('control_description')?.setValue(producto.control_description);
+        }
+      });
+
+    this.productoForm.get('control_result')!.valueChanges.subscribe(
+      (value: any) => {
+        console.log(value);
+      });
   }
 
   obtenerProveedores() {
@@ -733,6 +812,41 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   isControlRealizado(data: any) {
     return (data.product?.control_result !== null);
+  }
+
+  confirmarAltaProducto() {
+    this.isSubmit = true;
+    if (this.productoForm.valid) {
+      let producto = new ProductoTransaccionDTO();
+      producto.actual_role = this.actual_role;
+      producto.with = [];
+      producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
+      producto.product_uuid = this.productoForm.get('product_uuid')?.value.uuid;
+      producto.quantity = this.productoForm.get('quantity')?.value;
+      producto.unit_price = this.productoForm.get('unit_price')?.value;
+      producto.control_result = this.productoForm.get('control_result')?.value;
+      if (producto.control_result) {
+        producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+        producto.password = this.productoForm.get('password')?.value;
+        producto.control_comments = this.productoForm.get('control_comments')?.value;
+      }
+      producto.location_uuid = this.productoForm.get('location_uuid')?.value;
+      console.log(producto);
+      this._transactionProductService.saveTransactionProducto(producto).subscribe({
+        next: res => {
+          console.log(res);
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    }
+  }
+
+  cerrarModalAltaProducto() {
+    this.isSubmit = false;
+    this.modalProducto.close();
   }
 
 }
