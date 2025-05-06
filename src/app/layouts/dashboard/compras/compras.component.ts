@@ -375,7 +375,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   showDataCompra(compra: any) {
     this.isEdicion = false;
-    this.obtenerCompraPorId(compra.uuid);
+    this.obtenerCompraPorId(compra);
   }
 
   cancelarEdicion() {
