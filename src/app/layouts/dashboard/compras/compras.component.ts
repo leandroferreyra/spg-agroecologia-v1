@@ -239,9 +239,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
       // Facturacion
       fechaCompra: new FormControl({ value: this.selectedCompra?.transaction?.transaction_datetime, disabled: !this.isEdicion }, []),
       estadoCompra: new FormControl({ value: this.selectedCompra?.transaction?.current_state?.state, disabled: !this.isEdicion }, []),
-      tipoComprobante: new FormControl({ value: this.selectedCompra?.transaction?.transaction_documents[0]?.account_document_type?.name, disabled: !this.isEdicion }, []),
-      numeroComprobante: new FormControl({ value: this.selectedCompra?.transaction?.transaction_documents[0]?.prefix_number + ' ' + this.selectedCompra?.transaction?.transaction_documents[0]?.document_number, disabled: !this.isEdicion }, []),
-      moneda: new FormControl({ value: this.selectedCompra?.transaction?.transaction_documents[0]?.currency?.name, disabled: !this.isEdicion }, []),
+      tipoComprobante: new FormControl({ value: this.getTipoComprobante(), disabled: !this.isEdicion }, []),
+      numeroComprobante: new FormControl({ value: this.getNumeroComprobante(), disabled: !this.isEdicion }, []),
+      moneda: new FormControl({ value: this.getMoneda() , disabled: !this.isEdicion }, []),
       lote: new FormControl({ value: this.selectedCompra?.batch?.batch_identification, disabled: !this.isEdicion }, []),
       // 
       subtotalSinDescuento: new FormControl({ value: this.selectedCompra?.transaction?.subtotal_before_discount, disabled: !this.isEdicion }, []),
@@ -260,6 +260,28 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
   onFormEditChange() {
 
+  }
+
+  getMoneda() {
+    if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+      this.selectedCompra?.transaction?.transaction_documents[0]?.currency?.name;
+    }
+    return '';
+  }
+  
+  getTipoComprobante() {
+    if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.account_document_type?.name;
+    }
+    return '';
+  }
+
+  getNumeroComprobante() {
+    if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.prefix_number + ' ' +
+        this.selectedCompra?.transaction?.transaction_documents[0]?.document_number
+    }
+    return '';
   }
 
   getCalificacionTooltip() {
@@ -361,7 +383,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   showFactura(dato: any) {
-    let factura = '';
+    let factura = 'Sin factura';
     if (dato.transaction?.transaction_documents?.length > 0) {
       factura = dato.transaction?.transaction_documents[0].account_document_type.name + '-' + dato.transaction?.transaction_documents[0].document_number;
     }
