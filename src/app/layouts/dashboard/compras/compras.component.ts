@@ -33,13 +33,15 @@ import { CompraDTO, Transaction } from 'src/app/core/models/request/compraDTO';
 import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTransaccionDTO';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { TransactionProductoService } from 'src/app/core/services/transactionProducto.service';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 
 @Component({
   selector: 'app-compras',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule, IconSettingsComponent,
-    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective,
+    IconPencilComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './compras.component.html',
@@ -524,7 +526,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       product_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
       quantity: new FormControl({ value: null, disabled: false }, [Validators.required]),
       unit_price: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      control_result: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      control_result: new FormControl({ value: false, disabled: false }, [Validators.required]),
       control_user_uuid: new FormControl({ value: null, disabled: false }, []),
       password: new FormControl({ value: null, disabled: false }, []),
       control_comments: new FormControl({ value: null, disabled: false }, []),
@@ -848,7 +850,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       }
       producto.location_uuid = this.productoForm.get('location_uuid')?.value;
       console.log(producto);
-      this._transactionProductService.saveTransactionProducto(producto).subscribe({
+      this._transactionProductService.saveTransactionProduct(producto).subscribe({
         next: res => {
           this.cerrarModalAltaProducto();
           this.isSubmit = false;
@@ -870,5 +872,49 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.isSubmit = false;
     this.modalProducto.close();
   }
+
+
+  openSwalEliminarProductoTransaccion(producto: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el producto seleccionada?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarProductoTransaccion(producto);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarProductoTransaccion(producto: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._transactionProductService.deleteTransactionProduct(producto.uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerCompras();
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+
 
 }

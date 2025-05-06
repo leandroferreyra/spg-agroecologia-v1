@@ -271,6 +271,9 @@
                                     <th class="px-2 py-1">Resultado del control</th>
                                     <th class="px-2 py-1">Usuario del control</th>
                                     <th class="px-2 py-1">Comentarios del control</th>
+                                    <th>
+                                        Acciones
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -313,6 +316,21 @@
                                     <td class="border px-2 py-1">{{ data.product?.control_result }}</td>
                                     <td class="border px-2 py-1">{{ data.control_user?.user_name }}</td>
                                     <td class="border px-2 py-1">{{ data.control_comments }}</td>
+                                    <td>
+                                        <div class="flex items-center">
+                                            <div>
+                                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
+                                                    <icon-pencil />
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <button type="button" ngxTippy="Eliminar"
+                                                    (click)="openSwalEliminarProductoTransaccion(data)">
+                                                    <icon-trash-lines />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                                 }
                             </tbody>

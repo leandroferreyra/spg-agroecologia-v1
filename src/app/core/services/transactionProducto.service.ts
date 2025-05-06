@@ -16,7 +16,7 @@ export class TransactionProductoService {
 
   constructor(private http: HttpClient) { }
 
-  saveTransactionProducto(producto: ProductoTransaccionDTO): Observable<AuthResponse> {
+  saveTransactionProduct(producto: ProductoTransaccionDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<AuthResponse>(environment.baseUrl + this.api, JSON.stringify(producto), { headers });
   }
@@ -26,11 +26,10 @@ export class TransactionProductoService {
   //   return this.http.put<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, JSON.stringify(compra), { headers });
   // }
 
-  // deleteCompra(uuid: string, rolActual: string): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   const params = new HttpParams()
-  //     .set('actual_role', rolActual);
-  //   return this.http.delete<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, { headers, params });
-  // }
+  deleteTransactionProduct(uuid: string, rolActual: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams().set('actual_role', rolActual);
+    return this.http.delete<AuthResponse>(environment.baseUrl + this.api + '/' + uuid, { headers, params });
+  }
 
 }
