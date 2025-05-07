@@ -20,6 +20,7 @@ export class ComprasProveedorService {
     const params = new HttpParams()
       .append('actual_role', rol)
       .append('with[]', "transaction.person.human")
+      .append('with[]', "transaction.person.city.district.country")
       .append('with[]', "transaction.person.legalEntity")
       .append('with[]', "transaction.transactionDocuments.accountDocumentType")
       .append('with[]', "transaction.transactionDocuments.currency")

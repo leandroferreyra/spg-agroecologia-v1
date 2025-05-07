@@ -250,6 +250,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       cuit: new FormControl({ value: this.getCuit(), disabled: !this.isEdicion }, []),
       calle: new FormControl({ value: this.selectedCompra?.transaction?.person?.street_name, disabled: !this.isEdicion }, []),
       numero: new FormControl({ value: this.selectedCompra?.transaction?.person?.door_number, disabled: !this.isEdicion }, []),
+      localidad: new FormControl({ value: this.selectedCompra?.transaction?.person?.city?.name, disabled: !this.isEdicion }, []),
       // Facturacion
       fechaCompra: new FormControl({ value: this.selectedCompra?.transaction?.transaction_datetime, disabled: !this.isEdicion }, []),
       estadoCompra: new FormControl({ value: this.selectedCompra?.transaction?.current_state?.state, disabled: !this.isEdicion }, []),
