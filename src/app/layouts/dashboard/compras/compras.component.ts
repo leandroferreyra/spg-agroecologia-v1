@@ -69,7 +69,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 10;
+  MAX_ITEMS_PER_PAGE = 8;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;
@@ -122,6 +122,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
+  @ViewChild('modalEditarProveedor') modalEditarProveedor!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -137,6 +138,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   mostrarProductos = true;
   usuarioLogueado: any;
+  proveedorEdit: any;
+  inEdicionFechaCompra: boolean = false;
+  inEdicionDescuentos: boolean = false;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -180,7 +184,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["transaction.person.human", "transaction.person.city", "transaction.person.city.district", "transaction.person.city.district.country", "transaction.person.legalEntity",
+    this.params.with = ["transaction.person.human", "transaction.person.city.district.country", "transaction.person.legalEntity",
       "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch', 'batch.stocks.productInstances'];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
@@ -244,32 +248,33 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inicializarFormEdit() {
     this.compraForm = new FormGroup({
       // Proveedor
-      nombre: new FormControl({ value: this.selectedCompra?.transaction?.person?.human?.firstname, disabled: !this.isEdicion }, []),
-      apellido: new FormControl({ value: this.selectedCompra?.transaction?.person?.human?.lastname, disabled: !this.isEdicion }, []),
-      razonSocial: new FormControl({ value: this.selectedCompra?.transaction?.person?.legal_entity?.company_name, disabled: !this.isEdicion }, []),
-      cuit: new FormControl({ value: this.getCuit(), disabled: !this.isEdicion }, []),
-      calle: new FormControl({ value: this.selectedCompra?.transaction?.person?.street_name, disabled: !this.isEdicion }, []),
-      numero: new FormControl({ value: this.selectedCompra?.transaction?.person?.door_number, disabled: !this.isEdicion }, []),
-      localidad: new FormControl({ value: this.selectedCompra?.transaction?.person?.city?.name, disabled: !this.isEdicion }, []),
+      nombre: new FormControl({ value: this.selectedCompra?.transaction?.person?.human?.firstname, disabled: true }, []),
+      apellido: new FormControl({ value: this.selectedCompra?.transaction?.person?.human?.lastname, disabled: true }, []),
+      razonSocial: new FormControl({ value: this.selectedCompra?.transaction?.person?.legal_entity?.company_name, disabled: true }, []),
+      cuit: new FormControl({ value: this.getCuit(), disabled: true }, []),
+      calle: new FormControl({ value: this.selectedCompra?.transaction?.person?.street_name, disabled: true }, []),
+      numero: new FormControl({ value: this.selectedCompra?.transaction?.person?.door_number, disabled: true }, []),
+      localidad: new FormControl({ value: this.selectedCompra?.transaction?.person?.city?.name, disabled: true }, []),
       // Facturacion
-      fechaCompra: new FormControl({ value: this.selectedCompra?.transaction?.transaction_datetime, disabled: !this.isEdicion }, []),
-      estadoCompra: new FormControl({ value: this.selectedCompra?.transaction?.current_state?.state, disabled: !this.isEdicion }, []),
-      tipoComprobante: new FormControl({ value: this.getTipoComprobante(), disabled: !this.isEdicion }, []),
-      numeroComprobante: new FormControl({ value: this.getNumeroComprobante(), disabled: !this.isEdicion }, []),
-      moneda: new FormControl({ value: this.getMoneda(), disabled: !this.isEdicion }, []),
-      lote: new FormControl({ value: this.selectedCompra?.batch?.batch_identification, disabled: !this.isEdicion }, []),
+      fechaCompra: new FormControl({ value: this.selectedCompra?.transaction?.transaction_datetime, disabled: true }, []),
+      fechaFacturacion: new FormControl({ value: this.getFechaFacturacion(), disabled: true }, []),
+      estadoCompra: new FormControl({ value: this.selectedCompra?.transaction?.current_state?.state?.uuid, disabled: true }, []),
+      tipoComprobante: new FormControl({ value: this.getTipoComprobante(), disabled: true }, []),
+      numeroComprobante: new FormControl({ value: this.getNumeroComprobante(), disabled: true }, []),
+      moneda: new FormControl({ value: this.getMoneda(), disabled: true }, []),
+      lote: new FormControl({ value: this.selectedCompra?.batch?.batch_identification, disabled: true }, []),
       // 
-      subtotalSinDescuento: new FormControl({ value: this.selectedCompra?.transaction?.subtotal_before_discount, disabled: !this.isEdicion }, []),
-      descuento1: new FormControl({ value: this.selectedCompra?.transaction?.discount1, disabled: !this.isEdicion }, []),
-      descuento2: new FormControl({ value: this.selectedCompra?.transaction?.discount2, disabled: !this.isEdicion }, []),
-      subtotalConDescuento: new FormControl({ value: this.selectedCompra?.transaction?.subtotal_after_discount, disabled: !this.isEdicion }, []),
-      otrosCargos: new FormControl({ value: this.selectedCompra?.transaction?.others, disabled: !this.isEdicion }, []),
-      iva: new FormControl({ value: this.selectedCompra?.transaction?.vat, disabled: !this.isEdicion }, []),
-      percepcionIIBB: new FormControl({ value: this.selectedCompra?.transaction?.perceptionIB, disabled: !this.isEdicion }, []),
-      percepcionRG3337: new FormControl({ value: this.selectedCompra?.transaction?.perceptionRG3337, disabled: !this.isEdicion }, []),
-      total: new FormControl({ value: this.selectedCompra?.transaction?.total, disabled: !this.isEdicion }, []),
-      calificacion: new FormControl({ value: this.getComentario(), disabled: !this.isEdicion }, []),
-      calificacionComentarios: new FormControl({ value: this.selectedCompra?.qualification_comments, disabled: !this.isEdicion }, []),
+      subtotalSinDescuento: new FormControl({ value: this.selectedCompra?.transaction?.subtotal_before_discount, disabled: true }, []),
+      descuento1: new FormControl({ value: this.selectedCompra?.transaction?.discount1, disabled: true }, []),
+      descuento2: new FormControl({ value: this.selectedCompra?.transaction?.discount2, disabled: true }, []),
+      subtotalConDescuento: new FormControl({ value: this.selectedCompra?.transaction?.subtotal_after_discount, disabled: true }, []),
+      otrosCargos: new FormControl({ value: this.selectedCompra?.transaction?.others, disabled: true }, []),
+      iva: new FormControl({ value: this.selectedCompra?.transaction?.vat, disabled: true }, []),
+      percepcionIIBB: new FormControl({ value: this.selectedCompra?.transaction?.perceptionIB, disabled: true }, []),
+      percepcionRG3337: new FormControl({ value: this.selectedCompra?.transaction?.perceptionRG3337, disabled: true }, []),
+      total: new FormControl({ value: this.selectedCompra?.transaction?.total, disabled: true }, []),
+      calificacion: new FormControl({ value: this.selectedCompra?.qualification_option?.uuid, disabled: true }, []),
+      calificacionComentarios: new FormControl({ value: this.selectedCompra?.qualification_comments, disabled: true }, []),
     });
     this.onFormEditChange();
   }
@@ -277,9 +282,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   }
 
+  getFechaFacturacion() {
+    if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.document_datetime;
+    }
+    return '';
+  }
+
   getMoneda() {
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-      this.selectedCompra?.transaction?.transaction_documents[0]?.currency?.name;
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.currency?.name;
     }
     return '';
   }
@@ -303,9 +315,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return this.selectedCompra?.qualification_option?.description;
   }
 
-  getComentario() {
-    return this.selectedCompra?.qualification_option?.score + ' - ' + this.selectedCompra?.qualification_option?.name;
-  }
+  // getComentario() {
+  //   return this.selectedCompra?.qualification_option?.score + ' - ' + this.selectedCompra?.qualification_option?.name;
+  // }
 
   getCuit() {
     if (this.selectedCompra) {
@@ -539,7 +551,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
-        console.log(producto);
         if (producto.controllable === 1) {
           this.productoControllable = true;
           this.productoForm.get('control_description')?.setValue(producto.control_description);
@@ -548,7 +559,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
     this.productoForm.get('control_result')!.valueChanges.subscribe(
       (value: any) => {
-        console.log(value);
         if (value) {
           ['control_user_uuid', 'password', 'control_comments'].forEach((field) => {
             const control = this.productoForm.get(field);
@@ -850,12 +860,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
         producto.control_comments = this.productoForm.get('control_comments')?.value;
       }
       producto.location_uuid = this.productoForm.get('location_uuid')?.value;
-      console.log(producto);
       this._transactionProductService.saveTransactionProduct(producto).subscribe({
         next: res => {
           this.cerrarModalAltaProducto();
           this.isSubmit = false;
-          console.log(res);
           this.obtenerCompraPorId(this.selectedCompra);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
@@ -916,6 +924,159 @@ export class ComprasComponent implements OnInit, OnDestroy {
     )
   }
 
+  openModalEditarProveedor() {
+    this.modalEditarProveedor.options = this.modalOptions;
+    this.modalEditarProveedor.open();
+  }
 
+  editarProveedor() {
+    if (this.proveedorEdit) {
+      if (this.proveedorEdit?.person?.uuid === this.selectedCompra?.transaction?.person?.uuid) {
+        this.swalService.toastError('top-right', 'No puede elegir el proveedor actual.');
+        return;
+      }
+      let compraDTO = new CompraDTO();
+      let transaction = new Transaction();
+      transaction.person_uuid = this.proveedorEdit.person.uuid;
+      compraDTO.transaction = transaction;
+      compraDTO.actual_role = this.actual_role;
+      compraDTO.with = [
+        "transaction.person.human",
+        "transaction.person.legalEntity",
+        "transaction.person.city.district.country",
+        "transaction.transactionDocuments.accountDocumentType",
+        "transaction.transactionDocuments.currency",
+        "transaction.transactionProducts.product.measure",
+        "transaction.transactionProducts.controlUser",
+        "batch",
+        "qualificationOption"];
+      this.subscription.add(
+        this._comprasService.editCompra(this.selectedCompra.uuid, compraDTO).subscribe({
+          next: res => {
+            this.selectedCompra = res.data;
+            this.inicializarFormEdit();
+            this.obtenerCompras(true);
+            this.cerrarEdicionProveedor();
+          },
+          error: error => {
+            console.error(error);
+            this.swalService.toastError('top-right', error.error.message);
+          }
+        })
+      )
+    }
+  }
+
+  cerrarEdicionProveedor() {
+    this.proveedorEdit = null;
+    this.modalEditarProveedor.close();
+  }
+
+  openCloseEditarFechaCompra() {
+    this.inEdicionFechaCompra = !this.inEdicionFechaCompra;
+    if (this.inEdicionFechaCompra) {
+      this.compraForm.get('fechaCompra')?.enable();
+      this.compraForm.get('estadoCompra')?.enable();
+    } else {
+      this.compraForm.get('fechaCompra')?.disable();
+      this.compraForm.get('estadoCompra')?.disable();
+      this.inicializarFormEdit();
+    }
+  }
+
+  confirmarEdicionFechaCompra() {
+    if (this.compraForm.get('estadoCompra')?.value === null) {
+      this.swalService.toastError('top-right', 'Debe seleccionar un estado');
+      return;
+    }
+    let compraDTO = new CompraDTO();
+    let transaction = new Transaction();
+    transaction.transaction_datetime = this.compraForm.get('fechaCompra')?.value;
+    transaction.possible_transaction_state_uuid = this.compraForm.get('estadoCompra')?.value;
+    compraDTO.transaction = transaction;
+    compraDTO.actual_role = this.actual_role;
+    compraDTO.with = [
+      "transaction.person.human",
+      "transaction.person.legalEntity",
+      "transaction.person.city.district.country",
+      "transaction.transactionDocuments.accountDocumentType",
+      "transaction.transactionDocuments.currency",
+      "transaction.transactionProducts.product.measure",
+      "transaction.transactionProducts.controlUser",
+      "batch",
+      "qualificationOption"];
+    this.subscription.add(
+      this._comprasService.editCompra(this.selectedCompra.uuid, compraDTO).subscribe({
+        next: res => {
+          this.selectedCompra = res.data;
+          this.inicializarFormEdit();
+          this.openCloseEditarFechaCompra();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+        }
+      })
+    )
+  }
+
+  openCloseEditarDescuentosCompra() {
+    this.inEdicionDescuentos = !this.inEdicionDescuentos;
+    if (this.inEdicionDescuentos) {
+      this.compraForm.get('descuento1')?.enable();
+      this.compraForm.get('descuento2')?.enable();
+      this.compraForm.get('otrosCargos')?.enable();
+      this.compraForm.get('percepcionIIBB')?.enable();
+      this.compraForm.get('percepcionRG3337')?.enable();
+      this.compraForm.get('calificacion')?.enable();
+      this.compraForm.get('calificacionComentarios')?.enable();
+    } else {
+      this.compraForm.get('descuento1')?.disable();
+      this.compraForm.get('descuento2')?.disable();
+      this.compraForm.get('otrosCargos')?.disable();
+      this.compraForm.get('percepcionIIBB')?.disable();
+      this.compraForm.get('percepcionRG3337')?.disable();
+      this.compraForm.get('calificacion')?.disable();
+      this.compraForm.get('calificacionComentarios')?.disable();
+      this.inicializarFormEdit();
+    }
+  }
+
+  confirmarEdicionDescuentos() {
+    let compraDTO = new CompraDTO();
+    let transaction = new Transaction();
+    transaction.discount1 = this.compraForm.get('descuento1')?.value;
+    transaction.discount2 = this.compraForm.get('descuento2')?.value;
+    transaction.others = this.compraForm.get('otrosCargos')?.value;
+    transaction.perceptionIB = this.compraForm.get('percepcionIIBB')?.value;
+    transaction.perceptionRG3337 = this.compraForm.get('percepcionRG3337')?.value;
+    compraDTO.transaction = transaction;
+    compraDTO.qualification_option_uuid = this.compraForm.get('calificacion')?.value;
+    compraDTO.qualification_comments = this.compraForm.get('calificacionComentarios')?.value;
+    compraDTO.actual_role = this.actual_role;
+    compraDTO.with = [
+      "transaction.person.human",
+      "transaction.person.legalEntity",
+      "transaction.person.city.district.country",
+      "transaction.transactionDocuments.accountDocumentType",
+      "transaction.transactionDocuments.currency",
+      "transaction.transactionProducts.product.measure",
+      "transaction.transactionProducts.controlUser",
+      "batch",
+      "qualificationOption"];
+    this.subscription.add(
+      this._comprasService.editCompra(this.selectedCompra.uuid, compraDTO).subscribe({
+        next: res => {
+          this.selectedCompra = res.data;
+          this.inicializarFormEdit();
+          this.openCloseEditarDescuentosCompra();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+        }
+      })
+    )
+  }
 
 }

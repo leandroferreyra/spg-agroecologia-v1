@@ -35,7 +35,7 @@
                             @for(data of proveedores ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;"
                                 [ngClass]="{'bg-blue-200': selectedProveedor?.uuid === data.uuid}">
-                                <td (click)="showDataProveedor(data)">{{ getName(data) }}
+                                <td (click)="showDataProveedor(data)" style="font-size: 12px;">{{ getName(data) }}
                                 </td>
                                 <td>
                                     <div hlMenu class="dropdown">
