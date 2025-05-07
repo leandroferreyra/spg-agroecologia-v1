@@ -421,7 +421,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   showFactura(dato: any) {
     let factura = 'Sin factura';
     if (dato.transaction?.transaction_documents?.length > 0) {
-      factura = dato.transaction?.transaction_documents[0].account_document_type.name + '-' + dato.transaction?.transaction_documents[0].document_number;
+      factura = dato.transaction?.transaction_documents[0].account_document_type.name + '-' + dato.transaction?.transaction_documents[0].prefix_number + '-' + dato.transaction?.transaction_documents[0].document_number;
     }
     return factura;
   }
