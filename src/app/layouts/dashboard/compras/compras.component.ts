@@ -886,7 +886,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   openSwalEliminarProductoTransaccion(producto: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el producto seleccionada?`,
+      text: `¿Desea eliminar el producto seleccionado?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
