@@ -304,83 +304,6 @@
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
-                <legend class="text-lg font-semibold px-2 flex items-center justify-between">
-                    <span></span>
-                    <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
-                        (click)="openCloseEditarDescuentosCompra()">
-                        <icon-pencil />
-                    </button>
-                </legend>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-medium">Subtotal sin descuentos</label>
-                        <input type="text" class="form-control w-full" formControlName="subtotalSinDescuento" />
-                    </div>
-                    <div>
-                        <label class="block font-medium">Descuento 1</label>
-                        <input type="text" class="form-control w-full" formControlName="descuento1" />
-                    </div>
-                    <div>
-                        <label class="block font-medium">Descuento 2</label>
-                        <input type="text" class="form-control w-full" formControlName="descuento2" />
-                    </div>
-                    <div>
-                        <label class="block font-medium">Subtotal con descuentos</label>
-                        <input type="text" class="form-control w-full" formControlName="subtotalConDescuento" />
-                    </div>
-                    <div>
-                        <label class="block font-medium">Otros cargos</label>
-                        <input type="text" class="form-control w-full" formControlName="otrosCargos" />
-                    </div>
-                    <div>
-                        <label class="block font-medium">IVA</label>
-                        <input type="text" class="form-control w-full" formControlName="iva" />
-                    </div>
-                    <div>
-                        <label class="block font-medium">Percepción IIBB</label>
-                        <input type="text" class="form-control w-full" formControlName="percepcionIIBB" />
-                    </div>
-                    <div>
-                        <label class="block font-medium">Percepción RG. 3337</label>
-                        <input type="text" class="form-control w-full" formControlName="percepcionRG3337" />
-                    </div>
-                    <div>
-                        <label class="block font-medium">Total</label>
-                        <input type="text" class="form-control w-full" formControlName="total" />
-                    </div>
-                    <!-- <div>
-                        <label class="block font-medium">Calificación</label>
-                        <input type="text" class="form-control w-full" formControlName="calificacion"
-                            [ngxTippy]="getCalificacionTooltip()" data-tippy-placement="top" />
-                    </div> -->
-                    <div>
-                        <label>Calificación</label>
-                        <ng-select [items]="calificaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                            style="width: 100%" [virtualScroll]="true" notFoundText="No hay calificaciones"
-                            placeholder="" class="w-1/3 min-w-[200px]" formControlName="calificacion"
-                            [selectOnTab]="true" [appendTo]="'body'" [ngxTippy]="getCalificacionTooltip()"></ng-select>
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block font-medium">Observación de la calificación</label>
-                        <textarea class="form-control w-full" formControlName="calificacionComentarios"
-                            rows="2"></textarea>
-                    </div>
-                </div>
-                @if (inEdicionDescuentos) {
-                <div class="row mt-3">
-                    <div class="col-12 d-flex justify-content-center">
-                        <button class="btn btn-primary mr-3" (click)="confirmarEdicionDescuentos()">
-                            Confirmar
-                        </button>
-                        <button id="back-button-with-border" type="button" class="btn btn-wd"
-                            (click)="openCloseEditarDescuentosCompra()">Cancelar</button>
-                    </div>
-                </div>
-                }
-            </fieldset>
-
-
-            <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
                 <legend class="text-lg font-semibold px-2 flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Productos
@@ -479,6 +402,85 @@
                     </div>
                 </div>
             </fieldset>
+
+            <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
+                <legend class="text-lg font-semibold px-2 flex items-center justify-between">
+                    <span></span>
+                    <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
+                        (click)="openCloseEditarDescuentosCompra()">
+                        <icon-pencil />
+                    </button>
+                </legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium">Subtotal sin descuentos</label>
+                        <input type="text" class="form-control w-full" formControlName="subtotalSinDescuento" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Descuento 1</label>
+                        <input type="text" class="form-control w-full" formControlName="descuento1" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Descuento 2</label>
+                        <input type="text" class="form-control w-full" formControlName="descuento2" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Subtotal con descuentos</label>
+                        <input type="text" class="form-control w-full" formControlName="subtotalConDescuento" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Otros cargos</label>
+                        <input type="text" class="form-control w-full" formControlName="otrosCargos" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">IVA</label>
+                        <input type="text" class="form-control w-full" formControlName="iva" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Percepción IIBB</label>
+                        <input type="text" class="form-control w-full" formControlName="percepcionIIBB" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Percepción RG. 3337</label>
+                        <input type="text" class="form-control w-full" formControlName="percepcionRG3337" />
+                    </div>
+                    <div>
+                        <label class="block font-medium">Total</label>
+                        <input type="text" class="form-control w-full" formControlName="total" />
+                    </div>
+                    <!-- <div>
+                        <label class="block font-medium">Calificación</label>
+                        <input type="text" class="form-control w-full" formControlName="calificacion"
+                            [ngxTippy]="getCalificacionTooltip()" data-tippy-placement="top" />
+                    </div> -->
+                    <div>
+                        <label>Calificación</label>
+                        <ng-select [items]="calificaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                            style="width: 100%" [virtualScroll]="true" notFoundText="No hay calificaciones"
+                            placeholder="" class="w-1/3 min-w-[200px]" formControlName="calificacion"
+                            [selectOnTab]="true" [appendTo]="'body'" [ngxTippy]="getCalificacionTooltip()"></ng-select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block font-medium">Observación de la calificación</label>
+                        <textarea class="form-control w-full" formControlName="calificacionComentarios"
+                            rows="2"></textarea>
+                    </div>
+                </div>
+                @if (inEdicionDescuentos) {
+                <div class="row mt-3">
+                    <div class="col-12 d-flex justify-content-center">
+                        <button class="btn btn-primary mr-3" (click)="confirmarEdicionDescuentos()">
+                            Confirmar
+                        </button>
+                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                            (click)="openCloseEditarDescuentosCompra()">Cancelar</button>
+                    </div>
+                </div>
+                }
+            </fieldset>
+
+
+
 
         </div>
         }

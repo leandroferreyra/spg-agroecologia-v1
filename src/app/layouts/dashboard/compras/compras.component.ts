@@ -1084,6 +1084,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         next: res => {
           this.selectedCompra = res.data;
           this.inicializarFormEdit();
+          this.obtenerCompras(true);
           this.openCloseEditarFechaCompra();
         },
         error: error => {
