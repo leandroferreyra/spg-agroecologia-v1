@@ -660,9 +660,13 @@
                         @if (productoForm.controls['control_result'].value) {
                         <div (keydown.enter)="confirmarAltaProducto()"
                             [ngClass]="isSubmit ? productoForm.controls['password'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="password">Password</label>
-                            <input id="password" type="password" placeholder="" class="form-control"
-                                formControlName="password" />
+                            <label>Password</label>
+                            <div class="input-group">
+                                <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                                    formControlName="password">
+                                <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
+                                    style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
+                            </div>
                         </div>
                         <div (keydown.enter)="confirmarAltaProducto()"
                             [ngClass]="isSubmit ? productoForm.controls['control_comments'].errors ? 'has-error' : 'has-success' : ''">

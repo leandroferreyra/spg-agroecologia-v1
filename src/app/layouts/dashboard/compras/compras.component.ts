@@ -36,7 +36,7 @@ import { TransactionProductoService } from 'src/app/core/services/transactionPro
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { FacturaService } from 'src/app/core/services/factura.service';
 import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
-import { timeStamp } from 'console';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
 
 @Component({
@@ -152,6 +152,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inEdicionFactura: boolean = false;
   inAltaFactura: boolean = false;
   poseeFactura: boolean = false;
+
+
+  showPassword: boolean = false;
+
+  // Iconos
+  iconEye = faEye;
+  iconEyeSlash = faEyeSlash;
+
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -1275,6 +1283,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
 
 }
