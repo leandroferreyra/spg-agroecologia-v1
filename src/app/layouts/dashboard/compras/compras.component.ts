@@ -647,6 +647,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   resetUbicaciones() {
     this.breadcrumb = [];
+    this.productoForm.get('location_uuid')?.setValue(null);
     this.obtenerUbicaciones();
   }
 
