@@ -142,7 +142,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   monedas: any[] = [];
 
   breadcrumb: any[] = [];
-  ubicacionSeleccionada: string | null = null;
+  // ubicacionSeleccionada: string | null = null;
 
   mostrarProductos = true;
   usuarioLogueado: any;
@@ -150,6 +150,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inEdicionFechaCompra: boolean = false;
   inEdicionDescuentos: boolean = false;
   inEdicionFactura: boolean = false;
+  inEdicionProducto: boolean = false;
   inAltaFactura: boolean = false;
   poseeFactura: boolean = false;
 
@@ -214,6 +215,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
+          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
           if (this.compras.length === 0) {
             this.swalService.toastSuccess('center', 'No existen compras.');
             this.isTabDisabled = true;
@@ -397,6 +399,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(paramsProcesos, this.actual_role).subscribe({
         next: res => {
           this.productosParaFiltro = res.data;
+          console.log("🚀 ~ ComprasComponent ~ this._indexService.getProductosWithParam ~ this.productosParaFiltro:", this.productosParaFiltro)
           this.cargandoProductos = false;
         },
         error: error => {
@@ -570,7 +573,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
   }
 
-  openModalProducto(type: string) {
+  openModalProducto(type: string, producto?: any) {
     if (type === 'NEW') {
       if (this.isEdicion) {
         this.isEdicion = false;
@@ -579,22 +582,29 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.inicializarFormProducto();
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
+    } else {
+      this.inEdicionProducto = true;
+      this.tituloModal = 'Edición de producto';
+      this.modalProducto.options = this.modalOptions;
+      this.modalProducto.open();
+      this.inicializarFormProducto(producto);
     }
   }
 
-  inicializarFormProducto() {
-    this.productoControllable = false;
+  inicializarFormProducto(data?: any) {
+    console.log(data);
+    this.productoControllable = data ? (data.product.controllable === 1) : false;
     this.productoForm = new FormGroup({
-      transaction_uuid: new FormControl({ value: null, disabled: false }, []),
-      product_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      quantity: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      unit_price: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      control_result: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      control_user_uuid: new FormControl({ value: null, disabled: false }, []),
+      transaction_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
+      product_uuid: new FormControl({ value: data ? data.product : null, disabled: false }, [Validators.required]),
+      quantity: new FormControl({ value: data ? data.quantity : null, disabled: false }, [Validators.required]),
+      unit_price: new FormControl({ value: data ? data.unit_price : null, disabled: false }, [Validators.required]),
+      control_result: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, [Validators.required]),
+      // control_user_uuid: new FormControl({ value: null, disabled: false }, []), 
       password: new FormControl({ value: null, disabled: false }, []),
-      control_comments: new FormControl({ value: null, disabled: false }, []),
+      control_comments: new FormControl({ value: data ? data.control_comments : null, disabled: false }, []),
       location_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      control_description: new FormControl({ value: null, disabled: true }, []),
+      control_description: new FormControl({ value: data ? data.product.control_description : null, disabled: true }, []),
     });
     this.onFormProductoChange();
   }
@@ -610,18 +620,18 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.productoForm.get('control_result')!.valueChanges.subscribe(
       (value: any) => {
         if (value) {
-          ['control_user_uuid', 'password', 'control_comments'].forEach((field) => {
+          ['password', 'control_comments'].forEach((field) => {
             const control = this.productoForm.get(field);
             control?.setValidators(Validators.required);
           });
         } else {
-          ['control_user_uuid', 'password', 'control_comments'].forEach((field) => {
+          ['password', 'control_comments'].forEach((field) => {
             const control = this.productoForm.get(field);
             control?.clearValidators();
             control?.setErrors(null);
           });
         }
-        ['control_user_uuid', 'password', 'control_comments'].forEach((field) => {
+        ['password', 'control_comments'].forEach((field) => {
           this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
         });
       });
@@ -932,7 +942,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       let producto = new ProductoTransaccionDTO();
       producto.actual_role = this.actual_role;
       producto.with = [];
-      producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
       producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
       producto.quantity = this.productoForm.get('quantity')?.value;
       producto.unit_price = this.productoForm.get('unit_price')?.value;
@@ -943,25 +952,50 @@ export class ComprasComponent implements OnInit, OnDestroy {
         producto.control_comments = this.productoForm.get('control_comments')?.value;
       }
       producto.location_uuid = this.productoForm.get('location_uuid')?.value;
-      this._transactionProductService.saveTransactionProduct(producto).subscribe({
-        next: res => {
-          this.cerrarModalAltaProducto();
-          this.isSubmit = false;
-          this.obtenerCompraPorId(this.selectedCompra);
-          this.tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.swalService.toastError('top-right', error.error.message);
-          console.error(error);
-          this.spinner.hide();
-        }
-      })
+      if (!this.inEdicionProducto) {
+        producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
+        this.subscription.add(
+          this._transactionProductService.saveTransactionProduct(producto).subscribe({
+            next: res => {
+              this.cerrarModalAltaProducto();
+              this.isSubmit = false;
+              this.obtenerCompraPorId(this.selectedCompra);
+              this.tokenService.setToken(res.token);
+              this.breadcrumb = [];
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, producto).subscribe({
+            next: res => {
+              this.cerrarModalAltaProducto();
+              this.isSubmit = false;
+              this.obtenerCompraPorId(this.selectedCompra);
+              this.tokenService.setToken(res.token);
+              this.breadcrumb = [];
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
+        )
+      }
     }
   }
 
   cerrarModalAltaProducto() {
     this.isSubmit = false;
+    this.breadcrumb = [];
     this.modalProducto.close();
   }
 

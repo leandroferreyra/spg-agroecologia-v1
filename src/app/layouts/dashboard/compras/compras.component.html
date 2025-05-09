@@ -341,7 +341,6 @@
                                     <td class="border px-2 py-1">{{ data.unit_price }}</td>
                                     <td class="border px-2 py-1">{{ data.product.vat_percent }}</td>
                                     <td class="border px-2 py-1">{{ data.quantity * data.unit_price }}</td>
-                                    <!-- <td class="border px-2 py-1">{{ data.product.controllable }}</td> -->
                                     <td class="border px-2 py-1">
                                         <div class="flex items-center gap-2 mt-2">
                                             <label class="w-12 h-6 relative">
@@ -375,7 +374,8 @@
                                     <td>
                                         <div class="flex items-center">
                                             <div>
-                                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
+                                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                                    (click)="openModalProducto('EDIT', data)">
                                                     <icon-pencil />
                                                 </button>
                                             </div>
@@ -703,20 +703,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Breadcrumb -->
-                        <!-- <div class="text-sm text-gray-700 mt-2">
-                            <span>Ubicación seleccionada: </span>
-                            <ng-container *ngFor="let u of breadcrumb; let i = index">
-                                <span class="cursor-pointer hover:underline text-blue-600" (click)="irAUbicacion(i)">
-                                    {{ u.name }}
-                                </span>
-                                <span *ngIf="i < breadcrumb.length - 1"> / </span>
-                            </ng-container>
-                        </div> -->
-
-
-
 
                     </div>
                 </div>

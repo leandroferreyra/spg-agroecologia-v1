@@ -21,10 +21,10 @@ export class TransactionProductoService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.api, JSON.stringify(producto), { headers });
   }
 
-  // editCompra(uuid: string, compra: CompraDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.put<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, JSON.stringify(compra), { headers });
-  // }
+  editTransactionProduct(uuid: string, producto: ProductoTransaccionDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.api + '/' + uuid, JSON.stringify(producto), { headers });
+  }
 
   deleteTransactionProduct(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
