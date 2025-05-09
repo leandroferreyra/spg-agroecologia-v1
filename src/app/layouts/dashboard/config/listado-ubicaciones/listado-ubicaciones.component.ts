@@ -59,8 +59,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
   // Orden y filtro
   filtros: any = {
     'name': { value: '', op: 'LIKE', contiene: true },
-
-    // location_uuid: null,
+    'location_uuid': { value: '', op: '=', contiene: false },
   };
   showFilter: boolean = false;
   ordenamiento: any = {
@@ -126,7 +125,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
       this.filtros.location_uuid.op = '=';
       this.filtros.location_uuid.contiene = false;
     } else {
-      this.filtros.location_uuid = null;
+      this.filtros.location_uuid.value = 'null';
     }
     // Si filtra y es global eliminamos el uuid
     if (this.filtros.name && this.busqueda_global) {

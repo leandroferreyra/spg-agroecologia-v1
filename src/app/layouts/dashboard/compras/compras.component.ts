@@ -242,11 +242,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._comprasService.getCompraById(compra.uuid, this.actual_role).subscribe({
         next: res => {
-          console.log(res);
           this.selectedCompra = res.data;
-          // if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-          //   this.poseeFactura = true;
-          // }
           this.inicializarFormEdit();
         },
         error: error => {
@@ -402,19 +398,21 @@ export class ComprasComponent implements OnInit, OnDestroy {
     )
   }
 
-  obtenerUbicaciones() {
+  obtenerUbicaciones(uuid?: string) {
     const params: any = {};
     params.with = ["location.location.location.location"];
     params.paging = null;
     params.page = null;
     params.order_by = {};
-    params.filters = {};
+    params.filters = {
+      'location_uuid': { value: uuid ? uuid : 'null', op: '=', contiene: false },
+    };
 
     this.subscription.add(
       this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
         next: res => {
-          // console.log(res);
           this.ubicaciones = res.data;
+          console.log("🚀 ~ ComprasComponent ~ this._indexService.getUbicacionesWithParam ~ this.ubicaciones:", this.ubicaciones)
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -436,7 +434,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
         this.calificaciones = res.calificaciones.data;
         this.monedas = res.monedas.data;
-        console.log("🚀 ~ ComprasComponent ~ obtenerCatalogos ~ this.monedas:", this.monedas)
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -566,7 +563,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     if (type === 'NEW') {
       if (this.isEdicion) {
         this.isEdicion = false;
-        // this.inicializarFormEdit(); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
       }
       this.tituloModal = 'Nuevo producto';
       this.inicializarFormProducto();
@@ -618,6 +614,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
         });
       });
+
+    this.productoForm.get('location_uuid')!.valueChanges.subscribe(
+      (location_uuid: string) => {
+        console.log(location_uuid);
+        this.obtenerUbicaciones(location_uuid);
+      });
+
   }
 
   obtenerProveedores() {
@@ -717,9 +720,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     compra.qualification_comments = form.get('qualification_comments')?.value;
     let transaction = new Transaction();
     transaction.person_uuid = form.get('person_uuid')?.value.person.uuid;
-    // const today = new Date();
-    // const formattedDate = today.toISOString().split('T')[0];
-    // transaction.transaction_datetime = formattedDate;
     const fechaFormateada = form.get('transaction_datetime')?.value instanceof Date
       ? format(form.get('transaction_datetime')?.value, 'yyyy-MM-dd')
       : form.get('transaction_datetime')?.value;
@@ -1170,10 +1170,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._facturaService.saveFactura(factura).subscribe({
           next: res => {
-            console.log(res);
             this.tokenService.setToken(res.token);
             this.inAltaFactura = false;
-            // this.openCloseEditarFactura();
             this.obtenerCompras(true);
             this.showDataCompra(this.selectedCompra);
           },
@@ -1188,7 +1186,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._facturaService.editFactura(this.selectedCompra.transaction.transaction_documents[0].uuid, factura).subscribe({
           next: res => {
-            console.log(res);
             this.tokenService.setToken(res.token);
             this.inEdicionFactura = false;
             this.selectedCompra.transaction.transaction_documents[0] = res.data;
@@ -1233,7 +1230,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._facturaService.deleteFactura(this.selectedCompra.transaction?.transaction_documents[0].uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          console.log(res);
           this.selectedCompra.transaction.transaction_documents = [];
           this.obtenerCompras(true);
           this.inicializarFormEdit();
