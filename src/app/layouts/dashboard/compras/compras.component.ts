@@ -205,7 +205,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
     // Inicializamos un objeto vacío para los parámetros
     this.params.with = ["transaction.person.human", "transaction.person.city.district.country", "transaction.person.legalEntity",
-      "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch', 'batch.stocks.productInstances'];
+      "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch', 'batch.stocks.productInstances',
+      "transaction.transactionProducts.product.stocks.location"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -256,6 +257,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._comprasService.getCompraById(compra.uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedCompra = res.data;
+          console.log("🚀 ~ ComprasComponent ~ this._comprasService.getCompraById ~ this.selectedCompra:", this.selectedCompra)
           this.inicializarFormEdit();
         },
         error: error => {
@@ -977,6 +979,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
             next: res => {
               this.cerrarModalAltaProducto();
               this.isSubmit = false;
+              this.inEdicionProducto = false;
               this.obtenerCompraPorId(this.selectedCompra);
               this.tokenService.setToken(res.token);
               this.breadcrumb = [];
@@ -1028,7 +1031,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._transactionProductService.deleteTransactionProduct(producto.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerCompras();
+          let productos = this.selectedCompra.transaction.transaction_products;
+          const index = productos.findIndex((p: any) => p.uuid === producto.uuid);
+          if (index !== -1) {
+            productos.splice(index, 1);
+          }
+          this.obtenerCompras(true);
+          this.inicializarFormEdit();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
