@@ -512,17 +512,14 @@
                             </ng-select>
                         </div>
 
-                        <div
-                            [ngClass]="isSubmit ? newCompraForm.controls['transaction_datetime'].errors ? 'has-error' : 'has-success' : ''">
-                            <label>Fecha de compra</label>
-                            <input type="text" mwlFlatpickr [options]="{ 
-                                                enableTime: false, 
-                                                dateFormat: 'Y-m-d',
-                                                time24hr: true,
-                                                enableSeconds: false
-                                            }" class="form-input" formControlName="transaction_datetime" />
+                        <div>
+                            <label>Estado transacción</label>
+                            <ng-select [items]="posiblesEstadosTransaccion" bindLabel="name" bindValue="uuid"
+                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
+                                formControlName="possible_transaction_state_uuid" [selectOnTab]="true"
+                                [ngClass]="isSubmit ? newCompraForm.controls['possible_transaction_state_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
-                        
                         <div>
                             <label>Calificación</label>
                             <ng-select [items]="calificaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
@@ -572,14 +569,19 @@
                             <input id="perceptionRG3337" type="text" placeholder="" class="form-control"
                                 formControlName="perceptionRG3337" />
                         </div>
-                        <div>
-                            <label>Estado transacción</label>
-                            <ng-select [items]="posiblesEstadosTransaccion" bindLabel="name" bindValue="uuid"
-                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
-                                formControlName="possible_transaction_state_uuid" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newCompraForm.controls['possible_transaction_state_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+
+                        <div
+                            [ngClass]="isSubmit ? newCompraForm.controls['transaction_datetime'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Fecha de compra</label>
+                            <input type="text" mwlFlatpickr [options]="{ 
+                                                enableTime: false, 
+                                                dateFormat: 'Y-m-d',
+                                                time24hr: true,
+                                                enableSeconds: false
+                                            }" class="form-input" formControlName="transaction_datetime" />
                         </div>
+
+
                     </div>
                 </div>
 
@@ -680,10 +682,44 @@
                             <label>Ubicación</label>
                             <ng-select [items]="ubicaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 [virtualScroll]="true" notFoundText="No hay productos" formControlName="location_uuid"
-                                [appendTo]="'body'"
+                                [appendTo]="'body'" (change)="onSeleccionUbicacion()" [clearable]="false"
                                 [ngClass]="isSubmit ? productoForm.controls['location_uuid'].errors ? 'has-error' : 'has-success' : ''">
                             </ng-select>
+
+                            <!-- Breadcrumb con botón de limpiar -->
+                            <div class="text-sm text-gray-700 mt-2 flex items-center gap-2">
+                                <span>Ubicación seleccionada: </span>
+                                <ng-container *ngFor="let u of breadcrumb; let i = index">
+                                    <span class="cursor-pointer hover:underline text-blue-600"
+                                        (click)="irAUbicacion(i)">
+                                        {{ u.name }}
+                                    </span>
+                                    <span *ngIf="i < breadcrumb.length - 1"> / </span>
+                                </ng-container>
+
+                                <!-- Botón para reiniciar -->
+                                <button *ngIf="breadcrumb.length" (click)="resetUbicaciones()"
+                                    class="text-red-500 ml-2 hover:underline text-xs flex items-center"
+                                    title="Limpiar selección">
+                                    <span class="material-icons text-base">X</span>
+                                </button>
+                            </div>
                         </div>
+
+                        <!-- Breadcrumb -->
+                        <!-- <div class="text-sm text-gray-700 mt-2">
+                            <span>Ubicación seleccionada: </span>
+                            <ng-container *ngFor="let u of breadcrumb; let i = index">
+                                <span class="cursor-pointer hover:underline text-blue-600" (click)="irAUbicacion(i)">
+                                    {{ u.name }}
+                                </span>
+                                <span *ngIf="i < breadcrumb.length - 1"> / </span>
+                            </ng-container>
+                        </div> -->
+
+
+
+
                     </div>
                 </div>
 
@@ -834,9 +870,9 @@
                         (input)="obtenerComprasPorFiltroAvanzado()" />
                 </div>
                 <div style="width: 100%;">
-                    <label for="switchRight">Lote</label>
+                    <label for="switchRightLote">Lote</label>
                     <div class="flex">
-                        <input id="switchRight" type="text" placeholder=""
+                        <input id="switchRightLote" type="text" placeholder=""
                             [(ngModel)]="filtros['batch.batch_identification'].value"
                             (input)="obtenerComprasPorFiltroAvanzado()"
                             class="form-input ltr:rounded-r-none rtl:rounded-l-none" />

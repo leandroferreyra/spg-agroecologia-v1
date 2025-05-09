@@ -141,6 +141,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
   ubicaciones: any[] = [];
   monedas: any[] = [];
 
+  breadcrumb: any[] = [];
+  ubicacionSeleccionada: string | null = null;
+
   mostrarProductos = true;
   usuarioLogueado: any;
   proveedorEdit: any;
@@ -615,12 +618,36 @@ export class ComprasComponent implements OnInit, OnDestroy {
         });
       });
 
-    this.productoForm.get('location_uuid')!.valueChanges.subscribe(
-      (location_uuid: string) => {
-        console.log(location_uuid);
-        this.obtenerUbicaciones(location_uuid);
-      });
+    // this.productoForm.get('location_uuid')!.valueChanges.subscribe(
+    //   (location_uuid: string) => {
+    //     console.log(location_uuid);
+    //     this.obtenerUbicaciones(location_uuid);
+    //   });
 
+  }
+
+  onSeleccionUbicacion() {
+    const seleccion = this.ubicaciones.find(
+      (u) => u.uuid === this.productoForm.get('location_uuid')?.value
+    );
+
+    if (!seleccion) return;
+
+    this.breadcrumb.push(seleccion);
+    this.productoForm.get('location_uuid')?.setValue(seleccion.uuid);
+    this.obtenerUbicaciones(seleccion.uuid);
+  }
+
+  irAUbicacion(index: number) {
+    const ubicacion = this.breadcrumb[index];
+    this.breadcrumb = this.breadcrumb.slice(0, index + 1);
+    this.productoForm.get('location_uuid')?.setValue(ubicacion.uuid);
+    this.obtenerUbicaciones(ubicacion.uuid);
+  }
+
+  resetUbicaciones() {
+    this.breadcrumb = [];
+    this.obtenerUbicaciones();
   }
 
   obtenerProveedores() {
