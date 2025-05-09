@@ -37,6 +37,7 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { FacturaService } from 'src/app/core/services/factura.service';
 import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { timeStamp } from 'console';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-compras',
@@ -449,7 +450,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.newCompraForm = new FormGroup({
       qualification_option_uuid: new FormControl({ value: null, disabled: false }, []),
       qualification_comments: new FormControl({ value: null, disabled: false }, []),
-      transaction_datetime: new FormControl({ value: null, disabled: false }, []),
+      transaction_datetime: new FormControl({ value: new Date(), disabled: false }, []),
       person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
       vat_after_discount: new FormControl({ value: null, disabled: false }, []),
       discount1: new FormControl({ value: null, disabled: false }, []),
@@ -716,9 +717,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
     compra.qualification_comments = form.get('qualification_comments')?.value;
     let transaction = new Transaction();
     transaction.person_uuid = form.get('person_uuid')?.value.person.uuid;
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
-    transaction.transaction_datetime = formattedDate;
+    // const today = new Date();
+    // const formattedDate = today.toISOString().split('T')[0];
+    // transaction.transaction_datetime = formattedDate;
+    const fechaFormateada = form.get('transaction_datetime')?.value instanceof Date
+      ? format(form.get('transaction_datetime')?.value, 'yyyy-MM-dd')
+      : form.get('transaction_datetime')?.value;
+    transaction.transaction_datetime = fechaFormateada;
     transaction.vat_after_discount = false;
     transaction.discount1 = form.get('discount1')?.value;
     transaction.discount2 = form.get('discount2')?.value;
