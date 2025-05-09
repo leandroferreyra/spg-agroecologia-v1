@@ -34,6 +34,7 @@ import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTran
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { TransactionProductoService } from 'src/app/core/services/transactionProducto.service';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { FacturaService } from 'src/app/core/services/factura.service';
 
 @Component({
   selector: 'app-compras',
@@ -135,17 +136,20 @@ export class ComprasComponent implements OnInit, OnDestroy {
   posiblesEstadosTransaccion: any[] = [];
   calificaciones: any[] = [];
   ubicaciones: any[] = [];
+  monedas: any[] = [];
 
   mostrarProductos = true;
   usuarioLogueado: any;
   proveedorEdit: any;
   inEdicionFechaCompra: boolean = false;
   inEdicionDescuentos: boolean = false;
+  inEdicionFactura: boolean = false;
+  poseeFactura: boolean = false;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
-    private _transactionProductService: TransactionProductoService) {
+    private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService) {
     this.initStore();
   }
 
@@ -230,11 +234,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   obtenerCompraPorId(compra: any) {
+    this.poseeFactura = false;
     this.subscription.add(
       this._comprasService.getCompraById(compra.uuid, this.actual_role).subscribe({
         next: res => {
           console.log(res);
           this.selectedCompra = res.data;
+          if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+            this.poseeFactura = true;
+          }
           this.inicializarFormEdit();
         },
         error: error => {
@@ -291,14 +299,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   getMoneda() {
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-      return this.selectedCompra?.transaction?.transaction_documents[0]?.currency?.name;
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.currency?.uuid;
     }
     return '';
   }
 
   getTipoComprobante() {
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-      return this.selectedCompra?.transaction?.transaction_documents[0]?.account_document_type?.name;
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.account_document_type?.uuid;
     }
     return '';
   }
@@ -388,12 +396,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
     forkJoin({
       tiposDocumentosContables: this._catalogoService.getTiposCompraDocumentosContables(this.actual_role),
       posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccion(this.actual_role),
-      calificaciones: this._catalogoService.getCalificaciones(this.actual_role)
+      calificaciones: this._catalogoService.getCalificaciones(this.actual_role),
+      monedas: this._indexService.getMonedas(this.actual_role)
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
         this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
         this.calificaciones = res.calificaciones.data;
+        this.monedas = res.monedas.data;
+        console.log("🚀 ~ ComprasComponent ~ obtenerCatalogos ~ this.monedas:", this.monedas)
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -1074,6 +1085,71 @@ export class ComprasComponent implements OnInit, OnDestroy {
         error: error => {
           console.error(error);
           this.swalService.toastError('top-right', error.error.message);
+        }
+      })
+    )
+  }
+
+  openCloseEditarFactura() {
+    this.inEdicionFactura = !this.inEdicionFactura;
+    if (this.inEdicionFactura) {
+      this.compraForm.get('fechaFacturacion')?.enable();
+      this.compraForm.get('tipoComprobante')?.enable();
+      this.compraForm.get('numeroComprobante')?.enable();
+      this.compraForm.get('moneda')?.enable();
+      this.compraForm.get('lote')?.enable();
+    } else {
+      this.compraForm.get('fechaFacturacion')?.disable();
+      this.compraForm.get('tipoComprobante')?.disable();
+      this.compraForm.get('numeroComprobante')?.disable();
+      this.compraForm.get('moneda')?.disable();
+      this.compraForm.get('lote')?.disable();
+      this.inicializarFormEdit();
+    }
+  }
+
+  confirmarEdicionFactura() {
+
+  }
+
+  openSwalEliminarFactura() {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar la factura seleccionada?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarFactura();
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarFactura() {
+    this.spinner.show();
+    this.subscription.add(
+      this._facturaService.deleteFactura(this.selectedCompra.transaction?.transaction_documents[0].uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          console.log(res);
+          this.selectedCompra.transaction.transaction_documents = [];
+          this.inicializarFormEdit();
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
         }
       })
     )

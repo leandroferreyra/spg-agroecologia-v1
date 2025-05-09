@@ -216,32 +216,69 @@
             <fieldset class="border border-gray-300 rounded p-4">
                 <legend class="text-lg font-semibold px-2 flex items-center justify-between">
                     <span>Factura</span>
-                    <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar">
-                        <icon-pencil />
-                    </button>
+                    <div class="flex items-center">
+                        <div>
+                            <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
+                                (click)="openCloseEditarFactura()">
+                                <icon-pencil />
+                            </button>
+                        </div>
+                        <div>
+                            <button type="button" ngxTippy="Eliminar" class="ml-2" (click)="openSwalEliminarFactura()" [disabled]="!poseeFactura">
+                                <icon-trash-lines />
+                            </button>
+                        </div>
+                    </div>
+
                 </legend>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
+                    <!-- <div>
                         <label class="block font-medium">Fecha de facturacion</label>
                         <input type="text" class="form-control w-full" formControlName="fechaFacturacion" />
+                    </div> -->
+                    <div>
+                        <label class="block font-medium">Fecha de facturacion</label>
+                        <input type="text" mwlFlatpickr [options]="{ 
+                            enableTime: false, 
+                            dateFormat: 'Y-m-d',
+                            time24hr: true,
+                            enableSeconds: false
+                        }" class="form-input" formControlName="fechaFacturacion" />
                     </div>
                     <div>
                         <label class="block font-medium">Tipo de comprobante</label>
-                        <input type="text" class="form-control w-full" formControlName="tipoComprobante" />
+                        <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
+                            clearAllText="Limpiar" [virtualScroll]="true" notFoundText="No hay tipos de comprobante"
+                            formControlName="tipoComprobante" [selectOnTab]="true">
+                        </ng-select>
                     </div>
                     <div>
                         <label class="block font-medium">Número de comprobante</label>
                         <input type="text" class="form-control w-full" formControlName="numeroComprobante" />
                     </div>
                     <div>
-                        <label class="block font-medium">Moneda de la Compra</label>
-                        <input type="text" class="form-control w-full" formControlName="moneda" />
+                        <label class="block font-medium">Moneda de la compra</label>
+                        <ng-select [items]="monedas" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                            [virtualScroll]="true" notFoundText="No hay monedas" formControlName="moneda"
+                            [selectOnTab]="true">
+                        </ng-select>
                     </div>
                     <div>
                         <label class="block font-medium">Lote / Partida</label>
                         <input type="text" class="form-control w-full" formControlName="lote" />
                     </div>
                 </div>
+                @if (inEdicionFactura) {
+                <div class="row mt-3">
+                    <div class="col-12 d-flex justify-content-center">
+                        <button class="btn btn-primary mr-3" (click)="confirmarEdicionFactura()">
+                            Confirmar
+                        </button>
+                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                            (click)="openCloseEditarFactura()">Cancelar</button>
+                    </div>
+                </div>
+                }
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
