@@ -1166,6 +1166,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
     if (this.inEdicionFactura || this.inAltaFactura) {
       this.compraForm.get('fechaFacturacion')?.enable();
+      if (this.inAltaFactura) {
+        this.compraForm.get('fechaFacturacion')?.setValue(this.compraForm.get('fechaCompra')?.value);
+      }
       this.compraForm.get('tipoComprobante')?.enable();
       this.compraForm.get('prefijoComprobante')?.enable();
       this.compraForm.get('documentoComprobante')?.enable();
