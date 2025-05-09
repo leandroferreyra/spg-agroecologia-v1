@@ -35,6 +35,8 @@ import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { TransactionProductoService } from 'src/app/core/services/transactionProducto.service';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { FacturaService } from 'src/app/core/services/factura.service';
+import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
+import { timeStamp } from 'console';
 
 @Component({
   selector: 'app-compras',
@@ -144,6 +146,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inEdicionFechaCompra: boolean = false;
   inEdicionDescuentos: boolean = false;
   inEdicionFactura: boolean = false;
+  inAltaFactura: boolean = false;
   poseeFactura: boolean = false;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
@@ -234,15 +237,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   obtenerCompraPorId(compra: any) {
-    this.poseeFactura = false;
+    // this.poseeFactura = false;
     this.subscription.add(
       this._comprasService.getCompraById(compra.uuid, this.actual_role).subscribe({
         next: res => {
           console.log(res);
           this.selectedCompra = res.data;
-          if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-            this.poseeFactura = true;
-          }
+          // if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+          //   this.poseeFactura = true;
+          // }
           this.inicializarFormEdit();
         },
         error: error => {
@@ -254,6 +257,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   inicializarFormEdit() {
+    this.poseeFactura = false;
     this.compraForm = new FormGroup({
       // Proveedor
       nombre: new FormControl({ value: this.selectedCompra?.transaction?.person?.human?.firstname, disabled: true }, []),
@@ -268,8 +272,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
       fechaFacturacion: new FormControl({ value: this.getFechaFacturacion(), disabled: true }, []),
       estadoCompra: new FormControl({ value: this.selectedCompra?.transaction?.current_state?.state?.uuid, disabled: true }, []),
       tipoComprobante: new FormControl({ value: this.getTipoComprobante(), disabled: true }, []),
-      numeroComprobante: new FormControl({ value: this.getNumeroComprobante(), disabled: true }, []),
+      prefijoComprobante: new FormControl({ value: this.getPrefijoComprobante(), disabled: true }, []),
+      documentoComprobante: new FormControl({ value: this.getDocumentoComprobante(), disabled: true }, []),
+      // numeroComprobante: new FormControl({ value: this.getNumeroComprobante(), disabled: true }, []),
       moneda: new FormControl({ value: this.getMoneda(), disabled: true }, []),
+      tipoCambio: new FormControl({ value: this.getTipoCambio(), disabled: true }, []),
       lote: new FormControl({ value: this.selectedCompra?.batch?.batch_identification, disabled: true }, []),
       // 
       subtotalSinDescuento: new FormControl({ value: this.selectedCompra?.transaction?.subtotal_before_discount, disabled: true }, []),
@@ -284,6 +291,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
       calificacion: new FormControl({ value: this.selectedCompra?.qualification_option?.uuid, disabled: true }, []),
       calificacionComentarios: new FormControl({ value: this.selectedCompra?.qualification_comments, disabled: true }, []),
     });
+    if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+      this.poseeFactura = true;
+    }
     this.onFormEditChange();
   }
   onFormEditChange() {
@@ -304,6 +314,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return '';
   }
 
+  getTipoCambio() {
+    if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.exchange_rate;
+    }
+    return '';
+  }
+
   getTipoComprobante() {
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
       return this.selectedCompra?.transaction?.transaction_documents[0]?.account_document_type?.uuid;
@@ -311,13 +328,27 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  getNumeroComprobante() {
+  getPrefijoComprobante() {
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-      return this.selectedCompra?.transaction?.transaction_documents[0]?.prefix_number + ' ' +
-        this.selectedCompra?.transaction?.transaction_documents[0]?.document_number
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.prefix_number
     }
     return '';
   }
+
+  getDocumentoComprobante() {
+    if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.document_number
+    }
+    return '';
+  }
+
+  // getNumeroComprobante() {
+  //   if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
+  //     return this.selectedCompra?.transaction?.transaction_documents[0]?.prefix_number + ' ' +
+  //       this.selectedCompra?.transaction?.transaction_documents[0]?.document_number
+  //   }
+  //   return '';
+  // }
 
   getCalificacionTooltip() {
     return this.selectedCompra?.qualification_option?.description;
@@ -1090,26 +1121,83 @@ export class ComprasComponent implements OnInit, OnDestroy {
     )
   }
 
-  openCloseEditarFactura() {
-    this.inEdicionFactura = !this.inEdicionFactura;
-    if (this.inEdicionFactura) {
+  openCloseEditarFactura(type?: string) {
+    if (!type) {
+      // Está cerrando el modal 
+      this.inEdicionFactura = false;
+      this.inAltaFactura = false;
+    } else if (type === 'NEW') {
+      this.inAltaFactura = !this.inAltaFactura;
+    } else {
+      this.inEdicionFactura = !this.inEdicionFactura;
+    }
+    if (this.inEdicionFactura || this.inAltaFactura) {
       this.compraForm.get('fechaFacturacion')?.enable();
       this.compraForm.get('tipoComprobante')?.enable();
-      this.compraForm.get('numeroComprobante')?.enable();
+      this.compraForm.get('prefijoComprobante')?.enable();
+      this.compraForm.get('documentoComprobante')?.enable();
       this.compraForm.get('moneda')?.enable();
-      this.compraForm.get('lote')?.enable();
+      this.compraForm.get('tipoCambio')?.enable();
     } else {
       this.compraForm.get('fechaFacturacion')?.disable();
       this.compraForm.get('tipoComprobante')?.disable();
-      this.compraForm.get('numeroComprobante')?.disable();
+      this.compraForm.get('prefijoComprobante')?.disable();
+      this.compraForm.get('documentoComprobante')?.disable();
       this.compraForm.get('moneda')?.disable();
-      this.compraForm.get('lote')?.disable();
+      this.compraForm.get('tipoCambio')?.disable();
       this.inicializarFormEdit();
     }
   }
 
   confirmarEdicionFactura() {
-
+    this.spinner.show();
+    let factura = new FacturaDTO();
+    factura.account_document_type_uuid = this.compraForm.get('tipoComprobante')?.value;
+    factura.document_datetime = this.compraForm.get('fechaFacturacion')?.value;
+    factura.prefix_number = this.compraForm.get('prefijoComprobante')?.value;
+    factura.document_number = this.compraForm.get('documentoComprobante')?.value;
+    factura.currency_uuid = this.compraForm.get('moneda')?.value;
+    factura.exchange_rate = this.compraForm.get('tipoCambio')?.value;
+    factura.actual_role = this.actual_role;
+    factura.with = ["accountDocumentType", "currency"];
+    if (this.inAltaFactura) {
+      factura.transaction_uuid = this.selectedCompra.transaction.uuid;
+      this.subscription.add(
+        this._facturaService.saveFactura(factura).subscribe({
+          next: res => {
+            console.log(res);
+            this.tokenService.setToken(res.token);
+            this.inAltaFactura = false;
+            // this.openCloseEditarFactura();
+            this.obtenerCompras(true);
+            this.showDataCompra(this.selectedCompra);
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+            this.swalService.toastError('top-right', error.error.message);
+          }
+        })
+      )
+    } else {
+      this.subscription.add(
+        this._facturaService.editFactura(this.selectedCompra.transaction.transaction_documents[0].uuid, factura).subscribe({
+          next: res => {
+            console.log(res);
+            this.tokenService.setToken(res.token);
+            this.inEdicionFactura = false;
+            this.selectedCompra.transaction.transaction_documents[0] = res.data;
+            this.inicializarFormEdit();
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+            this.swalService.toastError('top-right', error.error.message);
+          }
+        })
+      )
+    }
   }
 
   openSwalEliminarFactura() {
@@ -1142,6 +1230,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         next: res => {
           console.log(res);
           this.selectedCompra.transaction.transaction_documents = [];
+          this.obtenerCompras(true);
           this.inicializarFormEdit();
           this.tokenService.setToken(res.token);
           this.spinner.hide();

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
-import { ContactoDTO } from '../models/request/contactoDTO';
+import { FacturaDTO } from '../models/request/facturaDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -14,15 +14,15 @@ export class FacturaService {
 
   constructor(private http: HttpClient) { }
 
-  // saveContacto(contacto: ContactoDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.api, JSON.stringify(contacto), { headers });
-  // }
+  saveFactura(factura: FacturaDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.api, JSON.stringify(factura), { headers });
+  }
 
-  // editContacto(uuid: string, contacto: ContactoDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.put<AuthResponse>(environment.baseUrl + this.api + '/' + uuid, JSON.stringify(contacto), { headers });
-  // }
+  editFactura(uuid: string, factura: FacturaDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.api + '/' + uuid, JSON.stringify(factura), { headers });
+  }
 
   deleteFactura(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

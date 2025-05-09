@@ -1,4 +1,4 @@
-export class FascturaDTO {
+export class FacturaDTO {
 
     transaction_uuid!: string;
     account_document_type_uuid!: string;

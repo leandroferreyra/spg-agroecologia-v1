@@ -217,14 +217,24 @@
                 <legend class="text-lg font-semibold px-2 flex items-center justify-between">
                     <span>Factura</span>
                     <div class="flex items-center">
+                        @if (!poseeFactura){
+                        <div>
+                            <button type="button" class="hover:text-primary" ngxTippy="Agregar"
+                                (click)="openCloseEditarFactura('NEW')">
+                                <icon-plus class="mx-auto" />
+                            </button>
+                        </div>
+                        }@else {
                         <div>
                             <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
-                                (click)="openCloseEditarFactura()">
+                                (click)="openCloseEditarFactura('EDIT')">
                                 <icon-pencil />
                             </button>
                         </div>
+                        }
                         <div>
-                            <button type="button" ngxTippy="Eliminar" class="ml-2" (click)="openSwalEliminarFactura()" [disabled]="!poseeFactura">
+                            <button type="button" ngxTippy="Eliminar" class="ml-2" (click)="openSwalEliminarFactura()"
+                                [disabled]="!poseeFactura">
                                 <icon-trash-lines />
                             </button>
                         </div>
@@ -239,8 +249,8 @@
                     <div>
                         <label class="block font-medium">Fecha de facturacion</label>
                         <input type="text" mwlFlatpickr [options]="{ 
-                            enableTime: false, 
-                            dateFormat: 'Y-m-d',
+                            enableTime: true, 
+                            dateFormat: 'Y-m-d H:i:S',
                             time24hr: true,
                             enableSeconds: false
                         }" class="form-input" formControlName="fechaFacturacion" />
@@ -252,10 +262,18 @@
                             formControlName="tipoComprobante" [selectOnTab]="true">
                         </ng-select>
                     </div>
-                    <div>
+                    <!-- <div>
                         <label class="block font-medium">Número de comprobante</label>
                         <input type="text" class="form-control w-full" formControlName="numeroComprobante" />
+                    </div> -->
+                    <div>
+                        <label class="block font-medium">Número de comprobante</label>
+                        <div class="flex gap-2">
+                            <input type="text" class="form-control w-full" formControlName="prefijoComprobante" />
+                            <input type="text" class="form-control w-full" formControlName="documentoComprobante" />
+                        </div>
                     </div>
+
                     <div>
                         <label class="block font-medium">Moneda de la compra</label>
                         <ng-select [items]="monedas" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
@@ -264,11 +282,15 @@
                         </ng-select>
                     </div>
                     <div>
+                        <label class="block font-medium">Tipo de cambio</label>
+                        <input type="text" class="form-control w-full" formControlName="tipoCambio" />
+                    </div>
+                    <div>
                         <label class="block font-medium">Lote / Partida</label>
                         <input type="text" class="form-control w-full" formControlName="lote" />
                     </div>
                 </div>
-                @if (inEdicionFactura) {
+                @if (inEdicionFactura || inAltaFactura) {
                 <div class="row mt-3">
                     <div class="col-12 d-flex justify-content-center">
                         <button class="btn btn-primary mr-3" (click)="confirmarEdicionFactura()">
@@ -279,6 +301,13 @@
                     </div>
                 </div>
                 }
+                <!-- <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="square-jelly-box"
+                    [fullScreen]="false">
+                    <p style="color: white"> Loading... </p>
+                </ngx-spinner> -->
+                <!-- <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade"
+                    [fullScreen]="false">
+                </ngx-spinner> -->
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
