@@ -26,6 +26,7 @@ export class ComprasProveedorService {
       .append('with[]', "transaction.transactionDocuments.currency")
       .append('with[]', "transaction.transactionProducts.product.measure")
       .append('with[]', "transaction.transactionProducts.controlUser")
+      .append('with[]', "transaction.transactionProducts.product.stocks.location")
       .append('with[]', "batch")
       .append('with[]', "qualificationOption")
       ;

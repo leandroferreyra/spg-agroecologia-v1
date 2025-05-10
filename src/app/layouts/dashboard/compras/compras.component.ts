@@ -38,6 +38,7 @@ import { FacturaService } from 'src/app/core/services/factura.service';
 import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
+import { UbicacionesService } from 'src/app/core/services/ubicaciones.service';
 
 @Component({
   selector: 'app-compras',
@@ -165,7 +166,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
-    private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService) {
+    private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
+    private _ubicacionService: UbicacionesService) {
     this.initStore();
   }
 
@@ -401,7 +403,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(paramsProcesos, this.actual_role).subscribe({
         next: res => {
           this.productosParaFiltro = res.data;
-          console.log("🚀 ~ ComprasComponent ~ this._indexService.getProductosWithParam ~ this.productosParaFiltro:", this.productosParaFiltro)
           this.cargandoProductos = false;
         },
         error: error => {
@@ -589,8 +590,33 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Edición de producto';
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
+      // this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
+      this.getParentsFromLocation(producto.product.stocks[0].location);
       this.inicializarFormProducto(producto);
     }
+  }
+
+  getParentsFromLocation(ubicacion: any) {
+    this.subscription.add(
+      this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
+        next: res => {
+          console.log(res);
+          this.breadcrumb = [...this.construirBreadcrumb(res.data)];
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    )
+  }
+  construirBreadcrumb(ubicacion: any): any[] {
+    const breadcrumb = [];
+    let actual = ubicacion;
+    while (actual) {
+      breadcrumb.unshift({ name: actual.name, uuid: actual.uuid }); // Agregamos al inicio
+      actual = actual.location; // Pasamos a su padre
+    }
+    return breadcrumb;
   }
 
   inicializarFormProducto(data?: any) {
@@ -601,11 +627,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
       product_uuid: new FormControl({ value: data ? data.product : null, disabled: false }, [Validators.required]),
       quantity: new FormControl({ value: data ? data.quantity : null, disabled: false }, [Validators.required]),
       unit_price: new FormControl({ value: data ? data.unit_price : null, disabled: false }, [Validators.required]),
-      control_result: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, [Validators.required]),
+      control_result: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, []),
       // control_user_uuid: new FormControl({ value: null, disabled: false }, []), 
       password: new FormControl({ value: null, disabled: false }, []),
       control_comments: new FormControl({ value: data ? data.control_comments : null, disabled: false }, []),
-      location_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      location_uuid: new FormControl({ value: data ? this.getLocation(data) : null, disabled: false }, [Validators.required]),
       control_description: new FormControl({ value: data ? data.product.control_description : null, disabled: true }, []),
     });
     this.onFormProductoChange();
@@ -637,13 +663,12 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
         });
       });
+  }
 
-    // this.productoForm.get('location_uuid')!.valueChanges.subscribe(
-    //   (location_uuid: string) => {
-    //     console.log(location_uuid);
-    //     this.obtenerUbicaciones(location_uuid);
-    //   });
-
+  getLocation(data: any) {
+    if (data.product.stocks.length > 0) {
+      return data.product.stocks[0].location.uuid;
+    }
   }
 
   onSeleccionUbicacion() {
