@@ -136,7 +136,7 @@
                         <icon-pencil />
                     </button>
                 </legend>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block font-medium">Fecha de compra</label>
                         <input type="text" mwlFlatpickr [options]="{ 
@@ -154,6 +154,11 @@
                             notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
                             formControlName="estadoCompra" [selectOnTab]="true">
                         </ng-select>
+                    </div>
+
+                    <div>
+                        <label class="block font-medium">Lote / Partida</label>
+                        <input type="text" class="form-control w-full" formControlName="lote" />
                     </div>
                 </div>
                 @if (inEdicionFechaCompra) {
@@ -277,10 +282,7 @@
                         <label class="block font-medium">Tipo de cambio</label>
                         <input type="text" class="form-control w-full" formControlName="tipoCambio" />
                     </div>
-                    <div>
-                        <label class="block font-medium">Lote / Partida</label>
-                        <input type="text" class="form-control w-full" formControlName="lote" />
-                    </div>
+
                 </div>
                 @if (inEdicionFactura || inAltaFactura) {
                 <div class="row mt-3">
