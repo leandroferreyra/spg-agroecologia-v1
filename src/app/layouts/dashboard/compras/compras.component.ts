@@ -219,7 +219,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
-          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
           if (this.compras.length === 0) {
             this.swalService.toastSuccess('center', 'No existen compras.');
             this.isTabDisabled = true;
@@ -390,7 +389,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   //     this._indexService.getProductosWithParam(paramsProcesos, this.actual_role).subscribe({
   //       next: res => {
   //         this.productosParaFiltro = res.data;
-  //         console.log("🚀 ~ ComprasComponent ~ this._indexService.getProductosWithParam ~ this.productosParaFiltro:", this.productosParaFiltro)
   //         this.cargandoProductos = false;
   //       },
   //       error: error => {
@@ -617,7 +615,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
         next: res => {
-          console.log(res);
           this.breadcrumb = [...this.construirBreadcrumb(res.data)];
         },
         error: error => {
@@ -637,7 +634,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   inicializarFormProducto(data?: any) {
-    console.log(data);
     this.selectedProducto = data;
     this.productoControllable = data ? (data.product.controllable === 1) : false;
     this.productoForm = new FormGroup({

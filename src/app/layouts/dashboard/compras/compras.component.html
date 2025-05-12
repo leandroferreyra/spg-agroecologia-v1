@@ -447,11 +447,6 @@
                         <label class="block font-medium">Total</label>
                         <input type="text" class="form-control w-full" formControlName="total" />
                     </div>
-                    <!-- <div>
-                        <label class="block font-medium">Calificación</label>
-                        <input type="text" class="form-control w-full" formControlName="calificacion"
-                            [ngxTippy]="getCalificacionTooltip()" data-tippy-placement="top" />
-                    </div> -->
                     <div>
                         <label>Calificación</label>
                         <ng-select [items]="calificaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
@@ -616,23 +611,12 @@
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
                         <div class="flex-grow-1">
-                            <label>Producto
-                                <!-- @if(cargandoProductos) {
-                                <span
-                                    class="animate-spin border-[3px] border-transparent border-l-primary rounded-full w-6 h-6 inline-block align-middle m-auto mb-10"></span>
-                                } -->
-                            </label>
-
-                            <!-- <ng-select [items]="productosParaFiltro" bindLabel="name" clearAllText="Limpiar"
-                                [virtualScroll]="true" notFoundText="No hay productos" formControlName="product_uuid"
-                                [appendTo]="'body'"
-                                [ngClass]="isSubmit ? productoForm.controls['product_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                            </ng-select> -->
-
+                            <label>Producto</label>
                             <ng-select [items]="productos$ | async" bindLabel="name" [typeahead]="productoInput$"
                                 [loading]="loadingProductos" [virtualScroll]="true" typeToSearchText='Escriba un nombre'
                                 loadingText="Cargando..." [appendTo]="'body'" placeholder="Buscar producto..."
-                                formControlName="product_uuid">
+                                formControlName="product_uuid"
+                                [ngClass]="isSubmit ? productoForm.controls['product_uuid'].errors ? 'has-error' : 'has-success' : ''">
                             </ng-select>
                         </div>
 
@@ -915,40 +899,17 @@
                 </div>
 
                 <div class="flex-grow-1">
-                    <label>Producto
-                        <!-- @if(cargandoProductos) {
-                        <span
-                            class="animate-spin border-[3px] border-transparent border-l-primary rounded-full w-6 h-6 inline-block align-middle m-auto mb-10"></span>
-                        } -->
-                    </label>
-                    <!-- <ng-select [items]="productosParaFiltro" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                        [virtualScroll]="true" notFoundText="No hay productos" class="w-1/3 min-w-[100px] max-w-[330px]"
-                        style="width: 100%;" [(ngModel)]="filtros['transaction.transactionProducts.product.uuid'].value"
-                        (change)="obtenerComprasPorFiltroAvanzado()">
-                    </ng-select> -->
-                    <ng-select [items]="productos$ | async" bindLabel="name" [typeahead]="productoInput$"  bindValue="uuid"
-                        [loading]="loadingProductos" [virtualScroll]="true" typeToSearchText='Escriba un nombre'
-                        loadingText="Cargando..." [appendTo]="'body'" placeholder="Buscar producto..."
+                    <label>Producto</label>
+                    <ng-select [items]="productos$ | async" bindLabel="name" [typeahead]="productoInput$"
+                        bindValue="uuid" [loading]="loadingProductos" [virtualScroll]="true"
+                        typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
+                        placeholder="Buscar producto..."
                         [(ngModel)]="filtros['transaction.transactionProducts.product.uuid'].value"
                         (change)="obtenerComprasPorFiltroAvanzado()">
                     </ng-select>
                 </div>
 
-                <!-- <div class="flex-grow-1">
-                    <label>Producto</label>
-                    <ng-select [items]="productos$ | async" bindLabel="name" bindValue="uuid"
-                        [typeahead]="productoInput$" [loading]="loadingProductos" [virtualScroll]="true"
-                        typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
-                        placeholder="Buscar producto..."
-                        [(ngModel)]="filtros['transaction.transactionProducts.product.uuid'].value">
-                    </ng-select>
-                </div> -->
-
             </div>
-
-            <!-- </div>
-                </div>
-            </div> -->
 
             <button class="mt-2 btn btn-primary" (click)="limpiarFiltros()">
                 Limpiar filtros avanzados
