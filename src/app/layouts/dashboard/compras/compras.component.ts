@@ -68,7 +68,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   newCompraForm!: FormGroup;
   productoForm!: FormGroup;
 
-  cargandoProductos: boolean = true;
+  // cargandoProductos: boolean = true;
   filtroSimpleName: string = '';
   filtroSimpleContiene: boolean = true;
   filtroTipoPersona: string = 'todos';
@@ -197,7 +197,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.obtenerCompras();
-    this.obtenerProductosParaFiltro();
+    this.obtenerProductos();
     this.obtenerProveedores();
     // this.obtenerUbicaciones();
     this.obtenerCatalogos();
@@ -288,7 +288,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       tipoComprobante: new FormControl({ value: this.getTipoComprobante(), disabled: true }, []),
       prefijoComprobante: new FormControl({ value: this.getPrefijoComprobante(), disabled: true }, []),
       documentoComprobante: new FormControl({ value: this.getDocumentoComprobante(), disabled: true }, []),
-      // numeroComprobante: new FormControl({ value: this.getNumeroComprobante(), disabled: true }, []),
       moneda: new FormControl({ value: this.getMoneda(), disabled: true }, []),
       tipoCambio: new FormControl({ value: this.getTipoCambio(), disabled: true }, []),
       lote: new FormControl({ value: this.selectedCompra?.batch?.batch_identification, disabled: true }, []),
@@ -356,21 +355,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  // getNumeroComprobante() {
-  //   if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-  //     return this.selectedCompra?.transaction?.transaction_documents[0]?.prefix_number + ' ' +
-  //       this.selectedCompra?.transaction?.transaction_documents[0]?.document_number
-  //   }
-  //   return '';
-  // }
-
   getCalificacionTooltip() {
     return this.selectedCompra?.qualification_option?.description;
   }
-
-  // getComentario() {
-  //   return this.selectedCompra?.qualification_option?.score + ' - ' + this.selectedCompra?.qualification_option?.name;
-  // }
 
   getCuit() {
     if (this.selectedCompra) {
@@ -391,28 +378,58 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
 
-  obtenerProductosParaFiltro() {
-    const paramsProcesos: any = {};
-    paramsProcesos.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
-    paramsProcesos.paging = null;
-    paramsProcesos.page = null;
-    paramsProcesos.order_by = {};
-    paramsProcesos.filters = {};
+  // obtenerProductosParaFiltro() {
+  //   const paramsProcesos: any = {};
+  //   paramsProcesos.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
+  //   paramsProcesos.paging = null;
+  //   paramsProcesos.page = null;
+  //   paramsProcesos.order_by = {};
+  //   paramsProcesos.filters = {};
 
-    this.subscription.add(
-      this._indexService.getProductosWithParam(paramsProcesos, this.actual_role).subscribe({
-        next: res => {
-          this.productosParaFiltro = res.data;
-          this.cargandoProductos = false;
-        },
-        error: error => {
-          this.cargandoProductos = false;
-          this.swalService.toastError('top-right', error.error.message);
-          console.error(error);
-          this.spinner.hide();
+  //   this.subscription.add(
+  //     this._indexService.getProductosWithParam(paramsProcesos, this.actual_role).subscribe({
+  //       next: res => {
+  //         this.productosParaFiltro = res.data;
+  //         console.log("🚀 ~ ComprasComponent ~ this._indexService.getProductosWithParam ~ this.productosParaFiltro:", this.productosParaFiltro)
+  //         this.cargandoProductos = false;
+  //       },
+  //       error: error => {
+  //         this.cargandoProductos = false;
+  //         this.swalService.toastError('top-right', error.error.message);
+  //         console.error(error);
+  //         this.spinner.hide();
+  //       }
+  //     })
+  //   )
+  // }
+
+  obtenerProductos() {
+    const params: any = {};
+    params.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
+    params.paging = null;
+    params.page = null;
+    params.order_by = {};
+    params.filters = {};
+
+    this.productos$ = this.productoInput$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => this.loadingProductos = true),
+      switchMap((term: string) => {
+        if (!term || term.trim().length < 2) {
+          this.loadingProductos = false;
+          return of([]);
         }
+        params.filters = {
+          'name': { value: term, op: 'LIKE', contiene: true },
+        };
+
+        return this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
+          map((res: any) => res.data), //
+          finalize(() => this.loadingProductos = false)
+        );
       })
-    )
+    );
   }
 
   obtenerUbicaciones(uuid?: string) {
@@ -685,6 +702,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   irAUbicacion(index: number) {
+    this.productoForm.markAsTouched();
+    this.productoForm.markAsDirty();
     const ubicacion = this.breadcrumb[index];
     this.breadcrumb = this.breadcrumb.slice(0, index + 1);
     this.productoForm.get('location_uuid')?.setValue(ubicacion.uuid);
@@ -693,6 +712,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   eliminarUbicacion(index: number): void {
+    this.productoForm.markAsTouched();
+    this.productoForm.markAsDirty();
     const ubicacion = this.breadcrumb[index - 1];
     this.breadcrumb.splice(index);
     this.productoForm.controls['location_uuid'].setValue(null);
@@ -977,7 +998,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   confirmarAltaProducto() {
     this.isSubmit = true;
-    if (this.productoForm.valid) {
+    if (this.productoForm.valid && !this.productoForm.pristine) {
       this.spinner.show();
       let producto = new ProductoTransaccionDTO();
       producto.actual_role = this.actual_role;
