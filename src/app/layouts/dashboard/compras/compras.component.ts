@@ -618,7 +618,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       control_result: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, []),
       password: new FormControl({ value: null, disabled: false }, []),
       control_comments: new FormControl({ value: data ? data.control_comments : null, disabled: false }, []),
-      location_uuid: new FormControl({ value: data ? this.getLocation(data) : null, disabled: false }, [Validators.required]),
+      location_uuid: new FormControl({ value: data ? this.getLocation(data) : null, disabled: false }, []),
       control_description: new FormControl({ value: data ? data.product.control_description : null, disabled: true }, []),
     });
     this.onFormProductoChange();
