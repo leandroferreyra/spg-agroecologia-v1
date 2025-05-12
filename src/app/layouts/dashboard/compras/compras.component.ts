@@ -157,7 +157,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inAltaFactura: boolean = false;
   poseeFactura: boolean = false;
 
-
   showPassword: boolean = false;
 
   // Iconos
@@ -375,31 +374,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       return false;
     }
   }
-
-
-  // obtenerProductosParaFiltro() {
-  //   const paramsProcesos: any = {};
-  //   paramsProcesos.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
-  //   paramsProcesos.paging = null;
-  //   paramsProcesos.page = null;
-  //   paramsProcesos.order_by = {};
-  //   paramsProcesos.filters = {};
-
-  //   this.subscription.add(
-  //     this._indexService.getProductosWithParam(paramsProcesos, this.actual_role).subscribe({
-  //       next: res => {
-  //         this.productosParaFiltro = res.data;
-  //         this.cargandoProductos = false;
-  //       },
-  //       error: error => {
-  //         this.cargandoProductos = false;
-  //         this.swalService.toastError('top-right', error.error.message);
-  //         console.error(error);
-  //         this.spinner.hide();
-  //       }
-  //     })
-  //   )
-  // }
 
   obtenerProductos() {
     const params: any = {};
