@@ -33,4 +33,16 @@ export class SwalService {
     });
   }
 
+  toastInfo(position: SweetAlertPosition, message: string) {
+    Swal.fire({
+      position: position,
+      toast: true,
+      width: '30em',
+      icon: "info",
+      title: message,
+      showConfirmButton: false,
+      timer: 2000
+    });
+  }
+
 }

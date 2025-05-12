@@ -984,81 +984,85 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   confirmarAltaProducto() {
     this.isSubmit = true;
-    if (this.productoForm.valid && !this.productoForm.pristine) {
-      this.spinner.show();
-      let producto = new ProductoTransaccionDTO();
-      producto.actual_role = this.actual_role;
-      producto.with = [];
-      producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
-      producto.quantity = this.productoForm.get('quantity')?.value;
-      producto.unit_price = this.productoForm.get('unit_price')?.value;
-      producto.control_result = this.productoForm.get('control_result')?.value ?? false;
-      if (producto.control_result) {
-        producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
-        producto.password = this.productoForm.get('password')?.value;
-        producto.control_comments = this.productoForm.get('control_comments')?.value;
-      }
-      producto.location_uuid = this.ultimaUbicacion?.uuid;
-      if (!this.inEdicionProducto) {
-        producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
-        this.cleanObject(producto);
-        this.subscription.add(
-          this._transactionProductService.saveTransactionProduct(producto).subscribe({
-            next: res => {
-              this.cerrarModalAltaProducto();
-              this.isSubmit = false;
-              this.obtenerCompraPorId(this.selectedCompra);
-              this.tokenService.setToken(res.token);
-              this.breadcrumb = [];
-              this.spinner.hide();
-            },
-            error: error => {
-              this.swalService.toastError('top-right', error.error.message);
-              console.error(error);
-              this.spinner.hide();
-            }
-          })
-        )
-      } else {
-        this.subscription.add(
-          this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, producto).subscribe({
-            next: res => {
-              this.cerrarModalAltaProducto();
-              this.isSubmit = false;
-              this.inEdicionProducto = false;
-              this.tokenService.setToken(res.token);
-              this.breadcrumb = [];
-              if (this.selectedProducto && this.selectedProducto.product?.stocks[0]?.location?.uuid !== producto.location_uuid) {
-                // Cambió la locación por lo que se llama al endpoint correspondiente.
-                let stock_uuid = this.selectedProducto.product.stocks[0].uuid;
-                let stockDTO = new StockDTO();
-                stockDTO.actual_role = this.actual_role;
-                stockDTO.location_uuid = producto.location_uuid;
-                this.subscription.add(
-                  this._stockService.editStock(stock_uuid, stockDTO).subscribe({
-                    next: res => {
-                      this.obtenerCompraPorId(this.selectedCompra);
-                      this.spinner.hide();
-                    },
-                    error: error => {
-                      console.error(error);
-                      this.spinner.hide();
-                      this.swalService.toastError('top-right', error.error.message);
-                    }
-                  })
-                )
-              } else {
+    if (this.productoForm.valid) {
+      if (!this.productoForm.pristine) {
+        this.spinner.show();
+        let producto = new ProductoTransaccionDTO();
+        producto.actual_role = this.actual_role;
+        producto.with = [];
+        producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
+        producto.quantity = this.productoForm.get('quantity')?.value;
+        producto.unit_price = this.productoForm.get('unit_price')?.value;
+        producto.control_result = this.productoForm.get('control_result')?.value ?? false;
+        if (producto.control_result) {
+          producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+          producto.password = this.productoForm.get('password')?.value;
+          producto.control_comments = this.productoForm.get('control_comments')?.value;
+        }
+        producto.location_uuid = this.ultimaUbicacion ? this.ultimaUbicacion?.uuid : null;
+        if (!this.inEdicionProducto) {
+          producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
+          this.cleanObject(producto);
+          this.subscription.add(
+            this._transactionProductService.saveTransactionProduct(producto).subscribe({
+              next: res => {
+                this.cerrarModalAltaProducto();
+                this.isSubmit = false;
                 this.obtenerCompraPorId(this.selectedCompra);
+                this.tokenService.setToken(res.token);
+                this.breadcrumb = [];
+                this.spinner.hide();
+              },
+              error: error => {
+                this.swalService.toastError('top-right', error.error.message);
+                console.error(error);
                 this.spinner.hide();
               }
-            },
-            error: error => {
-              this.swalService.toastError('top-right', error.error.message);
-              console.error(error);
-              this.spinner.hide();
-            }
-          })
-        )
+            })
+          )
+        } else {
+          this.subscription.add(
+            this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, producto).subscribe({
+              next: res => {
+                this.cerrarModalAltaProducto();
+                this.isSubmit = false;
+                this.inEdicionProducto = false;
+                this.tokenService.setToken(res.token);
+                this.breadcrumb = [];
+                if (this.selectedProducto && this.selectedProducto.product?.stocks[0]?.location?.uuid !== producto.location_uuid) {
+                  // Cambió la locación por lo que se llama al endpoint correspondiente.
+                  let stock_uuid = this.selectedProducto.product.stocks[0].uuid;
+                  let stockDTO = new StockDTO();
+                  stockDTO.actual_role = this.actual_role;
+                  stockDTO.location_uuid = producto.location_uuid;
+                  this.subscription.add(
+                    this._stockService.editStock(stock_uuid, stockDTO).subscribe({
+                      next: res => {
+                        this.obtenerCompraPorId(this.selectedCompra);
+                        this.spinner.hide();
+                      },
+                      error: error => {
+                        console.error(error);
+                        this.spinner.hide();
+                        this.swalService.toastError('top-right', error.error.message);
+                      }
+                    })
+                  )
+                } else {
+                  this.obtenerCompraPorId(this.selectedCompra);
+                  this.spinner.hide();
+                }
+              },
+              error: error => {
+                this.swalService.toastError('top-right', error.error.message);
+                console.error(error);
+                this.spinner.hide();
+              }
+            })
+          )
+        }
+      } else {
+        this.swalService.toastInfo('top-right', "El formulario no se modificó.");
       }
     }
   }
