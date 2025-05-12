@@ -143,7 +143,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   monedas: any[] = [];
 
   breadcrumb: any[] = [];
-  // ubicacionSeleccionada: string | null = null;
 
   mostrarProductos = true;
   usuarioLogueado: any;
@@ -197,7 +196,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.obtenerCompras();
     this.obtenerProductosParaFiltro();
     this.obtenerProveedores();
-    this.obtenerUbicaciones();
+    // this.obtenerUbicaciones();
     this.obtenerCatalogos();
   }
 
@@ -218,7 +217,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
-          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
           if (this.compras.length === 0) {
             this.swalService.toastSuccess('center', 'No existen compras.');
             this.isTabDisabled = true;
@@ -259,7 +257,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._comprasService.getCompraById(compra.uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedCompra = res.data;
-          console.log("🚀 ~ ComprasComponent ~ this._comprasService.getCompraById ~ this.selectedCompra:", this.selectedCompra)
           this.inicializarFormEdit();
         },
         error: error => {
@@ -429,7 +426,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.ubicaciones = res.data;
-          console.log("🚀 ~ ComprasComponent ~ this._indexService.getUbicacionesWithParam ~ this.ubicaciones:", this.ubicaciones)
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -582,6 +578,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.isEdicion = false;
       }
       this.tituloModal = 'Nuevo producto';
+      this.obtenerUbicaciones();
       this.inicializarFormProducto();
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
@@ -590,8 +587,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Edición de producto';
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
-      // this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
       this.getParentsFromLocation(producto.product.stocks[0].location);
+      this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
       this.inicializarFormProducto(producto);
     }
   }
@@ -624,11 +621,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.productoControllable = data ? (data.product.controllable === 1) : false;
     this.productoForm = new FormGroup({
       transaction_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
-      product_uuid: new FormControl({ value: data ? data.product : null, disabled: false }, [Validators.required]),
+      product_uuid: new FormControl({ value: data ? data.product : null, disabled: data ? true : false }, [Validators.required]),
       quantity: new FormControl({ value: data ? data.quantity : null, disabled: false }, [Validators.required]),
       unit_price: new FormControl({ value: data ? data.unit_price : null, disabled: false }, [Validators.required]),
       control_result: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, []),
-      // control_user_uuid: new FormControl({ value: null, disabled: false }, []), 
       password: new FormControl({ value: null, disabled: false }, []),
       control_comments: new FormControl({ value: data ? data.control_comments : null, disabled: false }, []),
       location_uuid: new FormControl({ value: data ? this.getLocation(data) : null, disabled: false }, [Validators.required]),
@@ -679,14 +675,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
     if (!seleccion) return;
 
     this.breadcrumb.push(seleccion);
-    this.productoForm.get('location_uuid')?.setValue(seleccion.uuid);
+    // this.productoForm.get('location_uuid')?.setValue(seleccion.uuid);
+    this.productoForm.get('location_uuid')?.setValue(null);
     this.obtenerUbicaciones(seleccion.uuid);
   }
 
   irAUbicacion(index: number) {
     const ubicacion = this.breadcrumb[index];
     this.breadcrumb = this.breadcrumb.slice(0, index + 1);
-    this.productoForm.get('location_uuid')?.setValue(ubicacion.uuid);
+    // this.productoForm.get('location_uuid')?.setValue(ubicacion.uuid);
+    this.productoForm.get('location_uuid')?.setValue(null);
     this.obtenerUbicaciones(ubicacion.uuid);
   }
 
@@ -1023,6 +1021,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   cerrarModalAltaProducto() {
     this.isSubmit = false;
+    this.inEdicionProducto = false;
     this.breadcrumb = [];
     this.modalProducto.close();
   }
