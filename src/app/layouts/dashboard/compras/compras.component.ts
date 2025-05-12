@@ -577,8 +577,12 @@ export class ComprasComponent implements OnInit, OnDestroy {
     } else {
       this.inEdicionProducto = true;
       this.tituloModal = 'Edición de producto';
-      this.getParentsFromLocation(producto.product.stocks[0].location);
-      this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
+      if (producto.product.stocks[0].location !== null) {
+        this.getParentsFromLocation(producto.product.stocks[0].location);
+        this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
+      } else {
+        this.obtenerUbicaciones();
+      }
       this.inicializarFormProducto(producto);
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
@@ -654,7 +658,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   getLocation(data: any) {
     if (data.product.stocks.length > 0) {
-      return data.product.stocks[0].location.uuid;
+      return data.product.stocks[0].location?.uuid;
     }
   }
 
