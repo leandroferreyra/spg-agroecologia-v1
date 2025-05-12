@@ -146,7 +146,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   monedas: any[] = [];
 
   breadcrumb: any[] = [];
-
+  ultimaUbicacion: any = null;
   mostrarProductos = true;
   usuarioLogueado: any;
   proveedorEdit: any;
@@ -198,7 +198,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.obtenerCompras();
     this.obtenerProductos();
     this.obtenerProveedores();
-    // this.obtenerUbicaciones();
     this.obtenerCatalogos();
   }
 
@@ -593,6 +592,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._ubicacionService.showUbicacionWithParent(ubicacion.uuid, this.actual_role).subscribe({
         next: res => {
+          this.ultimaUbicacion = res.data;
           this.breadcrumb = [...this.construirBreadcrumb(res.data)];
         },
         error: error => {
@@ -670,19 +670,21 @@ export class ComprasComponent implements OnInit, OnDestroy {
     if (!seleccion) return;
 
     this.breadcrumb.push(seleccion);
+    this.ultimaUbicacion = seleccion;
     // this.productoForm.get('location_uuid')?.setValue(seleccion.uuid);
-    // this.productoForm.get('location_uuid')?.setValue(null);
+    this.productoForm.get('location_uuid')?.setValue(null);
     this.obtenerUbicaciones(seleccion.uuid);
   }
 
   irAUbicacion(index: number) {
     this.productoForm.markAsTouched();
     this.productoForm.markAsDirty();
-    const ubicacion = this.breadcrumb[index];
+    this.ultimaUbicacion = this.breadcrumb[index];
     this.breadcrumb = this.breadcrumb.slice(0, index + 1);
-    this.productoForm.get('location_uuid')?.setValue(ubicacion.uuid);
-    // this.productoForm.get('location_uuid')?.setValue(null);
-    this.obtenerUbicaciones(ubicacion.uuid);
+    // this.ultimaUbicacion = ubicacion;
+    // this.productoForm.get('location_uuid')?.setValue(ubicacion.uuid);
+    this.productoForm.get('location_uuid')?.setValue(null);
+    this.obtenerUbicaciones(this.ultimaUbicacion.uuid);
   }
 
   eliminarUbicacion(index: number): void {
@@ -691,6 +693,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     const ubicacion = this.breadcrumb[index - 1];
     this.breadcrumb.splice(index);
     this.productoForm.controls['location_uuid'].setValue(null);
+    this.ultimaUbicacion = '';
     if (index === 0) {
       this.obtenerUbicaciones();
     } else {
@@ -986,7 +989,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         producto.password = this.productoForm.get('password')?.value;
         producto.control_comments = this.productoForm.get('control_comments')?.value;
       }
-      producto.location_uuid = this.productoForm.get('location_uuid')?.value;
+      producto.location_uuid = this.ultimaUbicacion?.uuid;
       if (!this.inEdicionProducto) {
         producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
         this.cleanObject(producto);
@@ -1055,6 +1058,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.isSubmit = false;
     this.inEdicionProducto = false;
     this.breadcrumb = [];
+    this.ultimaUbicacion = null;
     this.modalProducto.close();
   }
 
