@@ -39,6 +39,8 @@ import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
 import { UbicacionesService } from 'src/app/core/services/ubicaciones.service';
+import { StocksService } from 'src/app/core/services/stocks.service';
+import { StockDTO } from 'src/app/core/models/request/stockDTO';
 
 @Component({
   selector: 'app-compras',
@@ -61,6 +63,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   actual_role: string = '';
   compras: any[] = [];
   selectedCompra: any;
+  selectedProducto: any;
   compraForm!: FormGroup;
   newCompraForm!: FormGroup;
   productoForm!: FormGroup;
@@ -166,7 +169,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
-    private _ubicacionService: UbicacionesService) {
+    private _ubicacionService: UbicacionesService, private _stockService: StocksService) {
     this.initStore();
   }
 
@@ -206,8 +209,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
     // Inicializamos un objeto vacío para los parámetros
     this.params.with = ["transaction.person.human", "transaction.person.city.district.country", "transaction.person.legalEntity",
-      "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch', 'batch.stocks.productInstances',
-      "transaction.transactionProducts.product.stocks.location"];
+      "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch', 'batch.stocks.productInstances'];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -217,6 +219,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
+          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
           if (this.compras.length === 0) {
             this.swalService.toastSuccess('center', 'No existen compras.');
             this.isTabDisabled = true;
@@ -585,11 +588,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
     } else {
       this.inEdicionProducto = true;
       this.tituloModal = 'Edición de producto';
-      this.modalProducto.options = this.modalOptions;
-      this.modalProducto.open();
       this.getParentsFromLocation(producto.product.stocks[0].location);
       this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
       this.inicializarFormProducto(producto);
+      this.modalProducto.options = this.modalOptions;
+      this.modalProducto.open();
     }
   }
 
@@ -618,6 +621,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   inicializarFormProducto(data?: any) {
     console.log(data);
+    this.selectedProducto = data;
     this.productoControllable = data ? (data.product.controllable === 1) : false;
     this.productoForm = new FormGroup({
       transaction_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
@@ -676,15 +680,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
     this.breadcrumb.push(seleccion);
     // this.productoForm.get('location_uuid')?.setValue(seleccion.uuid);
-    this.productoForm.get('location_uuid')?.setValue(null);
+    // this.productoForm.get('location_uuid')?.setValue(null);
     this.obtenerUbicaciones(seleccion.uuid);
   }
 
   irAUbicacion(index: number) {
     const ubicacion = this.breadcrumb[index];
     this.breadcrumb = this.breadcrumb.slice(0, index + 1);
-    // this.productoForm.get('location_uuid')?.setValue(ubicacion.uuid);
-    this.productoForm.get('location_uuid')?.setValue(null);
+    this.productoForm.get('location_uuid')?.setValue(ubicacion.uuid);
+    // this.productoForm.get('location_uuid')?.setValue(null);
     this.obtenerUbicaciones(ubicacion.uuid);
   }
 
@@ -1003,10 +1007,31 @@ export class ComprasComponent implements OnInit, OnDestroy {
               this.cerrarModalAltaProducto();
               this.isSubmit = false;
               this.inEdicionProducto = false;
-              this.obtenerCompraPorId(this.selectedCompra);
               this.tokenService.setToken(res.token);
               this.breadcrumb = [];
-              this.spinner.hide();
+              if (this.selectedProducto && this.selectedProducto.product.stocks[0].location.uuid !== producto.location_uuid) {
+                // Cambió la locación por lo que se llama al endpoint correspondiente.
+                let stock_uuid = this.selectedProducto.product.stocks[0].uuid;
+                let stockDTO = new StockDTO();
+                stockDTO.actual_role = this.actual_role;
+                stockDTO.location_uuid = producto.location_uuid;
+                this.subscription.add(
+                  this._stockService.editStock(stock_uuid, stockDTO).subscribe({
+                    next: res => {
+                      this.obtenerCompraPorId(this.selectedCompra);
+                      this.spinner.hide();
+                    },
+                    error: error => {
+                      console.error(error);
+                      this.spinner.hide();
+                      this.swalService.toastError('top-right', error.error.message);
+                    }
+                  })
+                )
+              } else {
+                this.obtenerCompraPorId(this.selectedCompra);
+                this.spinner.hide();
+              }
             },
             error: error => {
               this.swalService.toastError('top-right', error.error.message);
