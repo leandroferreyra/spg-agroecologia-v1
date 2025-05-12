@@ -692,11 +692,22 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.obtenerUbicaciones(ubicacion.uuid);
   }
 
-  resetUbicaciones() {
-    this.breadcrumb = [];
-    this.productoForm.get('location_uuid')?.setValue(null);
-    this.obtenerUbicaciones();
+  eliminarUbicacion(index: number): void {
+    const ubicacion = this.breadcrumb[index - 1];
+    this.breadcrumb.splice(index);
+    this.productoForm.controls['location_uuid'].setValue(null);
+    if (index === 0) {
+      this.obtenerUbicaciones();
+    } else {
+      this.obtenerUbicaciones(ubicacion.uuid);
+    }
   }
+
+  // resetUbicaciones() {
+  //   this.breadcrumb = [];
+  //   this.productoForm.get('location_uuid')?.setValue(null);
+  //   this.obtenerUbicaciones();
+  // }
 
   obtenerProveedores() {
     const params: any = {};

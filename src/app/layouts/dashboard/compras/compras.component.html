@@ -689,24 +689,27 @@
                                 [appendTo]="'body'" (change)="onSeleccionUbicacion()" [clearable]="false"
                                 [ngClass]="isSubmit ? productoForm.controls['location_uuid'].errors ? 'has-error' : 'has-success' : ''">
                             </ng-select>
+                            
+                            <div
+                                class="text-sm text-gray-700 mt-2 flex items-center gap-2 overflow-x-auto whitespace-nowrap">
+                                <span class="flex-shrink-0">Ubicación seleccionada:</span>
 
-                            <!-- Breadcrumb con botón de limpiar -->
-                            <div class="text-sm text-gray-700 mt-2 flex items-center gap-2">
-                                <span>Ubicación seleccionada: </span>
                                 <ng-container *ngFor="let u of breadcrumb; let i = index">
-                                    <span class="cursor-pointer hover:underline text-blue-600"
-                                        (click)="irAUbicacion(i)">
-                                        {{ u.name }}
-                                    </span>
-                                    <span *ngIf="i < breadcrumb.length - 1"> / </span>
+                                    <div
+                                        class="relative inline-flex items-center bg-blue-100 text-blue-800 rounded px-2 py-1 mr-1 flex-shrink-0">
+                                        <span
+                                            class="cursor-pointer hover:underline text-blue-600 truncate max-w-[150px]"
+                                            title="{{ u.name }}" (click)="irAUbicacion(i)">
+                                            {{ u.name }}
+                                        </span>
+                                        <button (click)="eliminarUbicacion(i)"
+                                            class="absolute -top-1 -right-1 bg-white rounded-full text-red-500 text-xs leading-none px-1 shadow"
+                                            title="Eliminar esta ubicación">
+                                            ×
+                                        </button>
+                                    </div>
+                                    <span *ngIf="i < breadcrumb.length - 1" class="flex-shrink-0"> / </span>
                                 </ng-container>
-
-                                <!-- Botón para reiniciar -->
-                                <button *ngIf="breadcrumb.length" (click)="resetUbicaciones()"
-                                    class="text-red-500 ml-2 hover:underline text-xs flex items-center"
-                                    title="Limpiar selección">
-                                    <span class="material-icons text-base">X</span>
-                                </button>
                             </div>
                         </div>
 
