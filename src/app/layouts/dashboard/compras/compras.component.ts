@@ -126,6 +126,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   loadingProductos = false;
 
   productoControllable: boolean = false;
+  showInputUbicacion: boolean = false;
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
@@ -207,7 +208,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
     // Inicializamos un objeto vacío para los parámetros
     this.params.with = ["transaction.person.human", "transaction.person.city.district.country", "transaction.person.legalEntity",
-      "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'batch', 'batch.stocks.productInstances'];
+      "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'transaction.transactionProducts.product.productType', 'batch', 'batch.stocks.productInstances'];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -576,11 +577,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
     } else {
       this.inEdicionProducto = true;
       this.tituloModal = 'Edición de producto';
-      if (producto.product.stocks[0].location !== null) {
-        this.getParentsFromLocation(producto.product.stocks[0].location);
-        this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
-      } else {
-        this.obtenerUbicaciones();
+      if (producto.product?.product_type?.stock_controlled === 1 && producto.product?.traceable === 1) {
+        this.showInputUbicacion = true;
+        if (producto.product?.stocks?.length > 0 && producto.product.stocks[0].location !== null) {
+          this.getParentsFromLocation(producto.product.stocks[0].location);
+          this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
+        } else {
+          this.obtenerUbicaciones();
+        }
       }
       this.inicializarFormProducto(producto);
       this.modalProducto.options = this.modalOptions;
@@ -630,9 +634,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
-        if (producto.controllable === 1) {
+        if (producto?.controllable === 1) {
           this.productoControllable = true;
           this.productoForm.get('control_description')?.setValue(producto.control_description);
+        }
+        if (producto?.product_type?.stock_controlled === 1 && producto.traceable === 1) {
+          this.showInputUbicacion = true;
+        } else {
+          this.showInputUbicacion = false;
         }
       });
 
@@ -693,7 +702,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     const ubicacion = this.breadcrumb[index - 1];
     this.breadcrumb.splice(index);
     this.productoForm.controls['location_uuid'].setValue(null);
-    this.ultimaUbicacion = '';
+    this.ultimaUbicacion = ubicacion ? ubicacion : null;
     if (index === 0) {
       this.obtenerUbicaciones();
     } else {
@@ -1019,7 +1028,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
               this.inEdicionProducto = false;
               this.tokenService.setToken(res.token);
               this.breadcrumb = [];
-              if (this.selectedProducto && this.selectedProducto.product.stocks[0].location.uuid !== producto.location_uuid) {
+              if (this.selectedProducto && this.selectedProducto.product?.stocks[0]?.location?.uuid !== producto.location_uuid) {
                 // Cambió la locación por lo que se llama al endpoint correspondiente.
                 let stock_uuid = this.selectedProducto.product.stocks[0].uuid;
                 let stockDTO = new StockDTO();
@@ -1059,6 +1068,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.inEdicionProducto = false;
     this.breadcrumb = [];
     this.ultimaUbicacion = null;
+    this.showInputUbicacion = false;
     this.modalProducto.close();
   }
 
