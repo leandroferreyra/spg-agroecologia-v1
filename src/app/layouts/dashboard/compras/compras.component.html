@@ -684,9 +684,8 @@
                                 [ngClass]="isSubmit ? productoForm.controls['location_uuid'].errors ? 'has-error' : 'has-success' : ''">
                             </ng-select>
 
-                            <div
-                                class="text-sm text-gray-700 mt-2 flex items-center gap-2 overflow-x-auto whitespace-nowrap">
-                                <span class="flex-shrink-0">Ubicación seleccionada:</span>
+                            <div class="text-sm text-gray-700 mt-2 flex flex-wrap gap-2 items-start">
+                                <span class="flex-shrink-0">Ubicación:</span>
 
                                 <ng-container *ngFor="let u of breadcrumb; let i = index">
                                     <div
