@@ -985,6 +985,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       producto.location_uuid = this.productoForm.get('location_uuid')?.value;
       if (!this.inEdicionProducto) {
         producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
+        this.cleanObject(producto);
         this.subscription.add(
           this._transactionProductService.saveTransactionProduct(producto).subscribe({
             next: res => {
