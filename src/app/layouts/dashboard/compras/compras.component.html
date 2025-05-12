@@ -506,27 +506,15 @@
                             </ng-select>
                         </div>
 
-                        <div>
-                            <label>Estado transacción</label>
-                            <ng-select [items]="posiblesEstadosTransaccion" bindLabel="name" bindValue="uuid"
-                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
-                                formControlName="possible_transaction_state_uuid" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newCompraForm.controls['possible_transaction_state_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
-                        <div>
-                            <label>Calificación</label>
-                            <ng-select [items]="calificaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay calificaciones"
-                                placeholder="" class="w-1/3 min-w-[200px]" formControlName="qualification_option_uuid"
-                                [selectOnTab]="true" [appendTo]="'body'"
-                                [ngClass]="isSubmit ? newCompraForm.controls['qualification_option_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
                         <div
-                            [ngClass]="isSubmit ? newCompraForm.controls['qualification_comments'].errors ? 'has-error' : 'has-success' : ''">
-                            <label>Motivo de la calificación</label>
-                            <textarea class="form-control" id="qualification_comments"
-                                formControlName="qualification_comments" rows="1"></textarea>
+                            [ngClass]="isSubmit ? newCompraForm.controls['transaction_datetime'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Fecha de compra</label>
+                            <input type="text" mwlFlatpickr [options]="{ 
+                                                enableTime: false, 
+                                                dateFormat: 'Y-m-d',
+                                                time24hr: true,
+                                                enableSeconds: false
+                                            }" class="form-input" formControlName="transaction_datetime" />
                         </div>
 
                         <div (keydown.enter)="confirmarCompra(newCompraForm)"
@@ -563,18 +551,29 @@
                             <input id="perceptionRG3337" type="text" placeholder="" class="form-control"
                                 formControlName="perceptionRG3337" />
                         </div>
-
-                        <div
-                            [ngClass]="isSubmit ? newCompraForm.controls['transaction_datetime'].errors ? 'has-error' : 'has-success' : ''">
-                            <label>Fecha de compra</label>
-                            <input type="text" mwlFlatpickr [options]="{ 
-                                                enableTime: false, 
-                                                dateFormat: 'Y-m-d',
-                                                time24hr: true,
-                                                enableSeconds: false
-                                            }" class="form-input" formControlName="transaction_datetime" />
+                        <div>
+                            <label>Estado transacción</label>
+                            <ng-select [items]="posiblesEstadosTransaccion" bindLabel="name" bindValue="uuid"
+                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
+                                formControlName="possible_transaction_state_uuid" [selectOnTab]="true"
+                                [ngClass]="isSubmit ? newCompraForm.controls['possible_transaction_state_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
 
+                        <div>
+                            <label>Calificación</label>
+                            <ng-select [items]="calificaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay calificaciones"
+                                placeholder="" class="w-1/3 min-w-[200px]" formControlName="qualification_option_uuid"
+                                [selectOnTab]="true" [appendTo]="'body'"
+                                [ngClass]="isSubmit ? newCompraForm.controls['qualification_option_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                        </div>
+                        <div
+                            [ngClass]="isSubmit ? newCompraForm.controls['qualification_comments'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Motivo de la calificación</label>
+                            <textarea class="form-control" id="qualification_comments"
+                                formControlName="qualification_comments" rows="1"></textarea>
+                        </div>
 
                     </div>
                 </div>
