@@ -253,14 +253,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   obtenerCompraPorId(compra: any) {
-    // this.poseeFactura = false;
+    this.spinner.show();
     this.subscription.add(
       this._comprasService.getCompraById(compra.uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedCompra = res.data;
           this.inicializarFormEdit();
+          this.spinner.hide();
         },
         error: error => {
+          this.spinner.hide();
           this.swalService.toastError('top-right', error.error.message);
           console.error(error);
         }
@@ -1110,7 +1112,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           if (index !== -1) {
             productos.splice(index, 1);
           }
-          this.obtenerCompras(true);
+          // this.obtenerCompras(true);
           this.obtenerCompraPorId(this.selectedCompra);
           // this.inicializarFormEdit();
           this.tokenService.setToken(res.token);
