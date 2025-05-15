@@ -71,13 +71,10 @@ function getMenuByRole(role: string) {
         case 'ADMIN':
         case 'ADMINISTRACION':
             return [
-                { label: 'Productos', route: '/productos' },
-                { label: 'Producción', route: '/produccion' },
-                { label: 'Compras', route: '/compras' },
-                { label: 'Ventas', route: '/settings' },
-                { label: 'Proveedores', route: '/proveedores' },
-                { label: 'Clientes', route: '/clientes' },
-                { label: 'Equipos', route: '/settings' },
+                { label: 'Productos', route: 'productos' },
+                { label: 'Compras', route: 'compras' },
+                { label: 'Proveedores', route: 'proveedores' },
+                { label: 'Clientes', route: 'clientes' },
                 {
                     label: 'Configuraciones', route: '', submenu: [
                         { label: 'Usuarios', route: 'usuarios' },
@@ -94,17 +91,17 @@ function getMenuByRole(role: string) {
                         { label: 'Categorías de productos', route: 'categorias-productos' },
                     ]
                 },
-                { label: 'Mis datos', route: '/user-profile' },
+                { label: 'Mis datos', route: 'user-profile' },
             ];
         case 'PRODUCCION':
             return [
-                { label: 'Producción', route: '/produccion' },
-                { label: 'Mis datos', route: '/user-profile' },
+                { label: 'Producción', route: 'produccion' },
+                { label: 'Mis datos', route: 'user-profile' },
             ];
         case 'USUARIO':
         default:
             return [
-                { label: 'Mis datos', route: '/user-profile' },
+                { label: 'Mis datos', route: 'user-profile' },
             ];
     }
 }

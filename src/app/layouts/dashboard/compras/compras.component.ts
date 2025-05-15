@@ -1112,9 +1112,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           if (index !== -1) {
             productos.splice(index, 1);
           }
-          // this.obtenerCompras(true);
           this.obtenerCompraPorId(this.selectedCompra);
-          // this.inicializarFormEdit();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
