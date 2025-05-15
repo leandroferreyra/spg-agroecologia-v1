@@ -380,7 +380,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   obtenerProductos() {
     const params: any = {};
     params.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
-    params.paging = null;
+    params.paging = 20;
     params.page = null;
     params.order_by = {};
     params.filters = {};
