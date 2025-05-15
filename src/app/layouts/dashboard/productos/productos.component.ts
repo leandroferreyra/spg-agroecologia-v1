@@ -63,6 +63,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   actual_role: string = '';
   productos: any[] = [];
   selectedProducto: any;
+  productoAnterior: any;
   productoForm!: FormGroup;
   newProductoForm!: FormGroup;
 
@@ -552,7 +553,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   irAlProducto(event: any) {
+    this.productoAnterior = this.selectedProducto;
     this.inicializarFormEdit(event);
+    this.tab1 = 'datos-generales';
+  }
+
+  volverAlProductoAnterior() {
+    this.inicializarFormEdit(this.productoAnterior);
+    this.productoAnterior = null;
     this.tab1 = 'datos-generales';
   }
 

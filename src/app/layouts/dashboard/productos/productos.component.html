@@ -108,6 +108,11 @@
                 @if(productos.length > 0 && selectedProducto) {
                 {{selectedProducto.name}}
                 }
+                @if(productoAnterior) {
+                <a class="text-sm text-blue-600 hover:underline cursor-pointer" (click)="volverAlProductoAnterior()">
+                    ( Volver al producto anterior )
+                </a>
+                }
             </h5>
 
             <div class="flex w-full items-center justify-between sm:w-auto">
