@@ -51,6 +51,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     'product->childProduct.productType.name': { value: 'Procesos IP LADIE', op: '!=', contiene: false },
   };
   ordenamiento: any = {
+    'order': 'asc'
   };
 
   componenteForm!: FormGroup;
