@@ -41,6 +41,8 @@ import { format } from 'date-fns';
 import { UbicacionesService } from 'src/app/core/services/ubicaciones.service';
 import { StocksService } from 'src/app/core/services/stocks.service';
 import { StockDTO } from 'src/app/core/models/request/stockDTO';
+import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
+import { PagosService } from 'src/app/core/services/pagos.service';
 
 @Component({
   selector: 'app-compras',
@@ -67,6 +69,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   compraForm!: FormGroup;
   newCompraForm!: FormGroup;
   productoForm!: FormGroup;
+  pagoForm!: FormGroup;
 
   // cargandoProductos: boolean = true;
   filtroSimpleName: string = '';
@@ -110,6 +113,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   productosParaFiltro: [] = [];
   isSubmit = false;
+  isSubmitPago = false;
 
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
@@ -133,6 +137,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
+  @ViewChild('modalPago') modalPago!: NgxCustomModalComponent;
   @ViewChild('modalEditarProveedor') modalEditarProveedor!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
@@ -146,17 +151,20 @@ export class ComprasComponent implements OnInit, OnDestroy {
   posiblesEstadosTransaccion: any[] = [];
   calificaciones: any[] = [];
   ubicaciones: any[] = [];
+  pagos: any[] = [];
   monedas: any[] = [];
 
   breadcrumb: any[] = [];
   ultimaUbicacion: any = null;
   mostrarProductos = true;
+  mostrarPagos = true;
   usuarioLogueado: any;
   proveedorEdit: any;
   inEdicionFechaCompra: boolean = false;
   inEdicionDescuentos: boolean = false;
   inEdicionFactura: boolean = false;
   inEdicionProducto: boolean = false;
+  inEdicionPago: boolean = false;
   inAltaFactura: boolean = false;
   poseeFactura: boolean = false;
 
@@ -171,7 +179,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
-    private _ubicacionService: UbicacionesService, private _stockService: StocksService) {
+    private _ubicacionService: UbicacionesService, private _pagoService: PagosService) {
     this.initStore();
   }
 
@@ -260,6 +268,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._comprasService.getCompraById(compra.uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedCompra = res.data;
+          this.obtenerPagos(this.selectedCompra?.transaction?.uuid);
           this.inicializarFormEdit();
           this.spinner.hide();
         },
@@ -365,6 +374,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return this.mostrarProductos ? 'Ocultar' : 'Mostrar';
   }
 
+  getMostrarOcultarTooltipPagos() {
+    return this.mostrarPagos ? 'Ocultar' : 'Mostrar';
+  }
+
   getCuit() {
     if (this.selectedCompra) {
       if (this.isPersonaFisica()) {
@@ -456,7 +469,31 @@ export class ComprasComponent implements OnInit, OnDestroy {
     });
   }
 
+  obtenerPagos(uuid: string) {
+    const params: any = {};
+    params.with = ["currency"];
+    params.paging = 10;
+    params.page = 1;
+    params.order_by = {
 
+    };
+    params.filters = {
+      'transaction_uuid': { value: uuid, op: '=', contiene: false },
+    };
+
+    this.subscription.add(
+      this._indexService.getPagosWithParam(params, this.actual_role).subscribe({
+        next: res => {
+          this.pagos = res.data;
+          console.log(this.pagos);
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
+  }
 
   inicializarFormNew() {
     this.newCompraForm = new FormGroup({
@@ -602,6 +639,38 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
     }
+  }
+
+  openModalPagos(type: string, pago?: any) {
+    if (type === 'NEW') {
+      if (this.isEdicion) {
+        this.isEdicion = false;
+      }
+      this.tituloModal = 'Nuevo pago';
+      this.inicializarFormPago();
+      this.modalPago.options = this.modalOptions;
+      this.modalPago.open();
+    } else {
+      // this.tab1 = 'datos-generales';
+      // this.isEdicion = true;
+      this.inEdicionPago = true;
+      this.tituloModal = 'Edición pago';
+      this.inicializarFormPago(pago);
+      this.modalPago.options = this.modalOptions;
+      this.modalPago.open();
+    }
+  }
+
+  inicializarFormPago(data?: any) {
+    this.pagoForm = new FormGroup({
+      pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
+      payments_datetime: new FormControl({ value: data ? data.payments_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payments_method: new FormControl({ value: data ? data.payments_method : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
+      currency_uuid: new FormControl({ value: data ? data.currency.uuid : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+    });
   }
 
   getParentsFromLocation(ubicacion: any) {
@@ -999,6 +1068,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   toggleProductos() {
     this.mostrarProductos = !this.mostrarProductos;
+  }
+
+  togglePagos() {
+    this.mostrarPagos = !this.mostrarPagos;
   }
 
   showCantidad(data: any) {
@@ -1434,6 +1507,116 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   togglePassword() {
     this.showPassword = !this.showPassword;
+  }
+
+  confirmarPago() {
+    this.isSubmitPago = true;
+    if (this.pagoForm.valid) {
+      this.spinner.show();
+      let pago = new PagoDTO();
+      pago.actual_role = this.actual_role;
+      pago.payments_datetime = this.pagoForm.get('payments_datetime')?.value;
+      pago.amount = this.pagoForm.get('amount')?.value;
+      pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value;
+      pago.detail = this.pagoForm.get('detail')?.value;
+      pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
+      pago.payments_method = this.pagoForm.get('payments_method')?.value;
+      if (!this.inEdicionPago) {
+        pago.transaction_uuid = this.selectedCompra.transaction?.uuid;
+        this.subscription.add(
+          this._pagoService.savePago(pago).subscribe({
+            next: res => {
+              console.log(res);
+              this.obtenerCompraPorId(this.selectedCompra);
+              this.cerrarModalPago();
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              console.error(error);
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._pagoService.editPago(this.pagoForm.get('pago_uuid')?.value, pago).subscribe({
+            next: res => {
+              console.log(res);
+              this.obtenerCompraPorId(this.selectedCompra);
+              this.cerrarModalPago();
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              console.error(error);
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+            }
+          })
+        )
+      }
+
+    }
+  }
+
+  openSwalEliminarPago(pago: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el pago seleccionado?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarPago(pago);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarPago(pago: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._pagoService.deletePago(pago.uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          // let productos = this.selectedCompra.transaction.transaction_products;
+          // const index = productos.findIndex((p: any) => p.uuid === producto.uuid);
+          // if (index !== -1) {
+          //   productos.splice(index, 1);
+          // }
+          // this.obtenerCompraPorId(this.selectedCompra);
+          // this.tokenService.setToken(res.token);
+          // this.spinner.hide();
+
+          // console.log(res);
+          this.obtenerCompraPorId(this.selectedCompra);
+          this.cerrarModalPago();
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  cerrarModalPago() {
+    this.isSubmitPago = false;
+    this.inEdicionPago = false;
+    this.modalPago.close();
   }
 
 }

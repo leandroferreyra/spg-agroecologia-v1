@@ -40,6 +40,7 @@ export class IndexService {
   apiComponentes = '/components';
   apiReemplazos = '/replacements';
   apiStocks = '/stocks';
+  apiPagos = '/payments';
 
   constructor(private http: HttpClient) { }
 
@@ -311,6 +312,11 @@ export class IndexService {
   getStocksWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiStocks, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getPagosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPagos, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
 }
