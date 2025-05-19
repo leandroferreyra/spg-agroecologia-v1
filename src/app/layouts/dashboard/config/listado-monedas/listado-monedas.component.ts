@@ -21,13 +21,14 @@ import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { IndexService } from 'src/app/core/services/index.service';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-listado-monedas',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule, DataTableModule,
     NgxSpinnerModule, NgxTippyModule, IconPencilComponent, IconPlusComponent, IconTrashLinesComponent,
-    FontAwesomeModule, IconSearchComponent, NgbPagination],
+    FontAwesomeModule, IconSearchComponent, NgbPagination, NgSelectModule],
   templateUrl: './listado-monedas.component.html',
   styleUrl: './listado-monedas.component.css'
 })

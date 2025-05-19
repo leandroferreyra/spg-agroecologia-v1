@@ -21,13 +21,14 @@ import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IndexService } from 'src/app/core/services/index.service';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-listado-paises',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     NgxTippyModule, IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, FontAwesomeModule, NgbPagination,
-    IconSearchComponent
+    IconSearchComponent, NgSelectModule
   ],
   templateUrl: './listado-paises.component.html',
   styleUrl: './listado-paises.component.css'

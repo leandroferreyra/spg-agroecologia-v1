@@ -5,6 +5,7 @@ import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
@@ -28,7 +29,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule,
-    IconInfoCircleComponent, IconFolderComponent],
+    IconInfoCircleComponent, IconFolderComponent, NgSelectModule],
   templateUrl: './listado-ubicaciones.component.html',
   styleUrl: './listado-ubicaciones.component.css'
 })
@@ -303,6 +304,7 @@ export class ListadoUbicacionesComponent implements OnInit, OnDestroy {
     if (!this.showFilter) {
       this.filtros = {
         'name': { value: '', op: 'LIKE', contiene: true },
+        'location_uuid': { value: '', op: '=', contiene: false },
       };
       this.busqueda_global = false;
       if (this.breadcrumbs.length > 0) {

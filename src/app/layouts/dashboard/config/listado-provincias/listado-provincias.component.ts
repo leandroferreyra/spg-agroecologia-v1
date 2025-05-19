@@ -11,7 +11,6 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
-import { PaisDTO } from 'src/app/core/models/request/paisDTO';
 import { ProvinciaDTO } from 'src/app/core/models/request/provinciaDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';

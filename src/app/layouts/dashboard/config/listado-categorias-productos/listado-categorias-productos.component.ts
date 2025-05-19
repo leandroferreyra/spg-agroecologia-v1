@@ -5,6 +5,7 @@ import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
@@ -29,7 +30,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule,
-    IconInfoCircleComponent, IconFolderComponent],
+    IconInfoCircleComponent, IconFolderComponent, NgSelectModule],
   templateUrl: './listado-categorias-productos.component.html',
   styleUrl: './listado-categorias-productos.component.css'
 })

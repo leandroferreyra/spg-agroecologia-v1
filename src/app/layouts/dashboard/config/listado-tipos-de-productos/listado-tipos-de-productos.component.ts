@@ -21,12 +21,14 @@ import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 import { ColorSketchModule } from 'ngx-color/sketch';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-listado-tipos-de-productos',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
-    IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule, ColorSketchModule],
+    IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule, ColorSketchModule,
+    NgSelectModule],
   templateUrl: './listado-tipos-de-productos.component.html',
   styleUrl: './listado-tipos-de-productos.component.css'
 })

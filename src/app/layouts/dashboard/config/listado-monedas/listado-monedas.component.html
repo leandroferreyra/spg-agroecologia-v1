@@ -1,123 +1,104 @@
-<div>
-    <div class="panel mt-6 pb-0">
-        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
-            <h5 class="text-lg font-semibold dark:text-white-light">Monedas
-            </h5>
-            <button type="button" ngxTippy="Agregar moneda" (click)="openModalNuevaMoneda('NEW')">
-                <icon-plus />
-            </button>
-            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
-                <icon-search />
-            </button>
-        </div>
+<div class="panel mt-6 pb-0">
 
-
-        <div class="row mb-2">
-            <div class="col-6">
-                <span *ngIf="monedas && monedas.length > 0" class="float-md-start color-gris">
-                    Página: {{ currentPage}}/{{numPages.pageCount }}
-                </span>
-            </div>
-            <div class="col-6" style="text-align: right;">
-                <span *ngIf="monedas && monedas.length > 0" class="float-md-end color-gris">
-                    Ítems: {{itemsInPage}}/{{ total_rows }}
-                </span>
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table-hover">
-                <thead>
-                    <tr>
-                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Nombre
-                                <fa-icon
-                                    [icon]="ordenamiento['name'] === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
-                            </span>
-                        </th>
-                        <th style="cursor: pointer;">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Símbolo
-                            </span>
-                        </th>
-                        <th>
-                            Acciones
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (showFilter) {
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
-                                (input)="obtenerMonedas()" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.symbol.value"
-                                (input)="obtenerMonedas()" />
-                        </td>
-                        <td></td>
-                    </tr>
-                    }
-                    @for(data of monedas | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
-                    <tr>
-                        <td class="whitespace-nowrap">{{ data.name}} </td>
-                        <td class="whitespace-nowrap">{{ data.symbol}} </td>
-                        <td>
-                            <div class="flex items-center">
-                                <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                        (click)="openModalNuevaMoneda('EDIT', data)">
-                                        <icon-pencil />
-                                    </button>
-                                </div>
-                                <div>
-                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                        <icon-trash-lines />
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="row mt-4">
-                <div class="col">
-                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="obtenerMonedas()" />
-                </div>
-
-                <div class="col">
-                    <div class="row align-items-center float-md-end">
-                        <div class="col-auto">
-                            <label for="paginacion">Ítems por página:</label>
-                        </div>
-                        <div class="col-auto">
-                            <select id="paginacion" class="form-control"
-                                (change)="obtenerMonedas()" [(ngModel)]="itemsPerPage">
-                                <option value=5>5</option>
-                                <option value=10>10</option>
-                                <option value=20>20</option>
-                                <option value=50>50</option>
-                                <option value=100>100</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-
-
-
+    <div class="mb-5 flex flex-wrap items-center gap-2">
+        <h5 class="text-lg font-semibold dark:text-white-light">Monedas</h5>
+        <button type="button" ngxTippy="Agregar moneda" (click)="openModalNuevaMoneda('NEW')">
+            <icon-plus />
+        </button>
+        <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+            <icon-search />
+        </button>
     </div>
-</div>
 
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="monedas && monedas.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="monedas && monedas.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Nombre
+                            <fa-icon [icon]="ordenamiento['name'] === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Símbolo
+                        </span>
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (showFilter) {
+                <tr>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
+                            (input)="obtenerMonedas()" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.symbol.value"
+                            (input)="obtenerMonedas()" />
+                    </td>
+                    <td></td>
+                </tr>
+                }
+                @for(data of monedas | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.symbol}} </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalNuevaMoneda('EDIT', data)">
+                                    <icon-pencil />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerMonedas()" />
+            </div>
+
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerMonedas()">
+                </ng-select>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 <div>
     <ngx-custom-modal #modalCurrency class="modal-top animate animate-fade-in">
@@ -136,26 +117,12 @@
                                 [ngClass]="isSubmit ? monedaForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Nombre</label>
                                 <input type="text" class="form-control" formControlName="nombre">
-
-                                <!-- <ng-container *ngIf="isSubmit && !monedaForm.controls['nombre'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container *ngIf="isSubmit && monedaForm.controls['nombre'].errors">
-                                    <p class="mt-1 text-danger">Ingresa nombre de la moneda</p>
-                                </ng-container> -->
                             </div>
 
                             <div
                                 [ngClass]="isSubmit ? monedaForm.controls['simbolo'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Símbolo</label>
                                 <input type="text" class="form-control" formControlName="simbolo">
-
-                                <!-- <ng-container *ngIf="isSubmit && !monedaForm.controls['simbolo'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container *ngIf="isSubmit && monedaForm.controls['simbolo'].errors">
-                                    <p class="mt-1 text-danger">Ingresa simbolo de la moneda</p>
-                                </ng-container> -->
                             </div>
 
                             <div class="row mt-3">

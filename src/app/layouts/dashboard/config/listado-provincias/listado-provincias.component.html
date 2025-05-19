@@ -1,124 +1,106 @@
-<div>
-    <div class="panel mt-6 pb-0">
-        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
-            <h5 class="text-lg font-semibold dark:text-white-light">Provincias
-            </h5>
-            <button type="button" ngxTippy="Agregar provincia" (click)="openModalNuevaProvincia('NEW')">
-                <icon-plus />
-            </button>
-            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
-                <icon-search />
-            </button>
-        </div>
+<div class="panel mt-6 pb-0">
 
-        <div class="row mb-2">
-            <div class="col-6">
-                <span *ngIf="provincias && provincias.length > 0" class="float-md-start color-gris">
-                    Página: {{ currentPage}}/{{numPages.pageCount }}
-                </span>
-            </div>
-            <div class="col-6" style="text-align: right;">
-                <span *ngIf="provincias && provincias.length > 0" class="float-md-end color-gris">
-                    Ítems: {{itemsInPage}}/{{ total_rows }}
-                </span>
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table-hover">
-                <thead>
-                    <tr>
-                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('country.name')">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                País
-                                <fa-icon [icon]="icono(ordenamiento['country.name'])"></fa-icon>
-                            </span>
-                        </th>
-
-                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Provincia
-                                <fa-icon [icon]="icono(ordenamiento['name'])"></fa-icon>
-                            </span>
-                        </th>
-                        <th>
-                            Acciones
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (showFilter) {
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda"
-                                [(ngModel)]="filtros['country.name'].value" (input)="obtenerProvincias()" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
-                                (input)="obtenerProvincias()" />
-                        </td>
-                        <td></td>
-                    </tr>
-                    }
-                    @for(data of provincias | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
-                    <tr>
-                        <td class="whitespace-nowrap">{{ data.country.name}} </td>
-                        <td class="whitespace-nowrap">{{ data.name}} </td>
-                        <td>
-                            <div class="flex items-center">
-                                <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                        (click)="openModalNuevaProvincia('EDIT', data)">
-                                        <icon-pencil />
-                                    </button>
-                                </div>
-                                <div>
-                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                        <icon-trash-lines />
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="row mt-4">
-                <div class="col">
-                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="obtenerProvincias()" />
-                </div>
-
-                <div class="col">
-                    <div class="row align-items-center float-md-end">
-                        <div class="col-auto">
-                            <label for="paginacion">Ítems por página:</label>
-                        </div>
-                        <div class="col-auto">
-                            <select id="paginacion" class="form-control" [(ngModel)]="itemsPerPage"
-                                (change)="obtenerProvincias();">
-                                <option value=5>5</option>
-                                <option value=10>10</option>
-                                <option value=20>20</option>
-                                <option value=50>50</option>
-                                <option value=100>100</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-
-
-
-
+    <div class="mb-5 flex flex-wrap items-center gap-2">
+        <h5 class="text-lg font-semibold dark:text-white-light">Provincias</h5>
+        <button type="button" ngxTippy="Agregar provincia" (click)="openModalNuevaProvincia('NEW')">
+            <icon-plus />
+        </button>
+        <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+            <icon-search />
+        </button>
     </div>
-</div>
 
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="provincias && provincias.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="provincias && provincias.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th style="cursor: pointer;" (click)="cambiarOrdenamiento('country.name')">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            País
+                            <fa-icon [icon]="icono(ordenamiento['country.name'])"></fa-icon>
+                        </span>
+                    </th>
+
+                    <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Provincia
+                            <fa-icon [icon]="icono(ordenamiento['name'])"></fa-icon>
+                        </span>
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (showFilter) {
+                <tr>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda"
+                            [(ngModel)]="filtros['country.name'].value" (input)="obtenerProvincias()" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
+                            (input)="obtenerProvincias()" />
+                    </td>
+                    <td></td>
+                </tr>
+                }
+                @for(data of provincias | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.country.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.name}} </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalNuevaProvincia('EDIT', data)">
+                                    <icon-pencil />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerProvincias()" />
+            </div>
+
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerProvincias()">
+                </ng-select>
+            </div>
+
+        </div>
+    </div>
+
+</div>
 
 <div>
     <ngx-custom-modal #modalProvincia class="modal-top animate animate-fade-in">
@@ -137,13 +119,6 @@
                                 [ngClass]="isSubmit ? provinciaForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Provincia</label>
                                 <input type="text" class="form-control" formControlName="nombre">
-
-                                <!-- <ng-container *ngIf="isSubmit && !provinciaForm.controls['nombre'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container *ngIf="isSubmit && provinciaForm.controls['nombre'].errors">
-                                    <p class="mt-1 text-danger">Ingresa nombre de la provincia</p>
-                                </ng-container> -->
                             </div>
 
                             <div
@@ -153,12 +128,6 @@
                                     [virtualScroll]="true" [appendTo]="'body'" clearAllText="Limpiar"
                                     [ngClass]="isSubmit ? provinciaForm.controls['pais'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
-                                <!-- <ng-container *ngIf="isSubmit && !provinciaForm.controls['pais'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container *ngIf="isSubmit && provinciaForm.controls['pais'].errors">
-                                    <p class="mt-1 text-danger">Selecciona un país</p>
-                                </ng-container> -->
                             </div>
 
                             <div class="row mt-3">

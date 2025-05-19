@@ -1,322 +1,291 @@
-<div>
-    <div class="panel mt-6 pb-0">
-        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
-            <h5 class="text-lg font-semibold dark:text-white-light">Tipos de productos</h5>
-            <button type="button" ngxTippy="Agregar tipo de producto" (click)="openModalNuevoTipo('NEW')">
-                <icon-plus />
-            </button>
-            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
-                <icon-search />
-            </button>
+<div class="panel mt-6 pb-0">
+
+    <div class="mb-5 flex flex-wrap items-center gap-2">
+        <h5 class="text-lg font-semibold dark:text-white-light">Tipos de productos</h5>
+        <button type="button" ngxTippy="Agregar tipo de producto" (click)="openModalNuevoTipo('NEW')">
+            <icon-plus />
+        </button>
+        <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+            <icon-search />
+        </button>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="tiposProductos && tiposProductos.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
         </div>
-
-
-
-        <div class="row mb-2">
-            <div class="col-6">
-                <span *ngIf="tiposProductos && tiposProductos.length > 0" class="float-md-start color-gris">
-                    Página: {{ currentPage}}/{{numPages.pageCount }}
-                </span>
-            </div>
-            <div class="col-6" style="text-align: right;">
-                <span *ngIf="tiposProductos && tiposProductos.length > 0" class="float-md-end color-gris">
-                    Ítems: {{itemsInPage}}/{{ total_rows }}
-                </span>
-            </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="tiposProductos && tiposProductos.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
         </div>
+    </div>
 
-        <div class="table-responsive">
-            <table class="table-hover">
-                <thead>
-                    <tr>
-                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Nombre
-                                <fa-icon
-                                    [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
-                            </span>
-                        </th>
-                        <th style="cursor: pointer;" (click)="cambiarOrdenamiento('code')">
-                            <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                Código
-                                <fa-icon
-                                    [icon]="ordenamiento['code']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
-                            </span>
-                        </th>
-                        <th>
-                            Descripción
-                        </th>
-                        <th>
-                            Color
-                        </th>
-                        <th>
-                            Es proceso
-                        </th>
-                        <th>
-                            Es compuesto
-                        </th>
-                        <th>
-                            Debe ser trazable
-                        </th>
-                        <th>
-                            Control de stock
-                        </th>
-                        <th>
-                            Puede ser provisto
-                        </th>
-                        <th>
-                            Puede ser comprado
-                        </th>
-                        <th>
-                            Puede ser producido
-                        </th>
-                        <th>
-                            Acciones
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (showFilter) {
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
-                                (input)="obtenerTiposProductos()" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.code.value"
-                                (input)="obtenerTiposProductos()" />
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <!-- <td>
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="w-12 h-6 relative">
-                                    <input type="checkbox"
-                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" [(ngModel)]="filtros.is_process.value"
-                                        (change)="obtenerTiposProductos()" />
-                                    <span for="custom_switch_checkbox2"
-                                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                    </span>
-                                </label>
-                            </div>
-                        </td> -->
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th style="cursor: pointer;" (click)="cambiarOrdenamiento('name')">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Nombre
+                            <fa-icon [icon]="ordenamiento['name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                        </span>
+                    </th>
+                    <th style="cursor: pointer;" (click)="cambiarOrdenamiento('code')">
+                        <span style="display: inline-flex; align-items: center; gap: 10px;">
+                            Código
+                            <fa-icon [icon]="ordenamiento['code']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon>
+                        </span>
+                    </th>
+                    <th>
+                        Descripción
+                    </th>
+                    <th>
+                        Color
+                    </th>
+                    <th>
+                        Es proceso
+                    </th>
+                    <th>
+                        Es compuesto
+                    </th>
+                    <th>
+                        Debe ser trazable
+                    </th>
+                    <th>
+                        Control de stock
+                    </th>
+                    <th>
+                        Puede ser provisto
+                    </th>
+                    <th>
+                        Puede ser comprado
+                    </th>
+                    <th>
+                        Puede ser producido
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (showFilter) {
+                <tr>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name.value"
+                            (input)="obtenerTiposProductos()" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.code.value"
+                            (input)="obtenerTiposProductos()" />
+                    </td>
+                    <td></td>
+                    <td></td>
 
-                        <td>
-                            <select class="form-control campo-busqueda" [(ngModel)]="filtros.is_process.value"
-                                (change)="obtenerTiposProductos()">
-                                <option [ngValue]="''"></option>
-                                <option [ngValue]="1">Sí</option>
-                                <option [ngValue]="0">No</option>
-                            </select>
-                        </td>
+                    <td>
+                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.is_process.value"
+                            (change)="obtenerTiposProductos()">
+                            <option [ngValue]="''"></option>
+                            <option [ngValue]="1">Sí</option>
+                            <option [ngValue]="0">No</option>
+                        </select>
+                    </td>
 
-                        <td>
-                            <select class="form-control campo-busqueda" [(ngModel)]="filtros.product_compound.value"
-                                (change)="obtenerTiposProductos()">
-                                <option [ngValue]="''"></option>
-                                <option [ngValue]="1">Sí</option>
-                                <option [ngValue]="0">No</option>
-                            </select>
-                        </td>
+                    <td>
+                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.product_compound.value"
+                            (change)="obtenerTiposProductos()">
+                            <option [ngValue]="''"></option>
+                            <option [ngValue]="1">Sí</option>
+                            <option [ngValue]="0">No</option>
+                        </select>
+                    </td>
 
-                        <td>
-                            <select class="form-control campo-busqueda"
-                                [(ngModel)]="filtros.product_must_be_traceable.value"
-                                (change)="obtenerTiposProductos()">
-                                <option [ngValue]="''"></option>
-                                <option [ngValue]="1">Sí</option>
-                                <option [ngValue]="0">No</option>
-                            </select>
-                        </td>
+                    <td>
+                        <select class="form-control campo-busqueda"
+                            [(ngModel)]="filtros.product_must_be_traceable.value" (change)="obtenerTiposProductos()">
+                            <option [ngValue]="''"></option>
+                            <option [ngValue]="1">Sí</option>
+                            <option [ngValue]="0">No</option>
+                        </select>
+                    </td>
 
-                        <td>
-                            <select class="form-control campo-busqueda" [(ngModel)]="filtros.stock_controlled.value"
-                                (change)="obtenerTiposProductos()">
-                                <option [ngValue]="''"></option>
-                                <option [ngValue]="1">Sí</option>
-                                <option [ngValue]="0">No</option>
-                            </select>
-                        </td>
+                    <td>
+                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.stock_controlled.value"
+                            (change)="obtenerTiposProductos()">
+                            <option [ngValue]="''"></option>
+                            <option [ngValue]="1">Sí</option>
+                            <option [ngValue]="0">No</option>
+                        </select>
+                    </td>
 
-                        <td>
-                            <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_provided.value"
-                                (change)="obtenerTiposProductos()">
-                                <option [ngValue]="''"></option>
-                                <option [ngValue]="1">Sí</option>
-                                <option [ngValue]="0">No</option>
-                            </select>
-                        </td>
+                    <td>
+                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_provided.value"
+                            (change)="obtenerTiposProductos()">
+                            <option [ngValue]="''"></option>
+                            <option [ngValue]="1">Sí</option>
+                            <option [ngValue]="0">No</option>
+                        </select>
+                    </td>
 
-                        <td>
-                            <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_purchased.value"
-                                (change)="obtenerTiposProductos()">
-                                <option [ngValue]="''"></option>
-                                <option [ngValue]="1">Sí</option>
-                                <option [ngValue]="0">No</option>
-                            </select>
-                        </td>
+                    <td>
+                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_purchased.value"
+                            (change)="obtenerTiposProductos()">
+                            <option [ngValue]="''"></option>
+                            <option [ngValue]="1">Sí</option>
+                            <option [ngValue]="0">No</option>
+                        </select>
+                    </td>
 
-                        <td>
-                            <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_produced.value"
-                                (change)="obtenerTiposProductos()">
-                                <option [ngValue]="''"></option>
-                                <option [ngValue]="1">Sí</option>
-                                <option [ngValue]="0">No</option>
-                            </select>
-                        </td>
+                    <td>
+                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_produced.value"
+                            (change)="obtenerTiposProductos()">
+                            <option [ngValue]="''"></option>
+                            <option [ngValue]="1">Sí</option>
+                            <option [ngValue]="0">No</option>
+                        </select>
+                    </td>
 
-                    </tr>
-                    }
-                    @for(data of tiposProductos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
-                    <tr>
-                        <td class="whitespace-nowrap">{{ data.name}} </td>
-                        <td class="whitespace-nowrap">{{ data.code}} </td>
-                        <td class="whitespace-nowrap">{{ data.description}} </td>
-                        <td class="whitespace-nowrap">{{ data.color}} </td>
+                </tr>
+                }
+                @for(data of tiposProductos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.name}} </td>
+                    <td class="whitespace-nowrap">{{ data.code}} </td>
+                    <td class="whitespace-nowrap">{{ data.description}} </td>
+                    <td class="whitespace-nowrap">{{ data.color}} </td>
 
-                        <td class="whitespace-nowrap">
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="w-12 h-6 relative">
-                                    <input type="checkbox"
-                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" [checked]=data.is_process disabled />
-                                    <span for="custom_switch_checkbox2"
-                                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                    </span>
-                                </label>
-                            </div>
-                        </td>
-
-
-                        <td class="whitespace-nowrap">
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="w-12 h-6 relative">
-                                    <input type="checkbox"
-                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" [checked]=data.product_compound disabled />
-                                    <span for="custom_switch_checkbox2"
-                                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                    </span>
-                                </label>
-                            </div>
-                        </td>
-
-                        <td class="whitespace-nowrap">
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="w-12 h-6 relative">
-                                    <input type="checkbox"
-                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" [checked]=data.product_must_be_traceable
-                                        disabled />
-                                    <span for="custom_switch_checkbox2"
-                                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                    </span>
-                                </label>
-                            </div>
-                        </td>
-
-                        <td class="whitespace-nowrap">
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="w-12 h-6 relative">
-                                    <input type="checkbox"
-                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" [checked]=data.stock_controlled disabled />
-                                    <span for="custom_switch_checkbox2"
-                                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                    </span>
-                                </label>
-                            </div>
-                        </td>
-
-                        <td class="whitespace-nowrap">
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="w-12 h-6 relative">
-                                    <input type="checkbox"
-                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" [checked]=data.can_be_provided disabled />
-                                    <span for="custom_switch_checkbox2"
-                                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                    </span>
-                                </label>
-                            </div>
-                        </td>
-
-                        <td class="whitespace-nowrap">
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="w-12 h-6 relative">
-                                    <input type="checkbox"
-                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" [checked]=data.can_be_purchased disabled />
-                                    <span for="custom_switch_checkbox2"
-                                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                    </span>
-                                </label>
-                            </div>
-                        </td>
-
-                        <td class="whitespace-nowrap">
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="w-12 h-6 relative">
-                                    <input type="checkbox"
-                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" [checked]=data.can_be_produced disabled />
-                                    <span for="custom_switch_checkbox2"
-                                        class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                    </span>
-                                </label>
-                            </div>
-                        </td>
-
-                        <td>
-                            <div class="flex items-center">
-                                <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                        (click)="openModalNuevoTipo('EDIT', data)">
-                                        <icon-pencil />
-                                    </button>
-                                </div>
-                                <div>
-                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                        <icon-trash-lines />
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="row mt-4">
-                <div class="col">
-                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="obtenerTiposProductos()" />
-                </div>
-
-                <div class="col">
-                    <div class="row align-items-center float-md-end">
-                        <div class="col-auto">
-                            <label for="paginacion">Ítems por página:</label>
+                    <td class="whitespace-nowrap">
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" [checked]=data.is_process disabled />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
                         </div>
-                        <div class="col-auto">
-                            <select id="paginacion" class="form-control" (change)="obtenerTiposProductos()"
-                                [(ngModel)]="itemsPerPage">
-                                <option value=5>5</option>
-                                <option value=10>10</option>
-                                <option value=20>20</option>
-                                <option value=50>50</option>
-                                <option value=100>100</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                    </td>
 
+
+                    <td class="whitespace-nowrap">
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" [checked]=data.product_compound disabled />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                        </div>
+                    </td>
+
+                    <td class="whitespace-nowrap">
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" [checked]=data.product_must_be_traceable disabled />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                        </div>
+                    </td>
+
+                    <td class="whitespace-nowrap">
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" [checked]=data.stock_controlled disabled />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                        </div>
+                    </td>
+
+                    <td class="whitespace-nowrap">
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" [checked]=data.can_be_provided disabled />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                        </div>
+                    </td>
+
+                    <td class="whitespace-nowrap">
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" [checked]=data.can_be_purchased disabled />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                        </div>
+                    </td>
+
+                    <td class="whitespace-nowrap">
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" [checked]=data.can_be_produced disabled />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalNuevoTipo('EDIT', data)">
+                                    <icon-pencil />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerTiposProductos()" />
+            </div>
+
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerTiposProductos()">
+                </ng-select>
             </div>
         </div>
 
     </div>
+
 </div>
 
 <div>

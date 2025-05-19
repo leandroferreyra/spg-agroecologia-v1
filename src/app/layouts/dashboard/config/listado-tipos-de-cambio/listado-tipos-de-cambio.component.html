@@ -1,6 +1,6 @@
 <div>
     <div class="panel pb-4">
-        
+
         <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
             <h5 class="text-lg font-semibold dark:text-white-light">Tipos de cambio</h5>
             <button type="button" ngxTippy="Agregar tipo de cambio" (click)="openModalNuevoTipo('NEW')">
@@ -51,15 +51,11 @@
                         <th style="cursor: pointer;">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Moneda
-                                <!-- <fa-icon
-                                        [icon]="ordenamiento['currency_name']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon> -->
                             </span>
                         </th>
                         <th style="cursor: pointer;">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Valor
-                                <!-- <fa-icon
-                                        [icon]="ordenamiento['rate']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon> -->
                             </span>
                         </th>
                         <th style="cursor: pointer;" (click)="cambiarOrdenamiento('datetime_from')">
@@ -72,8 +68,6 @@
                         <th style="cursor: pointer;">
                             <span style="display: inline-flex; align-items: center; gap: 10px;">
                                 Hasta
-                                <!-- <fa-icon
-                                        [icon]="ordenamiento['datetime_to']  === 'asc' ? iconArrowUp : iconArrowDown"></fa-icon> -->
                             </span>
                         </th>
                         <th>
@@ -97,11 +91,6 @@
                                         <icon-pencil />
                                     </button>
                                 </div>
-                                <!-- <div>
-                                        <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                            <icon-trash-lines />
-                                        </button>
-                                    </div> -->
                             </div>
                         </td>
                     </tr>
@@ -109,32 +98,22 @@
                 </tbody>
             </table>
 
-            <div class="row mt-4">
-                <div class="col">
+            <div class="row mt-4 gy-3">
+                <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
                     <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
                         [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
                         [boundaryLinks]="true" (pageChange)="obtenerTiposCambio()" />
                 </div>
 
-                <div class="col">
-                    <div class="row align-items-center float-md-end">
-                        <div class="col-auto">
-                            <label for="paginacion">Ítems por página:</label>
-                        </div>
-                        <div class="col-auto">
-                            <select id="paginacion" class="form-control" (change)="obtenerTiposCambio()"
-                                [(ngModel)]="itemsPerPage">
-                                <option value=5>5</option>
-                                <option value=10>10</option>
-                                <option value=20>20</option>
-                                <option value=50>50</option>
-                                <option value=100>100</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                    <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                    <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label"
+                        [clearable]="false" class="custom-select" [dropdownPosition]="'top'"
+                        (change)="obtenerTiposCambio()">
+                    </ng-select>
                 </div>
-
             </div>
+
         </div>
         }
 
@@ -164,12 +143,6 @@
                                 [ngClass]="isSubmit ? tipoCambioForm.controls['valor'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Valor</label>
                                 <input type="text" class="form-control" formControlName="valor">
-                                <!-- <ng-container *ngIf="isSubmit && !tipoCambioForm.controls['valor'].errors">
-                                    <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                                </ng-container>
-                                <ng-container *ngIf="isSubmit && tipoCambioForm.controls['valor'].errors">
-                                    <p class="mt-1 text-danger">Ingresa valor</p>
-                                </ng-container> -->
                             </div>
 
                             <div class="col-md-12 pr-1 mb-3">

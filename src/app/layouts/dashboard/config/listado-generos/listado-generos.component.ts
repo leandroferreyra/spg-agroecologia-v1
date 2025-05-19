@@ -23,13 +23,14 @@ import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { IndexService } from 'src/app/core/services/index.service';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-listado-generos',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     IconPencilComponent, IconPlusComponent, IconTrashLinesComponent, NgxTippyModule, FontAwesomeModule, IconSearchComponent,
-    NgbPagination],
+    NgbPagination, NgSelectModule],
   templateUrl: './listado-generos.component.html',
   styleUrl: './listado-generos.component.css'
 })
