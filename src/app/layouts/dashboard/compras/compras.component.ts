@@ -992,7 +992,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
         let producto = new ProductoTransaccionDTO();
         producto.actual_role = this.actual_role;
         producto.with = [];
-        producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
         producto.quantity = this.productoForm.get('quantity')?.value;
         producto.unit_price = this.productoForm.get('unit_price')?.value;
         producto.control_result = this.productoForm.get('control_result')?.value ?? false;
@@ -1003,6 +1002,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         }
         producto.location_uuid = this.ultimaUbicacion ? this.ultimaUbicacion?.uuid : null;
         if (!this.inEdicionProducto) {
+          producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
           producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
           this.cleanObject(producto);
           this.subscription.add(
@@ -1031,29 +1031,29 @@ export class ComprasComponent implements OnInit, OnDestroy {
                 this.inEdicionProducto = false;
                 this.tokenService.setToken(res.token);
                 this.breadcrumb = [];
-                if (this.selectedProducto && this.selectedProducto.product?.stocks[0]?.location?.uuid !== producto.location_uuid) {
-                  // Cambió la locación por lo que se llama al endpoint correspondiente.
-                  let stock_uuid = this.selectedProducto.product.stocks[0].uuid;
-                  let stockDTO = new StockDTO();
-                  stockDTO.actual_role = this.actual_role;
-                  stockDTO.location_uuid = producto.location_uuid;
-                  this.subscription.add(
-                    this._stockService.editStock(stock_uuid, stockDTO).subscribe({
-                      next: res => {
-                        this.obtenerCompraPorId(this.selectedCompra);
-                        this.spinner.hide();
-                      },
-                      error: error => {
-                        console.error(error);
-                        this.spinner.hide();
-                        this.swalService.toastError('top-right', error.error.message);
-                      }
-                    })
-                  )
-                } else {
-                  this.obtenerCompraPorId(this.selectedCompra);
-                  this.spinner.hide();
-                }
+                // if (this.selectedProducto && this.selectedProducto.product?.stocks[0]?.location?.uuid !== producto.location_uuid) {
+                //   // Cambió la locación por lo que se llama al endpoint correspondiente.
+                //   let stock_uuid = this.selectedProducto.product.stocks[0].uuid;
+                //   let stockDTO = new StockDTO();
+                //   stockDTO.actual_role = this.actual_role;
+                //   stockDTO.location_uuid = producto.location_uuid;
+                //   this.subscription.add(
+                //     this._stockService.editStock(stock_uuid, stockDTO).subscribe({
+                //       next: res => {
+                //         this.obtenerCompraPorId(this.selectedCompra);
+                //         this.spinner.hide();
+                //       },
+                //       error: error => {
+                //         console.error(error);
+                //         this.spinner.hide();
+                //         this.swalService.toastError('top-right', error.error.message);
+                //       }
+                //     })
+                //   )
+                // } else {
+                this.obtenerCompraPorId(this.selectedCompra);
+                this.spinner.hide();
+                // }
               },
               error: error => {
                 this.swalService.toastError('top-right', error.error.message);
