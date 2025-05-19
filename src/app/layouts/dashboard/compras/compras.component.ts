@@ -128,6 +128,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   productoControllable: boolean = false;
   showInputUbicacion: boolean = false;
 
+  placeholderCantidad: string = '';
+
   // Referencia al modal para crear y editar países.
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
@@ -411,7 +413,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
     params.with = ["location.location.location.location"];
     params.paging = null;
     params.page = null;
-    params.order_by = {};
+    params.order_by = {
+      'name': 'asc'
+    };
     params.filters = {
       'location_uuid': { value: uuid ? uuid : 'null', op: '=', contiene: false },
     };
@@ -625,7 +629,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.productoForm = new FormGroup({
       transaction_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
       product_uuid: new FormControl({ value: data ? data.product : null, disabled: data ? true : false }, [Validators.required]),
-      quantity: new FormControl({ value: data ? data.quantity : null, disabled: false }, [Validators.required]),
+      quantity: new FormControl({ value: data ? this.showCantidad(data) : null, disabled: data ? false : true }, [Validators.required]),
       unit_price: new FormControl({ value: data ? data.unit_price : null, disabled: false }, [Validators.required]),
       control_result: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, []),
       password: new FormControl({ value: null, disabled: false }, []),
@@ -646,6 +650,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.showInputUbicacion = true;
         } else {
           this.showInputUbicacion = false;
+        }
+        // Quantity
+        if (producto) {
+          // let producto = this.productos.find(p => p.uuid === value);
+          this.productoForm.get('quantity')?.enable();
+          this.productoForm.get('quantity')?.setValue('');
+          this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
+        } else {
+          this.productoForm.get('quantity')?.disable();
+          this.placeholderCantidad = '';
         }
       });
 
@@ -668,6 +682,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
         });
       });
   }
+
+
+  // mostrarCantidad(data: any) {
+  //   if (data.child_product?.measure?.is_integer === 1) {
+  //     return (+data.quantity)?.toFixed(0);
+  //   } else {
+  //     return (+data.quantity)?.toFixed(2);
+  //   }
+  // }
 
   getLocation(data: any) {
     if (data.product.stocks.length > 0) {

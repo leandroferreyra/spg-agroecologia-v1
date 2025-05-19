@@ -639,7 +639,7 @@
                         <div (keydown.enter)="confirmarAltaProducto()"
                             [ngClass]="isSubmit ? productoForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="quantity">Cantidad</label>
-                            <input id="quantity" type="text" placeholder="" class="form-control"
+                            <input id="quantity" type="text" [placeholder]="placeholderCantidad" class="form-control"
                                 formControlName="quantity" />
                         </div>
 
