@@ -72,7 +72,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 9;
+  MAX_ITEMS_PER_PAGE = 10;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;
@@ -342,6 +342,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any) {
+    this.productoAnterior = null;
     this.isEdicion = false;
     this.inicializarFormEdit(producto);
   }
@@ -553,7 +554,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   irAlProducto(event: any) {
-    this.productoAnterior = this.selectedProducto;
+    if (this.productoAnterior && this.productoAnterior.uuid !== event.uuid) {
+      this.productoAnterior = null;
+    } else {
+      this.productoAnterior = this.selectedProducto;
+    }
     this.inicializarFormEdit(event);
     this.tab1 = 'datos-generales';
   }

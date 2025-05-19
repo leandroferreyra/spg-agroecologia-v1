@@ -53,7 +53,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   actual_role: string = '';
   proveedores: any[] = [];
-  proveedoresFiltrados: any[] = [];
+  // proveedoresFiltrados: any[] = [];
   selectedProveedor: any;
   newProveedorForm!: FormGroup;
   proveedorForm!: FormGroup;
@@ -89,7 +89,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   parametrosProvedores!: ParametrosIndex;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 8;
+  MAX_ITEMS_PER_PAGE = 10;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;
@@ -438,7 +438,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
             this.proveedores = [...this.proveedores.map(p =>
               p.uuid === res.data.uuid ? res.data : p
             )];
-            this.proveedoresFiltrados = this.proveedores;
+            // this.proveedoresFiltrados = this.proveedores;
             this.inicializarForm(res.data);
             this.isEdicion = false;
             this.swalService.toastSuccess('top-right', "Usuario actualizado.");
@@ -879,7 +879,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   getDropdownClass(index: number) {
-    let mitad = this.proveedoresFiltrados.length / 2;
+    let mitad = this.proveedores.length / 2;
     return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
   }
 

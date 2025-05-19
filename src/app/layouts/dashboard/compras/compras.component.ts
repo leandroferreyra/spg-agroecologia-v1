@@ -77,7 +77,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 8;
+  MAX_ITEMS_PER_PAGE = 10;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;
@@ -492,8 +492,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   showDataCompra(compra: any) {
-    this.isEdicion = false;
-    this.obtenerCompraPorId(compra);
+    if (this.selectedCompra && this.selectedCompra.uuid !== compra.uuid) {
+      this.isEdicion = false;
+      this.obtenerCompraPorId(compra);
+    }
   }
 
   cancelarEdicion() {

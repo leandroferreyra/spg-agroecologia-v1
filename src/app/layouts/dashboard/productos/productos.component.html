@@ -31,9 +31,9 @@
                 Productos: {{ total_rows }}
             </span>
 
-            <div class="table-container">
+            <div class="table-container flex-grow overflow-auto">
                 <div class="table-responsive">
-                    <table class="table-hover">
+                    <table class="table-hover w-full">
                         <tbody>
                             @for(data of productos ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;"
@@ -64,13 +64,27 @@
                 </div>
             </div>
 
-            <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
-                <div class="d-flex justify-content-center mb-3">
+            <div class="w-full p-2 mt-auto">
+                <div class="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-between mb-3">
+                    <!-- Paginación -->
                     <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
-                        [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        (pageChange)="obtenerProductos()">
+                        [(page)]="currentPage" [maxSize]="2" [rotate]="true" (pageChange)="obtenerProductos()">
                     </ngb-pagination>
+
+                    <!-- Selector de ítems por página -->
+                    <div class="flex items-center gap-2">
+                        <label for="paginacion" class="whitespace-nowrap">Ítems por página:</label>
+                        <select id="paginacion" class="form-control" (change)="obtenerProductos()"
+                            [(ngModel)]="itemsPerPage">
+                            <option value=5>5</option>
+                            <option value=10>10</option>
+                            <option value=20>20</option>
+                            <option value=50>50</option>
+                            <option value=100>100</option>
+                        </select>
+                    </div>
                 </div>
+
 
                 <div class="group relative">
                     <input type="text" placeholder="Buscar producto..." [(ngModel)]="filtros.name.value"

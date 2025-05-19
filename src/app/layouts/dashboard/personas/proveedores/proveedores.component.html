@@ -3,12 +3,12 @@
         <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
             [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
 
-        <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[250px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
+        <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[500px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
             [ngClass]="{ '!block': isShowMailMenu }">
 
             <!-- PANEL IZQUIERDO -->
 
-            <div class="flex h-full flex-col pb-16">
+            <div class="flex h-full flex-col">
 
                 <div class="flex items-center justify-between text-md mb-3">
                     <button type="button" class="hover:text-primary" (click)="openModalNuevoProveedor()"
@@ -29,43 +29,58 @@
                     Proveedores: {{ total_rows }}
                 </span>
 
-                <div class="table-responsive">
-                    <table class="table-hover">
-                        <tbody>
-                            @for(data of proveedores ; let index = $index ;track data.uuid) {
-                            <tr style="cursor: pointer;"
-                                [ngClass]="{'bg-blue-200': selectedProveedor?.uuid === data.uuid}">
-                                <td (click)="showDataProveedor(data)" style="font-size: 12px;">{{ getName(data) }}
-                                </td>
-                                <td>
-                                    <div hlMenu class="dropdown">
-                                        <button type="button" hlMenuButton>
-                                            <icon-horizontal-dots class="rotate-90 opacity-70" />
-                                        </button>
-                                        <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
-                                            <li>
-                                                <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                    (click)="editarUsuario(data)">Editar</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                    (click)="openSwalEliminar(data)">Eliminar</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
+                <div class="table-container flex-grow overflow-auto">
+                    <div class="table-responsive">
+                        <table class="table-hover w-full">
+                            <tbody>
+                                @for(data of proveedores ; let index = $index ;track data.uuid) {
+                                <tr style="cursor: pointer;"
+                                    [ngClass]="{'bg-blue-200': selectedProveedor?.uuid === data.uuid}">
+                                    <td (click)="showDataProveedor(data)" style="font-size: 12px;">{{ getName(data) }}
+                                    </td>
+                                    <td class="w-0 whitespace-nowrap text-right align-middle">
+                                        <div hlMenu class="dropdown">
+                                            <button type="button" hlMenuButton>
+                                                <icon-horizontal-dots class="rotate-90 opacity-70" />
+                                            </button>
+                                            <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
+                                                <li>
+                                                    <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                        (click)="editarUsuario(data)">Editar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" *hlMenuItem="let menuItem"
+                                                        (click)="openSwalEliminar(data)">Eliminar</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="absolute bottom-0 mp-2 w-full p-2 ltr:left-0 rtl:right-0">
-                    <div class="d-flex justify-content-center mb-3">
+                <div class="w-full p-2 mt-auto">
+                    <div class="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-between mb-3">
+                        <!-- Paginación -->
                         <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
-                            [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                            (pageChange)="obtenerProveedores()">
+                            [(page)]="currentPage" [maxSize]="2" [rotate]="true" (pageChange)="obtenerProveedores()">
                         </ngb-pagination>
+
+                        <!-- Selector de ítems por página -->
+                        <div class="flex items-center gap-2">
+                            <label for="paginacion" class="whitespace-nowrap">Ítems por página:</label>
+                            <select id="paginacion" class="form-control" (change)="obtenerProveedores()"
+                                [(ngModel)]="itemsPerPage">
+                                <option value=5>5</option>
+                                <option value=10>10</option>
+                                <option value=20>20</option>
+                                <option value=50>50</option>
+                                <option value=100>100</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="group relative">
