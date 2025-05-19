@@ -6,6 +6,11 @@
         [ngClass]="{ '!block': isShowMailMenu }">
 
         <!-- PANEL IZQUIERDO -->
+        <div class="flex justify-end xl:hidden mb-2">
+            <button (click)="isShowMailMenu = false" class="p-2 hover:text-primary">
+                <icon-menu class="w-5 h-5" />
+            </button>
+        </div>
 
         <div class="flex h-full flex-col">
 
@@ -45,23 +50,6 @@
                                     <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                         <icon-trash-lines />
                                     </button>
-
-                                    <!-- <div hlMenu class="dropdown">
-                                        <button type="button" hlMenuButton>
-                                            <icon-horizontal-dots class="rotate-90 opacity-70" />
-                                        </button>
-                                        <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
-                                            <li>
-                                                <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                    (click)="openModalCompra('EDIT', data)">Editar</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                    (click)="openSwalEliminar(data)">Eliminar</a>
-                                            </li>
-                                        </ul>
-                                    </div> -->
-
                                 </td>
                             </tr>
                             }
@@ -461,7 +449,7 @@
                         <input type="text" class="form-control w-full" formControlName="percepcionRG3337" />
                     </div>
                     <div>
-                        <label class="block font-medium">Total</label>
+                        <label class="block font-medium">Total compra</label>
                         <input type="text" class="form-control w-full" formControlName="total" />
                     </div>
                     <div>
@@ -513,9 +501,9 @@
                                 <tr>
                                     <th class="px-2 py-1">Fecha</th>
                                     <th class="px-2 py-1">Método</th>
-                                    <th class="px-2 py-1">Importe</th>
                                     <th class="px-2 py-1">Detalles</th>
                                     <th class="px-2 py-1">Moneda</th>
+                                    <th class="px-2 py-1">Importe</th>
                                     <th class="px-2 py-1">Tipo de cambio</th>
                                     <th class="px-2 py-1">
                                         Acciones
@@ -527,9 +515,9 @@
                                 <tr>
                                     <td class="border px-2 py-1">{{ data.payments_datetime | date:'yyyy-MM-dd' }}</td>
                                     <td class="border px-2 py-1">{{ data.payments_method }}</td>
-                                    <td class="border px-2 py-1"> {{ data.amount }} </td>
                                     <td class="border px-2 py-1">{{ data.detail }}</td>
                                     <td class="border px-2 py-1">{{ data.currency.name }}</td>
+                                    <td class="border px-2 py-1"> {{ data.amount }} </td>
                                     <td class="border px-2 py-1">{{ data.exchange_rate }}</td>
                                     <td class="border px-2 py-1">
                                         <div class="flex items-center">
@@ -549,6 +537,12 @@
                                     </td>
                                 </tr>
                                 }
+                                <!-- Fila de total -->
+                                <tr class="font-semibold bg-gray-50">
+                                    <td class="border px-2 py-1 text-right" colspan="4">Total pagos ($)</td>
+                                    <td class="border px-2 py-1">{{ calcularTotalImporte() }}</td>
+                                    <td class="border px-2 py-1" colspan="2"></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -557,7 +551,7 @@
                 <div
                     class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
                     <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee
-                            productos</strong></span>
+                            pagos</strong></span>
                 </div>
                 }
             </fieldset>

@@ -203,6 +203,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  goToBottom() {
+
+  }
+
   ngOnInit(): void {
     this.spinner.show();
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
@@ -1617,6 +1621,18 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.isSubmitPago = false;
     this.inEdicionPago = false;
     this.modalPago.close();
+  }
+
+  calcularTotalImporte() {
+    let suma = 0;
+    this.pagos.forEach(element => {
+      if (element.currency.name === 'Pesos') {
+        suma = suma + (+element.amount);
+      } else {
+        suma = suma + (+element.amount * +element.exchange_rate);
+      }
+    });
+    return suma;
   }
 
 }

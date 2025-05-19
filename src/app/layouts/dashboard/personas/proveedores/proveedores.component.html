@@ -9,7 +9,11 @@
             <!-- PANEL IZQUIERDO -->
 
             <div class="flex h-full flex-col">
-
+                <div class="flex justify-end xl:hidden mb-2">
+                    <button (click)="isShowMailMenu = false" class="p-2 hover:text-primary">
+                        <icon-menu class="w-5 h-5" />
+                    </button>
+                </div>
                 <div class="flex items-center justify-between text-md mb-3">
                     <button type="button" class="hover:text-primary" (click)="openModalNuevoProveedor()"
                         [disabled]="isEdicion" [ngClass]="{'text-gray-400 cursor-not-allowed': isEdicion}">
