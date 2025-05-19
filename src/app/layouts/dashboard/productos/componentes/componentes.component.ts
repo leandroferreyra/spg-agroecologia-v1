@@ -543,6 +543,12 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     return data.child_product?.comments.length > 32 ? data.child_product?.comments.slice(0, 32 - 2) + '…' : data.child_product?.comments;
   }
 
+  getTippyComments(data: any) {
+    if (!data.child_product?.comments) return null;
+    return data.child_product?.comments;
+  }
+
+
   isProductoCompuesto() {
     return this.producto.product_type?.product_compound === 1;
   }

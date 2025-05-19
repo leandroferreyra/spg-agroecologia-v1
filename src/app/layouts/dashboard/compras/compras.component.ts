@@ -489,7 +489,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getPagosWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.pagos = res.data;
-          console.log(this.pagos);
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -1530,7 +1529,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._pagoService.savePago(pago).subscribe({
             next: res => {
-              console.log(res);
               this.obtenerCompraPorId(this.selectedCompra);
               this.cerrarModalPago();
               this.tokenService.setToken(res.token);
@@ -1547,7 +1545,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._pagoService.editPago(this.pagoForm.get('pago_uuid')?.value, pago).subscribe({
             next: res => {
-              console.log(res);
               this.obtenerCompraPorId(this.selectedCompra);
               this.cerrarModalPago();
               this.tokenService.setToken(res.token);
@@ -1593,16 +1590,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._pagoService.deletePago(pago.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          // let productos = this.selectedCompra.transaction.transaction_products;
-          // const index = productos.findIndex((p: any) => p.uuid === producto.uuid);
-          // if (index !== -1) {
-          //   productos.splice(index, 1);
-          // }
-          // this.obtenerCompraPorId(this.selectedCompra);
-          // this.tokenService.setToken(res.token);
-          // this.spinner.hide();
-
-          // console.log(res);
           this.obtenerCompraPorId(this.selectedCompra);
           this.cerrarModalPago();
           this.tokenService.setToken(res.token);

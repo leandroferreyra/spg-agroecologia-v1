@@ -129,11 +129,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         });
     }
 
-    // navigateTo(route: string) {
-    //     if (route) {
-    //         this.router.navigate([`dashboard/${route}`])
-    //     }
-    // }
     navigateTo(route: string, event: MouseEvent) {
         if (route) {
             const urlTree = this.router.createUrlTree([`/dashboard/${route}`]);
@@ -147,7 +142,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
             }
         }
     }
-
 
     openModalCambiarRol() {
         this.modalCambioRol.options = this.modalOptions;

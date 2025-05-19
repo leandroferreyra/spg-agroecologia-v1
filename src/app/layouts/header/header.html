@@ -4,10 +4,6 @@
             <a class="main-logo flex shrink-0 items-center">
                 <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="/assets/images/ladie-logo.png" alt=""
                     style="height: 20px; width: 125px;" />
-                <!-- <span
-                    class="hidden align-middle text-2xl font-semibold transition-all duration-300 dark:text-white-light md:inline ltr:ml-1.5 rtl:mr-1.5">
-                    
-                </span> -->
             </a>
 
             <a href="javascript:;"
@@ -28,25 +24,20 @@
             <div class="dropdown shrink-0">
                 <div hlMenu class="!block">
                     <button type="button" hlMenuButton class="group relative block">
-                        <!-- <img class="h-9 w-9 rounded-full object-cover saturate-50 group-hover:saturate-100"
-                            src="/assets/images/user-profile.jpeg" alt="" />
-                            <i class="fa-regular fa-user"></i> -->
                         <icon-user class="h-6 w-6" />
-                        <!-- <fa-icon [icon]="iconUser" class="input-group-text" style="cursor: pointer;"></fa-icon> -->
                     </button>
                     <ul *hlMenuItems @toggleAnimation
                         class="top-11 w-[230px] !py-0 font-semibold text-dark dark:text-white-dark dark:text-white-light/90 ltr:right-0 rtl:left-0">
                         <li>
                             <div class="flex items-center px-4 py-4">
                                 <div class="flex-none">
-                                    <!-- <img class="h-10 w-10 rounded-md object-cover"
-                                        src="/assets/images/user-profile.jpeg" alt="" /> -->
                                 </div>
                                 <div class="truncate ltr:pl-4 rtl:pr-4">
                                     <h4 class="text-base">
                                         {{usuarioLogueado.user_name}}
                                     </h4>
-                                    <a class="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
+                                    <a
+                                        class="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
                                         {{usuarioLogueado.email}}
                                     </a>
                                 </div>
@@ -161,8 +152,6 @@
     </ngx-custom-modal>
 </div>
 
-
-
 <div>
     <ngx-custom-modal #modalCambioClave class="modal-top animate animate-fade-in">
         <ng-template #modalHeader>
@@ -227,7 +216,3 @@
         </ng-template>
     </ngx-custom-modal>
 </div>
-<!-- 
-<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
-    <p style="font-size: 20px; color: white">Cargando</p>
-</ngx-spinner> -->

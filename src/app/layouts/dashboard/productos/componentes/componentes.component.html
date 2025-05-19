@@ -45,7 +45,7 @@
                 data.uuid) {
                 <tr>
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
-                    (click)="goToProduct(data.child_product)"> {{ data.child_product.name}}</td>
+                        (click)="goToProduct(data.child_product)"> {{ data.child_product.name}}</td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
                     <td>
@@ -159,7 +159,7 @@
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
-                    <td class="whitespace-nowrap" [ngxTippy]="data.child_product?.comments"> {{ getComments(data)}}
+                    <td class="whitespace-nowrap" [ngxTippy]="getTippyComments(data)"> {{ getComments(data)}}
                     </td>
                     <td>
                         <div class="flex items-center">
@@ -250,9 +250,6 @@
         </ng-template>
     </ngx-custom-modal>
 </div>
-
-
-
 
 <!-- MODAL COMPONENTE -->
 <div>

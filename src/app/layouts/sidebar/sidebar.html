@@ -4,12 +4,10 @@
         <div class="h-full bg-white dark:bg-[#0e1726]">
             <div class="flex items-center justify-between px-4 py-3">
                 <a routerLink="/" class="main-logo flex shrink-0 items-center">
-                    <img class="ml-[5px] w-8 flex-none" src="/assets/images/ladie-logo.png" alt="" style="height: 20px; width: 120px;" />
-                    <!-- <span
-                        class="align-middle text-2xl font-semibold dark:text-white-light lg:inline ltr:ml-1.5 rtl:mr-1.5">LADIE</span> -->
+                    <img class="ml-[5px] w-8 flex-none" src="/assets/images/ladie-logo.png" alt=""
+                        style="height: 20px; width: 120px;" />
                 </a>
-                <a
-                    class="collapse-icon flex h-8 w-8 items-center rounded-full transition duration-300 hover:bg-gray-500/10 hover:text-primary dark:text-white-light dark:hover:bg-dark-light/10 rtl:rotate-180"
+                <a class="collapse-icon flex h-8 w-8 items-center rounded-full transition duration-300 hover:bg-gray-500/10 hover:text-primary dark:text-white-light dark:hover:bg-dark-light/10 rtl:rotate-180"
                     (click)="storeData.dispatch({ type: 'toggleSidebar'})">
                     <icon-carets-down class="m-auto rotate-90" />
                 </a>
@@ -22,10 +20,8 @@
                     <li class="accordion menu nav-item">
                         <button type="button" class="nav-link group w-full"
                             [ngClass]="{ active: isIncludedInActive(menu.label) }"
-                            (click)="toggleAccordion(menu.label)">
+                            (click)="menu.submenu?.length > 0 ? toggleAccordion(menu.label) : navigateTo(menu.route)">
                             <div class="flex items-center">
-                                <!-- <icon-menu-dashboard class="shrink-0 group-hover:!text-primary" /> -->
-
                                 <span
                                     class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
                                     {{ menu.label }}
@@ -36,8 +32,9 @@
                             </div>
                         </button>
 
+                        @if(menu.submenu?.length > 0) {
+
                         <div [@slideDownUp]="!activeDropdown.includes(menu.label)" class="accordion-content">
-                            @if(menu.submenu?.length > 0) {
                             <ul class="sub-menu text-gray-500">
                                 @for(sub of menu.submenu; track sub) {
                                 <li>
@@ -45,8 +42,11 @@
                                 </li>
                                 }
                             </ul>
-                            }
+
                         </div>
+
+                        }
+
                     </li>
                     }
 
