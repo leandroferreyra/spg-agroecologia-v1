@@ -320,8 +320,9 @@
                         </button>
                     </span>
 
-                    <button type="button" (click)="toggleProductos()" class="text-sm text-blue-600 hover:underline">
-                        {{ mostrarProductos ? 'Ocultar' : 'Mostrar' }}
+                    <button type="button" (click)="toggleProductos()" class="text-sm hover:underline"
+                        style="color:#000000a3" [ngxTippy]="getMostrarOcultarTooltip()">
+                        <fa-icon [icon]="mostrarProductos ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
                     </button>
                 </legend>
 

@@ -361,6 +361,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return this.selectedCompra?.qualification_option?.description;
   }
 
+  getMostrarOcultarTooltip() {
+    return this.mostrarProductos ? 'Ocultar' : 'Mostrar';
+  }
+
   getCuit() {
     if (this.selectedCompra) {
       if (this.isPersonaFisica()) {
