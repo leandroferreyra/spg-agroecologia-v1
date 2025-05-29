@@ -18,12 +18,15 @@ import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 
 @Component({
   selector: 'app-componentes',
   standalone: true,
   imports: [CommonModule, NgbPaginationModule, NgxSpinnerModule, NgxTippyModule, NgxCustomModalComponent, FormsModule, ReactiveFormsModule,
-    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, IconCircleCheckComponent],
+    NgSelectModule, IconTrashLinesComponent, IconPencilComponent, IconSearchComponent, IconPlusComponent, IconCircleCheckComponent, FontAwesomeModule],
   templateUrl: './componentes.component.html',
   styleUrl: './componentes.component.css'
 })
@@ -76,8 +79,13 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   componenteProceso: any[] = [];
 
   placeholderCantidad: string = '';
+  // placeholderOrden: string = '';
 
   procesoActivo: any;
+
+  // Iconos
+  iconArrowUp = faArrowUp;
+  iconArrowDown = faArrowDown;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private _componenteService: ComponentesService) {
@@ -114,6 +122,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          console.log("🚀 ~ ComponentesComponent ~ this._indexService.getComponentesWithParam ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.obtenerCatalogos();
@@ -185,6 +194,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
+    console.log("🚀 ~ ComponentesComponent ~ modificarPaginacion ~ this.total_rows:", this.total_rows)
     this.last_page = res.meta.last_page;
     if (this.componentes.length <= this.itemsPerPage) {
       if (res.meta?.current_page === res.meta?.last_page) {
@@ -228,6 +238,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           nombreCompleto: this.bindName(proveedor)
         }));
         this.productos = res.productos.data;
+        console.log("🚀 ~ ComponentesComponent ~ obtenerCatalogos ~ this.productos:", this.productos)
         this.productos = this.productos.map(p => ({
           ...p,
           disabled: this.disableProducto(p) // Solo deshabilita el que coincide
@@ -246,18 +257,21 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this.componenteForm = new FormGroup({
         child_product_uuid: new FormControl(null, Validators.required),
         quantity: new FormControl({ value: null, disabled: true }, Validators.required),
-        supplier_uuid: new FormControl(null, [])
+        supplier_uuid: new FormControl(null, []),
+        orden: new FormControl(null, [])
       });
     } else {
       this.isEdicion = true;
       this.tituloModal = 'Edición componente';
       this.placeholderCantidad = 'Cantidad en ' + dato.child_product.measure?.name;
+      // this.placeholderOrden = 'Ingrese un número entre 1 y ' + this.componentes.length;
       this.componenteForm = new FormGroup({
         uuid: new FormControl(dato.uuid),
         parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
         child_product_uuid: new FormControl(dato.child_product?.uuid, []),
         quantity: new FormControl(this.mostrarCantidad(dato), Validators.required),
-        supplier_uuid: new FormControl(dato.supplier?.uuid, [])
+        supplier_uuid: new FormControl(dato.supplier?.uuid, []),
+        orden: new FormControl(dato.order, [])
       });
     }
     this.onFormChange();
@@ -290,41 +304,46 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   confirmarComponente() {
     this.isSubmit = true;
     if (this.componenteForm.valid) {
-      this.spinner.show();
       let componente = new ComponenteDTO();
       this.armarDTOComponente(componente);
-      if (!this.isEdicion) {
-        this.subscription.add(
-          this._componenteService.saveComponente(componente).subscribe({
-            next: res => {
-              this.spinner.hide();
-              this.obtenerComponentes();
-              this.cerrarModal();
-            },
-            error: error => {
-              this.spinner.hide();
-              this._swalService.toastError('top-right', error.error.message)
-              console.error(error);
-            }
-          })
-        )
+      if (this.isValidOrden(componente.order)) {
+        this.spinner.show();
+        if (!this.isEdicion) {
+          componente['product->parent_product_uuid'] = this.producto.uuid;
+          this.subscription.add(
+            this._componenteService.saveComponente(componente).subscribe({
+              next: res => {
+                this.spinner.hide();
+                this.obtenerComponentes();
+                this.cerrarModal();
+              },
+              error: error => {
+                this.spinner.hide();
+                this._swalService.toastError('top-right', error.error.message)
+                console.error(error);
+              }
+            })
+          )
+        } else {
+          this.subscription.add(
+            this._componenteService.editComponente(this.componenteForm.get('uuid')?.value, componente).subscribe({
+              next: res => {
+                this.obtenerComponentes();
+                this.isEdicion = false;
+                this.cerrarModal();
+                this._swalService.toastSuccess('top-right', "Usuario actualizado.");
+                this.spinner.hide();
+              },
+              error: error => {
+                this.spinner.hide();
+                this._swalService.toastError('top-right', error.error.message);
+                console.error(error);
+              }
+            })
+          )
+        }
       } else {
-        this.subscription.add(
-          this._componenteService.editComponente(this.componenteForm.get('uuid')?.value, componente).subscribe({
-            next: res => {
-              this.obtenerComponentes();
-              this.isEdicion = false;
-              this.cerrarModal();
-              this._swalService.toastSuccess('top-right', "Usuario actualizado.");
-              this.spinner.hide();
-            },
-            error: error => {
-              this.spinner.hide();
-              this._swalService.toastError('top-right', error.error.message);
-              console.error(error);
-            }
-          })
-        )
+        this._swalService.toastError('top-right', 'El orden es inválido');
       }
     }
   }
@@ -332,8 +351,8 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     componente.actual_role = this.rol;
     componente.with = ["childProduct", "childProduct.productType", "childProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
     componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value;
-    componente['product->parent_product_uuid'] = this.producto.uuid;
     componente.quantity = this.componenteForm.get('quantity')?.value;
+    componente.order = this.componenteForm.get('orden')?.value;
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
     if (!this.isEdicion) {
       this.cleanObject(componente);
@@ -349,6 +368,12 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         delete obj[key]; // Eliminar propiedades nulas o undefined
       }
     });
+  }
+
+  isValidOrden(order: number): boolean {
+    const max = this.isEdicion ? this.total_rows : this.total_rows + 1;
+    const valor = +order;
+    return valor >= 1 && valor <= max;
   }
 
   openSwalEliminar(componente: any) {
@@ -487,13 +512,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     }
   }
 
-  // isProcesoActual() {
-  //   if (this.componenteProceso.length > 0) {
-  //     return this.procesoActivo === this.componenteProceso[0].child_product?.uuid;
-  //   }
-  //   return false;
-  // }
-
   openSwalEliminarProcesoActivo() {
     Swal.fire({
       title: '',
@@ -556,5 +574,61 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   goToProduct(data: any) {
     this.eventProducto.emit(data);
   }
+
+
+  getGlobalIndex(index: number): number {
+    return (this.currentPage - 1) * this.itemsPerPage + index;
+  }
+
+  esPrimerElementoGlobal(index: number): boolean {
+    return this.getGlobalIndex(index) === 0;
+  }
+
+  esUltimoElementoGlobal(index: number): boolean {
+    return this.getGlobalIndex(index) === this.total_rows - 1;
+  }
+
+  moverArriba(data: any): void {
+    let componente = new ComponenteDTO();
+    componente.actual_role = this.rol;
+    componente.with = ["childProduct", "childProduct.productType", "childProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
+    componente.order = data.order - 1;
+    this.subscription.add(
+      this._componenteService.editComponente(data.uuid, componente).subscribe({
+        next: res => {
+          this.obtenerComponentes();
+          this._swalService.toastSuccess('top-right', "Usuario actualizado.");
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
+  }
+
+  moverAbajo(data: any): void {
+    let componente = new ComponenteDTO();
+    componente.actual_role = this.rol;
+    componente.with = ["childProduct", "childProduct.productType", "childProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
+    componente.order = data.order + 1;
+    this.subscription.add(
+      this._componenteService.editComponente(data.uuid, componente).subscribe({
+        next: res => {
+          this.obtenerComponentes();
+          this._swalService.toastSuccess('top-right', "Usuario actualizado.");
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
+  }
+
 
 }
