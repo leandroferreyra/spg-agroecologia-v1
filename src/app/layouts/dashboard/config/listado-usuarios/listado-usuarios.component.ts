@@ -274,12 +274,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.userService.eliminarUsuario(user.uuid, this.actual_role).subscribe({
         next: res => {
-          this.usuarios = this.usuarios.filter(u => u.uuid !== user.uuid);
-          this.usuariosFiltrados = this.usuarios;
-          this.itemsInPage -= 1;
-          if (this.itemsInPage > this.itemsPerPage * this.currentPage) {
-            this.itemsInPage = this.itemsPerPage * this.currentPage;
-          }
+          this.obtenerUsuarios();
           this.swalService.toastSuccess('top-right', res.message)
           this.spinner.hide();
           this.tokenService.setToken(res.token);
