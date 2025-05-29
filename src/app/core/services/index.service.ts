@@ -42,6 +42,9 @@ export class IndexService {
   apiStocks = '/stocks';
   apiPagos = '/payments';
 
+  apiUsuarios = '/users';
+
+
   constructor(private http: HttpClient) { }
 
   getNewParams(paramsObj: any, rol?: string): HttpParams {
@@ -224,6 +227,12 @@ export class IndexService {
   getClientesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+
+  getUsuariosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiUsuarios, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
 

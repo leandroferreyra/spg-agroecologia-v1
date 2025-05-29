@@ -1,170 +1,159 @@
-<div>
-    <div class="panel mt-6 pb-0">
-        <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
-            <h5 class="text-lg font-semibold dark:text-white-light">Usuarios
-            </h5>
-            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
-                <icon-search />
-            </button>
-        </div>
+<div class="panel mt-6 pb-0">
 
-        <div class="row mb-4">
-            <div class="col-lg-12">
-                <div class="text-center">
-                    <div class="form-check form-check-inline">
-                        <label class="inline-flex" for="radioTodos">
-                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
-                                id="radioTodos" value="ALL_ROLES" [(ngModel)]="selectedRol" (change)="filteredItems()">
-                            <span style="cursor: pointer;">Todos</span>
-                        </label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <label class="inline-flex" for="radioAdministracion">
-                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
-                                id="radioAdministracion" value="ADMINISTRACION" [(ngModel)]="selectedRol"
-                                (change)="filteredItems()">
-                            <span style="cursor: pointer;">Administración</span>
-                        </label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <label class="inline-flex" for="radioProduccion">
-                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
-                                id="radioProduccion" value="PRODUCCION" [(ngModel)]="selectedRol"
-                                (change)="filteredItems()">
-                            <span style="cursor: pointer;">Producción</span>
-                        </label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <label class="inline-flex" for="radioAdmins">
-                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
-                                id="radioAdmins" value="ADMIN" [(ngModel)]="selectedRol" (change)="filteredItems()">
-                            <span style="cursor: pointer;">Admin</span>
-                        </label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <label class="inline-flex" for="radioUsuario">
-                            <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
-                                id="radioUsuario" value="USUARIO" [(ngModel)]="selectedRol" (change)="filteredItems()">
-                            <span style="cursor: pointer;">Usuario</span>
-                        </label>
-                    </div>
+    <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-center">
+        <h5 class="text-lg font-semibold dark:text-white-light">Usuarios
+        </h5>
+        <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+            <icon-search />
+        </button>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="text-center">
+                <div class="form-check form-check-inline">
+                    <label class="inline-flex" for="radioTodos">
+                        <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault" id="radioTodos"
+                            value="" [(ngModel)]="filtros['roles.name'].value" (change)="obtenerUsuarios()">
+                        <span style="cursor: pointer;">Todos</span>
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <label class="inline-flex" for="radioAdministracion">
+                        <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
+                            id="radioAdministracion" value="ADMINISTRACION" [(ngModel)]="filtros['roles.name'].value"
+                            (change)="obtenerUsuarios()">
+                        <span style="cursor: pointer;">Administración</span>
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <label class="inline-flex" for="radioProduccion">
+                        <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
+                            id="radioProduccion" value="PRODUCCION" [(ngModel)]="filtros['roles.name'].value"
+                            (change)="obtenerUsuarios()">
+                        <span style="cursor: pointer;">Producción</span>
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <label class="inline-flex" for="radioAdmins">
+                        <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault" id="radioAdmins"
+                            value="ADMIN" [(ngModel)]="filtros['roles.name'].value" (change)="obtenerUsuarios()">
+                        <span style="cursor: pointer;">Admin</span>
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <label class="inline-flex" for="radioUsuario">
+                        <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault" id="radioUsuario"
+                            value="USUARIO" [(ngModel)]="filtros['roles.name'].value" (change)="obtenerUsuarios()">
+                        <span style="cursor: pointer;">Usuario</span>
+                    </label>
                 </div>
             </div>
         </div>
+    </div>
 
-
-        <div class="row mb-2">
-            <div class="col-6">
-                <span *ngIf="usuarios && usuarios.length > 0" class="float-md-start color-gris">
-                    Página: {{ currentPage}}/{{numPages.pageCount }}
-                </span>
-            </div>
-            <div class="col-6" style="text-align: right;">
-                <span *ngIf="usuarios && usuarios.length > 0" class="float-md-end color-gris">
-                    Ítems: {{itemsInPage}}/{{ filtrarDatos().length }}
-                </span>
-            </div>
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="usuarios && usuarios.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{last_page }}
+            </span>
         </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="usuarios && usuarios.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
 
-        <div class="table-responsive">
-            <table class="table-hover">
-                <thead>
-                    <tr>
-                        <th>Nombre completo</th>
-                        <th>Email</th>
-                        <th>Verificado</th>
-                        <th>Roles</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (showFilter) {
-                    <tr>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.name" />
-                        </td>
-                        <td>
-                            <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.email" />
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    }
-                    @for(data of filtrarDatos() | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
-                    <tr>
-                        <td class="whitespace-nowrap">{{ data.human.firstname}} {{ data.human.lastname}} </td>
-                        <td> {{data.email}} </td>
-                        <td>
-                            <div class="form-check form-check-inline">
-                                <label class="form-check-label">
-                                    <input class="form-checkbox" type="checkbox" [checked]="isVerified(data)"
-                                        [id]="'checkbox' + data.uuid"
-                                        (click)="openSwalCambiarEstadoUsuario(data, 'checkbox' + data.uuid)">
-                                    <span class="form-check-sign"></span>
-                                </label>
-                            </div>
-                        </td>
-                        <td>
-                            {{data.roles | arrayToString:'name' }}
-                            <button type="button" ngxTippy="Administrar roles" (click)="openModalRoles(data)">
-                                <icon-pencil />
-                            </button>
-                        </td>
-                        <td>
-                            <div class="flex items-center">
-                                <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ver información"
-                                        (click)="openModalUsuarioView(data)">
-                                        <icon-info-circle />
-                                    </button>
-                                </div>
-                                <div>
-                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)"
-                                        [disabled]="data.email === usuarioLogueado.email">
-                                        <icon-trash-lines />
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="row mt-4">
-                <div class="col">
-                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="filtrarDatos().length || 0"
-                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="onPageChange(currentPage)" />
-                </div>
-
-                <div class="col">
-                    <div class="row align-items-center float-md-end">
-                        <div class="col-auto">
-                            <label for="paginacion">Ítems por página:</label>
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>Nombre completo</th>
+                    <th>Email</th>
+                    <th>Verificado</th>
+                    <th>Roles</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (showFilter) {
+                <tr>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" #filtroSimple
+                            (input)="obtenerUsuariosPorNombre(filtroSimple.value)" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.email.value"
+                            (input)="obtenerUsuarios()" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                }
+                @for(data of usuarios | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.human.firstname}} {{ data.human.lastname}} </td>
+                    <td> {{data.email}} </td>
+                    <td>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input class="form-checkbox" type="checkbox" [checked]="isVerified(data)"
+                                    [id]="'checkbox' + data.uuid"
+                                    (click)="openSwalCambiarEstadoUsuario(data, 'checkbox' + data.uuid)">
+                                <span class="form-check-sign"></span>
+                            </label>
                         </div>
-                        <div class="col-auto">
-                            <select id="paginacion" class="form-control" (change)="cambiarPaginacion();"
-                                [(ngModel)]="itemsPerPage">
-                                <option value=5>5</option>
-                                <option value=10>10</option>
-                                <option value=20>20</option>
-                                <option value=50>50</option>
-                                <option value=100>100</option>
-                            </select>
+                    </td>
+                    <td>
+                        {{data.roles | arrayToString:'name' }}
+                        <button type="button" ngxTippy="Administrar roles" (click)="openModalRoles(data)">
+                            <icon-pencil />
+                        </button>
+                    </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ver información"
+                                    (click)="openModalUsuarioView(data)">
+                                    <icon-info-circle />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)"
+                                    [disabled]="data.email === usuarioLogueado.email">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
 
+
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerUsuarios()" />
+            </div>
+
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerUsuarios()">
+                </ng-select>
             </div>
         </div>
-
 
 
     </div>
-</div>
 
+
+</div>
 
 <div>
     <ngx-custom-modal #modalUsuarioView class="modal-top extra-large-modal animate animate-fade-in">
