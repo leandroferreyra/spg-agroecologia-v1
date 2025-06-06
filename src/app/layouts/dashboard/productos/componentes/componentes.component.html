@@ -173,7 +173,7 @@
                     </td>
 
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
-                        (click)="goToProduct(data.child_product)"> {{ data.child_product.name}}</td>
+                        (click)="goToProduct($event, data.child_product)"> {{ data.child_product.name}}</td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>

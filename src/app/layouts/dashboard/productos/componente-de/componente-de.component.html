@@ -3,7 +3,8 @@
     @if (componentes.length === 0) {
     <div
         class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
-        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> El producto no es componente de ningún otro producto</strong></span>
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> El producto no es componente de ningún otro
+                producto</strong></span>
     </div>
     } @else {
     <div class="row mb-2">
@@ -64,7 +65,7 @@
                 <tr>
                     <td class="whitespace-nowrap">{{ index+1}} </td>
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
-                    (click)="goToProduct(data.parent_product)"> {{ data.parent_product.name}}</td>
+                        (click)="goToProduct($event, data.parent_product)"> {{ data.parent_product.name}}</td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
                     <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>

@@ -41,7 +41,7 @@ import { StocksComponent } from './stocks/stocks.component';
 import { ComprasProductoComponent } from './compras-producto/compras-producto.component';
 import { VinculosComponent } from './vinculos/vinculos.component';
 import { Location } from '@angular/common';
-import { ActivatedRoute, Route } from '@angular/router';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 import { producerIncrementEpoch } from '@angular/core/primitives/signals';
 import { error } from 'console';
 
@@ -133,7 +133,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute
+    private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router
   ) {
     this.initStore();
   }
@@ -161,7 +161,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       this.uuidFromUrl = params.get('uuid') ?? '';
-      console.log("🚀 ~ ProductosComponent ~ ngOnInit ~ this.uuidFromUrl:", this.uuidFromUrl)
     });
     this.spinner.show();
     this.obtenerProductos();
@@ -589,20 +588,25 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.obtenerProductos();
   }
 
-  irAlProducto(event: any) {
-    this.productoAnterior.push(this.selectedProducto);
-    /* if (this.productoAnterior.length > 0 && this.productoAnterior[this.productoAnterior.length - 1].uuid !== event.uuid) {
-      this.productoAnterior = [];
+  irAlProducto(data: { data: any, event: MouseEvent }) {
+    if (data.event.ctrlKey || data.event.metaKey) {
+      const baseUrl = window.location.origin + window.location.pathname;
+      const url = this.router.serializeUrl(
+        this.router.createUrlTree([`/dashboard/productos/${data.data.uuid}`])
+      );
+      window.open(`${baseUrl}#${url}`, '_blank');
     } else {
       this.productoAnterior.push(this.selectedProducto);
-    } */
-    this.inicializarFormEdit(event);
-    this.tab1 = 'datos-generales';
+      this.location.replaceState(`/dashboard/productos/${data.data.uuid}`);
+      this.inicializarFormEdit(data.data);
+      this.tab1 = 'datos-generales';
+    }
   }
 
   volverAlProductoAnterior() {
-    this.inicializarFormEdit(this.productoAnterior.pop());
-    //this.productoAnterior = null;
+    let p = this.productoAnterior.pop();
+    this.location.replaceState(`/dashboard/productos/${p.uuid}`);
+    this.inicializarFormEdit(p);
     this.tab1 = 'datos-generales';
   }
 

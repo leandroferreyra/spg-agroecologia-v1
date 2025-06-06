@@ -125,8 +125,8 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
     }
   }
 
-  goToProduct(data: any) {
-    this.eventProducto.emit(data);
+  goToProduct(event: MouseEvent, data: any) {
+    this.eventProducto.emit({ data, event });
   }
 
 }

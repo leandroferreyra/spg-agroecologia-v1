@@ -683,8 +683,8 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     return this.producto.product_type?.product_compound === 1;
   }
 
-  goToProduct(data: any) {
-    this.eventProducto.emit(data);
+  goToProduct(event: MouseEvent, data: any) {
+    this.eventProducto.emit({ data, event });
   }
 
 
