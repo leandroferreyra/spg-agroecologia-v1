@@ -386,26 +386,20 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.componenteForm.get('orden')!.valueChanges.subscribe(
-      (value) => {
+    this.componenteForm.get('orden')!.valueChanges.subscribe((value) => {
+      const esValorValido = value && value !== 0 && value <= this.componentes.length;
+
+      this.showWarningOrden = esValorValido;
+
+      if (esValorValido) {
+        this.showWarningComponent = this.componentes[value - 1].child_product?.name;
+      } else {
+        this.showWarningComponent = '';
         if (this.isEdicion) {
-          if (value && value !== 0 && value <= this.componentes.length) {
-            this.showWarningOrden = true;
-            this.showWarningComponent = this.componentes[value - 1].child_product?.name;
-          } else {
-            this.showWarningOrden = false;
-            this.componenteForm.get('orden')?.setErrors({ invalid: true })
-          }
-        } else {
-          if (value && value !== 0 && value <= this.componentes.length) {
-            this.showWarningOrden = true;
-            this.showWarningComponent = this.componentes[value - 1].child_product?.name;
-          } else {
-            this.showWarningOrden = false;
-            this.showWarningComponent = '';
-          }
+          this.componenteForm.get('orden')?.setErrors({ invalid: true });
         }
-      });
+      }
+    });
   }
 
 
