@@ -315,11 +315,21 @@
                                 <label>Orden</label>
                                 <input type="text" class="form-control" formControlName="orden">
                                 @if (showWarningOrden) {
+                                @if (isEdicion) {
                                 <div
                                     class="flex items-center p-3.5 rounded text-info bg-info-light dark:bg-warning-dark-light mt-2">
-                                    <span class="ltr:pr-2 rtl:pl-2">Vas a intercambiar posición con el componente:
+                                    <span class="ltr:pr-2 rtl:pl-2">Vas a intercambiar posición con el componente
                                         {{showWarningComponent}}</span>
-                                </div> }
+                                </div>
+                                } @else {
+                                <div
+                                    class="flex items-center p-3.5 rounded text-info bg-info-light dark:bg-warning-dark-light mt-2">
+                                    <span class="ltr:pr-2 rtl:pl-2">Vas a insertar el nuevo componente antes de
+                                        {{showWarningComponent}}</span>
+                                </div>
+                                }
+                                }
+
                             </div>
 
                             <div class="row mt-2">

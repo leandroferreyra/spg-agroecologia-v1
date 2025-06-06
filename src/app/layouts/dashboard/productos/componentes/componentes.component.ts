@@ -396,6 +396,14 @@ export class ComponentesComponent implements OnInit, OnDestroy {
             this.showWarningOrden = false;
             this.componenteForm.get('orden')?.setErrors({ invalid: true })
           }
+        } else {
+          if (value && value !== 0 && value <= this.componentes.length) {
+            this.showWarningOrden = true;
+            this.showWarningComponent = this.componentes[value - 1].child_product?.name;
+          } else {
+            this.showWarningOrden = false;
+            this.showWarningComponent = '';
+          }
         }
       });
   }
