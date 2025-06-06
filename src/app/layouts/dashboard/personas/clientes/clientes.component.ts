@@ -204,6 +204,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
             this.swalService.toastSuccess('center', 'No existen clientes.');
             this.isTabDisabled = true;
             this.tab1 = 'datos-generales';
+            this.selectedCliente = null;
           } else {
             this.isTabDisabled = false;
           }

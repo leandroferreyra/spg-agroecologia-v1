@@ -239,6 +239,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
             this.swalService.toastSuccess('center', 'No existen compras.');
             this.isTabDisabled = true;
             this.tab1 = 'datos-generales';
+            this.selectedCompra = null;
           } else {
             this.isTabDisabled = false;
           }
@@ -543,7 +544,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   showDataCompra(compra: any) {
-    if (this.selectedCompra && this.selectedCompra.uuid !== compra.uuid) {
+    if (this.compras.length == 0 || this.selectedCompra && this.selectedCompra.uuid !== compra.uuid) {
       this.isEdicion = false;
       this.obtenerCompraPorId(compra);
     }
