@@ -128,9 +128,9 @@
                 @if(productos.length > 0 && selectedProducto) {
                 {{selectedProducto.name}}
                 }
-                @if(productoAnterior) {
+                @if(productoAnterior.length > 0) {
                 <a class="text-sm text-blue-600 hover:underline cursor-pointer" (click)="volverAlProductoAnterior()">
-                    ( Volver al producto {{productoAnterior.name}} )
+                    ( Volver al producto {{productoAnterior[productoAnterior.length - 1]?.name}} )
                 </a>
                 }
             </h5>

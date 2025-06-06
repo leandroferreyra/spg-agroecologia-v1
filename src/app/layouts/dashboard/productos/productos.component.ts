@@ -67,7 +67,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   actual_role: string = '';
   productos: any[] = [];
   selectedProducto: any;
-  productoAnterior: any;
+  productoAnterior: any[] = [];
   productoForm!: FormGroup;
   newProductoForm!: FormGroup;
 
@@ -377,7 +377,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any) {
-    this.productoAnterior = null;
+    this.productoAnterior = [];
     this.isEdicion = false;
     this.location.replaceState(`/dashboard/productos/${producto.uuid}`);
     this.inicializarFormEdit(producto);
@@ -590,18 +590,19 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   irAlProducto(event: any) {
-    if (this.productoAnterior && this.productoAnterior.uuid !== event.uuid) {
-      this.productoAnterior = null;
+    this.productoAnterior.push(this.selectedProducto);
+    /* if (this.productoAnterior.length > 0 && this.productoAnterior[this.productoAnterior.length - 1].uuid !== event.uuid) {
+      this.productoAnterior = [];
     } else {
-      this.productoAnterior = this.selectedProducto;
-    }
+      this.productoAnterior.push(this.selectedProducto);
+    } */
     this.inicializarFormEdit(event);
     this.tab1 = 'datos-generales';
   }
 
   volverAlProductoAnterior() {
-    this.inicializarFormEdit(this.productoAnterior);
-    this.productoAnterior = null;
+    this.inicializarFormEdit(this.productoAnterior.pop());
+    //this.productoAnterior = null;
     this.tab1 = 'datos-generales';
   }
 
