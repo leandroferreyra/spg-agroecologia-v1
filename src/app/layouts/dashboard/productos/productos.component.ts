@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, provideImageKitLoader } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -40,6 +40,10 @@ import { ProveedoresProductoComponent } from './proveedores-producto/proveedores
 import { StocksComponent } from './stocks/stocks.component';
 import { ComprasProductoComponent } from './compras-producto/compras-producto.component';
 import { VinculosComponent } from './vinculos/vinculos.component';
+import { Location } from '@angular/common';
+import { ActivatedRoute, Route } from '@angular/router';
+import { producerIncrementEpoch } from '@angular/core/primitives/signals';
+import { error } from 'console';
 
 @Component({
   selector: 'app-productos',
@@ -124,9 +128,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
   tipoProductos: any[] = [];
   measures: any[] = [];
 
+  uuidFromUrl: string = '';
+  isLoadingProductos: boolean = true;
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService) {
+    private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute
+  ) {
     this.initStore();
   }
 
@@ -151,6 +159,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      this.uuidFromUrl = params.get('uuid') ?? '';
+      console.log("🚀 ~ ProductosComponent ~ ngOnInit ~ this.uuidFromUrl:", this.uuidFromUrl)
+    });
     this.spinner.show();
     this.obtenerProductos();
     this.obtenerCatalogos();
@@ -172,20 +184,26 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.productos = res.data;
-          if (this.productos.length === 0) {
-            this.swalService.toastSuccess('center', 'No existen productos.');
-            this.isTabDisabled = true;
-            this.tab1 = 'datos-generales';
-            this.selectedProducto = null;
-          } else {
-            this.isTabDisabled = false;
-          }
-          if (!alta && this.productos.length > 0) {
-            this.isEdicion = false;
-            this.inicializarFormEdit(this.productos[0]);
-          }
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
+          if (this.uuidFromUrl) {
+            this.showProductByUuid();
+          } else {
+            this.isLoadingProductos = false;
+            if (this.productos.length === 0) {
+              this.swalService.toastSuccess('center', 'No existen productos.');
+              this.isTabDisabled = true;
+              this.tab1 = 'datos-generales';
+              this.selectedProducto = null;
+            } else {
+              this.isTabDisabled = false;
+            }
+            if (!alta && this.productos.length > 0) {
+              this.isEdicion = false;
+              this.inicializarFormEdit(this.productos[0]);
+              this.location.replaceState(`/dashboard/productos/${this.productos[0].uuid}`);
+            }
+          }
           this.spinner.hide();
         },
         error: error => {
@@ -205,6 +223,22 @@ export class ProductosComponent implements OnInit, OnDestroy {
         this.itemsInPage = this.currentPage * this.itemsPerPage;
       }
     }
+  }
+
+  showProductByUuid() {
+    this.subscription.add(
+      this._productoService.showProduct(this.uuidFromUrl, this.actual_role).subscribe({
+        next: res => {
+          this.showDataProducto(res.data);
+          this.isLoadingProductos = false;
+          this.tokenService.setToken(res.token);
+        },
+        error: error => {
+          // this.isLoadingProductos = false;
+          console.error(error);
+        }
+      })
+    )
   }
 
   obtenerCatalogos() {
@@ -345,6 +379,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   showDataProducto(producto: any) {
     this.productoAnterior = null;
     this.isEdicion = false;
+    this.location.replaceState(`/dashboard/productos/${producto.uuid}`);
     this.inicializarFormEdit(producto);
   }
 

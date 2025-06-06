@@ -31,4 +31,17 @@ export class ProductoService {
     return this.http.delete<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, { headers, params });
   }
 
+  showProduct(uuid: string, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .append('actual_role', rol)
+      .append('with[]', "productType")
+      .append('with[]', "productCategory")
+      .append('with[]', "productStates")
+      .append('with[]', "measure")
+      .append('with[]', "country")
+      .append('with[]', "stocks");
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, { headers, params });
+  }
+
 }

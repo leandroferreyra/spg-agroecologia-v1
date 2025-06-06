@@ -216,7 +216,7 @@
 
             <div class="flex-1 text-sm">
                 <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
-                    @if (productos.length > 0) {
+                    @if (productos.length > 0 && !isLoadingProductos) {
                     <form [formGroup]="productoForm" class="p-4">
                         <div class="flex flex-col sm:flex-row">
                             <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
