@@ -122,7 +122,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._indexService.getComponentesWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          console.log("🚀 ~ ComponentesComponent ~ this._indexService.getComponentesWithParam ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.obtenerCatalogos();
@@ -132,7 +131,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           this._swalService.toastError('top-right', error.error.message);
           console.error(error);
           this.spinner.hide();
-        }
+        }   
       })
     )
   }
@@ -194,7 +193,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
-    console.log("🚀 ~ ComponentesComponent ~ modificarPaginacion ~ this.total_rows:", this.total_rows)
     this.last_page = res.meta.last_page;
     if (this.componentes.length <= this.itemsPerPage) {
       if (res.meta?.current_page === res.meta?.last_page) {
@@ -238,7 +236,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           nombreCompleto: this.bindName(proveedor)
         }));
         this.productos = res.productos.data;
-        console.log("🚀 ~ ComponentesComponent ~ obtenerCatalogos ~ this.productos:", this.productos)
         this.productos = this.productos.map(p => ({
           ...p,
           disabled: this.disableProducto(p) // Solo deshabilita el que coincide

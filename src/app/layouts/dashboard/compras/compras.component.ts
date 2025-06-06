@@ -153,6 +153,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   ubicaciones: any[] = [];
   pagos: any[] = [];
   monedas: any[] = [];
+  metodosDePago: string[] = ['Efectivo', 'Transferencia Bancaria', 'Tarjeta de Crédito', 'Tarjeta de Débito', 'PayPal', 'Mercado Pago', 'Otro'];
 
   breadcrumb: any[] = [];
   ultimaUbicacion: any = null;
@@ -232,6 +233,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
+          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
+
           if (this.compras.length === 0) {
             this.swalService.toastSuccess('center', 'No existen compras.');
             this.isTabDisabled = true;
@@ -671,10 +674,24 @@ export class ComprasComponent implements OnInit, OnDestroy {
       payments_method: new FormControl({ value: data ? data.payments_method : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
-      currency_uuid: new FormControl({ value: data ? data.currency.uuid : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      currency_uuid: new FormControl({ value: data ? data.currency.name : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
     });
+    this.onChangePagoForm();
   }
+  onChangePagoForm() {
+    this.pagoForm.get('currency_uuid')!.valueChanges.subscribe(
+      (value: any) => {
+        if (value.name === 'Pesos') {
+          this.pagoForm.get('exchange_rate')?.setValue(1);
+          this.pagoForm.get('exchange_rate')?.disable();
+        } else {
+          this.pagoForm.get('exchange_rate')?.setValue(null);
+          this.pagoForm.get('exchange_rate')?.enable();
+        }
+      });
+  }
+
 
   getParentsFromLocation(ubicacion: any) {
     this.subscription.add(
@@ -1087,6 +1104,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   isControlRealizado(data: any) {
     return (data.control_result == 1);
+  }
+
+  showPrecioTotal(data: any) {
+    return (data.quantity * data.unit_price).toFixed(2);
   }
 
   confirmarAltaProducto() {
@@ -1520,7 +1541,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       pago.actual_role = this.actual_role;
       pago.payments_datetime = this.pagoForm.get('payments_datetime')?.value;
       pago.amount = this.pagoForm.get('amount')?.value;
-      pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value;
+      pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;
       pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
       pago.payments_method = this.pagoForm.get('payments_method')?.value;
@@ -1619,7 +1640,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         suma = suma + (+element.amount * +element.exchange_rate);
       }
     });
-    return suma;
+    return suma.toFixed(2);
   }
 
 }

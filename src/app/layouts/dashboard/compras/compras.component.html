@@ -345,7 +345,7 @@
                                     <td class="border px-2 py-1"> {{ showCantidad(data)}} </td>
                                     <td class="border px-2 py-1">{{ data.unit_price }}</td>
                                     <td class="border px-2 py-1">{{ data.product.vat_percent }}</td>
-                                    <td class="border px-2 py-1">{{ data.quantity * data.unit_price }}</td>
+                                    <td class="border px-2 py-1">{{ showPrecioTotal(data) }}</td>
                                     <td class="border px-2 py-1">
                                         <div class="flex items-center gap-2 mt-2">
                                             <label class="w-12 h-6 relative">
@@ -1066,12 +1066,21 @@
                                             }" class="form-input" formControlName="payments_datetime" />
                         </div>
 
-                        <div (keydown.enter)="confirmarPago()"
+                        <!-- <div (keydown.enter)="confirmarPago()"
                             [ngClass]="isSubmitPago ? pagoForm.controls['payments_method'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="payments_method">Método de pago</label>
                             <input id="payments_method" type="text" class="form-control"
                                 formControlName="payments_method" />
+                        </div> -->
+
+                        <div>
+                            <label>Moneda</label>
+                            <ng-select [items]="metodosDePago" bindLabel="name" bindValue="name" clearAllText="Limpiar"
+                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay métodos de pago"
+                                class="w-1/3 min-w-[200px]" formControlName="payments_method" [selectOnTab]="true"
+                                [ngClass]="isSubmitPago ? pagoForm.controls['payments_method'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
+
 
                         <div (keydown.enter)="confirmarPago()"
                             [ngClass]="isSubmitPago ? pagoForm.controls['amount'].errors ? 'has-error' : 'has-success' : ''">
@@ -1087,7 +1096,7 @@
 
                         <div>
                             <label>Moneda</label>
-                            <ng-select [items]="monedas" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                            <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay monedas"
                                 class="w-1/3 min-w-[200px]" formControlName="currency_uuid" [selectOnTab]="true"
                                 [ngClass]="isSubmitPago ? pagoForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
