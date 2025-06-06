@@ -6,7 +6,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { forkJoin, Subscription } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, finalize, forkJoin, map, Observable, of, startWith, Subject, Subscription, switchMap, take, tap } from 'rxjs';
 import { ComponenteDTO } from 'src/app/core/models/request/componenteDTO';
 import { ComponentesService } from 'src/app/core/services/componentes.service';
 import { IndexService } from 'src/app/core/services/index.service';
@@ -74,8 +74,12 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   // Catalogos
   proveedores: any[] = [];
-  productos: any[] = [];
-  procesos: any[] = [];
+  prods: any[] = [];
+
+  productoInput$ = new Subject<string>();
+  productos$!: Observable<any[]>;
+  loadingProductos = false; procesos: any[] = [];
+
   componenteProceso: any[] = [];
 
   placeholderCantidad: string = '';
@@ -230,7 +234,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
     forkJoin({
       proveedores: this._indexService.getProveedores(this.rol),
-      productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid)
+      // productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid)
     }).subscribe({
       next: res => {
         this.proveedores = res.proveedores.data;
@@ -238,17 +242,107 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           ...proveedor,
           nombreCompleto: this.bindName(proveedor)
         }));
-        this.productos = res.productos.data;
-        this.productos = this.productos.map(p => ({
-          ...p,
-          disabled: this.disableProducto(p) // Solo deshabilita el que coincide
-        }));
+        // this.prods = res.productos.data;
+
+        // this.prods = this.prods.map(p => ({
+        //   ...p,
+        //   disabled: this.disableProducto(p) // Solo deshabilita el que coincide
+        // }));
+        // console.log("🚀 ~ ComponentesComponent ~ obtenerCatalogos ~ this.prods:", this.prods)
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
       }
     });
   }
+
+  obtenerProductos() {
+    const params: any = {};
+    params.with = ["productType", "measure"];
+    params.paging = 20;
+    params.page = null;
+    params.order_by = {};
+    params.filters = {};
+
+    this.productos$ = this.productoInput$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => this.loadingProductos = true),
+      switchMap((term: string) => {
+        if (!term || term.trim().length < 2) {
+          this.loadingProductos = false;
+          return of([]);
+        }
+
+        params.filters = {
+          'name': { value: term, op: 'LIKE', contiene: true },
+        };
+
+        return this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid).pipe(
+          map((res: any) => res.data),
+          map((productos: any[]) =>
+            productos.map(p => ({
+              ...p,
+              disabled: this.disableProducto(p)
+            }))
+          ),
+          finalize(() => this.loadingProductos = false)
+        );
+      })
+    );
+  }
+
+
+  obtenerProductosParaEdicion(dato: any) {
+    const productoActual = dato.child_product;
+
+    // Sobrescribimos el observable productos$ para inyectar el producto actual
+    const params: any = {
+      with: ['productType', 'measure'],
+      paging: 20,
+      page: null,
+      order_by: {}
+    };
+
+    this.productos$ = this.productoInput$.pipe(
+      startWith(''),
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => this.loadingProductos = true), // <- activamos loading justo antes del switch
+
+      switchMap((term: string) => {
+        if (!term || term.trim().length < 2) {
+          // Si no hay término de búsqueda, devolvemos solo el producto actual
+          return of([productoActual]);
+        }
+
+        params.filters = {
+          name: { value: term, op: 'LIKE', contiene: true }
+        };
+
+        return this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid).pipe(
+          map((res: any) => res.data),
+          map((productos: any[]) =>
+            productos.map(p => ({
+              ...p,
+              disabled: this.disableProducto(p)
+            }))
+          ),
+          map((productos: any[]) => {
+            const existe = productos.some(p => p.uuid === productoActual.uuid);
+            return existe ? productos : [productoActual, ...productos];
+          }),
+        );
+      }),
+      tap(() => this.loadingProductos = false), // <- apagamos loading luego del fetch
+      catchError(err => {
+        this.loadingProductos = false;
+        return of([productoActual]); // fallback en caso de error
+      })
+    );
+  }
+
+
 
   openModalComponente(type: string, dato?: any) {
     if (type === 'NEW') {
@@ -260,19 +354,20 @@ export class ComponentesComponent implements OnInit, OnDestroy {
         supplier_uuid: new FormControl(null, []),
         orden: new FormControl(null, [])
       });
+      this.obtenerProductos();
     } else {
       this.isEdicion = true;
       this.tituloModal = 'Edición componente';
       this.placeholderCantidad = 'Cantidad en ' + dato.child_product.measure?.name;
-      // this.placeholderOrden = 'Ingrese un número entre 1 y ' + this.componentes.length;
       this.componenteForm = new FormGroup({
         uuid: new FormControl(dato.uuid),
         parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
-        child_product_uuid: new FormControl(dato.child_product?.uuid, []),
+        child_product_uuid: new FormControl(dato.child_product, []),
         quantity: new FormControl(this.mostrarCantidad(dato), Validators.required),
         supplier_uuid: new FormControl(dato.supplier?.uuid, []),
         orden: new FormControl(dato.order, [])
       });
+      this.obtenerProductosParaEdicion(dato);
     }
     this.onFormChange();
     this.modalComponente.options = this.modalOptions;
@@ -280,29 +375,31 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   onFormChange() {
-    this.componenteForm.get('child_product_uuid')!.valueChanges.subscribe(
-      (value) => {
-        if (value) {
-          let producto = this.productos.find(p => p.uuid === value);
-          this.componenteForm.get('quantity')?.enable();
-          this.componenteForm.get('quantity')?.setValue('');
-          this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
-        } else {
-          this.componenteForm.get('quantity')?.disable();
-          this.placeholderCantidad = '';
-        }
-      });
+    this.componenteForm.get('child_product_uuid')!.valueChanges.subscribe((producto) => {
+      if (producto) {
+        this.componenteForm.get('quantity')?.enable();
+        this.componenteForm.get('quantity')?.setValue('');
+        this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
+      } else {
+        this.componenteForm.get('quantity')?.disable();
+        this.placeholderCantidad = '';
+      }
+    });
 
-    this.componenteForm.get('orden')!.valueChanges.subscribe(
-      (value) => {
-        if (value && value !== 0 && value <= this.componentes.length) {
-          this.showWarningOrden = true;
-          this.showWarningComponent = this.componentes[value - 1].child_product?.name;
-        } else {
-          this.showWarningOrden = false;
-          this.componenteForm.get('orden')?.setErrors({ invalid: true })
+    this.componenteForm.get('orden')!.valueChanges.subscribe((value) => {
+      const esValorValido = value && value !== 0 && value <= this.componentes.length;
+
+      this.showWarningOrden = esValorValido;
+
+      if (esValorValido) {
+        this.showWarningComponent = this.componentes[value - 1].child_product?.name;
+      } else {
+        this.showWarningComponent = '';
+        if (this.isEdicion) {
+          this.componenteForm.get('orden')?.setErrors({ invalid: true });
         }
-      });
+      }
+    });
   }
 
 
@@ -362,7 +459,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   armarDTOComponente(componente: ComponenteDTO) {
     componente.actual_role = this.rol;
     componente.with = ["childProduct", "childProduct.productType", "childProduct.measure", "supplier.person.human", "supplier.person.legalEntity"];
-    componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value;
+    componente['product->child_product_uuid'] = this.componenteForm.get('child_product_uuid')?.value.uuid;
     componente.quantity = this.componenteForm.get('quantity')?.value;
     componente.order = this.componenteForm.get('orden')?.value;
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
@@ -383,9 +480,12 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   isValidOrden(order: number): boolean {
-    const max = this.isEdicion ? this.total_rows : this.total_rows + 1;
-    const valor = +order;
-    return valor >= 1 && valor <= max;
+    if (order) {
+      const max = this.isEdicion ? this.total_rows : this.total_rows + 1;
+      const valor = +order;
+      return valor >= 1 && valor <= max;
+    }
+    return true;
   }
 
   openSwalEliminar(componente: any) {

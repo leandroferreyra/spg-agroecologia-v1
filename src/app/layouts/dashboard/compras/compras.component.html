@@ -1066,15 +1066,8 @@
                                             }" class="form-input" formControlName="payments_datetime" />
                         </div>
 
-                        <!-- <div (keydown.enter)="confirmarPago()"
-                            [ngClass]="isSubmitPago ? pagoForm.controls['payments_method'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="payments_method">Método de pago</label>
-                            <input id="payments_method" type="text" class="form-control"
-                                formControlName="payments_method" />
-                        </div> -->
-
                         <div>
-                            <label>Moneda</label>
+                            <label>Método de pago</label>
                             <ng-select [items]="metodosDePago" bindLabel="name" bindValue="name" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay métodos de pago"
                                 class="w-1/3 min-w-[200px]" formControlName="payments_method" [selectOnTab]="true"
