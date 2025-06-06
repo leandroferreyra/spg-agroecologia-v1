@@ -110,8 +110,8 @@
                             Orden
                         </span>
                     </th>
-                    <th></th>
-                    <th></th>
+                    <th class="px-1"></th>
+                    <th class="px-1"></th>
                     <th style="cursor: pointer;">
                         <span style="display: inline-flex; align-items: center; gap: 10px;">
                             Componente
@@ -156,7 +156,7 @@
                         }">
 
                     <td class="whitespace-nowrap"> {{data.order}} </td>
-                    <td class="whitespace-nowrap">
+                    <td class="whitespace-nowrap px-1">
                         <!-- Flecha abajo: solo si NO es el último elemento -->
                         <button *ngIf="!esUltimoElementoGlobal(index)" (click)="moverAbajo(data)"
                             class="text-gray-500 hover:text-blue-600" type="button" ngxTippy="Mover abajo">
@@ -164,7 +164,7 @@
                         </button>
                     </td>
 
-                    <td class="whitespace-nowrap">
+                    <td class="whitespace-nowrap px-1">
                         <!-- Flecha arriba: solo si NO es el primer elemento -->
                         <button *ngIf="!esPrimerElementoGlobal(index)" (click)="moverArriba(data)"
                             class="text-gray-500 hover:text-blue-600" type="button" ngxTippy="Mover arriba">
