@@ -6,7 +6,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Subscription, forkJoin } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, distinctUntilChanged, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { ComponenteDTO } from 'src/app/core/models/request/componenteDTO';
 import { ReemplazoDTO } from 'src/app/core/models/request/reemplazoDTO';
 import { ComponentesService } from 'src/app/core/services/componentes.service';
@@ -79,6 +79,10 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
   procesoActivo: any;
   isEdicionProceso: boolean = false;
 
+  productoInput$ = new Subject<string>();
+  productos$!: Observable<any[]>;
+  loadingProductos = false;
+
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private _reemplazoService: ReemplazoService) {
   }
@@ -96,7 +100,6 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['product_uuid'].value = this.producto.uuid;
       this.obtenerReemplazos();
-      // this.obtenerCatalogos();
     }
   }
 
@@ -115,7 +118,7 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
           this.reemplazos = res.data;
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
-          this.obtenerCatalogos();
+          this.obtenerProductosPosibles();
           this.spinner.hide();
         },
         error: error => {
@@ -139,34 +142,69 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
     }
   }
 
-
-  obtenerCatalogos() {
-    // Inicializamos un objeto vacío para los parámetros
+  obtenerProductosPosibles() {
     const params: any = {};
     params.with = ["productType", "measure"];
-    params.paging = null;
+    params.paging = 20;
     params.page = null;
     params.order_by = {};
-    params.filters = {
-      'uuid': { value: this.producto.uuid, op: '!=', contiene: false },
-    };
+    params.filters = {};
 
-    forkJoin({
-      productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid),
-    }).subscribe({
-      next: res => {
-        this.productos = res.productos.data;
-        this.productos = this.productos.map(p => ({
-          ...p,
-          disabled: this.disableProducto(p) // Solo deshabilita el que coincide
-        }));
+    this.productos$ = this.productoInput$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => this.loadingProductos = true),
+      switchMap((term: string) => {
+        if (!term || term.trim().length < 2) {
+          this.loadingProductos = false;
+          return of([]);
+        }
 
-      },
-      error: error => {
-        console.error('Error cargando catalogos:', error);
-      }
-    });
+        params.filters = {
+          'uuid': { value: this.producto.uuid, op: '!=', contiene: false },
+        };
+
+        return this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid).pipe(
+          map((res: any) => res.data),
+          map((productos: any[]) =>
+            productos.map(p => ({
+              ...p,
+              disabled: this.disableProducto(p)
+            }))
+          ),
+          finalize(() => this.loadingProductos = false)
+        );
+      })
+    );
   }
+
+
+  // obtenerCatalogos() {
+  //   const params: any = {};
+  //   params.with = ["productType", "measure"];
+  //   params.paging = null;
+  //   params.page = null;
+  //   params.order_by = {};
+  //   params.filters = {
+  //     'uuid': { value: this.producto.uuid, op: '!=', contiene: false },
+  //   };
+
+  //   forkJoin({
+  //     productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid),
+  //   }).subscribe({
+  //     next: res => {
+  //       this.productos = res.productos.data;
+  //       this.productos = this.productos.map(p => ({
+  //         ...p,
+  //         disabled: this.disableProducto(p) // Solo deshabilita el que coincide
+  //       }));
+
+  //     },
+  //     error: error => {
+  //       console.error('Error cargando catalogos:', error);
+  //     }
+  //   });
+  // }
 
   disableProducto = (item: any): boolean => {
     return (item.uuid === this.producto.uuid) || this.esComponente(item);
@@ -316,8 +354,8 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
     )
   }
 
-  goToProduct(data: any) {
-    this.eventProducto.emit(data);
+  goToProduct(event: MouseEvent, data: any) {
+    this.eventProducto.emit({ data, event });
   }
 
 }

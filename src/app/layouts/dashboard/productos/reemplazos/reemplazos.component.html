@@ -57,9 +57,8 @@
                 {
                 <tr>
                     <td class="whitespace-nowrap">{{ index+1}} </td>
-                    <!-- <td class="whitespace-nowrap">{{ data.replacement.name }} </td> -->
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
-                        (click)="goToProduct(data.replacement)"> {{ data.replacement.name}}</td>
+                        (click)="goToProduct($event, data.replacement)"> {{ data.replacement.name}}</td>
                     <td class="whitespace-nowrap">$ {{ data.unit_price }} </td>
                     <td>
                         <div class="flex items-center">
@@ -122,15 +121,24 @@
                     <div class="col-md-12">
                         <form [formGroup]="reemplazoForm" (keydown.enter)="confirmarReemplazo()">
 
-                            <div class="mb-2">
+                            <!-- <div class="mb-2">
                                 <label>Productos</label>
                                 <ng-select [items]="productos" bindLabel="name" bindValue="uuid"
                                     notFoundText="No hay productos" formControlName="replacement_uuid"
                                     [virtualScroll]="true" [appendTo]="'body'"
                                     [ngClass]="isSubmit ? reemplazoForm.controls['replacement_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
-                            </div>
+                            </div> -->
 
+                            <div class="mb-2">
+                                <label>Productos</label>
+                                <ng-select [items]="productos$ | async" bindLabel="name" bindValue="uuid" [typeahead]="productoInput$"
+                                    [loading]="loadingProductos" [virtualScroll]="true"
+                                    typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
+                                    placeholder="Buscar producto..." formControlName="replacement_uuid"
+                                    [ngClass]="isSubmit ? reemplazoForm.controls['replacement_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
 
                             <div class="row mt-2">
                                 <div class="col-12 d-flex justify-content-center">
