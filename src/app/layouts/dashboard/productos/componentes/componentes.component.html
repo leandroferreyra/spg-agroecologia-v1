@@ -110,6 +110,8 @@
                             Orden
                         </span>
                     </th>
+                    <th></th>
+                    <th></th>
                     <th style="cursor: pointer;">
                         <span style="display: inline-flex; align-items: center; gap: 10px;">
                             Componente
@@ -152,28 +154,23 @@
                           'tr-assign-serial': data.child_product.assign_serial_number === 1,
                           'tr-has-serial': data.child_product.has_serial_number === 1
                         }">
-                    <!-- <td class="whitespace-nowrap">{{ data.order}} </td> -->
 
-
+                    <td class="whitespace-nowrap"> {{data.order}} </td>
                     <td class="whitespace-nowrap">
-                        <div class="flex items-center space-x-1">
-                            <!-- Flecha abajo: solo si NO es el último elemento -->
-                            <button *ngIf="!esUltimoElementoGlobal(index)" (click)="moverAbajo(data)"
-                                class="text-gray-500 hover:text-blue-600" type="button" ngxTippy="Mover abajo">
-                                <fa-icon [icon]="iconArrowDown"></fa-icon>
-                            </button>
-
-                            <span>{{ data.order }}</span>
-                            <!-- Flecha arriba: solo si NO es el primer elemento -->
-                            <button *ngIf="!esPrimerElementoGlobal(index)" (click)="moverArriba(data)"
-                                class="text-gray-500 hover:text-blue-600" type="button" ngxTippy="Mover arriba">
-                                <fa-icon [icon]="iconArrowUp"></fa-icon>
-                            </button>
-
-                        </div>
+                        <!-- Flecha abajo: solo si NO es el último elemento -->
+                        <button *ngIf="!esUltimoElementoGlobal(index)" (click)="moverAbajo(data)"
+                            class="text-gray-500 hover:text-blue-600" type="button" ngxTippy="Mover abajo">
+                            <fa-icon [icon]="iconArrowDown"></fa-icon>
+                        </button>
                     </td>
 
-
+                    <td class="whitespace-nowrap">
+                        <!-- Flecha arriba: solo si NO es el primer elemento -->
+                        <button *ngIf="!esPrimerElementoGlobal(index)" (click)="moverArriba(data)"
+                            class="text-gray-500 hover:text-blue-600" type="button" ngxTippy="Mover arriba">
+                            <fa-icon [icon]="iconArrowUp"></fa-icon>
+                        </button>
+                    </td>
 
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
                         (click)="goToProduct(data.child_product)"> {{ data.child_product.name}}</td>
@@ -316,6 +313,12 @@
                                 [ngClass]="isSubmit ? componenteForm.controls['orden'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Orden</label>
                                 <input type="text" class="form-control" formControlName="orden">
+                                @if (showWarningOrden) {
+                                <div
+                                    class="flex items-center p-3.5 rounded text-info bg-info-light dark:bg-warning-dark-light mt-2">
+                                    <span class="ltr:pr-2 rtl:pl-2">Vas a intercambiar posición con el componente:
+                                        {{showWarningComponent}}</span>
+                                </div> }
                             </div>
 
                             <div class="row mt-2">

@@ -87,6 +87,9 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
+  showWarningOrden: boolean = false;
+  showWarningComponent: string = '';
+
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private _componenteService: ComponentesService) {
   }
@@ -131,7 +134,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           this._swalService.toastError('top-right', error.error.message);
           console.error(error);
           this.spinner.hide();
-        }   
+        }
       })
     )
   }
@@ -289,12 +292,24 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           this.placeholderCantidad = '';
         }
       });
+
+    this.componenteForm.get('orden')!.valueChanges.subscribe(
+      (value) => {
+        if (value && value !== 0 && value <= this.componentes.length) {
+          this.showWarningOrden = true;
+          this.showWarningComponent = this.componentes[value - 1].child_product?.name;
+        } else {
+          this.showWarningOrden = false;
+          this.componenteForm.get('orden')?.setErrors({ invalid: true })
+        }
+      });
   }
 
 
   cerrarModal() {
     this.isSubmit = false;
     this.placeholderCantidad = '';
+    this.showWarningOrden = false;
     this.modalComponente.close();
   }
 
@@ -594,7 +609,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._componenteService.editComponente(data.uuid, componente).subscribe({
         next: res => {
           this.obtenerComponentes();
-          this._swalService.toastSuccess('top-right', "Usuario actualizado.");
+          this._swalService.toastSuccess('top-right', "Componente actualizado.");
           this.spinner.hide();
         },
         error: error => {
@@ -615,7 +630,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this._componenteService.editComponente(data.uuid, componente).subscribe({
         next: res => {
           this.obtenerComponentes();
-          this._swalService.toastSuccess('top-right', "Usuario actualizado.");
+          this._swalService.toastSuccess('top-right', "Componente actualizado.");
           this.spinner.hide();
         },
         error: error => {
