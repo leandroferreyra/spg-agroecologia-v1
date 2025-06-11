@@ -39,11 +39,10 @@ import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { format } from 'date-fns';
 import { UbicacionesService } from 'src/app/core/services/ubicaciones.service';
-import { StocksService } from 'src/app/core/services/stocks.service';
-import { StockDTO } from 'src/app/core/models/request/stockDTO';
+import { Location } from '@angular/common';
 import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
 import { PagosService } from 'src/app/core/services/pagos.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-compras',
@@ -176,12 +175,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
   iconEye = faEye;
   iconEyeSlash = faEyeSlash;
 
+  uuidFromUrl: string = '';
+  isLoadingCompras: boolean = true;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
-    private _ubicacionService: UbicacionesService, private _pagoService: PagosService, private router: Router) {
+    private _ubicacionService: UbicacionesService, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
+    private router: Router) {
     this.initStore();
   }
 
@@ -205,19 +207,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  irAlProducto(event: MouseEvent, data: any) {
-    const baseUrl = window.location.origin + window.location.pathname;
-    const url = this.router.serializeUrl(
-      this.router.createUrlTree([`/dashboard/productos/${data.uuid}`])
-    );
-    if (event.ctrlKey || event.metaKey) {
-      window.open(`${baseUrl}#${url}`, '_blank');
-    } else {
-      this.router.navigate([`/dashboard/productos/${data.uuid}`])
-    }
-  }
-
   ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      this.uuidFromUrl = params.get('uuid') ?? '';
+    });
     this.spinner.show();
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.obtenerCompras();
@@ -242,22 +235,25 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
-          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
-
-          if (this.compras.length === 0) {
-            this.swalService.toastSuccess('center', 'No existen compras.');
-            this.isTabDisabled = true;
-            this.tab1 = 'datos-generales';
-            this.selectedCompra = null;
-          } else {
-            this.isTabDisabled = false;
-          }
-          if (!alta && this.compras.length > 0) {
-            this.isEdicion = false;
-            this.obtenerCompraPorId(this.compras[0]);
-          }
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
+          if (this.uuidFromUrl) {
+            this.obtenerCompraPorId(this.uuidFromUrl);
+          } else {
+            if (this.compras.length === 0) {
+              this.swalService.toastSuccess('center', 'No existen compras.');
+              this.isTabDisabled = true;
+              this.tab1 = 'datos-generales';
+              this.selectedCompra = null;
+            } else {
+              this.isTabDisabled = false;
+            }
+            if (!alta && this.compras.length > 0) {
+              this.isEdicion = false;
+              this.obtenerCompraPorId(this.compras[0].uuid);
+              this.location.replaceState(`/dashboard/compras/${this.compras[0].uuid}`);
+            }
+          }
           this.spinner.hide();
         },
         error: error => {
@@ -279,14 +275,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
   }
 
-  obtenerCompraPorId(compra: any) {
+  obtenerCompraPorId(uuid: any) {
     this.spinner.show();
     this.subscription.add(
-      this._comprasService.getCompraById(compra.uuid, this.actual_role).subscribe({
+      this._comprasService.getCompraById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedCompra = res.data;
           this.obtenerPagos(this.selectedCompra?.transaction?.uuid);
           this.inicializarFormEdit();
+          this.location.replaceState(`/dashboard/compras/${this.selectedCompra.uuid}`);
           this.spinner.hide();
         },
         error: error => {
@@ -555,7 +552,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   showDataCompra(compra: any) {
     if (this.compras.length == 0 || this.selectedCompra && this.selectedCompra.uuid !== compra.uuid) {
       this.isEdicion = false;
-      this.obtenerCompraPorId(compra);
+      this.obtenerCompraPorId(compra.uuid);
     }
   }
 
@@ -625,7 +622,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.tab1 = 'datos-generales';
       this.isEdicion = true;
       this.tituloModal = 'Edición compra';
-      this.obtenerCompraPorId(compra);
+      this.obtenerCompraPorId(compra.uuid);
     }
   }
 
@@ -1146,7 +1143,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
               next: res => {
                 this.cerrarModalAltaProducto();
                 this.isSubmit = false;
-                this.obtenerCompraPorId(this.selectedCompra);
+                this.obtenerCompraPorId(this.selectedCompra.uuid);
                 this.tokenService.setToken(res.token);
                 this.breadcrumb = [];
                 this.spinner.hide();
@@ -1167,29 +1164,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
                 this.inEdicionProducto = false;
                 this.tokenService.setToken(res.token);
                 this.breadcrumb = [];
-                // if (this.selectedProducto && this.selectedProducto.product?.stocks[0]?.location?.uuid !== producto.location_uuid) {
-                //   // Cambió la locación por lo que se llama al endpoint correspondiente.
-                //   let stock_uuid = this.selectedProducto.product.stocks[0].uuid;
-                //   let stockDTO = new StockDTO();
-                //   stockDTO.actual_role = this.actual_role;
-                //   stockDTO.location_uuid = producto.location_uuid;
-                //   this.subscription.add(
-                //     this._stockService.editStock(stock_uuid, stockDTO).subscribe({
-                //       next: res => {
-                //         this.obtenerCompraPorId(this.selectedCompra);
-                //         this.spinner.hide();
-                //       },
-                //       error: error => {
-                //         console.error(error);
-                //         this.spinner.hide();
-                //         this.swalService.toastError('top-right', error.error.message);
-                //       }
-                //     })
-                //   )
-                // } else {
-                this.obtenerCompraPorId(this.selectedCompra);
+                this.obtenerCompraPorId(this.selectedCompra.uuid);
                 this.spinner.hide();
-                // }
               },
               error: error => {
                 this.swalService.toastError('top-right', error.error.message);
@@ -1248,7 +1224,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           if (index !== -1) {
             productos.splice(index, 1);
           }
-          this.obtenerCompraPorId(this.selectedCompra);
+          this.obtenerCompraPorId(this.selectedCompra.uuid);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -1560,7 +1536,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._pagoService.savePago(pago).subscribe({
             next: res => {
-              this.obtenerCompraPorId(this.selectedCompra);
+              this.obtenerCompraPorId(this.selectedCompra.uuid);
               this.cerrarModalPago();
               this.tokenService.setToken(res.token);
               this.spinner.hide();
@@ -1576,7 +1552,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._pagoService.editPago(this.pagoForm.get('pago_uuid')?.value, pago).subscribe({
             next: res => {
-              this.obtenerCompraPorId(this.selectedCompra);
+              this.obtenerCompraPorId(this.selectedCompra.uuid);
               this.cerrarModalPago();
               this.tokenService.setToken(res.token);
               this.spinner.hide();
@@ -1621,7 +1597,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._pagoService.deletePago(pago.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerCompraPorId(this.selectedCompra);
+          this.obtenerCompraPorId(this.selectedCompra.uuid);
           this.cerrarModalPago();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
@@ -1651,6 +1627,18 @@ export class ComprasComponent implements OnInit, OnDestroy {
       }
     });
     return suma.toFixed(2);
+  }
+
+  irAlProducto(event: MouseEvent, data: any) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree([`/dashboard/productos/${data.uuid}`])
+    );
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`${baseUrl}#${url}`, '_blank');
+    } else {
+      this.router.navigate([`/dashboard/productos/${data.uuid}`])
+    }
   }
 
 }

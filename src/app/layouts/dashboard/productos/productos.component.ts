@@ -14,7 +14,6 @@ import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription, forkJoin } from 'rxjs';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
-import { ProveedoresService } from 'src/app/core/services/proveedores.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { toggleAnimation } from 'src/app/shared/animations';

@@ -7,10 +7,8 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
-import { CompraProveedorDTO } from 'src/app/core/models/request/compraProveedorDTO';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons'; import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.service';
-import { CuentasProveedorService } from 'src/app/core/services/cuentasProveedor.service';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
@@ -18,13 +16,10 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
-import Swal from 'sweetalert2';
 import { IconClipboardTextComponent } from 'src/app/shared/icon/icon-clipboard-text';
 import { IconShoppingCartComponent } from 'src/app/shared/icon/icon-shopping-cart';
-import { trigger, state, style, transition, animate } from '@angular/animations';
 import { slideDownUp, toggleAnimation } from 'src/app/shared/animations';
-import { Paginador } from 'src/app/core/models/request/paginador';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-compras-proveedor',
@@ -73,10 +68,11 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
 
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
+  isLoadingCompras: boolean = true;
 
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _tokenService: TokenService) {
+    private _tokenService: TokenService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -116,7 +112,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
     params.filters = this.filtrosCompras;
-    // si existe this.filtrosCompras['transaction.transactionProducts.product.uuid']
     if (this.filtrosCompras['transaction.transactionProducts.product.uuid']) {
       params.distinct = 'true';
     }
@@ -127,7 +122,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
           this.compras = res.data;
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
-          // this.iniciarPaginadoresProductos();
           this.spinner.hide();
         },
         error: error => {
@@ -181,17 +175,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
     }
   }
 
-  // iniciarPaginadoresProductos() {
-  //   this.compras.forEach(compra => {
-  //     if (!this.paginadores[compra.uuid]) {
-  //       this.paginadores[compra.uuid] = new Paginador(compra.transaction?.transaction_products?.length);
-  //       if (this.paginadores[compra.uuid].totalItems <= this.paginadores[compra.uuid].itemsPerPage) {
-  //         this.paginadores[compra.uuid].itemsInPage = this.paginadores[compra.uuid].totalItems;
-  //       }
-  //     }
-  //   });
-  // }
-
   toggleFilter() {
     this.showFilterCompras = !this.showFilterCompras;
     if (!this.showFilterCompras) {
@@ -201,18 +184,6 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
       this.obtenerCompras();
     }
   }
-
-  // public onPageChange(uuid: string, pageNum: number): void {
-  //   if (this.paginadores[uuid]) {
-  //     this.paginadores[uuid].currentPage = pageNum;
-  //     // this.paginadores[uuid].itemsInPage = this.paginadores[uuid].itemsPerPage;
-  //     this.paginadores[uuid].pageSize = this.paginadores[uuid].itemsPerPage * (pageNum - 1);
-
-  //   }
-  // }
-  // cambiarPaginacion(uuid: string) {
-  //   this.onPageChange(uuid, 1);
-  // }
 
   toggleProductos(data: any) {
     this.productosExpandido[data.uuid] = !this.productosExpandido[data.uuid];
@@ -232,6 +203,18 @@ export class ComprasProveedorComponent implements OnInit, OnDestroy {
       delete this.filtrosCompras['transaction.transactionProducts.product.uuid'];
     }
     this.obtenerCompras();
+  }
+
+  irACompra(event: MouseEvent, data: any) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree([`/dashboard/compras/${data.uuid}`])
+    );
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`${baseUrl}#${url}`, '_blank');
+    } else {
+      this.router.navigate([`/dashboard/compras/${data.uuid}`])
+    }
   }
 
 }

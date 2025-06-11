@@ -43,6 +43,7 @@
         </div>
     </div>
 
+    
     <div class="table-responsive">
         <table class="table-hover">
             <thead>
@@ -82,7 +83,7 @@
                         data.transaction?.transaction_documents[0]?.document_number }} </td>
                     <!-- Que el total se muestre con 2 decimales -->
                     <td class="whitespace-nowrap"> {{ data.total | number:'1.2-2' }} </td>
-                    <td class="whitespace-nowrap"> {{ data.batch.batch_identification}} </td>
+                    <td class="whitespace-nowrap"> {{ data.batch?.batch_identification}} </td>
                     <td>
                         @if (productosExpandido[data.uuid]) {
                         <span class="badge badge-outline-info" (click)="toggleProductos(data)" style="cursor: pointer;">
@@ -93,6 +94,10 @@
                             Ver productos
                         </span>
                         }
+                        <span class="ml-2 badge badge-outline-info" (click)="irACompra($event, data)"
+                            style="cursor: pointer;">
+                            Ir a compra
+                        </span>
                     </td>
                 </tr>
 
@@ -163,6 +168,8 @@
 
         </div>
     </div>
+    
+
     }
 
 </div>

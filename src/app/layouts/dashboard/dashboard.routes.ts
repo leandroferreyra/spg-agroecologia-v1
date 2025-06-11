@@ -109,6 +109,11 @@ export const DASHBOARD_ROUTES: Routes = [
                 path: 'compras',
                 loadComponent: () => import('./compras/compras.component').then(m => m.ComprasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'] }
+            },
+            {
+                path: 'compras/:uuid',
+                loadComponent: () => import('./compras/compras.component').then(m => m.ComprasComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'] }
             }
 
         ]
