@@ -86,6 +86,11 @@ export const DASHBOARD_ROUTES: Routes = [
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'] }
             },
             {
+                path: 'proveedores/:uuid',
+                loadComponent: () => import('./personas/proveedores/proveedores.component').then(m => m.ProveedoresComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'] }
+            },
+            {
                 path: 'clientes',
                 loadComponent: () => import('./personas/clientes/clientes.component').then(m => m.ClientesComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'] }

@@ -43,6 +43,7 @@ import { StocksService } from 'src/app/core/services/stocks.service';
 import { StockDTO } from 'src/app/core/models/request/stockDTO';
 import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
 import { PagosService } from 'src/app/core/services/pagos.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-compras',
@@ -180,7 +181,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
-    private _ubicacionService: UbicacionesService, private _pagoService: PagosService) {
+    private _ubicacionService: UbicacionesService, private _pagoService: PagosService, private router: Router) {
     this.initStore();
   }
 
@@ -204,8 +205,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  goToBottom() {
-
+  irAlProducto(event: MouseEvent, data: any) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree([`/dashboard/productos/${data.uuid}`])
+    );
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`${baseUrl}#${url}`, '_blank');
+    } else {
+      this.router.navigate([`/dashboard/productos/${data.uuid}`])
+    }
   }
 
   ngOnInit(): void {

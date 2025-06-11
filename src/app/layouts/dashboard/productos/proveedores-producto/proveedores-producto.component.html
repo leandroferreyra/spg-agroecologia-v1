@@ -1,18 +1,5 @@
 <div class="panel pb-4">
 
-    <!-- <div class="row mb-2">
-        <div class="col-6">
-            <span *ngIf="proveedores && proveedores.length > 0" class="float-md-start color-gris">
-                Página: {{ currentPage}}/{{numPages.pageCount }}
-            </span>
-        </div>
-        <div class="col-6" style="text-align: right;">
-            <span *ngIf="proveedores && proveedores.length > 0" class="float-md-end color-gris">
-                Ítems: {{itemsInPage}}/{{ total_rows }}
-            </span>
-        </div>
-    </div> -->
-
     @if(proveedores.length === 0) {
     <div
         class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
@@ -49,7 +36,10 @@
                 @for(data of proveedores | slice: pageSize | slice: 0:itemsPerPage ; track
                 data.supplier.uuid) {
                 <tr>
-                    <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
+                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                        (click)="irAlProveedor($event, data.supplier)"> {{getNombreCompletoProveedor(data)}}
+                    </td>
+                    <!-- <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td> -->
                     <td class="whitespace-nowrap"> {{ data.supplier.batch_prefix }} </td>
                     <td class="whitespace-nowrap">
                         @if(data.last_purchase) {
@@ -61,33 +51,6 @@
                 }
             </tbody>
         </table>
-
-        <!-- <div class="row mt-4">
-                <div class="col">
-                    <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                        [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                        [boundaryLinks]="true" (pageChange)="obtenerProveedores()" />
-                </div>
-    
-                <div class="col">
-                    <div class="row align-items-center float-md-end">
-                        <div class="col-auto">
-                            <label for="paginacion">Ítems por página:</label>
-                        </div>
-                        <div class="col-auto">
-                            <select id="paginacion" class="form-control" (change)="obtenerProveedores()"
-                                [(ngModel)]="itemsPerPage">
-                                <option value=5>5</option>
-                                <option value=10>10</option>
-                                <option value=20>20</option>
-                                <option value=50>50</option>
-                                <option value=100>100</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-    
-            </div> -->
 
     </div>
     }

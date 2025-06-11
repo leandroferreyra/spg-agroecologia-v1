@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxCustomModalComponent } from 'ngx-custom-modal';
@@ -42,7 +43,7 @@ export class ProveedoresProductoComponent implements OnInit, OnDestroy {
   };
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _tokenService: TokenService) {
+    private _tokenService: TokenService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -62,7 +63,7 @@ export class ProveedoresProductoComponent implements OnInit, OnDestroy {
   obtenerProveedores() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["suppliers", "suppliers.person","suppliers.person.human", "suppliers.person.legalEntity"];
+    params.with = ["suppliers", "suppliers.person", "suppliers.person.human", "suppliers.person.legalEntity"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -85,17 +86,17 @@ export class ProveedoresProductoComponent implements OnInit, OnDestroy {
     )
   }
 
-  // modificarPaginacion(res: any) {
-  //   this.total_rows = res.meta.total;
-  //   this.last_page = res.meta.last_page;
-  //   if (this.proveedores.length <= this.itemsPerPage) {
-  //     if (res.meta?.current_page === res.meta?.last_page) {
-  //       this.itemsInPage = this.total_rows;
-  //     } else {
-  //       this.itemsInPage = this.currentPage * this.itemsPerPage;
-  //     }
-  //   }
-  // }
+  irAlProveedor(event: MouseEvent, data: any) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree([`/dashboard/proveedores/${data.uuid}`])
+    );
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`${baseUrl}#${url}`, '_blank');
+    } else {
+      this.router.navigate([`/dashboard/proveedores/${data.uuid}`])
+    }
+  }
 
   getNombreCompletoProveedor(data: any): string {
     if (!data.supplier?.person) return '';

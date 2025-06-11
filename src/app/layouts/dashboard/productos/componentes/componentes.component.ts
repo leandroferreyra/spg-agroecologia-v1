@@ -242,13 +242,6 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           ...proveedor,
           nombreCompleto: this.bindName(proveedor)
         }));
-        // this.prods = res.productos.data;
-
-        // this.prods = this.prods.map(p => ({
-        //   ...p,
-        //   disabled: this.disableProducto(p) // Solo deshabilita el que coincide
-        // }));
-        // console.log("🚀 ~ ComponentesComponent ~ obtenerCatalogos ~ this.prods:", this.prods)
       },
       error: error => {
         console.error('Error cargando catalogos:', error);

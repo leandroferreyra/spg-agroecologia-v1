@@ -33,6 +33,8 @@ import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos
 import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-proveedores',
@@ -150,11 +152,12 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   };
 
   inputCuitRef?: HTMLInputElement;
-
+  uuidFromUrl: string = '';
+  isLoadingProveedores: boolean = true;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService) {
+    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location) {
     this.initStore();
   }
 
@@ -192,6 +195,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      this.uuidFromUrl = params.get('uuid') ?? '';
+    });
     this.spinner.show();
     this.inicializarForm();
     this.obtenerProveedores();
@@ -213,25 +219,47 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this._indexService.getProveedoresWithParam(this.parametrosProvedores, this.actual_role).subscribe({
         next: res => {
           this.proveedores = res.data;
-          if (this.proveedores.length === 0) {
-            this.swalService.toastSuccess('center', 'No existen clientes.');
-            this.isTabDisabled = true;
-            this.tab1 = 'datos-generales';
-            this.selectedProveedor = null;
-          } else {
-            this.isTabDisabled = false;
-          }
-          if (!alta && this.proveedores.length > 0) {
-            this.isEdicion = false;
-            this.inicializarForm(this.proveedores[0]);
-          }
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
+          if (this.uuidFromUrl) {
+            this.showProveedorByUuid();
+          } else {
+            this.isLoadingProveedores = false;
+            if (this.proveedores.length === 0) {
+              this.swalService.toastSuccess('center', 'No existen clientes.');
+              this.isTabDisabled = true;
+              this.tab1 = 'datos-generales';
+              this.selectedProveedor = null;
+            } else {
+              this.isTabDisabled = false;
+            }
+            if (!alta && this.proveedores.length > 0) {
+              this.isEdicion = false;
+              this.inicializarForm(this.proveedores[0]);
+              this.location.replaceState(`/dashboard/productos/${this.proveedores[0].uuid}`);
+            }
+          }
           this.spinner.hide();
         },
         error: error => {
           console.error(error);
           this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  showProveedorByUuid() {
+    this.subscription.add(
+      this._proveedoresService.showProveedor(this.uuidFromUrl, this.actual_role).subscribe({
+        next: res => {
+          this.showDataProveedor(res.data);
+          this.tokenService.setToken(res.token);
+          this.isLoadingProveedores = false;
+        },
+        error: error => {
+          // this.isLoadingProductos = false;
+          console.error(error);
         }
       })
     )
@@ -373,6 +401,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   showDataProveedor(proveedor: any) {
     this.isEdicion = false;
     this.inicializarForm(proveedor);
+    this.location.replaceState(`/dashboard/proveedores/${proveedor.uuid}`);
   }
 
   editarUsuario(proveedor: any) {

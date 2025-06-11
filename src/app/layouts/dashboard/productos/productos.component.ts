@@ -42,8 +42,6 @@ import { ComprasProductoComponent } from './compras-producto/compras-producto.co
 import { VinculosComponent } from './vinculos/vinculos.component';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Route, Router } from '@angular/router';
-import { producerIncrementEpoch } from '@angular/core/primitives/signals';
-import { error } from 'console';
 
 @Component({
   selector: 'app-productos',

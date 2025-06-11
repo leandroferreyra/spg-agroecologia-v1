@@ -341,7 +341,9 @@
                                 @for(data of selectedCompra?.transaction?.transaction_products; track data.uuid) {
                                 <tr>
                                     <td class="border px-2 py-1">{{ data.product.code }}</td>
-                                    <td class="border px-2 py-1">{{ data.product.name }}</td>
+                                    <td class="border px-2 py-1 hover:text-blue-600 hover:underline hover:cursor-pointer"
+                                        (click)="irAlProducto($event, data.product)"> {{ data.product.name}}
+                                    </td>
                                     <td class="border px-2 py-1"> {{ showCantidad(data)}} </td>
                                     <td class="border px-2 py-1">{{ data.unit_price }}</td>
                                     <td class="border px-2 py-1">{{ data.product.vat_percent }}</td>
@@ -1089,9 +1091,9 @@
 
                         <div>
                             <label>Moneda</label>
-                            <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay monedas"
-                                class="w-1/3 min-w-[200px]" formControlName="currency_uuid" [selectOnTab]="true"
+                            <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar" style="width: 100%"
+                                [virtualScroll]="true" notFoundText="No hay monedas" class="w-1/3 min-w-[200px]"
+                                formControlName="currency_uuid" [selectOnTab]="true"
                                 [ngClass]="isSubmitPago ? pagoForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
 
