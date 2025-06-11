@@ -31,4 +31,19 @@ export class ClientesService {
     return this.http.delete<AuthResponse>(environment.baseUrl + this.apiClientes + '/' + uuid, { headers, params });
   }
 
+  showCliente(uuid: string, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .append('actual_role', rol)
+      .append('with[]', "person.city")
+      .append('with[]', "person.city.district")
+      .append('with[]', "person.city.district.country")
+      .append('with[]', "person.human")
+      .append('with[]', "person.human.gender")
+      .append('with[]', "person.human.documentType")
+      .append('with[]', "person.human.user")
+      .append('with[]', "person.legalEntity");
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes + '/' + uuid, { headers, params });
+  }
+
 }

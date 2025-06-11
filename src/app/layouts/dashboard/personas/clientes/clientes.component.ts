@@ -33,6 +33,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ProductosEnPosesionComponent } from './productos-en-posesion/productos-en-posesion.component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { timeStamp } from 'console';
 
 @Component({
   selector: 'app-clientes',
@@ -143,9 +146,12 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   iconArrowLeft = faArrowLeft;
 
+  uuidFromUrl: string = '';
+  isLoadingClientes: boolean = true;
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _clienteService: ClientesService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService) {
+    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private router: Router) {
     this.initStore();
   }
 
@@ -178,8 +184,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      this.uuidFromUrl = params.get('uuid') ?? '';
+    });
     this.spinner.show();
-    // this.inicializarForm();
     this.obtenerClientes();
     this.obtenerCatalogos();
   }
@@ -200,25 +208,47 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this._indexService.getClientesWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.clientes = res.data;
-          if (this.clientes.length === 0) {
-            this.swalService.toastSuccess('center', 'No existen clientes.');
-            this.isTabDisabled = true;
-            this.tab1 = 'datos-generales';
-            this.selectedCliente = null;
-          } else {
-            this.isTabDisabled = false;
-          }
-          if (!alta && this.clientes.length > 0) {
-            this.isEdicion = false;
-            this.inicializarForm(this.clientes[0]);
-          }
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
+          if (this.uuidFromUrl) {
+            this.showClienteByUuid();
+          } else {
+            this.isLoadingClientes = false;
+            if (this.clientes.length === 0) {
+              this.swalService.toastSuccess('center', 'No existen clientes.');
+              this.isTabDisabled = true;
+              this.tab1 = 'datos-generales';
+              this.selectedCliente = null;
+            } else {
+              this.isTabDisabled = false;
+            }
+            if (!alta && this.clientes.length > 0) {
+              this.isEdicion = false;
+              this.inicializarForm(this.clientes[0]);
+              this.location.replaceState(`/dashboard/clientes/${this.clientes[0].uuid}`);
+            }
+          }
           this.spinner.hide();
         },
         error: error => {
           console.error(error);
           this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  showClienteByUuid() {
+    this.subscription.add(
+      this._clienteService.showCliente(this.uuidFromUrl, this.actual_role).subscribe({
+        next: res => {
+          this.showDataCliente(res.data);
+          this.tokenService.setToken(res.token);
+          this.isLoadingClientes = false;
+        },
+        error: error => {
+          // this.isLoadingProductos = false;
+          console.error(error);
         }
       })
     )
@@ -374,6 +404,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   showDataCliente(cliente: any) {
     this.isEdicion = false;
     this.inicializarForm(cliente);
+    this.location.replaceState(`/dashboard/clientes/${cliente.uuid}`);
   }
 
   editarUsuario(cliente: any) {

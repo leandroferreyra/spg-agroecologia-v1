@@ -123,7 +123,7 @@
             <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
                 <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                     Cliente
-                    @if (clientes.length > 0) {
+                    @if (clientes.length > 0 && !isLoadingClientes) {
                     @if(isHuman){
                     {{ selectedCliente.person?.human?.firstname }} {{ selectedCliente.person?.human?.lastname }}
                     } @else {
@@ -197,7 +197,7 @@
 
                 <div class="flex-1 text-sm">
                     <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
-                        @if (clientes.length > 0) {
+                        @if (clientes.length > 0 && !isLoadingClientes) {
                         <form [formGroup]="clienteForm" class="p-4">
                             <div class="flex flex-col sm:flex-row">
                                 <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">

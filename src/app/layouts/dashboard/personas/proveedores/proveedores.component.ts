@@ -236,7 +236,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
             if (!alta && this.proveedores.length > 0) {
               this.isEdicion = false;
               this.inicializarForm(this.proveedores[0]);
-              this.location.replaceState(`/dashboard/productos/${this.proveedores[0].uuid}`);
+              this.location.replaceState(`/dashboard/proveedores/${this.proveedores[0].uuid}`);
             }
           }
           this.spinner.hide();
