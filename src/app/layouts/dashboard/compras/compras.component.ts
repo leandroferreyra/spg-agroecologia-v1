@@ -1116,7 +1116,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   resultadoControl(data: any) {
-    if (data && data.control_result) {
+    if (data && data.control_result !== null) {
       return data.control_result === 1 ? 'Aprobado' : 'Desaprobado';
     }
     return '';
