@@ -369,35 +369,27 @@
         </ng-template>
 
         <ng-template #modalBody>
-            <!-- <div class="container">
-                <div class="row justify-content-center"> -->
             <form [formGroup]="tipoPersonaForm">
-                <div class="row mb-4">
-                    <div class="col-lg-12">
-                        <div class="text-center">
-
-                            <div class="form-check form-check-inline">
-                                <label class="inline-flex mr-3" for="personafisica">
-                                    <input class="form-radio" type="radio" name="tipoPersona" id="personafisica"
-                                        value="fisica" formControlName="tipoPersona">
-                                    <span style="cursor: pointer;">Persona física</span>
-                                </label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <label class="inline-flex mr-3" for="personajuridica">
-                                    <input class="form-radio" type="radio" name="tipoPersona" id="personajuridica"
-                                        value="juridica" formControlName="tipoPersona">
-                                    <span style="cursor: pointer;">Persona jurídica</span>
-                                </label>
-                            </div>
-                        </div>
+                <div class="text-center">
+                    <div class="form-check form-check-inline">
+                        <label class="inline-flex mr-3" for="personafisica">
+                            <input class="form-radio" type="radio" name="tipoPersona" id="personafisica" value="fisica"
+                                formControlName="tipoPersona">
+                            <span style="cursor: pointer;">Persona física</span>
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <label class="inline-flex mr-3" for="personajuridica">
+                            <input class="form-radio" type="radio" name="tipoPersona" id="personajuridica"
+                                value="juridica" formControlName="tipoPersona">
+                            <span style="cursor: pointer;">Persona jurídica</span>
+                        </label>
                     </div>
                 </div>
             </form>
 
-
             @if (!altaPersona) {
-            <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between">
+            <div class="mb-2 flex flex-col md:flex-row md:items-center justify-between">
                 <!-- Botón Agregar nuevo cliente -->
                 <button type="button" ngxTippy="Agregar nuevo cliente" (click)="altaNuevoCliente();">
                     <icon-plus />
@@ -416,11 +408,12 @@
                     </label>
                 </div>
             </div>
+
             <!-- TABLA  BÚSQUEDA -->
             <div class="row mb-2">
                 <div class="col-6">
                     <span *ngIf="personas && personas.length > 0" class="float-md-start color-gris">
-                        Página: {{ currentPage_buscar}}/{{numPages.pageCount }}
+                        Página: {{ currentPage_buscar}}/{{last_page_buscar }}
                     </span>
                 </div>
                 <div class="col-6" style="text-align: right;">
@@ -430,55 +423,26 @@
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table-hover">
-                    <thead>
+            <div class="overflow-x-auto p-2">
+                <table class="min-w-full border border-gray-200 rounded-xl overflow-hidden shadow">
+                    <thead class="bg-gray-100 text-gray-700 text-left text-sm">
                         <tr>
                             @if (tipoPersonaForm.controls['tipoPersona'].value === 'fisica') {
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Nombre
-                                </span>
-                            </th>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Apellido
-                                </span>
-                            </th>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Documento
-                                </span>
-                            </th>
+                            <th class="px-4 py-3">Nombre</th>
+                            <th class="px-4 py-3">Apellido</th>
+                            <th class="px-4 py-3">Documento</th>
                             } @else {
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Razón social
-                                </span>
-                            </th>
+                            <th class="px-4 py-3">Razón social</th>
                             }
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Cuit
-                                </span>
-                            </th>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Es proveedor
-                                </span>
-                            </th>
-                            <th style="cursor: pointer;">
-                                <span style="display: inline-flex; align-items: center; gap: 10px;">
-                                    Es cliente
-                                </span>
-                            </th>
+                            <th class="px-4 py-3">Cuit</th>
+                            <th class="px-4 py-3">Es proveedor</th>
+                            <th class="px-4 py-3">Es cliente</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-200 text-sm">
                         @if (showFilterPersonas) {
-                        <tr>
+                        <tr class="hover:bg-gray-50">
                             @if (tipoPersonaForm.controls['tipoPersona'].value === 'fisica') {
-
                             <td>
                                 <input type="text" class="form-control campo-busqueda"
                                     [(ngModel)]="filtrosContactos_buscar.firstname.value" (input)="obtenerPersonas()" />
@@ -506,16 +470,16 @@
                         </tr>
                         }
                         @for(data of (personas | slice: 0:itemsPerPage_buscar) ; track data.uuid) {
-                        <tr (click)="agregarClienteAFormulario(data)" style="cursor: pointer;">
+                        <tr (click)="agregarClienteAFormulario(data)" style="cursor: pointer;" class="hover:bg-gray-50">
                             @if(tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
-                            <td class="whitespace-nowrap">{{ data.firstname }} </td>
-                            <td class="whitespace-nowrap">{{ data.lastname }} </td>
-                            <td class="whitespace-nowrap">{{ data.document_number }}</td>
+                            <td class="px-4 py-2">{{ data.firstname }} </td>
+                            <td class="px-4 py-2">{{ data.lastname }} </td>
+                            <td class="px-4 py-2">{{ data.document_number }}</td>
                             }@else {
-                            <td class="whitespace-nowrap">{{ data.company_name }} </td>
+                            <td class="px-4 py-2">{{ data.company_name }} </td>
                             }
-                            <td class="whitespace-nowrap">{{ data.cuit }} </td>
-                            <td class="whitespace-nowrap">
+                            <td class="px-4 py-2">{{ data.cuit }} </td>
+                            <td class="px-4 py-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label flex items-center gap-2">
                                         <input class="form-checkbox" type="checkbox" [checked]="isProveedor(data)">
@@ -523,7 +487,7 @@
                                     </label>
                                 </div>
                             </td>
-                            <td class="whitespace-nowrap">
+                            <td class="px-4 py-2">
                                 <div class="form-check form-check-inline">
                                     <label class="form-check-label flex items-center gap-2">
                                         <input class="form-checkbox" type="checkbox" [checked]="isCliente(data)">
@@ -534,9 +498,31 @@
                         </tr>
                         }
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                <div
+                                    class="flex flex-col md:flex-row md:items-center justify-between w-full px-4 py-3 gap-4">
+                                    <div class="w-full md:w-1/2 flex justify-center md:justify-center">
+                                        <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows_buscar"
+                                            [pageSize]="itemsPerPage_buscar" [(page)]="currentPage_buscar" [maxSize]="2"
+                                            [rotate]="true" [boundaryLinks]="true"
+                                            (pageChange)="obtenerPersonas()"></ngb-pagination>
+                                    </div>
+                                    <div class="w-full md:w-1/2 flex justify-center md:justify-end items-center gap-2">
+                                        <label for="paginacion" class="mb-0 text-sm text-gray-600">Ítems por
+                                            página:</label>
+                                        <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage_buscar"
+                                            bindLabel="label" [clearable]="false" class="custom-select w-24"
+                                            [dropdownPosition]="'top'" (change)="obtenerPersonas()"></ng-select>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
 
-                <div class="row mt-2 mb-2">
+                <!-- <div class="row mt-2 mb-2">
                     <div class="col">
                         <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows_buscar"
                             [pageSize]="itemsPerPage_buscar" [(page)]="currentPage_buscar" [maxSize]="2" [rotate]="true"
@@ -561,7 +547,7 @@
                         </div>
                     </div>
 
-                </div>
+                </div> -->
             </div>
 
             } @else {
