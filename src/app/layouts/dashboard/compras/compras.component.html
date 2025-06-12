@@ -375,7 +375,7 @@
                                             </label>
                                         </div>
                                     </td>
-                                    <td class="border px-2 py-1">{{ data.product?.control_result }}</td>
+                                    <td class="border px-2 py-1">{{ resultadoControl(data) }}</td>
                                     <td class="border px-2 py-1">{{ data.control_user?.user_name }}</td>
                                     <td class="border px-2 py-1">{{ data.control_comments }}</td>
                                     <td class="border px-2 py-1">
@@ -717,45 +717,6 @@
                                 formControlName="unit_price" />
                         </div>
 
-                        @if (productoControllable) {
-                        <div
-                            [ngClass]="isSubmit ? productoForm.controls['control_description'].errors ? 'has-error' : 'has-success' : ''">
-                            <label>Descripción de control</label>
-                            <textarea class="form-control" id="control_description"
-                                formControlName="control_description" rows="1"></textarea>
-                        </div>
-
-                        <div class="flex items-center gap-2 mt-2">
-                            <label class="w-12 h-6 relative">
-                                <input type="checkbox"
-                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="control_result" />
-                                <span for="custom_switch_checkbox2"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
-                            </label>
-                            <span>Controló usuario</span>
-                        </div>
-
-                        @if (productoForm.controls['control_result'].value) {
-                        <div (keydown.enter)="confirmarAltaProducto()"
-                            [ngClass]="isSubmit ? productoForm.controls['password'].errors ? 'has-error' : 'has-success' : ''">
-                            <label>Password</label>
-                            <div class="input-group">
-                                <input [type]="showPassword ? 'text' : 'password'" class="form-control"
-                                    formControlName="password">
-                                <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
-                                    style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
-                            </div>
-                        </div>
-                        <div (keydown.enter)="confirmarAltaProducto()"
-                            [ngClass]="isSubmit ? productoForm.controls['control_comments'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="control_comments">Comentarios de control</label>
-                            <textarea class="form-control" id="control_comments" formControlName="control_comments"
-                                rows="1"></textarea>
-                        </div>
-                        }
-                        }
                         @if (showInputUbicacion) {
                         <div class="flex-grow-1">
                             <label>Ubicación</label>
@@ -787,6 +748,60 @@
                             </div>
                         </div>
                         }
+
+                        @if (productoControllable) {
+                        <div
+                            [ngClass]="isSubmit ? productoForm.controls['control_description'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Descripción de control</label>
+                            <textarea class="form-control" id="control_description"
+                                formControlName="control_description" rows="3"></textarea>
+                        </div>
+
+                        <div></div>
+
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" formControlName="producto_controlado" />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                            <span>Producto controlado</span>
+                        </div>
+
+                        @if (productoForm.controls['producto_controlado'].value) {
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" formControlName="control_ok" />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                            <span>Control OK</span>
+                        </div>
+                        <div (keydown.enter)="confirmarAltaProducto()"
+                            [ngClass]="isSubmit ? productoForm.controls['password'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Password</label>
+                            <div class="input-group">
+                                <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                                    formControlName="password">
+                                <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
+                                    style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
+                            </div>
+                        </div>
+                        <div (keydown.enter)="confirmarAltaProducto()"
+                            [ngClass]="isSubmit ? productoForm.controls['control_comments'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="control_comments">Comentarios de control</label>
+                            <textarea class="form-control" id="control_comments" formControlName="control_comments"
+                                rows="1"></textarea>
+                        </div>
+                        }
+                        }
+
 
                     </div>
                 </div>

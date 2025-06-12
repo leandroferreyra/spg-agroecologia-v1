@@ -235,6 +235,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.compras = res.data;
+          console.log("🚀 ~ ComprasComponent ~ this._indexService.getComprasProveedorWithParam ~ this.compras:", this.compras)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -731,7 +732,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
       product_uuid: new FormControl({ value: data ? data.product : null, disabled: data ? true : false }, [Validators.required]),
       quantity: new FormControl({ value: data ? this.showCantidad(data) : null, disabled: data ? false : true }, [Validators.required]),
       unit_price: new FormControl({ value: data ? data.unit_price : null, disabled: false }, [Validators.required]),
-      control_result: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, []),
+      control_ok: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, []),
+      producto_controlado: new FormControl({ value: data ? (data.control_result !== null) : null, disabled: false }, []),
       password: new FormControl({ value: null, disabled: false }, []),
       control_comments: new FormControl({ value: data ? data.control_comments : null, disabled: false }, []),
       location_uuid: new FormControl({ value: data ? this.getLocation(data) : null, disabled: false }, []),
@@ -763,7 +765,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.productoForm.get('control_result')!.valueChanges.subscribe(
+    this.productoForm.get('producto_controlado')!.valueChanges.subscribe(
       (value: any) => {
         if (value) {
           ['password', 'control_comments'].forEach((field) => {
@@ -1110,7 +1112,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   isControlRealizado(data: any) {
-    return (data.control_result == 1);
+    return (data.control_result !== null);
+  }
+
+  resultadoControl(data: any) {
+    if (data && data.control_result) {
+      return data.control_result === 1 ? 'Aprobado' : 'Desaprobado';
+    }
+    return '';
   }
 
   showPrecioTotal(data: any) {
@@ -1127,13 +1136,18 @@ export class ComprasComponent implements OnInit, OnDestroy {
         producto.with = [];
         producto.quantity = this.productoForm.get('quantity')?.value;
         producto.unit_price = this.productoForm.get('unit_price')?.value;
-        producto.control_result = this.productoForm.get('control_result')?.value ?? false;
-        if (producto.control_result) {
+        producto.location_uuid = this.ultimaUbicacion ? this.ultimaUbicacion?.uuid : null;
+        if (this.productoForm.get('producto_controlado')?.value) {
+          producto.control_result = this.productoForm.get('control_ok')?.value ?? false;
           producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
           producto.password = this.productoForm.get('password')?.value;
           producto.control_comments = this.productoForm.get('control_comments')?.value;
+        } else {
+          producto.control_result = null;
+          producto['user->control_user_uuid'] = null;
+          producto.password = null;
+          producto.control_comments = null;
         }
-        producto.location_uuid = this.ultimaUbicacion ? this.ultimaUbicacion?.uuid : null;
         if (!this.inEdicionProducto) {
           producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
           producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;

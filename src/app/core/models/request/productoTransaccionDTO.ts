@@ -4,10 +4,10 @@ export class ProductoTransaccionDTO {
     product_uuid!: string;
     quantity!: string;
     unit_price!: string;
-    control_result!: boolean;
-    "user->control_user_uuid"!: string;
-    password!: string;
-    control_comments!: string;
+    control_result!: boolean | null;
+    "user->control_user_uuid"!: string | null;
+    password!: string | null;
+    control_comments!: string | null;
     location_uuid!: string;
     actual_role!: string;
     with: string[] = [];
