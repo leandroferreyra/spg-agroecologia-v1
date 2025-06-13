@@ -589,10 +589,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
     if (form.get('tipoProducto')?.value?.stock_controlled === 1) {
       if (form.get('unidad')?.value?.is_integer === 1) {
         producto.minimum = +(+form.get('stock_minimum')?.value)?.toFixed(0);
-        producto.optimum = +(+form.get('stock_minimum')?.value)?.toFixed(0);
+        producto.optimum = +(+form.get('stock_optimum')?.value)?.toFixed(0);
       } else {
         producto.minimum = +(+form.get('stock_minimum')?.value)?.toFixed(2);
-        producto.optimum = +(+form.get('stock_minimum')?.value)?.toFixed(2);
+        producto.optimum = +(+form.get('stock_optimum')?.value)?.toFixed(2);
       }
     }
     if (!this.isEdicion) {
