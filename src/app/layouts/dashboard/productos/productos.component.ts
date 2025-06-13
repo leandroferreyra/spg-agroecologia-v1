@@ -182,7 +182,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.productos = res.data;
-          console.log("🚀 ~ ProductosComponent ~ this._indexService.getProductosWithParam ~  this.productos:", this.productos)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -416,7 +415,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
     this.newProductoForm.get('unidad')!.valueChanges.subscribe(
       (value) => {
-        console.log(value);
         if (value) {
           this.placeholderStocks = 'Cantidad en ' + value.name;
         } else {
