@@ -1,0 +1,170 @@
+<div class="relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
+    <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
+        [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
+
+    <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[520px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
+        [ngClass]="{ '!block': isShowMailMenu }">
+
+        <!-- PANEL IZQUIERDO -->
+        <div class="flex justify-end xl:hidden mb-2">
+            <button (click)="isShowMailMenu = false" class="p-2 hover:text-primary">
+                <icon-menu class="w-5 h-5" />
+            </button>
+        </div>
+
+        <div class="flex h-full flex-col">
+
+            <div class="flex items-center justify-between text-md mb-3">
+                <button type="button" class="hover:text-primary" (click)="openModalVenta('NEW')" [disabled]="isEdicion"
+                    [ngClass]="{
+                        'text-gray-400 cursor-not-allowed': isEdicion
+                      }">
+                    <icon-plus class="mx-auto mb-1" />
+                    Agregar compra
+                </button>
+
+                <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" [disabled]="isEdicion"
+                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" [ngClass]="{
+                        'text-gray-400 cursor-not-allowed': isEdicion
+                      }">
+                    <icon-settings class="mx-auto mb-1" />
+                    Filtros avanzados
+                </button>
+            </div>
+
+            <span *ngIf="ventas && ventas.length > 0" class="float-md-end color-gris">
+                Ventas {{ total_rows }}
+            </span>
+
+            <div class="table-container flex-grow overflow-auto">
+                <div class="table-responsive">
+                    <table class="table-hover w-full">
+                        <tbody>
+                            @for(data of ventas ; let index = $index ;track data.uuid) {
+                            <tr style="cursor: pointer;" [ngClass]="{'bg-blue-200': selectedVenta?.uuid === data.uuid}">
+                                <td (click)="showDataVenta(data);" style="font-size: 12px;">
+                                    <!-- <b>{{ showName(data) }}</b> - {{showFactura(data)}} - {{showFecha(data)}} -->
+                                </td>
+                                <td class="w-0 text-right align-middle">
+                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                        <icon-trash-lines />
+                                    </button>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- <div class="w-full p-2 mt-auto">
+
+                <div class="row mt-4 gy-3">
+                    <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                        <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                            [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                            [boundaryLinks]="true" (pageChange)="obtenerVentas()" />
+                    </div>
+
+                    <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                        <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                        <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label"
+                            [clearable]="false" class="custom-select" [dropdownPosition]="'top'"
+                            (change)="obtenerVentas()">
+                        </ng-select>
+                    </div>
+                </div>
+
+                <div class="group relative">
+                    <input type="text" placeholder="Buscar compra..." [(ngModel)]="filtroSimpleName"
+                        (input)="obtenerComprasPorFiltroSimple()" class="peer form-input ltr:pr-8 rtl:pl-8" />
+                    <div
+                        class="absolute top-1/2 -translate-y-1/2 peer-focus:text-primary ltr:right-[11px] rtl:left-[11px]">
+                        <icon-search />
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 mt-2">
+                    <label class="w-12 h-6 relative">
+                        <input type="checkbox"
+                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                            id="custom_switch_checkbox2" [(ngModel)]="filtroSimpleContiene"
+                            (change)="obtenerComprasPorFiltroSimple();" />
+                        <span for="custom_switch_checkbox2"
+                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                        </span>
+                    </label>
+                    <span>Contiene</span>
+                </div>
+            </div> -->
+
+            <div class="w-full p-2 mt-auto">
+                <div class="flex flex-col items-center justify-center sm:flex-row sm:justify-between mb-3">
+                    <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
+                        [(page)]="currentPage" [maxSize]="1" [rotate]="true" (pageChange)="obtenerVentas()">
+                    </ngb-pagination>
+
+                    <div class="flex items-center gap-1 mt-2 sm:mt-0">
+                        <label for="paginacion" class="mb-0 text-sm text-gray-600">Ítems por página:</label>
+                        <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label"
+                            [clearable]="false" class="custom-select w-24" [dropdownPosition]="'top'"
+                            (change)="obtenerVentas()">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="flex w-full">
+                    <div class="relative flex-grow">
+                        <input id="switchRight" type="text" placeholder="Buscar venta..." [(ngModel)]="filtroSimpleName"
+                            (input)="obtenerVentasPorFiltroSimple()"
+                            class="form-input w-full ltr:rounded-r-none rtl:rounded-l-none" />
+                        <div class="absolute top-1/2 -translate-y-1/2 ltr:right-[11px] rtl:left-[11px]">
+                            <icon-search />
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                            <input type="checkbox" (change)="obtenerVentasPorFiltroSimple();"
+                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                id="custom_switch_checkbox2" [(ngModel)]="filtroSimpleContiene" />
+                            <span
+                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                        </label>
+                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div class="panel h-full flex-1 overflow-x-hidden p-2">
+
+        <!-- MENU ICONO OCULTO RESPONSIVE -->
+        <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
+            <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
+                Venta
+                @if(ventas.length > 0 && selectedVenta) {
+                {{selectedVenta.name}}
+                }
+            </h5>
+
+            <div class="flex w-full items-center justify-between sm:w-auto">
+                <div class="flex items-center ltr:mr-4 rtl:ml-4">
+                    <button type="button" class="block hover:text-primary ltr:mr-3 rtl:ml-3 xl:hidden"
+                        (click)="isShowMailMenu = !isShowMailMenu">
+                        <icon-menu />
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+</ngx-spinner>

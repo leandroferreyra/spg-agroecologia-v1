@@ -119,7 +119,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   iconArrowDown = faArrowDown;
   iconArrowLeft = faArrowLeft;
 
-  tab1: string = 'datos-generales';
+  // tab1: string = 'datos-generales';
 
   proveedorInput$ = new Subject<string>();
   proveedores$!: Observable<any[]>;
@@ -243,7 +243,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
             if (this.compras.length === 0) {
               this.swalService.toastSuccess('center', 'No existen compras.');
               this.isTabDisabled = true;
-              this.tab1 = 'datos-generales';
               this.selectedCompra = null;
             } else {
               this.isTabDisabled = false;
@@ -619,7 +618,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.modalCompra.options = this.modalOptions;
       this.modalCompra.open();
     } else {
-      this.tab1 = 'datos-generales';
+      // this.tab1 = 'datos-generales';
       this.isEdicion = true;
       this.tituloModal = 'Edición compra';
       this.obtenerCompraPorId(compra.uuid);

@@ -67,15 +67,13 @@
                         </table>
                     </div>
                 </div>
-
+                <!-- 
                 <div class="w-full p-2 mt-auto">
                     <div class="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-between mb-3">
-                        <!-- Paginación -->
                         <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
                             [(page)]="currentPage" [maxSize]="2" [rotate]="true" (pageChange)="obtenerClientes()">
                         </ngb-pagination>
 
-                        <!-- Selector de ítems por página -->
                         <div class="flex items-center gap-2">
                             <label for="paginacion" class="whitespace-nowrap">Ítems por página:</label>
                             <select id="paginacion" class="form-control" (change)="obtenerClientes()"
@@ -111,8 +109,47 @@
                         </label>
                         <span>Contiene</span>
                     </div>
-                </div>
+                </div> -->
 
+
+                <div class="w-full p-2 mt-auto">
+                    <div class="flex flex-col items-center justify-center sm:flex-row sm:justify-between mb-3">
+                        <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
+                            [(page)]="currentPage" [maxSize]="2" [rotate]="true" (pageChange)="obtenerClientes()">
+                        </ngb-pagination>
+
+                        <div class="flex items-center gap-1 mt-2 sm:mt-0">
+                            <label for="paginacion" class="mb-0 text-sm text-gray-600">Ítems por página:</label>
+                            <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label"
+                                [clearable]="false" class="custom-select w-24" [dropdownPosition]="'top'"
+                                (change)="obtenerClientes()">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="flex w-full">
+                        <div class="relative flex-grow">
+                            <input id="switchRight" type="text" placeholder="Buscar proveedor..." #filtroSimple
+                                (input)="obtenerClientesPorFiltroSimple(filtroSimple.value)"
+                                class="form-input w-full ltr:rounded-r-none rtl:rounded-l-none" />
+                            <div class="absolute top-1/2 -translate-y-1/2 ltr:right-[11px] rtl:left-[11px]">
+                                <icon-search />
+                            </div>
+                        </div>
+                        <div
+                            class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                            <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                <input type="checkbox" (change)="obtenerClientes();"
+                                    class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                    id="custom_switch_checkbox2"
+                                    [(ngModel)]="filtros['person.human.firstname'].contiene" />
+                                <span
+                                    class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                            </label>
+                            <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
 
@@ -522,32 +559,6 @@
                     </tfoot>
                 </table>
 
-                <!-- <div class="row mt-2 mb-2">
-                    <div class="col">
-                        <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows_buscar"
-                            [pageSize]="itemsPerPage_buscar" [(page)]="currentPage_buscar" [maxSize]="2" [rotate]="true"
-                            #numPages [boundaryLinks]="true" (pageChange)="obtenerPersonas()" />
-                    </div>
-
-                    <div class="col">
-                        <div class="row align-items-center float-md-end">
-                            <div class="col-auto">
-                                <label for="paginacion">Ítems por página:</label>
-                            </div>
-                            <div class="col-auto">
-                                <select id="paginacion" class="form-control" (change)="obtenerPersonas()"
-                                    [(ngModel)]="itemsPerPage_buscar">
-                                    <option value=5>5</option>
-                                    <option value=10>10</option>
-                                    <option value=20>20</option>
-                                    <option value=50>50</option>
-                                    <option value=100>100</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                </div> -->
             </div>
 
             } @else {
