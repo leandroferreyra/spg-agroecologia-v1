@@ -1144,6 +1144,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           producto.control_comments = this.productoForm.get('control_comments')?.value;
         } else {
           producto.control_result = null;
+          producto.control_comments = null;
         }
         if (!this.inEdicionProducto) {
           producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
