@@ -18,6 +18,8 @@ export class ProductoDTO {
     controllable!: boolean;
     control_description!: string;
     product_state!: ProductState;
+    minimum!: number;
+    optimum!: number;
     with: string[] = [];
     actual_role!: string;
 

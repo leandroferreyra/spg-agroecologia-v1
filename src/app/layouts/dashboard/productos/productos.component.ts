@@ -1,6 +1,6 @@
 import { CommonModule, provideImageKitLoader } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, RequiredValidator } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -128,6 +128,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
   uuidFromUrl: string = '';
   isLoadingProductos: boolean = true;
 
+  placeholderStocks: string = '';
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router
@@ -180,6 +182,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.productos = res.data;
+          console.log("🚀 ~ ProductosComponent ~ this._indexService.getProductosWithParam ~  this.productos:", this.productos)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -279,12 +282,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.productoForm = new FormGroup({
       nombre: new FormControl({ value: producto?.name, disabled: !this.isEdicion }, [Validators.required]),
       codigo: new FormControl({ value: producto?.code, disabled: !this.isEdicion }, []),
-      tipoProducto: new FormControl({ value: producto?.product_type?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      tipoProducto: new FormControl({ value: producto?.product_type, disabled: !this.isEdicion }, [Validators.required]),
       categoria: new FormControl({ value: producto?.product_category?.uuid, disabled: !this.isEdicion }, []),
       estado: new FormControl({ value: producto?.current_state?.state?.uuid, disabled: !this.isEdicion }, [Validators.required]),
       estadoComentario: new FormControl({ value: producto?.current_state?.comments, disabled: !this.isEdicion }, []),
       nomenclatura: new FormControl({ value: producto?.mercosur_nomenclature, disabled: !this.isEdicion }, []),
-      unidad: new FormControl({ value: producto?.measure?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      unidad: new FormControl({ value: producto?.measure, disabled: !this.isEdicion }, [Validators.required]),
       iva: new FormControl({ value: producto?.vat_percent, disabled: !this.isEdicion }, [Validators.required]),
       pais: new FormControl({ value: producto?.country?.uuid, disabled: !this.isEdicion }, [Validators.required]),
       asignaNumSerie: new FormControl({ value: producto?.assign_serial_number, disabled: !this.isEdicion }, [Validators.required]),
@@ -299,8 +302,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
       stock_reserved: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.reserved), disabled: true }, []),
       stock_samples: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.samples), disabled: true }, []),
       stock_observed: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.observed), disabled: true }, []),
-      stock_minimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.minimum), disabled: true }, []),
-      stock_optimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.optimum), disabled: true }, []),
+      stock_minimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.minimum), disabled: this.isFieldDisabled(producto) }, []),
+      stock_optimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.optimum), disabled: this.isFieldDisabled(producto) }, []),
       stock_initial: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.initial_stock), disabled: true }, []),
       stock_quantity_sold: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.quantity_sold), disabled: true }, []),
     });
@@ -328,6 +331,32 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.productoForm.get('descripcionControl')?.disable();
         }
       });
+
+    this.productoForm.get('tipoProducto')!.valueChanges.subscribe(
+      (value) => {
+        if (value && value.stock_controlled === 1) {
+          this.productoForm.get('stock_minimum')?.enable();
+          this.productoForm.get('stock_optimum')?.enable();
+          this.productoForm.get('stock_minimum')?.setValidators(Validators.required)
+          this.productoForm.get('stock_optimum')?.setValidators(Validators.required)
+        } else {
+          this.placeholderStocks = '';
+          this.productoForm.get('stock_minimum')?.setValue(null);
+          this.productoForm.get('stock_optimum')?.setValue(null);
+          this.productoForm.get('stock_minimum')?.disable();
+          this.productoForm.get('stock_optimum')?.disable();
+          this.productoForm.get('stock_minimum')?.clearValidators();
+          this.productoForm.get('stock_optimum')?.clearValidators();
+        }
+        ['stock_minimum', 'stock_optimum'].forEach((field) => {
+          this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+        });
+      });
+  }
+
+  isFieldDisabled(producto: any) {
+    // Solo se habilita si es edicion y es stock controlled
+    return !this.isEdicion || producto.product_type?.stock_controlled !== 1;
   }
 
   mostrarCantidad(data: any, stock: string) {
@@ -357,18 +386,55 @@ export class ProductosComponent implements OnInit, OnDestroy {
       tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
       trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
       vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      controlable: new FormControl({ value: false, disabled: false }, [Validators.required])
+      controlable: new FormControl({ value: false, disabled: false }, [Validators.required]),
+      stock_minimum: new FormControl({ value: null, disabled: true }, []),
+      stock_optimum: new FormControl({ value: null, disabled: true }, [])
     });
     this.onNewForm();
   }
   onNewForm() {
+    this.newProductoForm.get('tipoProducto')!.valueChanges.subscribe(
+      (value) => {
+        if (value && value.stock_controlled === 1) {
+          this.newProductoForm.get('stock_minimum')?.enable();
+          this.newProductoForm.get('stock_optimum')?.enable();
+          this.newProductoForm.get('stock_minimum')?.setValidators(Validators.required)
+          this.newProductoForm.get('stock_optimum')?.setValidators(Validators.required)
+        } else {
+          this.placeholderStocks = '';
+          this.newProductoForm.get('stock_minimum')?.setValue(null);
+          this.newProductoForm.get('stock_optimum')?.setValue(null);
+          this.newProductoForm.get('stock_minimum')?.disable();
+          this.newProductoForm.get('stock_optimum')?.disable();
+          this.newProductoForm.get('stock_minimum')?.clearValidators();
+          this.newProductoForm.get('stock_optimum')?.clearValidators();
+        }
+        ['stock_minimum', 'stock_optimum'].forEach((field) => {
+          this.newProductoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+        });
+      });
+
+    this.newProductoForm.get('unidad')!.valueChanges.subscribe(
+      (value) => {
+        console.log(value);
+        if (value) {
+          this.placeholderStocks = 'Cantidad en ' + value.name;
+        } else {
+          this.placeholderStocks = '';
+        }
+      });
+
     this.newProductoForm.get('controlable')!.valueChanges.subscribe(
       (value) => {
         if (value) {
           this.newProductoForm.get('descripcionControl')?.enable();
         } else {
+          this.newProductoForm.get('descripcionControl')?.setValue(null);
           this.newProductoForm.get('descripcionControl')?.disable();
         }
+        ['descripcionControl'].forEach((field) => {
+          this.newProductoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+        });
       });
   }
 
@@ -504,14 +570,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
     producto.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
     producto.name = form.get('nombre')?.value;
     producto.code = form.get('codigo')?.value;
-    producto.product_type_uuid = form.get('tipoProducto')?.value;
+    producto.product_type_uuid = form.get('tipoProducto')?.value.uuid;
     producto.product_category_uuid = form.get('categoria')?.value;
     let estadoProducto = new ProductState();
     estadoProducto.possible_product_state_uuid = form.get('estado')?.value;
     estadoProducto.comments = form.get('estadoComentario')?.value;
     producto.product_state = estadoProducto;
     producto.comments = form.get('comentarios')?.value;
-    producto.measure_uuid = form.get('unidad')?.value;
+    producto.measure_uuid = form.get('unidad')?.value.uuid;
     producto.vat_percent = form.get('iva')?.value;
     producto.country_uuid = form.get('pais')?.value;
     producto.mercosur_nomenclature = form.get('nomenclatura')?.value;
@@ -522,7 +588,15 @@ export class ProductosComponent implements OnInit, OnDestroy {
     producto.sales_name = form.get('nombreVenta')?.value;
     producto.controllable = form.get('controlable')?.value;
     producto.control_description = form.get('descripcionControl')?.value;
-
+    if (form.get('tipoProducto')?.value?.stock_controlled === 1) {
+      if (form.get('unidad')?.value?.is_integer === 1) {
+        producto.minimum = +(+form.get('stock_minimum')?.value)?.toFixed(0);
+        producto.optimum = +(+form.get('stock_minimum')?.value)?.toFixed(0);
+      } else {
+        producto.minimum = +(+form.get('stock_minimum')?.value)?.toFixed(2);
+        producto.optimum = +(+form.get('stock_minimum')?.value)?.toFixed(2);
+      }
+    }
     if (!this.isEdicion) {
       this.cleanObject(producto);
     }

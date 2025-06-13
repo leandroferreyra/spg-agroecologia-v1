@@ -233,7 +233,7 @@
                                 </div>
                                 <div>
                                     <label for="tipoProducto">Tipo de producto</label>
-                                    <ng-select [items]="tipoProductos" bindLabel="name" bindValue="uuid"
+                                    <ng-select [items]="tipoProductos" bindLabel="name"
                                         clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                         notFoundText="No hay tipos de producto" placeholder="" [selectOnTab]="true"
                                         class="w-1/3 min-w-[200px]" formControlName="tipoProducto"></ng-select>
@@ -266,7 +266,7 @@
                                 </div>
                                 <div>
                                     <label for="unidad">Unidad</label>
-                                    <ng-select [items]="measures" bindLabel="name" bindValue="uuid" [selectOnTab]="true"
+                                    <ng-select [items]="measures" bindLabel="name" [selectOnTab]="true"
                                         clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                         notFoundText="No hay unidades" placeholder="" class="w-1/3 min-w-[200px]"
                                         formControlName="unidad"></ng-select>
@@ -558,7 +558,7 @@
                         </div>
                         <div>
                             <label for="tipoProducto">Tipo de producto</label>
-                            <ng-select [items]="tipoProductos" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                            <ng-select [items]="tipoProductos" bindLabel="name" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay tipos de producto"
                                 placeholder="" class="w-1/3 min-w-[200px]" formControlName="tipoProducto"
                                 [selectOnTab]="true"
@@ -595,8 +595,8 @@
                         </div>
                         <div>
                             <label for="unidad">Unidad</label>
-                            <ng-select [items]="measures" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay unidades" placeholder=""
+                            <ng-select [items]="measures" bindLabel="name" clearAllText="Limpiar" style="width: 100%"
+                                [virtualScroll]="true" notFoundText="No hay unidades" placeholder=""
                                 class="w-1/3 min-w-[200px]" formControlName="unidad" [selectOnTab]="true"
                                 [ngClass]="isSubmit ? newProductoForm.controls['unidad'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
@@ -695,6 +695,20 @@
                             <label for="descripcionControl">Descripción control</label>
                             <textarea class="form-control" id="descripcionControl" formControlName="descripcionControl"
                                 rows="1"></textarea>
+                        </div>
+
+                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
+                            [ngClass]="isSubmit ? newProductoForm.controls['stock_minimum'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="stock_minimum">Stock mínimo</label>
+                            <input id="stock_minimum" type="text" [placeholder]="placeholderStocks" class="form-control"
+                                formControlName="stock_minimum" />
+                        </div>
+
+                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
+                            [ngClass]="isSubmit ? newProductoForm.controls['stock_optimum'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="stock_optimum">Stock óptimo</label>
+                            <input id="stock_optimum" type="text" [placeholder]="placeholderStocks" class="form-control"
+                                formControlName="stock_optimum" />
                         </div>
 
                     </div>
