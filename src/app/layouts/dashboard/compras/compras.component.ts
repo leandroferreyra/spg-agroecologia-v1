@@ -129,7 +129,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   productos$!: Observable<any[]>;
   loadingProductos = false;
 
-  productoControllable: boolean = false;
   showInputUbicacion: boolean = false;
 
   placeholderCantidad: string = '';
@@ -676,8 +675,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inicializarFormPago(data?: any) {
     this.pagoForm = new FormGroup({
       pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
-      payments_datetime: new FormControl({ value: data ? data.payments_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
-      payments_method: new FormControl({ value: data ? data.payments_method : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_datetime: new FormControl({ value: data ? data.payment_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_method: new FormControl({ value: data ? data.payment_method : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
       currency_uuid: new FormControl({ value: data ? data.currency.name : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
@@ -724,7 +723,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   inicializarFormProducto(data?: any) {
     this.selectedProducto = data;
-    this.productoControllable = data ? (data.product.controllable === 1) : false;
     this.productoForm = new FormGroup({
       transaction_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
       product_uuid: new FormControl({ value: data ? data.product : null, disabled: data ? true : false }, [Validators.required]),
@@ -742,10 +740,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
-        if (producto?.controllable === 1) {
-          this.productoControllable = true;
-          this.productoForm.get('control_description')?.setValue(producto.control_description);
-        }
+        this.productoForm.get('control_description')?.setValue(producto.control_description);
         if (producto?.product_type?.stock_controlled === 1 && producto.traceable === 1) {
           this.showInputUbicacion = true;
         } else {
@@ -1535,12 +1530,12 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let pago = new PagoDTO();
       pago.actual_role = this.actual_role;
-      pago.payments_datetime = this.pagoForm.get('payments_datetime')?.value;
+      pago.payment_datetime = this.pagoForm.get('payment_datetime')?.value;
       pago.amount = this.pagoForm.get('amount')?.value;
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;
       pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
-      pago.payments_method = this.pagoForm.get('payments_method')?.value;
+      pago.payment_method = this.pagoForm.get('payment_method')?.value;
       if (!this.inEdicionPago) {
         pago.transaction_uuid = this.selectedCompra.transaction?.uuid;
         this.subscription.add(

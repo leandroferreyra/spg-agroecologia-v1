@@ -293,7 +293,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: !this.isEdicion }, [Validators.required]),
       trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
       vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
-      controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, [Validators.required]),
       descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
       comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, []),
       nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, []),
@@ -584,7 +583,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     producto.traceable = form.get('trazable')?.value;
     producto.salable = form.get('vendible')?.value;
     producto.sales_name = form.get('nombreVenta')?.value;
-    producto.controllable = form.get('controlable')?.value;
     producto.control_description = form.get('descripcionControl')?.value;
     if (form.get('tipoProducto')?.value?.stock_controlled === 1) {
       if (form.get('unidad')?.value?.is_integer === 1) {
