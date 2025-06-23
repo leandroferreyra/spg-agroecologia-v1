@@ -1,10 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
-import { CompraProveedorDTO } from '../models/request/compraProveedorDTO';
-import { CompraDTO } from '../models/request/compraDTO';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
