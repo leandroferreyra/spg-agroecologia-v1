@@ -282,6 +282,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.selectedCompra = res.data;
           this.obtenerPagos(this.selectedCompra?.transaction?.uuid);
           this.inicializarFormEdit();
+          this.uuidFromUrl = this.selectedCompra.uuid;
           this.location.replaceState(`/dashboard/compras/${this.selectedCompra.uuid}`);
           this.spinner.hide();
         },
