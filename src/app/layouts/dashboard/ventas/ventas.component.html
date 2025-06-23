@@ -20,7 +20,7 @@
                         'text-gray-400 cursor-not-allowed': isEdicion
                       }">
                     <icon-plus class="mx-auto mb-1" />
-                    Agregar compra
+                    Agregar venta
                 </button>
 
                 <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" [disabled]="isEdicion"
@@ -43,7 +43,7 @@
                             @for(data of ventas ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;" [ngClass]="{'bg-blue-200': selectedVenta?.uuid === data.uuid}">
                                 <td (click)="showDataVenta(data);" style="font-size: 12px;">
-                                    <!-- <b>{{ showName(data) }}</b> - {{showFactura(data)}} - {{showFecha(data)}} -->
+                                    <b>{{ showName(data) }} </b> - {{showDocumento(data)}} - {{showFecha(data)}}
                                 </td>
                                 <td class="w-0 text-right align-middle">
                                     <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
@@ -56,47 +56,6 @@
                     </table>
                 </div>
             </div>
-
-            <!-- <div class="w-full p-2 mt-auto">
-
-                <div class="row mt-4 gy-3">
-                    <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
-                        <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                            [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                            [boundaryLinks]="true" (pageChange)="obtenerVentas()" />
-                    </div>
-
-                    <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
-                        <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
-                        <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label"
-                            [clearable]="false" class="custom-select" [dropdownPosition]="'top'"
-                            (change)="obtenerVentas()">
-                        </ng-select>
-                    </div>
-                </div>
-
-                <div class="group relative">
-                    <input type="text" placeholder="Buscar compra..." [(ngModel)]="filtroSimpleName"
-                        (input)="obtenerComprasPorFiltroSimple()" class="peer form-input ltr:pr-8 rtl:pl-8" />
-                    <div
-                        class="absolute top-1/2 -translate-y-1/2 peer-focus:text-primary ltr:right-[11px] rtl:left-[11px]">
-                        <icon-search />
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2 mt-2">
-                    <label class="w-12 h-6 relative">
-                        <input type="checkbox"
-                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id="custom_switch_checkbox2" [(ngModel)]="filtroSimpleContiene"
-                            (change)="obtenerComprasPorFiltroSimple();" />
-                        <span for="custom_switch_checkbox2"
-                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                        </span>
-                    </label>
-                    <span>Contiene</span>
-                </div>
-            </div> -->
 
             <div class="w-full p-2 mt-auto">
                 <div class="flex flex-col items-center justify-center sm:flex-row sm:justify-between mb-3">
@@ -164,6 +123,216 @@
     </div>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasRight"
+    aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close">
+        </button>
+    </div>
+
+    <div class="offcanvas-body">
+
+        <div class="row d-flex justify-content-center">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <fieldset class="border border-gray-300 p-4 rounded-md">
+                    <legend class="text-lg font-semibold text-gray-700 px-2">Proveedor</legend>
+                    <div class="mb-3 text-center">
+                        <label class="font-semibold text-gray-700 d-block">Tipo de Persona:</label>
+                        <div class="d-flex justify-content-center gap-3">
+                            <div class="form-check">
+                                <label class="inline-flex items-center" for="radioTodos">
+                                    <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                        id="radioTodos" value="todos" [(ngModel)]="filtroTipoPersona"
+                                        (change)="changeTipoPersona()">
+                                    <span class="ml-2 cursor-pointer">Todos</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="inline-flex items-center" for="radioFisica">
+                                    <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                        id="radioFisica" value="fisica" [(ngModel)]="filtroTipoPersona"
+                                        (change)="changeTipoPersona()">
+                                    <span class="ml-2 cursor-pointer">Física</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="inline-flex items-center" for="radioJuridica">
+                                    <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
+                                        id="radioJuridica" value="juridica" [(ngModel)]="filtroTipoPersona"
+                                        (change)="changeTipoPersona()">
+                                    <span class="ml-2 cursor-pointer">Jurídica</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if(this.filtroTipoPersona === 'fisica' || this.filtroTipoPersona === 'todos') {
+                    <div class="flex-grow-1">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" class="form-control"
+                            [(ngModel)]="filtrosVentas['transaction.person.human.firstname'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()">
+                    </div>
+                    <div class="flex-grow-1">
+                        <label for="apellido">Apellido</label>
+                        <input type="text" id="apellido" class="form-control"
+                            [(ngModel)]="filtrosVentas['transaction.person.human.lastname'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()">
+                    </div>
+                    }
+                    @if(this.filtroTipoPersona === 'juridica' || this.filtroTipoPersona === 'todos') {
+                    <div class="flex-grow-1">
+                        <label for="razon">Razón Social</label>
+                        <input type="text" id="razon" class="form-control"
+                            [(ngModel)]="filtrosVentas['transaction.person.legalEntity.company_name'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()">
+                    </div>
+                    }
+                </fieldset>
+                <div class="col-md-12 pr-1 mb-3">
+                    <label>Fecha transacción desde</label>
+                    <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'Y-m-d',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" [(ngModel)]="filtroFechaTransacDesde"
+                        (input)="obtenerComprasPorFiltroAvanzado()" />
+                </div>
+                <div class="col-md-12 pr-1 mb-3">
+                    <label>Fecha transacción hasta</label>
+                    <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'Y-m-d',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" [(ngModel)]="filtroFechaTransacHasta"
+                        (input)="obtenerComprasPorFiltroAvanzado()" />
+                </div>
+                <div class="flex-grow-1">
+                    <label>Tipo de comprobante contable</label>
+                    <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
+                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                        notFoundText="No hay tipos de comprobantes contables" class="w-1/3 min-w-[200px]"
+                        [(ngModel)]="filtrosVentas['transaction.transactionDocuments.accountDocumentType.uuid'].value"
+                        (change)="obtenerComprasPorFiltroAvanzado()"></ng-select>
+                </div>
+                <div class="flex-grow-1">
+                    <label for="prefijo">Prefijo (comprobante contable)</label>
+                    <input type="text" id="prefijo" class="form-control"
+                        [(ngModel)]="filtrosVentas['transaction.transactionDocuments.prefix_number'].value"
+                        (input)="obtenerComprasPorFiltroAvanzado()">
+                </div>
+                <div class="flex-grow-1">
+                    <label for="documento">Número de documento (comprobante contable)</label>
+                    <input type="text" id="documento" class="form-control"
+                        [(ngModel)]="filtrosVentas['transaction.transactionDocuments.document_number'].value"
+                        (input)="obtenerComprasPorFiltroAvanzado()">
+                </div>
+                <div class="col-md-12 pr-1 mb-3">
+                    <label>Fecha Comprobante desde</label>
+                    <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'Y-m-d',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" [(ngModel)]="filtroFechaComprobanteDesde"
+                        (input)="obtenerComprasPorFiltroAvanzado()" />
+                </div>
+                <div class="col-md-12 pr-1 mb-3">
+                    <label>Fecha Comprobante hasta</label>
+                    <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'Y-m-d',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" [(ngModel)]="filtroFechaComprobanteHasta"
+                        (input)="obtenerComprasPorFiltroAvanzado()" />
+                </div>
+                <div style="width: 100%;">
+                    <label for="switchRightLote">Lote</label>
+                    <div class="flex">
+                        <input id="switchRightLote" type="text" placeholder=""
+                            [(ngModel)]="filtrosVentas['batch.batch_identification'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()"
+                            class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
+                        <div
+                            class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                            <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                <input type="checkbox"
+                                    class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                    id="custom_switch_checkbox2"
+                                    [(ngModel)]="filtrosVentas['batch.batch_identification'].contiene"
+                                    (change)="obtenerComprasPorFiltroAvanzado()" />
+                                <span
+                                    class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                            </label>
+                            <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="width: 100%;">
+                    <label for="switchRight">Nro de serie</label>
+                    <div class="flex">
+                        <input id="switchRight" type="text" placeholder=""
+                            [(ngModel)]="filtrosVentas['batch.stocks.productInstances.serial_number'].value"
+                            (input)="obtenerComprasPorFiltroAvanzado()"
+                            class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
+                        <div
+                            class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                            <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                <input type="checkbox"
+                                    class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                    id="custom_switch_checkbox2"
+                                    [(ngModel)]="filtrosVentas['batch.stocks.productInstances.serial_number'].contiene"
+                                    (change)="obtenerComprasPorFiltroAvanzado()" />
+                                <span
+                                    class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                            </label>
+                            <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <label>Producto</label>
+                    <ng-select [items]="productos$ | async" bindLabel="name" [typeahead]="productoInput$"
+                        bindValue="uuid" [loading]="loadingProductos" [virtualScroll]="true"
+                        typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
+                        placeholder="Buscar producto..."
+                        [(ngModel)]="filtrosVentas['transaction.transactionProducts.product.uuid'].value"
+                        (change)="obtenerComprasPorFiltroAvanzado()">
+                    </ng-select>
+                </div>
+
+            </div>
+
+            <button class="mt-2 btn btn-primary" (click)="limpiarFiltros()">
+                Limpiar filtros avanzados
+            </button>
+
+        </div>
+
+
+
+    </div>
+
+</div>
+
 
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
     <p style="font-size: 20px; color: white">Cargando</p>

@@ -28,6 +28,7 @@ export class IndexService {
   apiDetalleContacto = '/contact_details';
   apiDetalleContactoPersona = '/contact_people';
   apiComprasClientes = '/transactions';
+  apiVentas = '/sales';
 
   apiHumans = '/humans'
   apiLegalEntities = '/legal_entities'
@@ -276,6 +277,12 @@ export class IndexService {
   getComprasClientesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasClientes, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+
+  getVentasWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiVentas, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
   getHumansWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {

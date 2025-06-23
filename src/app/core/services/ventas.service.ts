@@ -11,7 +11,7 @@ import { CompraDTO } from '../models/request/compraDTO';
 })
 export class VentasService {
 
-  private apiCompras = '/transactions';
+  private apiVentas = '/sales';
 
   constructor(private http: HttpClient) { }
 
@@ -19,36 +19,34 @@ export class VentasService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .append('actual_role', rol)
-      .append('with[]', "transaction.person.human")
+      .append('with[]', "transaction.person.human.documentType")
       .append('with[]', "transaction.person.city.district.country")
       .append('with[]', "transaction.person.legalEntity")
+      .append('with[]', "transaction.transactionProducts.product.measure")
+      .append('with[]', "transaction.transactionProducts.saleProduct.stock.batch")
+      .append('with[]', "transaction.transactionProducts.saleProduct.productInstances")
       .append('with[]', "transaction.transactionDocuments.accountDocumentType")
       .append('with[]', "transaction.transactionDocuments.currency")
-      .append('with[]', "transaction.transactionProducts.product.measure")
-      .append('with[]', "transaction.transactionProducts.controlUser")
-      .append('with[]', "transaction.transactionProducts.product.stocks.location")
-      .append('with[]', "transaction.transactionProducts.product.productType")
-      .append('with[]', "batch")
-      .append('with[]', "qualificationOption")
+      .append('with[]', "transaction.payments.currency")
       ;
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, { headers, params });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, { headers, params });
   }
 
-  saveCompra(compra: CompraDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiCompras, JSON.stringify(compra), { headers });
-  }
+  // saveCompra(compra: CompraDTO): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiVentas, JSON.stringify(compra), { headers });
+  // }
 
-  editCompra(uuid: string, compra: CompraDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, JSON.stringify(compra), { headers });
-  }
+  // editCompra(uuid: string, compra: CompraDTO): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   return this.http.put<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, JSON.stringify(compra), { headers });
+  // }
 
-  deleteCompra(uuid: string, rolActual: string): Observable<AuthResponse> {
+  deleteVenta(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .set('actual_role', rolActual);
-    return this.http.delete<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, { headers, params });
+    return this.http.delete<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, { headers, params });
   }
 
 }

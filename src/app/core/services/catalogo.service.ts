@@ -90,7 +90,7 @@ export class CatalogoService {
   getPosiblesEstadosTransaccion(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams().append('actual_role', rol)
-    .append('filters[0][]', 'transactionType.name').append('filters[0][]', '=').append('filters[0][]', 'Compra');
+      .append('filters[0][]', 'transactionType.name').append('filters[0][]', '=').append('filters[0][]', 'Compra');
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPosiblesEstadosTransaccion, { headers, params: params });
   }
 
@@ -133,6 +133,12 @@ export class CatalogoService {
   getTiposCompraDocumentosContables(rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams().append('actual_role', rol).append('filters[0][]', 'transactionType.name').append('filters[0][]', '=').append('filters[0][]', 'Compra');
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDocumentosContables, { headers, params: params });
+  }
+
+  getTiposVentaDocumentosContables(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams().append('actual_role', rol).append('filters[0][]', 'transactionType.name').append('filters[0][]', '=').append('filters[0][]', 'Venta');
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiDocumentosContables, { headers, params: params });
   }
 

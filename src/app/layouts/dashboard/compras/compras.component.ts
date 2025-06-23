@@ -519,7 +519,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       others: new FormControl({ value: null, disabled: false }, []),
       perceptionIB: new FormControl({ value: null, disabled: false }, []),
       perceptionRG3337: new FormControl({ value: null, disabled: false }, []),
-      possible_transaction_state_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      possible_transaction_state_uuid: new FormControl({ value: null, disabled: false }, []),
     });
     this.onNewForm();
   }
