@@ -36,6 +36,7 @@ import { ProductosEnPosesionComponent } from './productos-en-posesion/productos-
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { timeStamp } from 'console';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-clientes',
@@ -151,7 +152,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _clienteService: ClientesService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private router: Router) {
+    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private titleService: Title) {
     this.initStore();
   }
 

@@ -21,6 +21,7 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 import { IndexService } from 'src/app/core/services/index.service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-listado-bancos',

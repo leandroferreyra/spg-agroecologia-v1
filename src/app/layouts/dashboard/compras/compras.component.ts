@@ -43,6 +43,7 @@ import { Location } from '@angular/common';
 import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
 import { PagosService } from 'src/app/core/services/pagos.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-compras',
@@ -179,7 +180,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
+    private _catalogoService: CatalogoService, private _userLogged: UserLoggedService, private titleService: Title,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
     private _ubicacionService: UbicacionesService, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
     private router: Router) {

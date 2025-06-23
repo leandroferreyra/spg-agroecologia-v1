@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, TitleStrategy } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
@@ -22,6 +22,7 @@ import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
 import { IconLockComponent } from 'src/app/shared/icon/icon-lock';
 import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
 import { HumanService } from 'src/app/core/services/human.service';
+import { Title } from '@angular/platform-browser';
 
 
 @Component({

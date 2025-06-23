@@ -41,6 +41,7 @@ import { ComprasProductoComponent } from './compras-producto/compras-producto.co
 import { VinculosComponent } from './vinculos/vinculos.component';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Route, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-productos',
@@ -132,7 +133,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router
+    private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router,
+    private titleService: Title
   ) {
     this.initStore();
   }
@@ -293,6 +295,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: !this.isEdicion }, [Validators.required]),
       trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
       vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
+      controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, [Validators.required]),
       descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
       comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, []),
       nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, []),

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { NgbModule, NgbPagination, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
@@ -92,7 +93,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private userService: UserService, private spinner: NgxSpinnerService,
     private tokenService: TokenService, private swalService: SwalService, private rolService: RolesService,
-    private _userLogged: UserLoggedService, private _indexService: IndexService
+    private _userLogged: UserLoggedService, private _indexService: IndexService, private titleService: Title
   ) {
     this.initStore();
   }
@@ -112,6 +113,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.obtenerUsuarios();
     this.obtenerRoles();
+    this.titleService.setTitle('LADIE - Usuarios');
   }
 
   obtenerUsuarios() {

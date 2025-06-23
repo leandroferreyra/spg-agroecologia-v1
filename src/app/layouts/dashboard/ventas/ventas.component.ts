@@ -37,6 +37,7 @@ import { IconUserComponent } from 'src/app/shared/icon/icon-user';
 import Swal from 'sweetalert2';
 import { Location } from '@angular/common';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-ventas',
@@ -113,7 +114,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
-    private _ubicacionService: UbicacionesService, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
+    private titleService: Title, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
     private router: Router) {
     this.initStore();
   }

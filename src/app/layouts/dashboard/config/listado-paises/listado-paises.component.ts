@@ -22,6 +22,7 @@ import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IndexService } from 'src/app/core/services/index.service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-listado-paises',
@@ -75,7 +76,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
     closeOnEscape: false
   };
 
-  constructor(public storeData: Store<any>, private _indexService: IndexService,
+  constructor(public storeData: Store<any>, private _indexService: IndexService, private titleService: Title,
     private spinner: NgxSpinnerService, private _paisService: PaisesService,
     private _tokenService: TokenService, private swalService: SwalService) {
     this.initStore();
@@ -92,6 +93,7 @@ export class ListadoPaisesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.spinner.show();
     this.obtenerPaises();
+    this.titleService.setTitle('LADIE - Países');
   }
 
   obtenerPaises() {

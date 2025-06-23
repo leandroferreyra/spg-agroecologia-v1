@@ -35,6 +35,7 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-proveedores',
@@ -157,7 +158,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location) {
+    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private titleService: Title) {
     this.initStore();
   }
 

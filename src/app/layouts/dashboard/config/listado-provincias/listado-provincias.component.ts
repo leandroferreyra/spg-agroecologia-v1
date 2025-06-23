@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowDown, faArrowsUpDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
@@ -81,7 +82,7 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
   };
 
   constructor(public storeData: Store<any>, private _indexService: IndexService,
-    private _catalogoService: CatalogoService, private spinner: NgxSpinnerService, private _paisService: PaisesService,
+    private _catalogoService: CatalogoService, private spinner: NgxSpinnerService, private titleService: Title,
     private _tokenService: TokenService, private swalService: SwalService, private _provinciaService: ProvinciaService) {
     this.initStore();
   }
@@ -98,6 +99,8 @@ export class ListadoProvinciasComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.obtenerProvincias();
     this.obtenerPaises();
+    this.titleService.setTitle('LADIE - Provincias');
+
   }
 
   ngOnDestroy(): void {
