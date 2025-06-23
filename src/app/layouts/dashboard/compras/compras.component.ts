@@ -130,7 +130,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   productos$!: Observable<any[]>;
   loadingProductos = false;
 
-  showInputUbicacion: boolean = false;
+  // showInputUbicacion: boolean = false;
 
   placeholderCantidad: string = '';
 
@@ -335,7 +335,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.onFormEditChange();
   }
   onFormEditChange() {
-
+    this.compraForm.get('moneda')!.valueChanges.subscribe(
+      (value: any) => {
+        if (value.name === 'Pesos') {
+          this.compraForm.get('tipoCambio')?.setValue(1);
+          this.compraForm.get('tipoCambio')?.disable();
+        } else {
+          this.compraForm.get('tipoCambio')?.setValue(null);
+          this.compraForm.get('tipoCambio')?.enable();
+        }
+      });
   }
 
   getFechaFacturacion() {
@@ -347,7 +356,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   getMoneda() {
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-      return this.selectedCompra?.transaction?.transaction_documents[0]?.currency?.uuid;
+      return this.selectedCompra?.transaction?.transaction_documents[0]?.currency;
     }
     return '';
   }
@@ -639,15 +648,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
     } else {
       this.inEdicionProducto = true;
       this.tituloModal = 'Edición de producto';
-      if (producto.product?.product_type?.stock_controlled === 1 && producto.product?.traceable === 1) {
-        this.showInputUbicacion = true;
-        if (producto.product?.stocks?.length > 0 && producto.product.stocks[0].location !== null) {
-          this.getParentsFromLocation(producto.product.stocks[0].location);
-          this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
-        } else {
-          this.obtenerUbicaciones();
-        }
+      // if (producto.product?.product_type?.stock_controlled === 1 && producto.product?.traceable === 1) {
+      //   this.showInputUbicacion = true;
+      if (producto.product?.stocks?.length > 0 && producto.product.stocks[0].location !== null) {
+        this.getParentsFromLocation(producto.product.stocks[0].location);
+        this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
+      } else {
+        this.obtenerUbicaciones();
       }
+      // }
       this.inicializarFormProducto(producto);
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
@@ -742,15 +751,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
+        console.log(this.selectedCompra);
         this.productoForm.get('control_description')?.setValue(producto.control_description);
-        if (producto?.product_type?.stock_controlled === 1 && producto.traceable === 1) {
-          this.showInputUbicacion = true;
-        } else {
-          this.showInputUbicacion = false;
-        }
+        // if (producto?.product_type?.stock_controlled === 1 && producto.traceable === 1) {
+        //   this.showInputUbicacion = true;
+        // } else {
+        //   this.showInputUbicacion = false;
+        // }
         // Quantity
         if (producto) {
-          // let producto = this.productos.find(p => p.uuid === value);
           this.productoForm.get('quantity')?.enable();
           this.productoForm.get('quantity')?.setValue('');
           this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
@@ -1193,7 +1202,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.inEdicionProducto = false;
     this.breadcrumb = [];
     this.ultimaUbicacion = null;
-    this.showInputUbicacion = false;
+    // this.showInputUbicacion = false;
     this.modalProducto.close();
   }
 
@@ -1438,7 +1447,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     factura.document_datetime = this.compraForm.get('fechaFacturacion')?.value;
     factura.prefix_number = this.compraForm.get('prefijoComprobante')?.value;
     factura.document_number = this.compraForm.get('documentoComprobante')?.value;
-    factura.currency_uuid = this.compraForm.get('moneda')?.value;
+    factura.currency_uuid = this.compraForm.get('moneda')?.value?.uuid;
     factura.exchange_rate = this.compraForm.get('tipoCambio')?.value;
     factura.actual_role = this.actual_role;
     factura.with = ["accountDocumentType", "currency"];

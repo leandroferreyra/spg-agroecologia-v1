@@ -74,7 +74,7 @@
                 </div>
                 <div class="flex w-full">
                     <div class="relative flex-grow">
-                        <input id="switchRight" type="text" placeholder="Buscar compra..."
+                        <input id="switchRight1" type="text" placeholder="Buscar compra..."
                             [(ngModel)]="filtroSimpleName" (input)="obtenerComprasPorFiltroSimple()"
                             class="form-input w-full ltr:rounded-r-none rtl:rounded-l-none" />
                         <div class="absolute top-1/2 -translate-y-1/2 ltr:right-[11px] rtl:left-[11px]">
@@ -311,7 +311,7 @@
 
                     <div>
                         <label class="block font-medium">Moneda de la compra</label>
-                        <ng-select [items]="monedas" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                        <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar"
                             [virtualScroll]="true" notFoundText="No hay monedas" formControlName="moneda"
                             [selectOnTab]="true">
                         </ng-select>
@@ -389,9 +389,9 @@
                                             <label class="w-12 h-6 relative">
                                                 <input type="checkbox"
                                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="custom_switch_checkbox2" [checked]=isControlRealizado(data)
+                                                    id="custom_switch_checkbox3" [checked]=isControlRealizado(data)
                                                     disabled />
-                                                <span for="custom_switch_checkbox2"
+                                                <span for="custom_switch_checkbox3"
                                                     class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                                 </span>
                                             </label>
@@ -739,7 +739,9 @@
                                 formControlName="unit_price" />
                         </div>
 
-                        @if (showInputUbicacion) {
+                        <!-- @if (showInputUbicacion) { -->
+                        @if (selectedCompra?.transaction?.current_state?.state?.name === 'Finalizada' ||
+                        selectedCompra?.transaction?.current_state?.state?.name === 'Entregada pendiente de factura' ) {
                         <div class="flex-grow-1">
                             <label>Ubicación</label>
                             <ng-select [items]="ubicaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
@@ -770,7 +772,9 @@
                             </div>
                         </div>
                         }
+                        <!-- } -->
 
+                        @if(selectedCompra.transaction?.current_state?.state?.name === 'Borrador') {
                         <div
                             [ngClass]="isSubmit ? productoForm.controls['control_description'].errors ? 'has-error' : 'has-success' : ''">
                             <label>Descripción de control</label>
@@ -784,8 +788,8 @@
                             <label class="w-12 h-6 relative">
                                 <input type="checkbox"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="producto_controlado" />
-                                <span for="custom_switch_checkbox2"
+                                    id="custom_switch_checkbox4" formControlName="producto_controlado" />
+                                <span for="custom_switch_checkbox4"
                                     class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                 </span>
                             </label>
@@ -797,8 +801,8 @@
                             <label class="w-12 h-6 relative">
                                 <input type="checkbox"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="control_ok" />
-                                <span for="custom_switch_checkbox2"
+                                    id="custom_switch_checkbox5" formControlName="control_ok" />
+                                <span for="custom_switch_checkbox5"
                                     class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                 </span>
                             </label>
@@ -820,6 +824,7 @@
                             <textarea class="form-control" id="control_comments" formControlName="control_comments"
                                 rows="1"></textarea>
                         </div>
+                        }
                         }
 
                     </div>
@@ -983,7 +988,7 @@
                             <label class="relative mb-0 h-4 w-7 cursor-pointer">
                                 <input type="checkbox"
                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                    id="custom_switch_checkbox2"
+                                    id="custom_switch_checkbox6"
                                     [(ngModel)]="filtros['batch.batch_identification'].contiene"
                                     (change)="obtenerComprasPorFiltroAvanzado()" />
                                 <span
@@ -994,9 +999,9 @@
                     </div>
                 </div>
                 <div style="width: 100%;">
-                    <label for="switchRight">Nro de serie</label>
+                    <label for="switchRight2">Nro de serie</label>
                     <div class="flex">
-                        <input id="switchRight" type="text" placeholder=""
+                        <input id="switchRight2" type="text" placeholder=""
                             [(ngModel)]="filtros['batch.stocks.productInstances.serial_number'].value"
                             (input)="obtenerComprasPorFiltroAvanzado()"
                             class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
