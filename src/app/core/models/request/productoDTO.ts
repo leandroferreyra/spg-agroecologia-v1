@@ -15,7 +15,6 @@ export class ProductoDTO {
     traceable!: boolean;
     salable!: boolean;
     sales_name!: string;
-    controllable!: boolean;
     control_description!: string;
     product_state!: ProductState;
     minimum!: number;
