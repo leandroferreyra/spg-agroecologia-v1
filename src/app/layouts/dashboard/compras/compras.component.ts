@@ -414,7 +414,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
     params.paging = 20;
     params.page = null;
     params.order_by = {};
-    params.filters = {};
+    params.filters = {
+      'productType.can_be_purchased': { value: '1', op: '=', contiene: false },
+    };
 
     this.productos$ = this.productoInput$.pipe(
       debounceTime(300),
