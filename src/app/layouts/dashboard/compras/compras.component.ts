@@ -428,12 +428,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.loadingProductos = false;
           return of([]);
         }
-        params.filters = {
-          'name': { value: term, op: 'LIKE', contiene: true },
-        };
+        params.filters['name'] = { value: term, op: 'LIKE', contiene: true };
 
         return this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
-          map((res: any) => res.data), //
+          map((res: any) => res.data),
           finalize(() => this.loadingProductos = false)
         );
       })
