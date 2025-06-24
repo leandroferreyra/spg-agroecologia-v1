@@ -476,7 +476,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   obtenerCatalogos() {
     forkJoin({
       tiposDocumentosContables: this._catalogoService.getTiposCompraDocumentosContables(this.actual_role),
-      posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccion(this.actual_role),
+      posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccionCompra(this.actual_role),
       calificaciones: this._catalogoService.getCalificaciones(this.actual_role),
       monedas: this._indexService.getMonedas(this.actual_role)
     }).subscribe({
@@ -1064,12 +1064,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.obtenerCompras();
   }
 
-  // irAlProducto(event: any) {
-  //   this.inicializarFormEdit(event);
-  //   this.tab1 = 'datos-generales';
-  // }
-
-  changeTipoPersona() {
+   changeTipoPersona() {
     this.filtroSimpleName = '';
     this.filtroSimpleContiene = true;
     this.filtros.operator.value = '';

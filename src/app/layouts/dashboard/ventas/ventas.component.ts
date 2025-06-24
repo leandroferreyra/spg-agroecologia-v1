@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -14,7 +14,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { debounceTime, distinctUntilChanged, finalize, forkJoin, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
-import { ComprasProveedorService } from 'src/app/core/services/comprasProveedor.service';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FacturaService } from 'src/app/core/services/factura.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { PagosService } from 'src/app/core/services/pagos.service';
@@ -67,6 +67,14 @@ export class VentasComponent implements OnInit, OnDestroy {
   filtroSimpleContiene: boolean = true;
   filtroTipoPersona: string = 'todos';
   isTabDisabled = false;
+  ventaForm!: FormGroup;
+  mostrarProductos = true;
+  inEdicionProducto: boolean = false;
+
+
+  // Iconos
+  iconEye = faEye;
+  iconEyeSlash = faEyeSlash;
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 10;
@@ -104,11 +112,14 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   ventas: any[] = [];
   tiposDocumentosContables: any[] = [];
+  posiblesEstadosTransaccion: any[] = [];
+  ubicaciones: any[] = [];
 
   productoInput$ = new Subject<string>();
   productos$!: Observable<any[]>;
   loadingProductos = false;
 
+  tituloModal: string = '';
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -169,7 +180,7 @@ export class VentasComponent implements OnInit, OnDestroy {
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
-            this.showVentaByUuid();
+            this.obtenerVentaPorId(this.uuidFromUrl);
           } else {
             this.isLoadingVentas = false;
             if (this.ventas.length === 0) {
@@ -182,7 +193,7 @@ export class VentasComponent implements OnInit, OnDestroy {
             }
             if (!alta && this.ventas.length > 0) {
               this.isEdicion = false;
-              this.inicializarFormEdit(this.ventas[0]);
+              this.obtenerVentaPorId(this.ventas[0].uuid);
               this.location.replaceState(`/dashboard/ventas/${this.ventas[0].uuid}`);
             }
           }
@@ -260,13 +271,13 @@ export class VentasComponent implements OnInit, OnDestroy {
   obtenerCatalogos() {
     forkJoin({
       tiposDocumentosContables: this._catalogoService.getTiposVentaDocumentosContables(this.actual_role),
-      // posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccion(this.actual_role),
+      posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccionVenta(this.actual_role),
       // calificaciones: this._catalogoService.getCalificaciones(this.actual_role),
       // monedas: this._indexService.getMonedas(this.actual_role)
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
-        // this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
+        this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
         // this.calificaciones = res.calificaciones.data;
         // this.monedas = res.monedas.data;
       },
@@ -276,20 +287,87 @@ export class VentasComponent implements OnInit, OnDestroy {
     });
   }
 
-  inicializarFormEdit(data: any) {
+  inicializarFormEdit() {
+    this.ventaForm = new FormGroup({
+      // Venta
+      nombre: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.firstname, disabled: true }, []),
+      apellido: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.lastname, disabled: true }, []),
+      razonSocial: new FormControl({ value: this.selectedVenta?.transaction?.person?.legal_entity?.company_name, disabled: true }, []), cuit: new FormControl({ value: this.getCuit(), disabled: true }, []),
+      tipoDocumento: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.document_type?.name, disabled: true }, []),
+      numeroDocumento: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.document_number, disabled: true }, []),
+      fechaVenta: new FormControl({ value: this.selectedVenta?.transaction?.transaction_datetime, disabled: true }, []),
+      estadoVenta: new FormControl({ value: this.selectedVenta?.transaction?.current_state?.state.uuid, disabled: true }, []),
+      calle: new FormControl({ value: this.selectedVenta?.transaction?.person?.street_name, disabled: true }, []),
+      numero: new FormControl({ value: this.selectedVenta?.transaction?.person?.door_number, disabled: true }, []),
+      ciudad: new FormControl({ value: this.selectedVenta?.transaction?.person?.city?.name, disabled: true }, []),
+      pais: new FormControl({ value: this.selectedVenta?.transaction?.person?.city?.district?.country?.name, disabled: true }, []),
+      // Detalles
+      subtotalSinDescuento: new FormControl({ value: this.selectedVenta?.transaction?.subtotal_before_discount, disabled: true }, []),
+      descuento1: new FormControl({ value: this.selectedVenta?.transaction?.discount1, disabled: true }, []),
+      descuento2: new FormControl({ value: this.selectedVenta?.transaction?.discount2, disabled: true }, []),
+      subtotalConDescuento: new FormControl({ value: this.selectedVenta?.transaction?.subtotal_after_discount, disabled: true }, []),
+      otrosCargos: new FormControl({ value: this.selectedVenta?.transaction?.others, disabled: true }, []),
+      iva: new FormControl({ value: this.selectedVenta?.transaction?.vat, disabled: true }, []),
+      percepcionIIBB: new FormControl({ value: this.selectedVenta?.transaction?.perceptionIB, disabled: true }, []),
+      percepcionRG3337: new FormControl({ value: this.selectedVenta?.transaction?.perceptionRG3337, disabled: true }, []),
+      total: new FormControl({ value: this.selectedVenta?.transaction?.total, disabled: true }, []),
+      // Retira
+      nombreRetira: new FormControl({ value: this.selectedVenta?.delivered_to, disabled: true }, []),
+      fechaRetira: new FormControl({ value: this.selectedVenta?.delivery_date, disabled: true }, []),
+      remito: new FormControl({ value: this.selectedVenta?.delivery_note, disabled: true }, []),
+    })
 
   }
 
+  getCuit() {
+    if (this.selectedVenta) {
+      if (this.isPersonaFisica()) {
+        return this.selectedVenta.transaction?.person?.human?.cuit;
+      } else {
+        return this.selectedVenta.transaction?.person?.legal_entity?.cuit;
+      }
+    }
+  }
 
-  showVentaByUuid() {
+  isPersonaFisica() {
+    if (this.selectedVenta?.transaction?.person?.human !== null) {
+      return true
+    } else {
+      return false;
+    }
+  }
+
+  // showVentaByUuid() {
+  //   this.subscription.add(
+  //     this._ventaService.getVentaById(this.uuidFromUrl, this.actual_role).subscribe({
+  //       next: res => {
+  //         this.showDataVenta(res.data);
+  //         this.isLoadingVentas = false;
+  //         this.tokenService.setToken(res.token);
+  //       },
+  //       error: error => {
+  //         console.error(error);
+  //       }
+  //     })
+  //   )
+  // }
+
+  obtenerVentaPorId(uuid: any) {
+    this.spinner.show();
     this.subscription.add(
-      this._ventaService.getVentaById(this.uuidFromUrl, this.actual_role).subscribe({
+      this._ventaService.getVentaById(uuid, this.actual_role).subscribe({
         next: res => {
-          this.showDataVenta(res.data);
-          this.isLoadingVentas = false;
-          this.tokenService.setToken(res.token);
+          this.selectedVenta = res.data;
+          console.log("🚀 ~ VentasComponent ~ this._ventaService.getVentaById ~ this.selectedVenta:", this.selectedVenta)
+          // this.obtenerPagos(this.selectedVenta?.transaction?.uuid);
+          this.inicializarFormEdit();
+          this.uuidFromUrl = this.selectedVenta.uuid;
+          this.location.replaceState(`/dashboard/ventas/${this.selectedVenta.uuid}`);
+          this.spinner.hide();
         },
         error: error => {
+          this.spinner.hide();
+          this.swalService.toastError('top-right', error.error.message);
           console.error(error);
         }
       })
@@ -297,9 +375,13 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   showDataVenta(venta: any) {
-    this.isEdicion = false;
-    this.location.replaceState(`/dashboard/ventas/${venta.uuid}`);
-    this.inicializarFormEdit(venta);
+    if (this.ventas.length == 0 || this.selectedVenta && this.selectedVenta.uuid !== venta.uuid) {
+      this.isEdicion = false;
+      this.obtenerVentaPorId(venta.uuid);
+    }
+    // this.isEdicion = false;
+    // this.location.replaceState(`/dashboard/ventas/${venta.uuid}`);
+    // this.inicializarFormEdit(venta);
   }
 
 
@@ -460,6 +542,122 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.params.extraDateFilters = [];
 
     this.obtenerVentas();
+  }
+
+  irAlProducto(event: MouseEvent, data: any) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree([`/dashboard/productos/${data.uuid}`])
+    );
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`${baseUrl}#${url}`, '_blank');
+    } else {
+      this.router.navigate([`/dashboard/productos/${data.uuid}`])
+    }
+  }
+
+  getMostrarOcultarTooltip() {
+    return this.mostrarProductos ? 'Ocultar' : 'Mostrar';
+  }
+
+  toggleProductos() {
+    this.mostrarProductos = !this.mostrarProductos;
+  }
+
+  openSwalEliminarProductoTransaccion(producto: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el producto seleccionado?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarProductoTransaccion(producto);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarProductoTransaccion(producto: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._transactionProductService.deleteTransactionProduct(producto.uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          let productos = this.selectedVenta.transaction.transaction_products;
+          const index = productos.findIndex((p: any) => p.uuid === producto.uuid);
+          if (index !== -1) {
+            productos.splice(index, 1);
+          }
+          this.obtenerVentaPorId(this.selectedVenta.uuid);
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  openModalProducto(type: string, producto?: any) {
+    if (type === 'NEW') {
+      if (this.isEdicion) {
+        this.isEdicion = false;
+      }
+      this.tituloModal = 'Nuevo producto';
+      this.obtenerUbicaciones();
+      // this.inicializarFormProducto();
+      // this.modalProducto.options = this.modalOptions;
+      // this.modalProducto.open();
+    } else {
+      this.inEdicionProducto = true;
+      this.tituloModal = 'Edición de producto';
+      // if (producto.product?.stocks?.length > 0 && producto.product.stocks[0].location !== null) {
+      //   this.getParentsFromLocation(producto.product.stocks[0].location);
+      //   this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
+      // } else {
+      //   this.obtenerUbicaciones();
+      // }
+      // this.inicializarFormProducto(producto);
+      // this.modalProducto.options = this.modalOptions;
+      // this.modalProducto.open();
+    }
+  }
+
+  obtenerUbicaciones(uuid?: string) {
+    const params: any = {};
+    params.with = ["location.location.location.location"];
+    params.paging = null;
+    params.page = null;
+    params.order_by = {
+      'name': 'asc'
+    };
+    params.filters = {
+      'location_uuid': { value: uuid ? uuid : 'null', op: '=', contiene: false },
+    };
+
+    this.subscription.add(
+      this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
+        next: res => {
+          this.ubicaciones = res.data;
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
   }
 
 }

@@ -18,14 +18,14 @@ export class VentasService {
     const params = new HttpParams()
       .append('actual_role', rol)
       .append('with[]', "transaction.person.human.documentType")
-      .append('with[]', "transaction.person.city.district.country")
       .append('with[]', "transaction.person.legalEntity")
+      .append('with[]', "transaction.person.city.district.country")
       .append('with[]', "transaction.transactionProducts.product.measure")
       .append('with[]', "transaction.transactionProducts.saleProduct.stock.batch")
       .append('with[]', "transaction.transactionProducts.saleProduct.productInstances")
       .append('with[]', "transaction.transactionDocuments.accountDocumentType")
       .append('with[]', "transaction.transactionDocuments.currency")
-      .append('with[]', "transaction.payments.currency")
+      .append('with[]', "transaction.payments")
       ;
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, { headers, params });
   }
