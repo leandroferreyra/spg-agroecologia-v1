@@ -774,18 +774,18 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.productoForm.get('producto_controlado')!.valueChanges.subscribe(
       (value: any) => {
         if (value) {
-          ['password', 'control_comments'].forEach((field) => {
+          ['password'].forEach((field) => {
             const control = this.productoForm.get(field);
             control?.setValidators(Validators.required);
           });
         } else {
-          ['password', 'control_comments'].forEach((field) => {
+          ['password'].forEach((field) => {
             const control = this.productoForm.get(field);
             control?.clearValidators();
             control?.setErrors(null);
           });
         }
-        ['password', 'control_comments'].forEach((field) => {
+        ['password'].forEach((field) => {
           this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
         });
       });
@@ -1064,7 +1064,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.obtenerCompras();
   }
 
-   changeTipoPersona() {
+  changeTipoPersona() {
     this.filtroSimpleName = '';
     this.filtroSimpleContiene = true;
     this.filtros.operator.value = '';
