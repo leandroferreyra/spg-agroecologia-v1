@@ -211,7 +211,7 @@
                     </span>
 
                     <button type="button" (click)="toggleProductos()" class="text-sm hover:underline"
-                        style="color:#000000a3" [ngxTippy]="getMostrarOcultarTooltip()">
+                        style="color:#000000a3" [ngxTippy]="getMostrarOcultarProductosTooltip()">
                         <fa-icon [icon]="mostrarProductos ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
                     </button>
                 </legend>
@@ -349,14 +349,14 @@
                         </button>
                     </span>
 
-                    <button type="button" (click)="toggleProductos()" class="text-sm hover:underline"
-                        style="color:#000000a3" [ngxTippy]="getMostrarOcultarTooltip()">
-                        <fa-icon [icon]="mostrarProductos ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
+                    <button type="button" (click)="toggleComprobantes()" class="text-sm hover:underline"
+                        style="color:#000000a3" [ngxTippy]="getMostrarOcultarComprobantesTooltip()">
+                        <fa-icon [icon]="mostrarComprobantes ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
                     </button>
                 </legend>
 
                 @if (selectedVenta?.transaction?.transaction_documents?.length > 0) {
-                <div *ngIf="mostrarProductos" class="mt-4">
+                <div *ngIf="mostrarComprobantes" class="mt-4">
                     <div class="table-responsive">
                         <table class="table-hover">
                             <thead class="bg-gray-100">

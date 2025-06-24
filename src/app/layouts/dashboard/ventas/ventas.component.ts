@@ -69,6 +69,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
   ventaForm!: FormGroup;
   mostrarProductos = true;
+  mostrarComprobantes = true;
   inEdicionProducto: boolean = false;
 
 
@@ -556,14 +557,20 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
-  getMostrarOcultarTooltip() {
+  getMostrarOcultarProductosTooltip() {
     return this.mostrarProductos ? 'Ocultar' : 'Mostrar';
+  }
+  getMostrarOcultarComprobantesTooltip() {
+    return this.mostrarComprobantes ? 'Ocultar' : 'Mostrar';
   }
 
   toggleProductos() {
     this.mostrarProductos = !this.mostrarProductos;
   }
-
+  toggleComprobantes() {
+    this.mostrarComprobantes = !this.mostrarComprobantes;
+  }
+  
   openSwalEliminarProductoTransaccion(producto: any) {
     Swal.fire({
       title: '',
