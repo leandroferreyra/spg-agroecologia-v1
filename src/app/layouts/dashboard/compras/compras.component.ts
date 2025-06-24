@@ -740,7 +740,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
       quantity: new FormControl({ value: data ? this.showCantidad(data) : null, disabled: data ? false : true }, [Validators.required]),
       unit_price: new FormControl({ value: data ? data.unit_price : null, disabled: false }, [Validators.required]),
       control_ok: new FormControl({ value: data ? (data.control_result === 1) : null, disabled: false }, []),
+      control_propio: new FormControl({ value: true, disabled: false }, []),
       producto_controlado: new FormControl({ value: data ? (data.control_result !== null) : null, disabled: false }, []),
+      usuario: new FormControl({ value: null, disabled: false }, []),
       password: new FormControl({ value: null, disabled: false }, []),
       control_comments: new FormControl({ value: data ? data.control_comments : null, disabled: false }, []),
       location_uuid: new FormControl({ value: data ? this.getLocation(data) : null, disabled: false }, []),
@@ -1143,7 +1145,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
         producto.location_uuid = this.ultimaUbicacion ? this.ultimaUbicacion?.uuid : null;
         if (this.productoForm.get('producto_controlado')?.value) {
           producto.control_result = this.productoForm.get('control_ok')?.value ?? false;
-          producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+          if (this.productoForm.get('control_propio')) {
+            producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+          } else {
+            if (this.isEmail(this.productoForm.get('usuario')?.value)) {
+              producto.control_user_email = this.productoForm.get('usuario')?.value;
+            } else {
+              producto.control_user_name = this.productoForm.get('usuario')?.value;
+            }
+          }
           producto.password = this.productoForm.get('password')?.value;
           producto.control_comments = this.productoForm.get('control_comments')?.value;
         } else {
@@ -1195,6 +1205,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.swalService.toastInfo('top-right', "El formulario no se modificó.");
       }
     }
+  }
+
+  isEmail(value: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
   }
 
   cerrarModalAltaProducto() {

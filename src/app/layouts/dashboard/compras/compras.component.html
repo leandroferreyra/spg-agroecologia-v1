@@ -311,9 +311,8 @@
 
                     <div>
                         <label class="block font-medium">Moneda de la compra</label>
-                        <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar"
-                            [virtualScroll]="true" notFoundText="No hay monedas" formControlName="moneda"
-                            [selectOnTab]="true">
+                        <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar" [virtualScroll]="true"
+                            notFoundText="No hay monedas" formControlName="moneda" [selectOnTab]="true">
                         </ng-select>
                     </div>
                     <div>
@@ -808,6 +807,31 @@
                             </label>
                             <span>Control OK</span>
                         </div>
+
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox5" formControlName="control_propio" />
+                                <span for="custom_switch_checkbox5"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                            <div class="flex flex-col">
+                                <span>Control propio</span>
+                                <small class="text-gray-500">*(Indica si controló el propio usuario o si lo hizo otro
+                                    usuario)</small>
+                            </div>
+                        </div>
+
+                        @if (!productoForm.controls['control_propio'].value) {
+                        <div (keydown.enter)="confirmarAltaProducto()"
+                            [ngClass]="isSubmit ? productoForm.controls['usuario'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="usuario">Usuario</label>
+                            <input id="usuario" type="text" class="form-control" formControlName="usuario" />
+                        </div>
+                        }
+
                         <div (keydown.enter)="confirmarAltaProducto()"
                             [ngClass]="isSubmit ? productoForm.controls['password'].errors ? 'has-error' : 'has-success' : ''">
                             <label>Password</label>
