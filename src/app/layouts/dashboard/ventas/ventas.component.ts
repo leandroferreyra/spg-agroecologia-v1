@@ -138,6 +138,13 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   tituloModal: string = '';
 
+  inEdicionVenta: boolean = false;
+  // inEdicionDescuentos: boolean = false;
+  // inEdicionFactura: boolean = false;
+  // inEdicionProducto: boolean = false;
+  // inEdicionPago: boolean = false;
+
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
@@ -841,6 +848,54 @@ export class VentasComponent implements OnInit, OnDestroy {
         delete obj[key]; // Eliminar propiedades nulas o undefined
       }
     });
+  }
+
+  openCloseEditarVenta() {
+    this.inEdicionVenta = !this.inEdicionVenta;
+    if (this.inEdicionVenta) {
+      this.ventaForm.get('fechaVenta')?.enable();
+      this.ventaForm.get('estadoVenta')?.enable();
+    } else {
+      this.ventaForm.get('fechaVenta')?.disable();
+      this.ventaForm.get('estadoVenta')?.disable();
+      this.inicializarFormEdit();
+    }
+  }
+  confirmarEdicionVenta() {
+    if (this.ventaForm.get('estadoVenta')?.value === null) {
+      this.swalService.toastError('top-right', 'Debe seleccionar un estado');
+      return;
+    }
+    this.spinner.show();
+    let ventaDTO = new VentaDTO();
+    let transaction = new Transaction();
+    transaction.transaction_datetime = this.ventaForm.get('fechaVenta')?.value;
+    transaction.possible_transaction_state_uuid = this.ventaForm.get('estadoVenta')?.value;
+    ventaDTO.transaction = transaction;
+    ventaDTO.actual_role = this.actual_role;
+    ventaDTO.with = [
+      "transaction.person.human",
+      "transaction.person.legalEntity",
+      "transaction.person.city.district.country",
+      "transaction.transactionDocuments.accountDocumentType",
+      "transaction.transactionDocuments.currency",
+      "transaction.transactionProducts.product.measure"];
+    this.subscription.add(
+      this._ventaService.editVenta(this.selectedVenta.uuid, ventaDTO).subscribe({
+        next: res => {
+          this.selectedVenta = res.data;
+          this.inicializarFormEdit();
+          this.obtenerVentas(true);
+          this.openCloseEditarVenta();
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
   }
 
 

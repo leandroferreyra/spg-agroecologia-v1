@@ -1158,6 +1158,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           producto.control_result = null;
           producto.control_comments = null;
         }
+
         if (!this.inEdicionProducto) {
           producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
           producto.transaction_uuid = this.selectedCompra?.transaction?.uuid;
@@ -1180,6 +1181,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
             })
           )
         } else {
+          if (this.productoForm.get('control_ok')?.pristine && this.productoForm.get('producto_controlado')?.pristine &&
+            this.productoForm.get('control_comments')?.pristine) {
+            delete producto.control_result;
+            delete producto.password;
+          }
+          if (this.selectedCompra?.transaction?.current_state?.state?.name === 'Borrador') {
+            delete producto.location_uuid;
+          }
           this.subscription.add(
             this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, producto).subscribe({
               next: res => {
@@ -1331,6 +1340,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.swalService.toastError('top-right', 'Debe seleccionar un estado');
       return;
     }
+    this.spinner.show();
     let compraDTO = new CompraDTO();
     let transaction = new Transaction();
     transaction.transaction_datetime = this.compraForm.get('fechaCompra')?.value;
@@ -1354,8 +1364,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.inicializarFormEdit();
           this.obtenerCompras(true);
           this.openCloseEditarFechaCompra();
+          this.spinner.hide();
         },
         error: error => {
+          this.spinner.hide();
           console.error(error);
           this.swalService.toastError('top-right', error.error.message);
         }
