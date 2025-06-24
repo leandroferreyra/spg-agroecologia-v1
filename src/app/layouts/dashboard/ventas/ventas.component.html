@@ -532,7 +532,7 @@
                             <ng-select [items]="clientes$ | async" bindLabel="nombreCompleto"
                                 [typeahead]="clienteInput$" [loading]="loadingClientes" [virtualScroll]="true"
                                 typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
-                                placeholder="Buscar cliente..." formControlName="person_uuid"
+                                placeholder="Buscar cliente..." formControlName="person_uuid" notFoundText="No hay clientes"
                                 [ngClass]="isSubmit ? newVentaForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
                             </ng-select>
                         </div>
