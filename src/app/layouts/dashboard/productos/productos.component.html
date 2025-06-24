@@ -415,6 +415,7 @@
                                             Mínimo
                                         </div>
                                         <input type="text" formControlName="stock_minimum"
+                                            (keydown.enter)="confirmarProducto(productoForm)"
                                             class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
                                     </div>
                                 </div>
@@ -427,6 +428,7 @@
                                             Óptimo
                                         </div>
                                         <input type="text" formControlName="stock_optimum"
+                                            (keydown.enter)="confirmarProducto(productoForm)"
                                             class="form-input ltr:rounded-l-none rtl:rounded-r-none py-1.5 text-xs" />
                                     </div>
                                 </div>

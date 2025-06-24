@@ -295,7 +295,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: !this.isEdicion }, [Validators.required]),
       trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
       vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
-      controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, [Validators.required]),
+      controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, []),
       descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
       comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, []),
       nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, []),
