@@ -295,7 +295,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: !this.isEdicion }, [Validators.required]),
       trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
       vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
-      controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, []),
+      // controlable: new FormControl({ value: producto?.controllable, disabled: !this.isEdicion }, []),
       descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
       comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, []),
       nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, []),
@@ -317,21 +317,21 @@ export class ProductosComponent implements OnInit, OnDestroy {
         }
       });
       // Deshabilita la descripción si no es controlable
-      if (this.productoForm.get('controlable')?.value === 0) {
-        this.productoForm.get('descripcionControl')?.disable();
-      }
+      // if (this.productoForm.get('controlable')?.value === 0) {
+      //   this.productoForm.get('descripcionControl')?.disable();
+      // }
     }
     this.onFormEditChange();
   }
   onFormEditChange() {
-    this.productoForm.get('controlable')!.valueChanges.subscribe(
-      (value) => {
-        if (value) {
-          this.productoForm.get('descripcionControl')?.enable();
-        } else {
-          this.productoForm.get('descripcionControl')?.disable();
-        }
-      });
+    // this.productoForm.get('controlable')!.valueChanges.subscribe(
+    //   (value) => {
+    //     if (value) {
+    //       this.productoForm.get('descripcionControl')?.enable();
+    //     } else {
+    //       this.productoForm.get('descripcionControl')?.disable();
+    //     }
+    //   });
 
     this.productoForm.get('tipoProducto')!.valueChanges.subscribe(
       (value) => {
@@ -382,12 +382,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
       iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
       comentarios: new FormControl({ value: null, disabled: false }, []),
       nombreVenta: new FormControl({ value: null, disabled: false }, []),
-      descripcionControl: new FormControl({ value: null, disabled: true }, []),
+      descripcionControl: new FormControl({ value: null, disabled: false }, []),
       asignaNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
       tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
       trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
       vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      controlable: new FormControl({ value: false, disabled: false }, [Validators.required]),
+      // controlable: new FormControl({ value: false, disabled: false }, [Validators.required]),
       stock_minimum: new FormControl({ value: null, disabled: true }, []),
       stock_optimum: new FormControl({ value: null, disabled: true }, [])
     });
@@ -424,18 +424,18 @@ export class ProductosComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.newProductoForm.get('controlable')!.valueChanges.subscribe(
-      (value) => {
-        if (value) {
-          this.newProductoForm.get('descripcionControl')?.enable();
-        } else {
-          this.newProductoForm.get('descripcionControl')?.setValue(null);
-          this.newProductoForm.get('descripcionControl')?.disable();
-        }
-        ['descripcionControl'].forEach((field) => {
-          this.newProductoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
-        });
-      });
+    // this.newProductoForm.get('controlable')!.valueChanges.subscribe(
+    //   (value) => {
+    //     if (value) {
+    //       this.newProductoForm.get('descripcionControl')?.enable();
+    //     } else {
+    //       this.newProductoForm.get('descripcionControl')?.setValue(null);
+    //       this.newProductoForm.get('descripcionControl')?.disable();
+    //     }
+    //     ['descripcionControl'].forEach((field) => {
+    //       this.newProductoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+    //     });
+    //   });
   }
 
   showDataProducto(producto: any) {
