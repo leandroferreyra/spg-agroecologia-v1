@@ -776,18 +776,40 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
     this.productoForm.get('producto_controlado')!.valueChanges.subscribe(
       (value: any) => {
+        ['password'].forEach((field) => {
+          const control = this.productoForm.get(field);
+          control?.setValidators(Validators.required);
+        });
         if (value) {
-          ['password'].forEach((field) => {
-            const control = this.productoForm.get(field);
-            control?.setValidators(Validators.required);
-          });
+
         } else {
-          ['password'].forEach((field) => {
-            const control = this.productoForm.get(field);
-            control?.clearValidators();
-            control?.setErrors(null);
-          });
+          this.productoForm.get('control_ok')?.setValue(null);
         }
+        ['password'].forEach((field) => {
+          this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+        });
+      });
+
+    this.productoForm.get('control_ok')!.valueChanges.subscribe(
+      (value: any) => {
+        if (value) {
+          this.productoForm.get('producto_controlado')?.setValue(true);
+        }
+        ['password'].forEach((field) => {
+          const control = this.productoForm.get(field);
+          control?.setValidators(Validators.required);
+        });
+        ['password'].forEach((field) => {
+          this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+        });
+      });
+
+    this.productoForm.get('control_comments')!.valueChanges.subscribe(
+      (value: any) => {
+        ['password'].forEach((field) => {
+          const control = this.productoForm.get(field);
+          control?.setValidators(Validators.required);
+        });
         ['password'].forEach((field) => {
           this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
         });
@@ -1143,21 +1165,21 @@ export class ComprasComponent implements OnInit, OnDestroy {
         producto.location_uuid = this.ultimaUbicacion ? this.ultimaUbicacion?.uuid : null;
         if (this.productoForm.get('producto_controlado')?.value) {
           producto.control_result = this.productoForm.get('control_ok')?.value ?? false;
-          if (this.productoForm.get('control_propio')) {
-            producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
-          } else {
-            if (this.isEmail(this.productoForm.get('usuario')?.value)) {
-              producto.control_user_email = this.productoForm.get('usuario')?.value;
-            } else {
-              producto.control_user_name = this.productoForm.get('usuario')?.value;
-            }
-          }
-          producto.password = this.productoForm.get('password')?.value;
           producto.control_comments = this.productoForm.get('control_comments')?.value;
         } else {
           producto.control_result = null;
           producto.control_comments = null;
         }
+        if (this.productoForm.get('control_propio')) {
+          producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+        } else {
+          if (this.isEmail(this.productoForm.get('usuario')?.value)) {
+            producto.control_user_email = this.productoForm.get('usuario')?.value;
+          } else {
+            producto.control_user_name = this.productoForm.get('usuario')?.value;
+          }
+        }
+        producto.password = this.productoForm.get('password')?.value;
 
         if (!this.inEdicionProducto) {
           producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
