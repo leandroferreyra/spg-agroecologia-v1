@@ -134,7 +134,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   placeholderCantidad: string = '';
 
-  // Referencia al modal para crear y editar países.
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
   @ViewChild('modalPago') modalPago!: NgxCustomModalComponent;
@@ -598,6 +597,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._comprasService.deleteCompra(compra.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
+          if (this.uuidFromUrl === compra.uuid) {
+            // Se blanquea para que si elimina en el que está parado no tire error al recargar, ya que no existe el uuid.
+            this.uuidFromUrl = '';
+          }
           this.obtenerCompras();
           this.tokenService.setToken(res.token);
           this.spinner.hide();

@@ -478,6 +478,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._productoService.deleteProducto(producto.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
+          if (this.uuidFromUrl === producto.uuid) {
+            // Se blanquea para que si elimina en el que está parado no tire error al recargar, ya que no existe el uuid.
+            this.uuidFromUrl = '';
+          }
           this.obtenerProductos();
           this.tokenService.setToken(res.token);
           this.spinner.hide();

@@ -539,6 +539,10 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._clienteService.eliminarCliente(cliente.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
+          if (this.uuidFromUrl === cliente.uuid) {
+            // Se blanquea para que si elimina en el que está parado no tire error al recargar, ya que no existe el uuid.
+            this.uuidFromUrl = '';
+          }
           this.obtenerClientes();
           this.tokenService.setToken(res.token);
           this.spinner.hide();

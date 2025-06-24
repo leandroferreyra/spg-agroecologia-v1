@@ -230,6 +230,10 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiClientes, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
+  getClientesWithParamAsync(paramsObj: any, rol: string): Observable<any[]> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<any[]>(environment.baseUrl + this.apiClientes, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
 
   getUsuariosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

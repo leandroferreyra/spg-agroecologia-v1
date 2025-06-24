@@ -546,6 +546,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._proveedoresService.eliminarProveedor(proveedor.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
+          if (this.uuidFromUrl === proveedor.uuid) {
+            // Se blanquea para que si elimina en el que está parado no tire error al recargar, ya que no existe el uuid.
+            this.uuidFromUrl = '';
+          }
           this.obtenerProveedores();
           this.tokenService.setToken(res.token);
           this.spinner.hide();

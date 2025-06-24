@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthResponse } from '../models/response/authResponse';
 import { environment } from 'src/environments/environment';
+import { VentaDTO } from '../models/request/ventaDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -30,15 +31,15 @@ export class VentasService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, { headers, params });
   }
 
-  // saveCompra(compra: CompraDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiVentas, JSON.stringify(compra), { headers });
-  // }
+  saveVenta(venta: VentaDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiVentas, JSON.stringify(venta), { headers });
+  }
 
-  // editCompra(uuid: string, compra: CompraDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.put<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, JSON.stringify(compra), { headers });
-  // }
+  editVenta(uuid: string, venta: VentaDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, JSON.stringify(venta), { headers });
+  }
 
   deleteVenta(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -8,7 +8,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { FlatpickrDirective } from 'angularx-flatpickr';
 import { MenuModule } from 'headlessui-angular';
-import { NgxCustomModalComponent } from 'ngx-custom-modal';
+import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
@@ -38,6 +38,9 @@ import Swal from 'sweetalert2';
 import { Location } from '@angular/common';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
 import { Title } from '@angular/platform-browser';
+import { format } from 'date-fns';
+import { CompraDTO, Transaction } from 'src/app/core/models/request/compraDTO';
+import { VentaDTO } from 'src/app/core/models/request/ventaDTO';
 
 @Component({
   selector: 'app-ventas',
@@ -53,6 +56,12 @@ import { Title } from '@angular/platform-browser';
 export class VentasComponent implements OnInit, OnDestroy {
 
   @ViewChild('offcanvasRight', { static: false }) offcanvasElement!: ElementRef;
+  @ViewChild('modalVenta') modalVenta!: NgxCustomModalComponent;
+  modalOptions: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: false
+  };
 
   store: any;
   private subscription: Subscription = new Subscription();
@@ -68,6 +77,9 @@ export class VentasComponent implements OnInit, OnDestroy {
   filtroTipoPersona: string = 'todos';
   isTabDisabled = false;
   ventaForm!: FormGroup;
+  newVentaForm!: FormGroup;
+  isSubmit = false;
+
   mostrarProductos = true;
   mostrarComprobantes = true;
   inEdicionProducto: boolean = false;
@@ -120,6 +132,10 @@ export class VentasComponent implements OnInit, OnDestroy {
   productos$!: Observable<any[]>;
   loadingProductos = false;
 
+  clienteInput$ = new Subject<string>();
+  clientes$!: Observable<any[]>;
+  loadingClientes = false;
+
   tituloModal: string = '';
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
@@ -152,6 +168,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this.uuidFromUrl = params.get('uuid') ?? '';
     });
     this.obtenerVentas();
+    this.obtenerClientes();
     this.obtenerProductos();
     this.obtenerCatalogos();
   }
@@ -387,6 +404,37 @@ export class VentasComponent implements OnInit, OnDestroy {
 
 
   openModalVenta(type: string, venta?: any) {
+    if (type === 'NEW') {
+      if (this.isEdicion) {
+        this.isEdicion = false;
+        this.inicializarFormEdit(); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
+      }
+      this.tituloModal = 'Nueva venta';
+      this.inicializarFormNew();
+      this.modalVenta.options = this.modalOptions;
+      this.modalVenta.open();
+    } else {
+      // this.tab1 = 'datos-generales';
+      this.isEdicion = true;
+      this.tituloModal = 'Edición venta';
+      this.obtenerVentaPorId(venta.uuid);
+    }
+  }
+  inicializarFormNew() {
+    this.newVentaForm = new FormGroup({
+      transaction_datetime: new FormControl({ value: new Date(), disabled: false }, []),
+      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      // vat_after_discount: new FormControl({ value: null, disabled: false }, []),
+      // discount1: new FormControl({ value: null, disabled: false }, []),
+      // discount2: new FormControl({ value: null, disabled: false }, []),
+      // others: new FormControl({ value: null, disabled: false }, []),
+      // perceptionIB: new FormControl({ value: null, disabled: false }, []),
+      // perceptionRG3337: new FormControl({ value: null, disabled: false }, []),
+      possible_transaction_state_uuid: new FormControl({ value: null, disabled: false }, []),
+    });
+    this.onNewForm();
+  }
+  onNewForm() {
 
   }
 
@@ -454,6 +502,10 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._ventaService.deleteVenta(venta.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
+          if (this.uuidFromUrl === venta.uuid) {
+            // Se blanquea para que si elimina en el que está parado no tire error al recargar, ya que no existe el uuid.
+            this.uuidFromUrl = '';
+          }
           this.obtenerVentas();
           this.tokenService.setToken(res.token);
           this.spinner.hide();
@@ -570,7 +622,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   toggleComprobantes() {
     this.mostrarComprobantes = !this.mostrarComprobantes;
   }
-  
+
   openSwalEliminarProductoTransaccion(producto: any) {
     Swal.fire({
       title: '',
@@ -666,5 +718,130 @@ export class VentasComponent implements OnInit, OnDestroy {
       })
     )
   }
+
+  obtenerClientes() {
+    const params: any = {};
+    params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+      "person.human.documentType", "person.human.user", "person.legalEntity"];
+    params.paging = 10;
+    params.page = 1;
+    params.order_by = {};
+    params.filters = {};
+
+    this.clientes$ = this.clienteInput$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => this.loadingClientes = true),
+      switchMap((term: string) => {
+        if (!term || term.trim().length < 2) {
+          this.loadingClientes = false;
+          return of([]);
+        }
+        params.filters = {
+          operator: { value: 'OR' },
+          'person.human.firstname': { value: term, op: 'LIKE', contiene: true },
+          'person.human.lastname': { value: term, op: 'LIKE', contiene: true },
+          'person.legalEntity.company_name': { value: term, op: 'LIKE', contiene: true }
+        };
+
+        return this._indexService.getClientesWithParamAsync(params, this.actual_role).pipe(
+          map((res: any) => res.data.map((proveedor: any) => ({
+            ...proveedor,
+            nombreCompleto: this.bindName(proveedor)
+          }))),
+          finalize(() => this.loadingClientes = false)
+        );
+      })
+    );
+  }
+  bindName(data: any): string {
+    if (!data.person) return '';
+    if (data.person.human) {
+      return data.person.human.firstname + ' ' + data.person.human.lastname;
+    } else if (data.person.legal_entity) {
+      return data.person.legal_entity.company_name;
+    }
+    return '';
+  }
+
+  cerrarModal() {
+    this.isSubmit = false;
+    this.modalVenta.close();
+  }
+
+  confirmarVenta(form: FormGroup) {
+    this.isSubmit = true;
+    if (form.valid) {
+      this.spinner.show();
+      let venta = new VentaDTO();
+      this.armarDTOVenta(venta, form);
+      if (!this.isEdicion) {
+        this.subscription.add(
+          this._ventaService.saveVenta(venta).subscribe({
+            next: res => {
+              this.spinner.hide();
+              this.obtenerVentas(true);
+              this.cerrarModal();
+              this.showDataVenta(res.data);
+            },
+            error: error => {
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message)
+              console.error(error);
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._ventaService.editVenta(this.selectedVenta.uuid, venta).subscribe({
+            next: res => {
+              this.ventas = [...this.ventas.map(p =>
+                p.uuid === res.data.uuid ? res.data : p
+              )];
+              this.isEdicion = false;
+              this.inicializarFormEdit();
+              this.swalService.toastSuccess('top-right', "Producto actualizado.");
+              this.spinner.hide();
+            },
+            error: error => {
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+            }
+          })
+        )
+      }
+    }
+  }
+
+  armarDTOVenta(venta: VentaDTO, form: FormGroup) {
+    venta.actual_role = this.actual_role;
+    let transaction = new Transaction();
+    transaction.person_uuid = form.get('person_uuid')?.value.person.uuid;
+    const fechaFormateada = form.get('transaction_datetime')?.value instanceof Date
+      ? format(form.get('transaction_datetime')?.value, 'yyyy-MM-dd')
+      : form.get('transaction_datetime')?.value;
+    transaction.transaction_datetime = fechaFormateada;
+
+    transaction.possible_transaction_state_uuid = form.get('possible_transaction_state_uuid')?.value;
+    venta.transaction = transaction;
+
+    if (!this.isEdicion) {
+      this.cleanObject(venta);
+    }
+  }
+
+  // Se eliminan los nulos.
+  private cleanObject(obj: any): void {
+    Object.keys(obj).forEach(key => {
+      if (obj[key] && typeof obj[key] === 'object') {
+        this.cleanObject(obj[key]); // Limpiar objetos anidados
+      }
+      if (obj[key] == null) {
+        delete obj[key]; // Eliminar propiedades nulas o undefined
+      }
+    });
+  }
+
 
 }
