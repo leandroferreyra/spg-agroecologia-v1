@@ -169,7 +169,16 @@
                         <label class="block font-medium">Número documento</label>
                         <input type="text" class="form-control w-full" formControlName="numeroDocumento" />
                     </div>
+                    } @else {
+                    <div>
+                        <label class="block font-medium">Razón social</label>
+                        <input type="text" class="form-control w-full" formControlName="razonSocial" />
+                    </div>
                     }
+                    <div>
+                        <label class="block font-medium">Cuit</label>
+                        <input type="text" class="form-control w-full" formControlName="cuit" />
+                    </div>
                     <div>
                         <label class="block font-medium">Calle</label>
                         <input type="text" class="form-control w-full" formControlName="calle" />
@@ -285,8 +294,8 @@
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
                 <legend class="text-lg font-semibold px-2 flex items-center justify-between">
                     <span>Detalles</span>
-                    <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar">
-                        <!-- (click)="openCloseEditarDescuentosCompra()"> -->
+                    <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
+                        (click)="openCloseEditaDetalles()">
                         <icon-pencil />
                     </button>
                 </legend>
@@ -295,11 +304,11 @@
                         <label class="block font-medium">Subtotal sin descuentos</label>
                         <input type="text" class="form-control w-full" formControlName="subtotalSinDescuento" />
                     </div>
-                    <div>
+                    <div (keydown.enter)="confirmarDetalles()">
                         <label class="block font-medium">Descuento 1</label>
                         <input type="text" class="form-control w-full" formControlName="descuento1" />
                     </div>
-                    <div>
+                    <div (keydown.enter)="confirmarDetalles()">
                         <label class="block font-medium">Descuento 2</label>
                         <input type="text" class="form-control w-full" formControlName="descuento2" />
                     </div>
@@ -307,7 +316,7 @@
                         <label class="block font-medium">Subtotal con descuentos</label>
                         <input type="text" class="form-control w-full" formControlName="subtotalConDescuento" />
                     </div>
-                    <div>
+                    <div (keydown.enter)="confirmarDetalles()">
                         <label class="block font-medium">Otros cargos</label>
                         <input type="text" class="form-control w-full" formControlName="otrosCargos" />
                     </div>
@@ -315,11 +324,11 @@
                         <label class="block font-medium">IVA</label>
                         <input type="text" class="form-control w-full" formControlName="iva" />
                     </div>
-                    <div>
+                    <div (keydown.enter)="confirmarDetalles()">
                         <label class="block font-medium">Percepción IIBB</label>
                         <input type="text" class="form-control w-full" formControlName="percepcionIIBB" />
                     </div>
-                    <div>
+                    <div (keydown.enter)="confirmarDetalles()">
                         <label class="block font-medium">Percepción RG. 3337</label>
                         <input type="text" class="form-control w-full" formControlName="percepcionRG3337" />
                     </div>
@@ -328,17 +337,17 @@
                         <input type="text" class="form-control w-full" formControlName="total" />
                     </div>
                 </div>
-                <!-- @if (inEdicionDescuentos) {
+                @if (inEdicionDetalles) {
                 <div class="row mt-3">
                     <div class="col-12 d-flex justify-content-center">
-                        <button class="btn btn-primary mr-3" (click)="confirmarEdicionDescuentos()">
+                        <button class="btn btn-primary mr-3" (click)="confirmarDetalles()">
                             Confirmar
                         </button>
                         <button id="back-button-with-border" type="button" class="btn btn-wd"
-                            (click)="openCloseEditarDescuentosCompra()">Cancelar</button>
+                            (click)="openCloseEditaDetalles()">Cancelar</button>
                     </div>
                 </div>
-                } -->
+                }
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
@@ -510,7 +519,63 @@
 
 
 
+<div>
+    <ngx-custom-modal #modalProducto class=" modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <div class="position-relative text-center w-100">
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
+            </div>
+        </ng-template>
 
+        <ng-template #modalBody>
+
+            <form [formGroup]="productoForm" class="p-1">
+                <div class="flex flex-col sm:flex-row">
+                    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+
+                        <div class="flex-grow-1">
+                            <label>Producto</label>
+                            <ng-select [items]="productos$ | async" bindLabel="name" [typeahead]="productoInput$"
+                                [loading]="loadingProductos" [virtualScroll]="true" typeToSearchText='Escriba un nombre'
+                                loadingText="Cargando..." [appendTo]="'body'" placeholder="Buscar producto..."
+                                formControlName="product_uuid"
+                                [ngClass]="isSubmit ? productoForm.controls['product_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                            </ng-select>
+                        </div>
+
+                        <div (keydown.enter)="confirmarProducto()"
+                            [ngClass]="isSubmit ? productoForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="quantity">Cantidad</label>
+                            <input id="quantity" type="text" class="form-control" [placeholder]="placeholderCantidad"
+                                formControlName="quantity" />
+                        </div>
+
+
+                        <div (keydown.enter)="confirmarProducto()"
+                            [ngClass]="isSubmit ? productoForm.controls['unit_price'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="unit_price">Precio unitario</label>
+                            <input id="unit_price" type="text" placeholder="" class="form-control"
+                                formControlName="unit_price" />
+                        </div>
+
+                    </div>
+                </div>
+
+            </form>
+
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <button class="btn btn-primary mr-3" (click)="confirmarProducto()">
+                        Confirmar
+                    </button>
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cerrarModalProducto()">Cancelar</button>
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
 
 
 <div>

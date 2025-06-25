@@ -42,6 +42,7 @@ import { format } from 'date-fns';
 import { CompraDTO, Transaction } from 'src/app/core/models/request/compraDTO';
 import { VentaDTO } from 'src/app/core/models/request/ventaDTO';
 import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
+import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTransaccionDTO';
 
 @Component({
   selector: 'app-ventas',
@@ -59,6 +60,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   @ViewChild('offcanvasRight', { static: false }) offcanvasElement!: ElementRef;
   @ViewChild('modalVenta') modalVenta!: NgxCustomModalComponent;
   @ViewChild('modalComprobante') modalComprobante!: NgxCustomModalComponent;
+  @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -80,6 +82,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
   ventaForm!: FormGroup;
   comprobanteForm!: FormGroup;
+  productoForm!: FormGroup;
   newVentaForm!: FormGroup;
   isSubmit = false;
 
@@ -87,7 +90,10 @@ export class VentasComponent implements OnInit, OnDestroy {
   mostrarComprobantes = true;
   inEdicionProducto: boolean = false;
   inEdicionComprobante: boolean = false;
-
+  inEdicionDetalles: boolean = false;
+  inEdicionVenta: boolean = false;
+  tituloModal: string = '';
+  placeholderCantidad: string = '';
 
   // Iconos
   iconEye = faEye;
@@ -141,13 +147,8 @@ export class VentasComponent implements OnInit, OnDestroy {
   clientes$!: Observable<any[]>;
   loadingClientes = false;
 
-  tituloModal: string = '';
 
-  inEdicionVenta: boolean = false;
-  // inEdicionDescuentos: boolean = false;
-  // inEdicionFactura: boolean = false;
-  // inEdicionProducto: boolean = false;
-  // inEdicionPago: boolean = false;
+
 
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
@@ -196,7 +197,10 @@ export class VentasComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     this.params.with = ["transaction.person.human",
       "transaction.person.legalEntity",
-      "transaction.transactionDocuments"];
+      "transaction.transactionDocuments",
+      "transaction.transactionProducts", "transaction.transactionProducts.saleProduct.productInstances",
+      "transaction.transactionProducts.saleProduct.stock",
+      "transaction.transactionProducts.saleProduct.stock.batch"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -322,7 +326,8 @@ export class VentasComponent implements OnInit, OnDestroy {
       // Venta
       nombre: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.firstname, disabled: true }, []),
       apellido: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.lastname, disabled: true }, []),
-      razonSocial: new FormControl({ value: this.selectedVenta?.transaction?.person?.legal_entity?.company_name, disabled: true }, []), cuit: new FormControl({ value: this.getCuit(), disabled: true }, []),
+      razonSocial: new FormControl({ value: this.selectedVenta?.transaction?.person?.legal_entity?.company_name, disabled: true }, []),
+      cuit: new FormControl({ value: this.getCuit(), disabled: true }, []),
       tipoDocumento: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.document_type?.name, disabled: true }, []),
       numeroDocumento: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.document_number, disabled: true }, []),
       fechaVenta: new FormControl({ value: this.selectedVenta?.transaction?.transaction_datetime, disabled: true }, []),
@@ -367,20 +372,57 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
-  // showVentaByUuid() {
-  //   this.subscription.add(
-  //     this._ventaService.getVentaById(this.uuidFromUrl, this.actual_role).subscribe({
-  //       next: res => {
-  //         this.showDataVenta(res.data);
-  //         this.isLoadingVentas = false;
-  //         this.tokenService.setToken(res.token);
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
+  openCloseEditaDetalles() {
+    this.inEdicionDetalles = !this.inEdicionDetalles;
+    if (this.inEdicionDetalles) {
+      this.ventaForm.get('descuento1')?.enable();
+      this.ventaForm.get('descuento2')?.enable();
+      this.ventaForm.get('otrosCargos')?.enable();
+      this.ventaForm.get('percepcionIIBB')?.enable();
+      this.ventaForm.get('percepcionRG3337')?.enable();
+    } else {
+      this.ventaForm.get('descuento1')?.disable();
+      this.ventaForm.get('descuento2')?.disable();
+      this.ventaForm.get('otrosCargos')?.disable();
+      this.ventaForm.get('percepcionIIBB')?.disable();
+      this.ventaForm.get('percepcionRG3337')?.disable();
+      this.inicializarFormEdit();
+    }
+  }
+
+  confirmarDetalles() {
+    this.spinner.show();
+    let ventaDTO = new VentaDTO();
+    let transaction = new Transaction();
+    transaction.discount1 = this.ventaForm.get('descuento1')?.value;
+    transaction.discount2 = this.ventaForm.get('descuento2')?.value;
+    transaction.others = this.ventaForm.get('otrosCargos')?.value;
+    transaction.perceptionIB = this.ventaForm.get('percepcionIIBB')?.value;
+    transaction.perceptionRG3337 = this.ventaForm.get('percepcionRG3337')?.value;
+    ventaDTO.transaction = transaction;
+    ventaDTO.actual_role = this.actual_role;
+    ventaDTO.with = [
+      "transaction.person.human",
+      "transaction.person.legalEntity",
+      "transaction.person.city.district.country",
+      "transaction.transactionDocuments.accountDocumentType",
+      "transaction.transactionDocuments.currency",
+      "transaction.transactionProducts.product.measure"];
+    this.subscription.add(
+      this._ventaService.editVenta(this.selectedVenta.uuid, ventaDTO).subscribe({
+        next: res => {
+          this.obtenerVentaPorId(this.uuidFromUrl);
+          this.openCloseEditaDetalles();
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+        }
+      })
+    )
+  }
 
   obtenerVentaPorId(uuid: any) {
     this.spinner.show();
@@ -663,11 +705,11 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._transactionProductService.deleteTransactionProduct(producto.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          let productos = this.selectedVenta.transaction.transaction_products;
-          const index = productos.findIndex((p: any) => p.uuid === producto.uuid);
-          if (index !== -1) {
-            productos.splice(index, 1);
-          }
+          // let productos = this.selectedVenta.transaction.transaction_products;
+          // const index = productos.findIndex((p: any) => p.uuid === producto.uuid);
+          // if (index !== -1) {
+          //   productos.splice(index, 1);
+          // }
           this.obtenerVentaPorId(this.selectedVenta.uuid);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
@@ -688,7 +730,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       }
       this.tituloModal = 'Nuevo producto';
       this.obtenerUbicaciones();
-      // this.inicializarFormProducto();
+      this.inicializarFormProducto();
       // this.modalProducto.options = this.modalOptions;
       // this.modalProducto.open();
     } else {
@@ -704,6 +746,82 @@ export class VentasComponent implements OnInit, OnDestroy {
       // this.modalProducto.options = this.modalOptions;
       // this.modalProducto.open();
     }
+    this.modalProducto.options = this.modalOptions;
+    this.modalProducto.open();
+  }
+
+  inicializarFormProducto(data?: any) {
+    this.productoForm = new FormGroup({
+      product_uuid: new FormControl(null, [Validators.required]),
+      quantity: new FormControl({ value: null, disabled: data ? false : true }, [Validators.required]),
+      unit_price: new FormControl(null, [Validators.required]),
+    })
+    this.onFormProductoChange();
+
+  }
+  onFormProductoChange() {
+    this.productoForm.get('product_uuid')!.valueChanges.subscribe(
+      (producto: any) => {
+        // Quantity
+        if (producto) {
+          this.productoForm.get('quantity')?.enable();
+          this.productoForm.get('quantity')?.setValue('');
+          this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
+        } else {
+          this.productoForm.get('quantity')?.disable();
+          this.placeholderCantidad = '';
+        }
+      });
+  }
+
+  confirmarProducto() {
+    this.isSubmit = true;
+    if (this.productoForm.valid) {
+      this.spinner.show();
+      let productoTransaccionDTO = new ProductoTransaccionDTO();
+      productoTransaccionDTO.actual_role = this.actual_role;
+      productoTransaccionDTO.transaction_uuid = this.selectedVenta.transaction?.uuid;
+      productoTransaccionDTO.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
+      productoTransaccionDTO.quantity = this.productoForm.get('quantity')?.value;
+      productoTransaccionDTO.unit_price = this.productoForm.get('unit_price')?.value;
+      if (!this.inEdicionProducto) {
+        this.subscription.add(
+          this._transactionProductService.saveTransactionProduct(productoTransaccionDTO).subscribe({
+            next: res => {
+              console.log(res);
+              this.tokenService.setToken(res.token);
+              this.isSubmit = false;
+              this.inEdicionProducto = false;
+              this.obtenerVentaPorId(this.selectedVenta.uuid);
+              this.cerrarModalProducto();
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              this.isSubmit = false;
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          // this._transactionProductService.editTransactionProduct().subscribe({
+          //   next: res => {
+          //     console.log(res);
+          //   },
+          //   error: error => {
+          //     console.error(error);
+          //   }
+          // })
+        )
+      }
+    }
+  }
+
+  cerrarModalProducto() {
+    this.isSubmit = false;
+    this.modalProducto.close();
   }
 
   obtenerUbicaciones(uuid?: string) {
