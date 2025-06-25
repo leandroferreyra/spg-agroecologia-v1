@@ -260,6 +260,8 @@
                 <legend class="text-lg font-semibold px-2 flex items-center justify-between">
                     <span>Factura</span>
                     <div class="flex items-center">
+                        @if (selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' ||
+                        selectedCompra?.transaction?.current_state?.state?.name === 'Entregada pendiente de factura' ) {
                         @if (!poseeFactura){
                         <div>
                             <button type="button" class="hover:text-primary" ngxTippy="Agregar"
@@ -281,6 +283,7 @@
                                 <icon-trash-lines />
                             </button>
                         </div>
+                        }
                     </div>
 
                 </legend>
@@ -338,9 +341,11 @@
                 <legend class="text-lg font-semibold px-2 flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Productos
+                        @if(selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' ) {
                         <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
                             <icon-plus class="w-4 h-4" />
                         </button>
+                        }
                     </span>
 
                     <button type="button" (click)="toggleProductos()" class="text-sm hover:underline"
@@ -407,12 +412,15 @@
                                                     <icon-pencil />
                                                 </button>
                                             </div>
+                                            @if(selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' )
+                                            {
                                             <div>
                                                 <button type="button" ngxTippy="Eliminar"
                                                     (click)="openSwalEliminarProductoTransaccion(data)">
                                                     <icon-trash-lines />
                                                 </button>
                                             </div>
+                                            }
                                         </div>
                                     </td>
                                 </tr>
