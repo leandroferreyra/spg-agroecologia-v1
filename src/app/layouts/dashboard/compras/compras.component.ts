@@ -1170,7 +1170,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           producto.control_result = null;
           producto.control_comments = null;
         }
-        if (this.productoForm.get('control_propio')) {
+        if (this.productoForm.get('control_propio')?.value) {
           producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
         } else {
           if (this.isEmail(this.productoForm.get('usuario')?.value)) {
