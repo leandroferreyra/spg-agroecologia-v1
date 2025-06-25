@@ -345,7 +345,7 @@
                 <legend class="text-lg font-semibold px-2 flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Comprobantes
-                        <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
+                        <button type="button" class="hover:text-primary" (click)="openModalComprobante('NEW')">
                             <icon-plus class="w-4 h-4" />
                         </button>
                     </span>
@@ -389,13 +389,13 @@
                                         <div class="flex items-center">
                                             <div>
                                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                                    (click)="openModalProducto('EDIT', data)">
+                                                    (click)="openModalComprobante('EDIT',data)">
                                                     <icon-pencil />
                                                 </button>
                                             </div>
                                             <div>
                                                 <button type="button" ngxTippy="Eliminar"
-                                                    (click)="openSwalEliminarProductoTransaccion(data)">
+                                                    (click)="openSwalEliminarComprobante(data)">
                                                     <icon-trash-lines />
                                                 </button>
                                             </div>
@@ -571,6 +571,85 @@
                     </button>
                     <button id="back-button-with-border" type="button" class="btn btn-wd"
                         (click)="cerrarModal()">Cancelar</button>
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<div>
+    <ngx-custom-modal #modalComprobante class=" modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <div class="position-relative text-center w-100">
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
+            </div>
+        </ng-template>
+
+        <ng-template #modalBody>
+
+            <form [formGroup]="comprobanteForm" class="p-4">
+                <div class="flex flex-col sm:flex-row">
+                    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-1">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+                            <div
+                                [ngClass]="isSubmit ? comprobanteForm.controls['document_datetime'].errors ? 'has-error' : 'has-success' : ''">
+                                <label class="block font-medium">Fecha de facturacion</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                            enableTime: false, 
+                            dateFormat: 'Y-m-d',
+                            time24hr: true,
+                            enableSeconds: false
+                        }" class="form-input" formControlName="document_datetime" />
+                            </div>
+
+                            <div>
+                                <label class="block font-medium">Tipo de comprobante</label>
+                                <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
+                                    [ngClass]="isSubmit ? comprobanteForm.controls['account_document_type_uuid'].errors ? 'has-error' : 'has-success' : ''"
+                                    clearAllText="Limpiar" [virtualScroll]="true"
+                                    notFoundText="No hay tipos de comprobante"
+                                    formControlName="account_document_type_uuid" [selectOnTab]="true">
+                                </ng-select>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? (comprobanteForm.controls['document_number'].errors || comprobanteForm.controls['prefix_number'].errors) ? 'has-error' : 'has-success' : ''">
+                                <label class="block font-medium">Número de comprobante</label>
+                                <div class="flex gap-2">
+                                    <input type="text" class="form-control w-full" formControlName="prefix_number" />
+                                    <input type="text" class="form-control w-full" formControlName="document_number" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block font-medium">Moneda de la compra</label>
+                                <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar"
+                                    [ngClass]="isSubmit ? comprobanteForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''"
+                                    [virtualScroll]="true" notFoundText="No hay monedas" formControlName="currency_uuid"
+                                    [selectOnTab]="true">
+                                </ng-select>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? comprobanteForm.controls['exchange_rate'].errors ? 'has-error' : 'has-success' : ''">
+                                <label class="block font-medium">Tipo de cambio</label>
+                                <input type="text" class="form-control w-full" formControlName="exchange_rate" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <button class="btn btn-primary mr-3" (click)="confirmarComprobante()">
+                        Confirmar
+                    </button>
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cerrarModalComprobante()">Cancelar</button>
                 </div>
             </div>
         </ng-template>

@@ -41,6 +41,7 @@ import { Title } from '@angular/platform-browser';
 import { format } from 'date-fns';
 import { CompraDTO, Transaction } from 'src/app/core/models/request/compraDTO';
 import { VentaDTO } from 'src/app/core/models/request/ventaDTO';
+import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 
 @Component({
   selector: 'app-ventas',
@@ -57,6 +58,7 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   @ViewChild('offcanvasRight', { static: false }) offcanvasElement!: ElementRef;
   @ViewChild('modalVenta') modalVenta!: NgxCustomModalComponent;
+  @ViewChild('modalComprobante') modalComprobante!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -77,12 +79,14 @@ export class VentasComponent implements OnInit, OnDestroy {
   filtroTipoPersona: string = 'todos';
   isTabDisabled = false;
   ventaForm!: FormGroup;
+  comprobanteForm!: FormGroup;
   newVentaForm!: FormGroup;
   isSubmit = false;
 
   mostrarProductos = true;
   mostrarComprobantes = true;
   inEdicionProducto: boolean = false;
+  inEdicionComprobante: boolean = false;
 
 
   // Iconos
@@ -127,6 +131,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   tiposDocumentosContables: any[] = [];
   posiblesEstadosTransaccion: any[] = [];
   ubicaciones: any[] = [];
+  monedas: any[] = [];
 
   productoInput$ = new Subject<string>();
   productos$!: Observable<any[]>;
@@ -149,7 +154,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
-    private titleService: Title, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
+    private _transactionDocumentsService: FacturaService, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
     private router: Router) {
     this.initStore();
   }
@@ -298,13 +303,13 @@ export class VentasComponent implements OnInit, OnDestroy {
       tiposDocumentosContables: this._catalogoService.getTiposVentaDocumentosContables(this.actual_role),
       posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccionVenta(this.actual_role),
       // calificaciones: this._catalogoService.getCalificaciones(this.actual_role),
-      // monedas: this._indexService.getMonedas(this.actual_role)
+      monedas: this._indexService.getMonedas(this.actual_role)
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
         this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
         // this.calificaciones = res.calificaciones.data;
-        // this.monedas = res.monedas.data;
+        this.monedas = res.monedas.data;
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -383,7 +388,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._ventaService.getVentaById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedVenta = res.data;
-          console.log("🚀 ~ VentasComponent ~ this._ventaService.getVentaById ~ this.selectedVenta:", this.selectedVenta)
+          // console.log("🚀 ~ VentasComponent ~ this._ventaService.getVentaById ~ this.selectedVenta:", this.selectedVenta)
           // this.obtenerPagos(this.selectedVenta?.transaction?.uuid);
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedVenta.uuid;
@@ -898,5 +903,158 @@ export class VentasComponent implements OnInit, OnDestroy {
     )
   }
 
+
+  openSwalEliminarComprobante(comprobante: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el comprobante seleccionado?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarComprobante(comprobante);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarComprobante(comprobante: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._transactionDocumentsService.deleteFactura(comprobante.uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          // let comprobantes = this.selectedVenta.transaction?.transaction_documents;
+          // const index = comprobantes.findIndex((p: any) => p.uuid === comprobante.uuid);
+          // if (index !== -1) {
+          //   comprobantes.splice(index, 1);
+          // }
+          this.obtenerVentaPorId(this.selectedVenta.uuid);
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  cerrarModalComprobante() {
+    this.isSubmit = false;
+    this.modalComprobante.close();
+  }
+
+  openModalComprobante(type: string, data?: any) {
+    console.log(data);
+    if (type === 'NEW') {
+      if (this.isEdicion) {
+        this.isEdicion = false;
+      }
+      this.tituloModal = 'Nuevo comprobante';
+      this.inicializarNewFormComprobante();
+    } else {
+      this.inEdicionComprobante = true;
+      this.tituloModal = 'Edición de comprobante';
+      this.inicializarNewFormComprobante(data);
+    }
+    this.modalComprobante.options = this.modalOptions;
+    this.modalComprobante.open();
+  }
+
+  inicializarNewFormComprobante(data?: any) {
+    this.comprobanteForm = new FormGroup({
+      comprobante_uuid: new FormControl(data ? data.uuid : null, []),
+      account_document_type_uuid: new FormControl(data ? data.account_document_type?.uuid : null, [Validators.required]),
+      document_datetime: new FormControl(data ? data.document_datetime : new Date(), []),
+      prefix_number: new FormControl(data ? data.prefix_number : null, []),
+      document_number: new FormControl(data ? data.document_number : null, []),
+      currency_uuid: new FormControl({ value: data ? data.currency : null, disabled: false }, [Validators.required]),
+      exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: data ? data.currency?.name === 'Pesos' : false }, [Validators.required])
+    })
+    this.onChange();
+  }
+  onChange() {
+    this.comprobanteForm.get('currency_uuid')!.valueChanges.subscribe(
+      (value: any) => {
+        if (value.name === 'Pesos') {
+          this.comprobanteForm.get('exchange_rate')?.setValue(1);
+          this.comprobanteForm.get('exchange_rate')?.disable();
+        } else {
+          this.comprobanteForm.get('exchange_rate')?.setValue(null);
+          this.comprobanteForm.get('exchange_rate')?.enable();
+        }
+      });
+  }
+
+  confirmarComprobante() {
+    this.isSubmit = true;
+    if (this.comprobanteForm.valid) {
+      this.spinner.show();
+      let comprobante = new FacturaDTO();
+      comprobante.transaction_uuid = this.selectedVenta.transaction?.uuid;
+      comprobante.account_document_type_uuid = this.comprobanteForm.get('account_document_type_uuid')?.value;
+      const fechaFormateada = this.comprobanteForm.get('document_datetime')?.value instanceof Date
+        ? format(this.comprobanteForm.get('document_datetime')?.value, 'yyyy-MM-dd')
+        : this.comprobanteForm.get('document_datetime')?.value;
+      comprobante.document_datetime = fechaFormateada;
+      comprobante.prefix_number = this.comprobanteForm.get('prefix_number')?.value;
+      comprobante.document_number = this.comprobanteForm.get('document_number')?.value;
+      comprobante.currency_uuid = this.comprobanteForm.get('currency_uuid')?.value?.uuid;
+      comprobante.exchange_rate = this.comprobanteForm.get('exchange_rate')?.value;
+      comprobante.actual_role = this.actual_role;
+      if (!this.inEdicionComprobante) {
+        this.subscription.add(
+          this._transactionDocumentsService.saveFactura(comprobante).subscribe({
+            next: res => {
+              console.log(res);
+              this.tokenService.setToken(res.token);
+              this.isSubmit = false;
+              // this.obtenerVentas(true);
+              // this.showDataVenta(this.selectedVenta);
+              this.obtenerVentaPorId(this.selectedVenta.uuid);
+              this.cerrarModalComprobante();
+              this.spinner.hide();
+            },
+            error: error => {
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+            }
+          })
+        )
+      } else {
+        delete comprobante.transaction_uuid;
+        this.subscription.add(
+          this._transactionDocumentsService.editFactura(this.comprobanteForm.get('comprobante_uuid')?.value, comprobante).subscribe({
+            next: res => {
+              console.log(res);
+              this.tokenService.setToken(res.token);
+              this.isSubmit = false;
+              this.obtenerVentaPorId(this.selectedVenta.uuid);
+              this.cerrarModalComprobante();
+              this.inEdicionComprobante = false;
+              this.spinner.hide();
+            },
+            error: error => {
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+            }
+          })
+        )
+      }
+    }
+  }
 
 }

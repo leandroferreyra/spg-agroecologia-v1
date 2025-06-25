@@ -1,6 +1,6 @@
 export class FacturaDTO {
 
-    transaction_uuid!: string;
+    transaction_uuid?: string;
     account_document_type_uuid!: string;
     document_datetime!: string;
     prefix_number!: string;
