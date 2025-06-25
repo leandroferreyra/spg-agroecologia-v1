@@ -1214,6 +1214,19 @@ export class ComprasComponent implements OnInit, OnDestroy {
             this.productoForm.get('control_comments')?.pristine) {
             delete producto.control_result;
             delete producto.password;
+          } else {
+            // Le remueve el producto controlado ya sea por error o x motivo
+            if (this.productoForm.get('control_propio')?.value) {
+              producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+              producto.password = this.productoForm.get('password')?.value;
+            } else {
+              if (this.isEmail(this.productoForm.get('usuario')?.value)) {
+                producto.control_user_email = this.productoForm.get('usuario')?.value;
+              } else {
+                producto.control_user_name = this.productoForm.get('usuario')?.value;
+              }
+              producto.password = this.productoForm.get('password')?.value;
+            }
           }
           if (this.selectedCompra?.transaction?.current_state?.state?.name === 'Borrador') {
             delete producto.location_uuid;
