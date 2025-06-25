@@ -375,8 +375,10 @@
                                     <th class="px-2 py-1">
                                         <div class="flex items-center gap-2">
                                             <span>Acciones</span>
+                                            @if(selectedCompra.transaction?.current_state?.state?.name === 'Borrador') {
                                             <input class="form-checkbox" type="checkbox" id="seleccionarTodos"
                                                 (change)="toggleSeleccionTodos($event)">
+                                            }
                                         </div>
                                     </th>
 
@@ -427,7 +429,9 @@
                                                 </button>
                                             </div>
                                             }
-                                            @if (!isControlRealizado(data)) {
+                                            @if (
+                                            selectedCompra.transaction?.current_state?.state?.name === 'Borrador'
+                                            ) {
                                             <div>
                                                 <label class="form-check-label">
                                                     <input class="form-checkbox" type="checkbox"
@@ -444,12 +448,14 @@
                             </tbody>
                         </table>
                         <!-- Botón para controlar múltiples productos -->
+                        @if(selectedCompra.transaction?.current_state?.state?.name === 'Borrador') {
                         <div class="flex justify-end mb-2 mt-1">
                             <button class="btn btn-primary" [disabled]="!productosSeleccionados.length"
                                 (click)="controlarSeleccionados()">
-                                Controlar seleccionados
+                                Control seleccionados
                             </button>
                         </div>
+                        }
                     </div>
                 </div>
                 } @else {
@@ -1231,6 +1237,18 @@
             <form [formGroup]="controlTotalForm" class="p-4">
                 <div class="flex flex-col sm:flex-row">
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox4" formControlName="producto_controlado" />
+                                <span for="custom_switch_checkbox4"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                            <span>Producto controlado</span>
+                        </div>
 
                         <div class="flex items-center gap-2 mt-2">
                             <label class="w-12 h-6 relative">

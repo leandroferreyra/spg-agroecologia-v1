@@ -1726,9 +1726,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   toggleSeleccionTodos(event: any) {
     const checked = (event.target as HTMLInputElement).checked;
-    const productosNoControlados = (this.selectedCompra?.transaction?.transaction_products || [])
-      .filter((p: any) => !this.isControlRealizado(p));
-    productosNoControlados.forEach((p: any) => {
+    const productosTotales = (this.selectedCompra?.transaction?.transaction_products || []);
+    productosTotales.forEach((p: any) => {
       const checkbox = document.getElementById('checkbox' + p.uuid) as HTMLInputElement;
       if (checkbox) {
         checkbox.checked = checked;
@@ -1741,7 +1740,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.productosSeleccionados = this.productosSeleccionados.filter(uuid => uuid !== p.uuid);
       }
     });
-    console.log(this.productosSeleccionados);
   }
 
   actualizarSeleccionados(producto: any) {
@@ -1763,13 +1761,25 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
   inicializarFormControlTotal() {
     this.controlTotalForm = new FormGroup({
+      producto_controlado: new FormControl(null, []),
       control_ok: new FormControl(null, []),
       control_propio: new FormControl(true, []),
       control_comments: new FormControl(null, []),
       usuario: new FormControl(null, []),
       password: new FormControl(null, [Validators.required]),
     });
+    this.onChangeControlForm();
   }
+
+  onChangeControlForm() {
+    this.controlTotalForm.get('control_ok')!.valueChanges.subscribe(
+      (value: any) => {
+        if (value) {
+          this.controlTotalForm.get('producto_controlado')?.setValue(true);
+        }
+      });
+  }
+
   cerrarModalControl() {
     this.modalControlarTodos.close();
   }
@@ -1783,16 +1793,42 @@ export class ComprasComponent implements OnInit, OnDestroy {
       controlTotalDTO.transaction_product_uuids = this.productosSeleccionados;
       controlTotalDTO.control_result = this.controlTotalForm.get('control_ok')?.value ?? false;
       controlTotalDTO.control_comments = this.controlTotalForm.get('control_comments')?.value;
+
+      if (this.controlTotalForm.get('producto_controlado')?.value) {
+        controlTotalDTO.control_result = this.controlTotalForm.get('control_ok')?.value ?? false;
+        controlTotalDTO.control_comments = this.controlTotalForm.get('control_comments')?.value;
+
+      } else {
+
+        controlTotalDTO.control_result = null;
+        controlTotalDTO.control_comments = null;
+      }
       if (this.controlTotalForm.get('control_propio')?.value) {
         controlTotalDTO['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+        controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
       } else {
         if (this.isEmail(this.controlTotalForm.get('usuario')?.value)) {
           controlTotalDTO.control_user_email = this.controlTotalForm.get('usuario')?.value;
         } else {
           controlTotalDTO.control_user_name = this.controlTotalForm.get('usuario')?.value;
         }
+        controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
       }
-      controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
+      // controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
+
+
+
+      // if (this.controlTotalForm.get('control_propio')?.value) {
+      //   controlTotalDTO['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+      // } else {
+      //   if (this.isEmail(this.controlTotalForm.get('usuario')?.value)) {
+      //     controlTotalDTO.control_user_email = this.controlTotalForm.get('usuario')?.value;
+      //   } else {
+      //     controlTotalDTO.control_user_name = this.controlTotalForm.get('usuario')?.value;
+      //   }
+      // }
+
+      // controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
       this.subscription.add(
         this._transactionProductService.batchUpdateControl(controlTotalDTO).subscribe({
           next: res => {
@@ -1806,6 +1842,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
             if (checkbox.checked) {
               checkbox.checked = false;
             }
+            const productosTotales = (this.selectedCompra?.transaction?.transaction_products || []);
+            productosTotales.forEach((p: any) => {
+              const checkbox = document.getElementById('checkbox' + p.uuid) as HTMLInputElement;
+              if (checkbox) {
+                checkbox.checked = false;
+              }
+            });
             this.spinner.hide();
           },
           error: error => {
