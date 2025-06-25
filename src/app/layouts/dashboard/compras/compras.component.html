@@ -356,6 +356,7 @@
 
                 @if (selectedCompra?.transaction?.transaction_products?.length > 0) {
                 <div *ngIf="mostrarProductos" class="mt-4">
+
                     <div class="table-responsive">
                         <table class="table-hover">
                             <thead class="bg-gray-100">
@@ -372,8 +373,13 @@
                                     <th class="px-2 py-1">Usuario del control</th>
                                     <th class="px-2 py-1">Comentarios del control</th>
                                     <th class="px-2 py-1">
-                                        Acciones
+                                        <div class="flex items-center gap-2">
+                                            <span>Acciones</span>
+                                            <input class="form-checkbox" type="checkbox" id="seleccionarTodos"
+                                                (change)="toggleSeleccionTodos($event)">
+                                        </div>
                                     </th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -415,10 +421,20 @@
                                             @if(selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' )
                                             {
                                             <div>
-                                                <button type="button" ngxTippy="Eliminar"
+                                                <button class="ltr:mr-3 rtl:ml-2" type="button" ngxTippy="Eliminar"
                                                     (click)="openSwalEliminarProductoTransaccion(data)">
                                                     <icon-trash-lines />
                                                 </button>
+                                            </div>
+                                            }
+                                            @if (!isControlRealizado(data)) {
+                                            <div>
+                                                <label class="form-check-label">
+                                                    <input class="form-checkbox" type="checkbox"
+                                                        (change)="actualizarSeleccionados(data)"
+                                                        [id]="'checkbox' + data.uuid">
+                                                    <span class="form-check-sign"></span>
+                                                </label>
                                             </div>
                                             }
                                         </div>
@@ -427,6 +443,13 @@
                                 }
                             </tbody>
                         </table>
+                        <!-- Botón para controlar múltiples productos -->
+                        <div class="flex justify-end mb-2 mt-1">
+                            <button class="btn btn-primary" [disabled]="!productosSeleccionados.length"
+                                (click)="controlarSeleccionados()">
+                                Controlar seleccionados
+                            </button>
+                        </div>
                     </div>
                 </div>
                 } @else {
@@ -1188,6 +1211,93 @@
                     </button>
                     <button id="back-button-with-border" type="button" class="btn btn-wd"
                         (click)="cerrarModalPago()">Cancelar</button>
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+
+<div>
+    <ngx-custom-modal #modalControlarTodos class=" modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <div class="position-relative text-center w-100">
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">Controlar productos</h5>
+            </div>
+        </ng-template>
+
+        <ng-template #modalBody>
+
+            <form [formGroup]="controlTotalForm" class="p-4">
+                <div class="flex flex-col sm:flex-row">
+                    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox5" formControlName="control_ok" />
+                                <span for="custom_switch_checkbox5"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                            <span>Control OK</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 mt-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox10" formControlName="control_propio" />
+                                <span for="custom_switch_checkbox10"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                            <div class="flex flex-col">
+                                <span>Control propio</span>
+                                <small class="text-gray-500">*(Indica si controló el propio usuario o si lo hizo otro
+                                    usuario)</small>
+                            </div>
+                        </div>
+
+                        @if (!controlTotalForm.controls['control_propio'].value) {
+                        <div (keydown.enter)="confirmarAltaProducto()"
+                            [ngClass]="isSubmit ? controlTotalForm.controls['usuario'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="usuario">Usuario</label>
+                            <input id="usuario" type="text" class="form-control" formControlName="usuario" />
+                        </div>
+                        }
+
+                        <div (keydown.enter)="confirmarAltaProducto()"
+                            [ngClass]="isSubmit ? controlTotalForm.controls['password'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Password</label>
+                            <div class="input-group">
+                                <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                                    formControlName="password">
+                                <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
+                                    style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
+                            </div>
+                        </div>
+                        <div (keydown.enter)="confirmarAltaProducto()"
+                            [ngClass]="isSubmit ? controlTotalForm.controls['control_comments'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="control_comments">Comentarios de control</label>
+                            <textarea class="form-control" id="control_comments" formControlName="control_comments"
+                                rows="1"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+            </form>
+
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <button class="btn btn-primary mr-3" (click)="confirmarControlTotal()">
+                        Confirmar
+                    </button>
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cerrarModalControl()">Cancelar</button>
                 </div>
             </div>
         </ng-template>

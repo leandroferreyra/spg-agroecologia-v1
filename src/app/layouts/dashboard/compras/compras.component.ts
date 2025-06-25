@@ -44,6 +44,7 @@ import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
 import { PagosService } from 'src/app/core/services/pagos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import { BatchUpdateControlDTO } from 'src/app/core/models/request/batchUpdateControlDTO';
 
 @Component({
   selector: 'app-compras',
@@ -70,6 +71,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   compraForm!: FormGroup;
   newCompraForm!: FormGroup;
   productoForm!: FormGroup;
+  controlTotalForm!: FormGroup;
   pagoForm!: FormGroup;
 
   // cargandoProductos: boolean = true;
@@ -136,6 +138,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
+  @ViewChild('modalControlarTodos') modalControlarTodos!: NgxCustomModalComponent;
   @ViewChild('modalPago') modalPago!: NgxCustomModalComponent;
   @ViewChild('modalEditarProveedor') modalEditarProveedor!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
@@ -176,6 +179,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   uuidFromUrl: string = '';
   isLoadingCompras: boolean = true;
+
+  productosSeleccionados: any[] = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -1123,6 +1128,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   toggleProductos() {
     this.mostrarProductos = !this.mostrarProductos;
+    this.productosSeleccionados = [];
   }
 
   togglePagos() {
@@ -1166,20 +1172,21 @@ export class ComprasComponent implements OnInit, OnDestroy {
         if (this.productoForm.get('producto_controlado')?.value) {
           producto.control_result = this.productoForm.get('control_ok')?.value ?? false;
           producto.control_comments = this.productoForm.get('control_comments')?.value;
+          if (this.productoForm.get('control_propio')?.value) {
+            producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+            producto.password = this.productoForm.get('password')?.value;
+          } else {
+            if (this.isEmail(this.productoForm.get('usuario')?.value)) {
+              producto.control_user_email = this.productoForm.get('usuario')?.value;
+            } else {
+              producto.control_user_name = this.productoForm.get('usuario')?.value;
+            }
+            producto.password = this.productoForm.get('password')?.value;
+          }
         } else {
           producto.control_result = null;
           producto.control_comments = null;
         }
-        if (this.productoForm.get('control_propio')?.value) {
-          producto['user->control_user_uuid'] = this.usuarioLogueado.uuid;
-        } else {
-          if (this.isEmail(this.productoForm.get('usuario')?.value)) {
-            producto.control_user_email = this.productoForm.get('usuario')?.value;
-          } else {
-            producto.control_user_name = this.productoForm.get('usuario')?.value;
-          }
-        }
-        producto.password = this.productoForm.get('password')?.value;
 
         if (!this.inEdicionProducto) {
           producto.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
@@ -1703,5 +1710,101 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.router.navigate([`/dashboard/productos/${data.uuid}`])
     }
   }
+
+  toggleSeleccionTodos(event: any) {
+    const checked = (event.target as HTMLInputElement).checked;
+    const productosNoControlados = (this.selectedCompra?.transaction?.transaction_products || [])
+      .filter((p: any) => !this.isControlRealizado(p));
+    productosNoControlados.forEach((p: any) => {
+      const checkbox = document.getElementById('checkbox' + p.uuid) as HTMLInputElement;
+      if (checkbox) {
+        checkbox.checked = checked;
+      }
+      if (checked) {
+        if (!this.productosSeleccionados.find(uuid => uuid === p.uuid)) {
+          this.productosSeleccionados.push(p.uuid);
+        }
+      } else {
+        this.productosSeleccionados = this.productosSeleccionados.filter(uuid => uuid !== p.uuid);
+      }
+    });
+    console.log(this.productosSeleccionados);
+  }
+
+  actualizarSeleccionados(producto: any) {
+    const index = this.productosSeleccionados.findIndex(uuid => uuid === producto.uuid);
+    if (index === -1) {
+      // Lo agregamos
+      this.productosSeleccionados.push(producto.uuid);
+    } else {
+      // Lo eliminamos
+      this.productosSeleccionados.splice(index, 1);
+    }
+    console.log(this.productosSeleccionados);
+  }
+
+  controlarSeleccionados() {
+    this.inicializarFormControlTotal();
+    this.modalControlarTodos.options = this.modalOptions;
+    this.modalControlarTodos.open();
+  }
+  inicializarFormControlTotal() {
+    this.controlTotalForm = new FormGroup({
+      control_ok: new FormControl(null, []),
+      control_propio: new FormControl(true, []),
+      control_comments: new FormControl(null, []),
+      usuario: new FormControl(null, []),
+      password: new FormControl(null, [Validators.required]),
+    });
+  }
+  cerrarModalControl() {
+    this.modalControlarTodos.close();
+  }
+
+  confirmarControlTotal() {
+    this.isSubmit = true;
+    if (this.controlTotalForm.valid) {
+      this.spinner.show();
+      let controlTotalDTO = new BatchUpdateControlDTO();
+      controlTotalDTO.actual_role = this.actual_role;
+      controlTotalDTO.transaction_product_uuids = this.productosSeleccionados;
+      controlTotalDTO.control_result = this.controlTotalForm.get('control_ok')?.value ?? false;
+      controlTotalDTO.control_comments = this.controlTotalForm.get('control_comments')?.value;
+      if (this.controlTotalForm.get('control_propio')?.value) {
+        controlTotalDTO['user->control_user_uuid'] = this.usuarioLogueado.uuid;
+      } else {
+        if (this.isEmail(this.controlTotalForm.get('usuario')?.value)) {
+          controlTotalDTO.control_user_email = this.controlTotalForm.get('usuario')?.value;
+        } else {
+          controlTotalDTO.control_user_name = this.controlTotalForm.get('usuario')?.value;
+        }
+      }
+      controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
+      this.subscription.add(
+        this._transactionProductService.batchUpdateControl(controlTotalDTO).subscribe({
+          next: res => {
+            console.log(res);
+            this.productosSeleccionados = [];
+            this.tokenService.setToken(res.token);
+            this.cerrarModalControl();
+            this.obtenerCompraPorId(this.selectedCompra.uuid);
+            this.isSubmit = false;
+            const checkbox = document.getElementById('seleccionarTodos') as HTMLInputElement;
+            if (checkbox.checked) {
+              checkbox.checked = false;
+            }
+            this.spinner.hide();
+          },
+          error: error => {
+            this.isSubmit = false;
+            this.spinner.hide();
+            console.error(error);
+          }
+        })
+      )
+    }
+  }
+
+
 
 }

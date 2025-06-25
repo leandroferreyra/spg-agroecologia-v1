@@ -6,6 +6,7 @@ import { AuthResponse } from '../models/response/authResponse';
 import { CompraProveedorDTO } from '../models/request/compraProveedorDTO';
 import { CompraDTO } from '../models/request/compraDTO';
 import { ProductoTransaccionDTO } from '../models/request/productoTransaccionDTO';
+import { BatchUpdateControlDTO } from '../models/request/batchUpdateControlDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,12 @@ export class TransactionProductoService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams().set('actual_role', rolActual);
     return this.http.delete<AuthResponse>(environment.baseUrl + this.api + '/' + uuid, { headers, params });
+  }
+
+  batchUpdateControl(batch: BatchUpdateControlDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    // const params = new HttpParams().set('actual_role', rolActual);
+    return this.http.post<AuthResponse>(environment.baseUrl + this.api + '/' + 'batch-update-control', JSON.stringify(batch), { headers });
   }
 
 }
