@@ -372,9 +372,13 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
-  openCloseEditaDetalles() {
+  openCloseEditarDetalles() {
     this.inEdicionDetalles = !this.inEdicionDetalles;
     if (this.inEdicionDetalles) {
+      // Cerramos los edit
+      if (this.inEdicionVenta) {
+        this.openCloseEditarVenta();
+      }
       this.ventaForm.get('descuento1')?.enable();
       this.ventaForm.get('descuento2')?.enable();
       this.ventaForm.get('otrosCargos')?.enable();
@@ -412,7 +416,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._ventaService.editVenta(this.selectedVenta.uuid, ventaDTO).subscribe({
         next: res => {
           this.obtenerVentaPorId(this.uuidFromUrl);
-          this.openCloseEditaDetalles();
+          this.openCloseEditarDetalles();
           this.spinner.hide();
         },
         error: error => {
@@ -472,6 +476,13 @@ export class VentasComponent implements OnInit, OnDestroy {
       this.isEdicion = true;
       this.tituloModal = 'Edición venta';
       this.obtenerVentaPorId(venta.uuid);
+    }
+    // Cerramos los edit
+    if (this.inEdicionDetalles) {
+      this.openCloseEditarDetalles();
+    }
+    if (this.inEdicionVenta) {
+      this.openCloseEditarVenta();
     }
   }
   inicializarFormNew() {
@@ -748,6 +759,13 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
     this.modalProducto.options = this.modalOptions;
     this.modalProducto.open();
+    // Cerramos los edit
+    if (this.inEdicionDetalles) {
+      this.openCloseEditarDetalles();
+    }
+    if (this.inEdicionVenta) {
+      this.openCloseEditarVenta();
+    }
   }
 
   inicializarFormProducto(data?: any) {
@@ -976,6 +994,10 @@ export class VentasComponent implements OnInit, OnDestroy {
   openCloseEditarVenta() {
     this.inEdicionVenta = !this.inEdicionVenta;
     if (this.inEdicionVenta) {
+      // Cerramos los edit
+      if (this.inEdicionDetalles) {
+        this.openCloseEditarDetalles();
+      }
       this.ventaForm.get('fechaVenta')?.enable();
       this.ventaForm.get('estadoVenta')?.enable();
     } else {
@@ -1088,6 +1110,13 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
     this.modalComprobante.options = this.modalOptions;
     this.modalComprobante.open();
+    // Cerramos los edit
+    if (this.inEdicionDetalles) {
+      this.openCloseEditarDetalles();
+    }
+    if (this.inEdicionVenta) {
+      this.openCloseEditarVenta();
+    }
   }
 
   inicializarNewFormComprobante(data?: any) {
