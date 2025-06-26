@@ -1279,14 +1279,14 @@
                         </div>
 
                         @if (!controlTotalForm.controls['control_propio'].value) {
-                        <div (keydown.enter)="confirmarAltaProducto()"
+                        <div (keydown.enter)="confirmarControlTotal()"
                             [ngClass]="isSubmit ? controlTotalForm.controls['usuario'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="usuario">Usuario</label>
                             <input id="usuario" type="text" class="form-control" formControlName="usuario" />
                         </div>
                         }
 
-                        <div (keydown.enter)="confirmarAltaProducto()"
+                        <div (keydown.enter)="confirmarControlTotal()"
                             [ngClass]="isSubmit ? controlTotalForm.controls['password'].errors ? 'has-error' : 'has-success' : ''">
                             <label>Password</label>
                             <div class="input-group">
@@ -1296,7 +1296,7 @@
                                     style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
                             </div>
                         </div>
-                        <div (keydown.enter)="confirmarAltaProducto()"
+                        <div (keydown.enter)="confirmarControlTotal()"
                             [ngClass]="isSubmit ? controlTotalForm.controls['control_comments'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="control_comments">Comentarios de control</label>
                             <textarea class="form-control" id="control_comments" formControlName="control_comments"

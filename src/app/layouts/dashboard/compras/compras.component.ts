@@ -1761,7 +1761,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
   inicializarFormControlTotal() {
     this.controlTotalForm = new FormGroup({
-      producto_controlado: new FormControl(null, []),
+      producto_controlado: new FormControl(true, []),
       control_ok: new FormControl(null, []),
       control_propio: new FormControl(true, []),
       control_comments: new FormControl(null, []),
@@ -1797,9 +1797,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       if (this.controlTotalForm.get('producto_controlado')?.value) {
         controlTotalDTO.control_result = this.controlTotalForm.get('control_ok')?.value ?? false;
         controlTotalDTO.control_comments = this.controlTotalForm.get('control_comments')?.value;
-
       } else {
-
         controlTotalDTO.control_result = null;
         controlTotalDTO.control_comments = null;
       }
@@ -1814,21 +1812,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         }
         controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
       }
-      // controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
 
-
-
-      // if (this.controlTotalForm.get('control_propio')?.value) {
-      //   controlTotalDTO['user->control_user_uuid'] = this.usuarioLogueado.uuid;
-      // } else {
-      //   if (this.isEmail(this.controlTotalForm.get('usuario')?.value)) {
-      //     controlTotalDTO.control_user_email = this.controlTotalForm.get('usuario')?.value;
-      //   } else {
-      //     controlTotalDTO.control_user_name = this.controlTotalForm.get('usuario')?.value;
-      //   }
-      // }
-
-      // controlTotalDTO.password = this.controlTotalForm.get('password')?.value;
       this.subscription.add(
         this._transactionProductService.batchUpdateControl(controlTotalDTO).subscribe({
           next: res => {
