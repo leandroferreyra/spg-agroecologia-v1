@@ -669,6 +669,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
     }
+    // Cerramos todos los edit.
+    if (this.inEdicionFechaCompra) {
+      this.openCloseEditarFechaCompra();
+    }
+    if (this.inEdicionDescuentos) {
+      this.openCloseEditarDescuentosCompra();
+    }
+    if (this.inEdicionFactura) {
+      this.openCloseEditarFactura();
+    }
   }
 
   openModalPagos(type: string, pago?: any) {
@@ -688,6 +698,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.inicializarFormPago(pago);
       this.modalPago.options = this.modalOptions;
       this.modalPago.open();
+    }
+    // Cerramos todos los edit.
+    if (this.inEdicionFechaCompra) {
+      this.openCloseEditarFechaCompra();
+    }
+    if (this.inEdicionDescuentos) {
+      this.openCloseEditarDescuentosCompra();
+    }
+    if (this.inEdicionFactura) {
+      this.openCloseEditarFactura();
     }
   }
 
@@ -1367,6 +1387,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
   openCloseEditarFechaCompra() {
     this.inEdicionFechaCompra = !this.inEdicionFechaCompra;
     if (this.inEdicionFechaCompra) {
+      // Cerramos todos los edit.
+      if (this.inEdicionFactura) {
+        this.openCloseEditarFactura();
+      }
+      if (this.inEdicionDescuentos) {
+        this.openCloseEditarDescuentosCompra();
+      }
       this.compraForm.get('fechaCompra')?.enable();
       this.compraForm.get('estadoCompra')?.enable();
     } else {
@@ -1374,6 +1401,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.compraForm.get('estadoCompra')?.disable();
       this.inicializarFormEdit();
     }
+
   }
 
   confirmarEdicionFechaCompra() {
@@ -1419,6 +1447,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
   openCloseEditarDescuentosCompra() {
     this.inEdicionDescuentos = !this.inEdicionDescuentos;
     if (this.inEdicionDescuentos) {
+      // Cerramos todos los edit.
+      if (this.inEdicionFechaCompra) {
+        this.openCloseEditarFechaCompra();
+      }
+      if (this.inEdicionFactura) {
+        this.openCloseEditarFactura();
+      }
       this.compraForm.get('descuento1')?.enable();
       this.compraForm.get('descuento2')?.enable();
       this.compraForm.get('otrosCargos')?.enable();
@@ -1486,6 +1521,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.inEdicionFactura = !this.inEdicionFactura;
     }
     if (this.inEdicionFactura || this.inAltaFactura) {
+      // Cerramos todos los edit.
+      if (this.inEdicionFechaCompra) {
+        this.openCloseEditarFechaCompra();
+      }
+      if (this.inEdicionDescuentos) {
+        this.openCloseEditarDescuentosCompra();
+      }
       this.compraForm.get('fechaFacturacion')?.enable();
       if (this.inAltaFactura) {
         this.compraForm.get('fechaFacturacion')?.setValue(this.compraForm.get('fechaCompra')?.value);
