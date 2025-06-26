@@ -641,6 +641,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Edición compra';
       this.obtenerCompraPorId(compra.uuid);
     }
+    // Cerramos todos los edit.
+    if (this.inEdicionFechaCompra) {
+      this.openCloseEditarFechaCompra();
+    }
+    if (this.inEdicionDescuentos) {
+      this.openCloseEditarDescuentosCompra();
+    }
+    if (this.inEdicionFactura) {
+      this.openCloseEditarFactura();
+    }
   }
 
   openModalProducto(type: string, producto?: any) {
@@ -1798,6 +1808,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.inicializarFormControlTotal();
     this.modalControlarTodos.options = this.modalOptions;
     this.modalControlarTodos.open();
+    // Cerramos todos los edit.
+    if (this.inEdicionFechaCompra) {
+      this.openCloseEditarFechaCompra();
+    }
+    if (this.inEdicionDescuentos) {
+      this.openCloseEditarDescuentosCompra();
+    }
+    if (this.inEdicionFactura) {
+      this.openCloseEditarFactura();
+    }
   }
   inicializarFormControlTotal() {
     this.controlTotalForm = new FormGroup({
