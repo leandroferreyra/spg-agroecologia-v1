@@ -761,7 +761,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
-        console.log(this.selectedCompra);
         this.productoForm.get('control_description')?.setValue(producto.control_description);
         // if (producto?.product_type?.stock_controlled === 1 && producto.traceable === 1) {
         //   this.showInputUbicacion = true;
@@ -1751,7 +1750,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       // Lo eliminamos
       this.productosSeleccionados.splice(index, 1);
     }
-    console.log(this.productosSeleccionados);
   }
 
   controlarSeleccionados() {
@@ -1816,7 +1814,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._transactionProductService.batchUpdateControl(controlTotalDTO).subscribe({
           next: res => {
-            console.log(res);
             this.productosSeleccionados = [];
             this.tokenService.setToken(res.token);
             this.cerrarModalControl();
