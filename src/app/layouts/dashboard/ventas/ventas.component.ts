@@ -497,7 +497,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       // others: new FormControl({ value: null, disabled: false }, []),
       // perceptionIB: new FormControl({ value: null, disabled: false }, []),
       // perceptionRG3337: new FormControl({ value: null, disabled: false }, []),
-      possible_transaction_state_uuid: new FormControl({ value: null, disabled: false }, []),
+      // possible_transaction_state_uuid: new FormControl({ value: null, disabled: false }, []),
     });
     this.onNewForm();
   }
@@ -973,7 +973,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       : form.get('transaction_datetime')?.value;
     transaction.transaction_datetime = fechaFormateada;
 
-    transaction.possible_transaction_state_uuid = form.get('possible_transaction_state_uuid')?.value;
+    // transaction.possible_transaction_state_uuid = form.get('possible_transaction_state_uuid')?.value;
     venta.transaction = transaction;
 
     if (!this.isEdicion) {
