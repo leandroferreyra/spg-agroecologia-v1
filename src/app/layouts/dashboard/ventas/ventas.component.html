@@ -255,9 +255,9 @@
                                         data.sale_product?.stock?.batch?.batch_identification}}</td>
                                     <td class="border px-2 py-1">{{
                                         data.sale_product?.product_instances[0]?.serial_number }}</td>
-                                    <td class="border px-2 py-1">{{ data.quantity }}</td>
+                                    <td class="border px-2 py-1">{{ showCantidad(data) }}</td>
                                     <td class="border px-2 py-1">{{ data.unit_price }}</td>
-                                    <td class="border px-2 py-1">{{ data.quantity * data.unit_price }}</td>
+                                    <td class="border px-2 py-1">{{ showPrecioTotal(data) }}</td>
 
                                     <td class="border px-2 py-1">
                                         <div class="flex items-center">

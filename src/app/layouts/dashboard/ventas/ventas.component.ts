@@ -744,20 +744,9 @@ export class VentasComponent implements OnInit, OnDestroy {
       this.tituloModal = 'Nuevo producto';
       this.obtenerUbicaciones();
       this.inicializarFormProducto();
-      // this.modalProducto.options = this.modalOptions;
-      // this.modalProducto.open();
     } else {
       this.inEdicionProducto = true;
       this.tituloModal = 'Edición de producto';
-      // if (producto.product?.stocks?.length > 0 && producto.product.stocks[0].location !== null) {
-      //   this.getParentsFromLocation(producto.product.stocks[0].location);
-      //   this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
-      // } else {
-      //   this.obtenerUbicaciones();
-      // }
-      // this.inicializarFormProducto(producto);
-      // this.modalProducto.options = this.modalOptions;
-      // this.modalProducto.open();
     }
     this.modalProducto.options = this.modalOptions;
     this.modalProducto.open();
@@ -789,9 +778,11 @@ export class VentasComponent implements OnInit, OnDestroy {
           this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
         } else {
           this.productoForm.get('quantity')?.disable();
+          this.productoForm.get('quantity')?.setValue(null);
           this.placeholderCantidad = '';
         }
       });
+
   }
 
   confirmarProducto() {
@@ -1204,6 +1195,18 @@ export class VentasComponent implements OnInit, OnDestroy {
         )
       }
     }
+  }
+
+  showCantidad(data: any) {
+    if (data.product?.measure?.is_integer === 1) {
+      return (+data.quantity).toFixed(0);
+    } else {
+      return (+data.quantity).toFixed(2);
+    }
+  }
+
+    showPrecioTotal(data: any) {
+    return (data.quantity * data.unit_price).toFixed(2);
   }
 
 }
