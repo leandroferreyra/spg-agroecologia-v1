@@ -333,7 +333,7 @@
                         <input type="text" class="form-control w-full" formControlName="percepcionRG3337" />
                     </div>
                     <div>
-                        <label class="block font-medium">Total compra</label>
+                        <label class="block font-medium">Total venta</label>
                         <input type="text" class="form-control w-full" formControlName="total" />
                     </div>
                 </div>
@@ -605,7 +605,7 @@
 
                         <div
                             [ngClass]="isSubmit ? newVentaForm.controls['transaction_datetime'].errors ? 'has-error' : 'has-success' : ''">
-                            <label>Fecha de compra</label>
+                            <label>Fecha de venta</label>
                             <input type="text" mwlFlatpickr [options]="{ 
                                                 enableTime: false, 
                                                 dateFormat: 'Y-m-d',
@@ -687,7 +687,7 @@
                             </div>
 
                             <div>
-                                <label class="block font-medium">Moneda de la compra</label>
+                                <label class="block font-medium">Moneda del comprobante</label>
                                 <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar"
                                     [ngClass]="isSubmit ? comprobanteForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''"
                                     [virtualScroll]="true" notFoundText="No hay monedas" formControlName="currency_uuid"

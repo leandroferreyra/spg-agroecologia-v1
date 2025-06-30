@@ -197,10 +197,11 @@ export class VentasComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     this.params.with = ["transaction.person.human",
       "transaction.person.legalEntity",
-      "transaction.transactionDocuments",
-      "transaction.transactionProducts", "transaction.transactionProducts.saleProduct.productInstances",
-      "transaction.transactionProducts.saleProduct.stock",
-      "transaction.transactionProducts.saleProduct.stock.batch"];
+      "transaction.transactionDocuments.accountDocumentType",
+      "transaction.transactionProducts.product",
+      "transaction.transactionProducts.saleProduct.productInstances",
+      "transaction.transactionProducts.saleProduct.stock.batch"
+    ];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -270,7 +271,8 @@ export class VentasComponent implements OnInit, OnDestroy {
       return 'Sin documento';
     }
     const docOrden1 = documentos.find((doc: any) => doc.order === 1);
-    return docOrden1?.document_number ?? 'Sin documento';
+    const docIdent = docOrden1 ? docOrden1.account_document_type.name + '-' + docOrden1.prefix_number + '-' + docOrden1.document_number : 'Sin documento';
+    return docIdent;
   }
 
   obtenerProductos() {
