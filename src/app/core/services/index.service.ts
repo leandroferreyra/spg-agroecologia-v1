@@ -48,65 +48,147 @@ export class IndexService {
 
   constructor(private http: HttpClient) { }
 
+  // getNewParams(paramsObj: any, rol?: string): HttpParams {
+  //   let params = new HttpParams();
+  //   if (paramsObj) {
+  //     // Paging 
+  //     paramsObj.paging && (params = params.append('paging', paramsObj.paging));
+  //     paramsObj.page && (params = params.append('page', paramsObj.page));
+  //     // para cada elemento de paramsObj.with, agregar un with[]
+  //     paramsObj.with.forEach((element: any) => {
+  //       params = params.append('with[]', element);
+  //     });
+  //     // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
+  //     Object.keys(paramsObj.order_by).forEach((key, index) => {
+  //       if (paramsObj.order_by[key] !== '') {
+  //         params = params.append(`order_by[${index}][]`, key);
+  //         params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
+  //       }
+  //     });
+  //     // para cada elemento de paramsObj.filters, agregar un filters[]
+  //     Object.keys(paramsObj.filters).forEach((key, index) => {
+  //       if (paramsObj.filters[key] && paramsObj.filters[key].value !== '' && paramsObj.filters[key].value !== null) {
+  //         if (key === 'operator') {
+  //           params = params.append(`filters[${index}]`, `${paramsObj.filters[key].value}`);
+  //         } else {
+  //           params = params.append(`filters[${index}][]`, key);
+  //           params = params.append(`filters[${index}][]`, paramsObj.filters[key].op);
+  //           if (paramsObj.filters[key].contiene) {
+  //             params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key].value}%`);
+  //           } else {
+  //             if (paramsObj.filters[key].op === 'LIKE') {
+  //               // Acá ingresa cuando es una búsqueda por string y el contiene es false es decir, debería ser un startWith 
+  //               params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}%`);
+  //             } else {
+  //               // Acá no es LIKE por lo que seguro es un '=' o un '!=' y busca por uuid.
+  //               params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
+  //             }
+  //           }
+  //         }
+  //       }
+  //     });
+
+  //     const existingFiltersCount = Math.ceil(params.keys().filter(k => k.startsWith('filters[')).length / 3);
+
+  //     if (paramsObj.extraDateFilters && Array.isArray(paramsObj.extraDateFilters)) {
+  //       paramsObj.extraDateFilters.forEach((filtro: any[], index: number) => {
+  //         const baseIndex = index + existingFiltersCount;
+  //         params = params.append(`filters[${baseIndex}][]`, filtro[0]);
+  //         params = params.append(`filters[${baseIndex}][]`, filtro[1]);
+  //         params = params.append(`filters[${baseIndex}][]`, filtro[2]);
+  //       });
+  //     }
+
+
+
+  //     if (paramsObj.distinct !== null && paramsObj.distinct !== undefined) {
+  //       params = params.append('distinct', paramsObj.distinct);
+  //     }
+  //   }
+  //   if (rol) {
+  //     params = params.append('actual_role', rol);
+  //   }
+  //   return params;
+  // }
+
   getNewParams(paramsObj: any, rol?: string): HttpParams {
     let params = new HttpParams();
     if (paramsObj) {
-      // Paging 
-      paramsObj.paging && (params = params.append('paging', paramsObj.paging));
-      paramsObj.page && (params = params.append('page', paramsObj.page));
-      // para cada elemento de paramsObj.with, agregar un with[]
-      paramsObj.with.forEach((element: any) => {
-        params = params.append('with[]', element);
-      });
-      // para cada atributo del objeto paramsObj.order_by, mostrar el nombre y el valor
-      Object.keys(paramsObj.order_by).forEach((key, index) => {
-        if (paramsObj.order_by[key] !== '') {
-          params = params.append(`order_by[${index}][]`, key);
-          params = params.append(`order_by[${index}][]`, paramsObj.order_by[key]);
-        }
-      });
-      // para cada elemento de paramsObj.filters, agregar un filters[]
-      Object.keys(paramsObj.filters).forEach((key, index) => {
-        if (paramsObj.filters[key] && paramsObj.filters[key].value !== '' && paramsObj.filters[key].value !== null) {
-          if (key === 'operator') {
-            params = params.append(`filters[${index}]`, `${paramsObj.filters[key].value}`);
-          } else {
-            params = params.append(`filters[${index}][]`, key);
-            params = params.append(`filters[${index}][]`, paramsObj.filters[key].op);
-            if (paramsObj.filters[key].contiene) {
-              params = params.append(`filters[${index}][]`, `%${paramsObj.filters[key].value}%`);
-            } else {
-              if (paramsObj.filters[key].op === 'LIKE') {
-                // Acá ingresa cuando es una búsqueda por string y el contiene es false es decir, debería ser un startWith 
-                params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}%`);
-              } else {
-                // Acá no es LIKE por lo que seguro es un '=' o un '!=' y busca por uuid.
-                params = params.append(`filters[${index}][]`, `${paramsObj.filters[key].value}`);
-              }
-            }
-          }
-        }
-      });
+      // Paging
+      if (paramsObj.paging) params = params.append('paging', paramsObj.paging);
+      if (paramsObj.page) params = params.append('page', paramsObj.page);
 
-      if (paramsObj.extraDateFilters && Array.isArray(paramsObj.extraDateFilters)) {
-        paramsObj.extraDateFilters.forEach((filtro: any[], index: number) => {
-          // Sumar los filtros extra luego de los existentes
-          const currentIndex = Math.ceil(params.keys().filter(k => k.startsWith('filters[')).length / 3);
-          params = params.append(`filters[${currentIndex}][]`, filtro[0]);
-          params = params.append(`filters[${currentIndex}][]`, filtro[1]);
-          params = params.append(`filters[${currentIndex}][]`, filtro[2]);
+      // With[]
+      if (Array.isArray(paramsObj.with)) {
+        paramsObj.with.forEach((element: any) => {
+          params = params.append('with[]', element);
         });
       }
 
+      // Order by
+      if (paramsObj.order_by) {
+        Object.keys(paramsObj.order_by).forEach((key, index) => {
+          const value = paramsObj.order_by[key];
+          if (value !== '') {
+            params = params.append(`order_by[${index}][]`, key);
+            params = params.append(`order_by[${index}][]`, value);
+          }
+        });
+      }
 
+      // Filters
+      let filterIndex = 0;
 
+      if (paramsObj.filters) {
+        Object.keys(paramsObj.filters).forEach((key) => {
+          const filter = paramsObj.filters[key];
+
+          if (filter && filter.value !== '' && filter.value !== null) {
+            if (key === 'operator') {
+              params = params.append(`filters[${filterIndex}]`, `${filter.value}`);
+            } else {
+              params = params.append(`filters[${filterIndex}][]`, key);
+              params = params.append(`filters[${filterIndex}][]`, filter.op);
+
+              let valueToUse = filter.value;
+
+              if (filter.contiene) {
+                valueToUse = `%${filter.value}%`;
+              } else if (filter.op === 'LIKE') {
+                valueToUse = `${filter.value}%`;
+              }
+
+              params = params.append(`filters[${filterIndex}][]`, valueToUse);
+            }
+
+            filterIndex++;
+          }
+        });
+      }
+
+      // Extra date filters (respetando el orden y continuidad del índice)
+      if (Array.isArray(paramsObj.extraDateFilters)) {
+        paramsObj.extraDateFilters.forEach((filtro: any[]) => {
+          if (filtro.length === 3) {
+            params = params.append(`filters[${filterIndex}][]`, filtro[0]);
+            params = params.append(`filters[${filterIndex}][]`, filtro[1]);
+            params = params.append(`filters[${filterIndex}][]`, filtro[2]);
+            filterIndex++;
+          }
+        });
+      }
+
+      // Distinct
       if (paramsObj.distinct !== null && paramsObj.distinct !== undefined) {
         params = params.append('distinct', paramsObj.distinct);
       }
     }
+
+    // Rol
     if (rol) {
       params = params.append('actual_role', rol);
     }
+
     return params;
   }
 
