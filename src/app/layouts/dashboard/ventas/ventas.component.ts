@@ -294,6 +294,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         }
         params.filters = {
           'name': { value: term, op: 'LIKE', contiene: true },
+          'salable': { value: 1, op: '=', contiene: false }
         };
 
         return this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
@@ -1205,7 +1206,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
-    showPrecioTotal(data: any) {
+  showPrecioTotal(data: any) {
     return (data.quantity * data.unit_price).toFixed(2);
   }
 
