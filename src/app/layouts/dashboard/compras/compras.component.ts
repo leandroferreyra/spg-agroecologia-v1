@@ -1091,12 +1091,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
     if (this.filtroFechaFacturaDesde) {
       this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '>=', this.filtroFechaFacturaDesde]);
-
     }
     if (this.filtroFechaFacturaHasta) {
       this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '<=', this.filtroFechaFacturaHasta]);
-
     }
+    this.params.distinct = true;
     this.obtenerCompras();
   }
 

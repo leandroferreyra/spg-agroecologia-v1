@@ -6,6 +6,7 @@ export class ParametrosIndex {
     order_by: any;
     filters: any;
     extraDateFilters: any[] = [];
+    distinct: boolean = false;
 
     constructor() {
 
