@@ -29,26 +29,4 @@ export class RolesService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiRoles, { headers, params });
   }
 
-  // saveRol(rol: RolDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiRoles, JSON.stringify(rol), { headers });
-  // }
-
-  //Quitar permisos de un rol
-  // eliminarPermisoDelRol(id: string, removePermisoDTO: AddRemovePermisoDTO): Observable<any> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   const url = `${environment.baseUrl}${this.apiRoles}/${id}/remove-permissions`;
-  //   return this.http.request('delete', url, {
-  //     headers: headers,
-  //     body: JSON.stringify(removePermisoDTO),
-  //     observe: 'response'
-  //   });
-  // }
-
-  //Agregar permiso a un rol.
-  // agregarPermisoARol(id: string, addPermisoDTO: AddRemovePermisoDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   const url = `${environment.baseUrl}${this.apiRoles}/${id}/add-permissions`;
-  //   return this.http.post<AuthResponse>(url, JSON.stringify(addPermisoDTO), { headers });
-  // }
 }

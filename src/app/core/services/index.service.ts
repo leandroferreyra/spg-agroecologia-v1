@@ -44,6 +44,7 @@ export class IndexService {
   apiPagos = '/payments';
 
   apiUsuarios = '/users';
+  apiParametrosGenerales = '/general_parameters';
 
 
   constructor(private http: HttpClient) { }
@@ -419,6 +420,11 @@ export class IndexService {
   getPagosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPagos, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getParametrosWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiParametrosGenerales, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
 }
