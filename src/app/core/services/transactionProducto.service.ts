@@ -39,4 +39,8 @@ export class TransactionProductoService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.api + '/' + 'batch-update-control', JSON.stringify(batch), { headers });
   }
 
+  validatePriceRange() {
+    
+  }
+
 }

@@ -1,10 +1,7 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
-import { CiudadDTO } from '../models/request/ciudadDTO';
-import { HumanDTO } from '../models/request/humanDTO';
 import { LegalEntityDTO } from '../models/request/legalEntityDTO';
 
 @Injectable({
@@ -15,7 +12,6 @@ export class LegalEntityService {
   private apiLegalEntities = '/legal_entities';
 
   constructor(private http: HttpClient) { }
-
 
   saveLegalEntity(legalEntityDTO: LegalEntityDTO) {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

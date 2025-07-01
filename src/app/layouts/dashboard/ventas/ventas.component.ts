@@ -294,7 +294,10 @@ export class VentasComponent implements OnInit, OnDestroy {
           this.loadingProductos = false;
           return of([]);
         }
-        params.filters['name'] = { value: term, op: 'LIKE', contiene: true };
+        params.filters = {
+          'name': { value: term, op: 'LIKE', contiene: true },
+          'salable': { value: 1, op: '=', contiene: false }
+        };
 
         return this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
           map((res: any) => res.data), //
@@ -1205,7 +1208,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
-    showPrecioTotal(data: any) {
+  showPrecioTotal(data: any) {
     return (data.quantity * data.unit_price).toFixed(2);
   }
 

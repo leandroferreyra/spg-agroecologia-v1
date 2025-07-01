@@ -65,7 +65,7 @@ export class ListadoBancosComponent implements OnInit, OnDestroy {
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
-  // Referencia al modal para crear y editar países.
+  // Referencia al modal para crear y editar bancos.
   @ViewChild('modalBanco') modalBanco!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,

@@ -12,14 +12,6 @@ import { Rol } from '../models/response/rol';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { ChangePasswordDTO } from '../models/request/changePasswordDTO';
-// import { AuthResponse } from '../models/response/authResponse';
-// import { EmailDTO } from '../models/request/emailDTO';
-// import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
-// import { RegistroDTO } from '../models/request/registroDTO';
-// import { Rol } from '../models/response/rol';
-// import { ChangePasswordDTO } from '../models/request/changePasswordDTO';
-// import { Constantes } from '../../components/Constantes';
-
 
 @Injectable({
   providedIn: 'root'

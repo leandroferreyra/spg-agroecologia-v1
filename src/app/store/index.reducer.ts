@@ -90,6 +90,7 @@ function getMenuByRole(role: string) {
                         { label: 'Tipos de productos', route: 'tipos-productos' },
                         { label: 'Cuentas bancarias de LADIE', route: 'cuentas-bancarias' },
                         { label: 'Categorías de productos', route: 'categorias-productos' },
+                        { label: 'Parámetros generales', route: 'parametros-generales' },
                     ]
                 },
                 { label: 'Mis datos', route: 'user-profile' },
