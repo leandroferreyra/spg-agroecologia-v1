@@ -59,6 +59,7 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   @ViewChild('offcanvasRight', { static: false }) offcanvasElement!: ElementRef;
   @ViewChild('modalVenta') modalVenta!: NgxCustomModalComponent;
+  @ViewChild('modalCliente') modalCliente!: NgxCustomModalComponent;
   @ViewChild('modalComprobante') modalComprobante!: NgxCustomModalComponent;
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
@@ -88,9 +89,13 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   mostrarProductos = true;
   mostrarComprobantes = true;
+  mostrarCliente = true;
+  mostrarDetalle = true;
   inEdicionProducto: boolean = false;
   inEdicionComprobante: boolean = false;
   inEdicionDetalles: boolean = false;
+  inEdicionRetirado: boolean = false;
+  inEdicionCliente: boolean = false;
   inEdicionVenta: boolean = false;
   tituloModal: string = '';
   placeholderCantidad: string = '';
@@ -146,10 +151,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   clienteInput$ = new Subject<string>();
   clientes$!: Observable<any[]>;
   loadingClientes = false;
-
-
-
-
+  clienteEdit: any;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -375,12 +377,123 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
+  openCloseEditarRetirado() {
+    this.inEdicionRetirado = !this.inEdicionRetirado;
+    if (this.inEdicionRetirado) {
+      if (this.inEdicionVenta) {
+        this.openCloseEditarVenta();
+      }
+      if (this.inEdicionDetalles) {
+        this.openCloseEditarDetalles();
+      }
+      this.ventaForm.get('nombreRetira')?.enable();
+      this.ventaForm.get('fechaRetira')?.enable();
+      this.ventaForm.get('remito')?.enable();
+    } else {
+      this.ventaForm.get('nombreRetira')?.disable();
+      this.ventaForm.get('fechaRetira')?.disable();
+      this.ventaForm.get('remito')?.disable();
+    }
+
+  }
+
+  confirmarRetirado() {
+    this.spinner.show();
+    let ventaDTO = new VentaDTO();
+    ventaDTO.delivered_to = this.ventaForm.get('nombreRetira')?.value;
+    ventaDTO.delivery_date = this.ventaForm.get('fechaRetira')?.value;
+    ventaDTO.delivery_note = this.ventaForm.get('remito')?.value;
+    ventaDTO.actual_role = this.actual_role;
+    ventaDTO.with = [
+      "transaction.person.human",
+      "transaction.person.legalEntity",
+      "transaction.person.city.district.country",
+      "transaction.transactionDocuments.accountDocumentType",
+      "transaction.transactionDocuments.currency",
+      "transaction.transactionProducts.product.measure"];
+    this.subscription.add(
+      this._ventaService.editVenta(this.selectedVenta.uuid, ventaDTO).subscribe({
+        next: res => {
+          this.selectedVenta = res.data;
+          this.inicializarFormEdit();
+          this.obtenerVentas(true);
+          this.openCloseEditarRetirado();
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  openModalCliente() {
+    this.modalCliente.options = this.modalOptions;
+    this.modalCliente.open();
+    // Cerramos los edit
+    if (this.inEdicionDetalles) {
+      this.openCloseEditarDetalles();
+    }
+    if (this.inEdicionVenta) {
+      this.openCloseEditarVenta();
+    }
+    if (this.inEdicionRetirado) {
+      this.openCloseEditarRetirado();
+    }
+  }
+
+  cerrarModalCliente() {
+    this.clienteEdit = null;
+    this.modalCliente.close();
+  }
+
+  confirmarCliente() {
+    if (this.clienteEdit) {
+      if (this.clienteEdit?.person?.uuid === this.selectedVenta?.transaction?.person?.uuid) {
+        this.swalService.toastError('top-right', 'No puede elegir el cliente actual.');
+        return;
+      }
+      let ventaDTO = new VentaDTO();
+      let transaction = new Transaction();
+      transaction.person_uuid = this.clienteEdit.person.uuid;
+      ventaDTO.transaction = transaction;
+      ventaDTO.actual_role = this.actual_role;
+      ventaDTO.with = [
+        "transaction.person.human",
+        "transaction.person.legalEntity",
+        "transaction.person.city.district.country",
+        "transaction.transactionDocuments.accountDocumentType",
+        "transaction.transactionDocuments.currency",
+        "transaction.transactionProducts.product.measure"];
+      this.subscription.add(
+        this._ventaService.editVenta(this.selectedVenta.uuid, ventaDTO).subscribe({
+          next: res => {
+            this.selectedVenta = res.data;
+            this.inicializarFormEdit();
+            this.obtenerVentas(true);
+            this.cerrarModalCliente();
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.swalService.toastError('top-right', error.error.message);
+          }
+        })
+      )
+    }
+  }
+
   openCloseEditarDetalles() {
     this.inEdicionDetalles = !this.inEdicionDetalles;
     if (this.inEdicionDetalles) {
       // Cerramos los edit
       if (this.inEdicionVenta) {
         this.openCloseEditarVenta();
+      }
+      if (this.inEdicionRetirado) {
+        this.openCloseEditarRetirado();
       }
       this.ventaForm.get('descuento1')?.enable();
       this.ventaForm.get('descuento2')?.enable();
@@ -486,6 +599,9 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
     if (this.inEdicionVenta) {
       this.openCloseEditarVenta();
+    }
+    if (this.inEdicionRetirado) {
+      this.openCloseEditarRetirado();
     }
   }
   inicializarFormNew() {
@@ -683,12 +799,24 @@ export class VentasComponent implements OnInit, OnDestroy {
   getMostrarOcultarComprobantesTooltip() {
     return this.mostrarComprobantes ? 'Ocultar' : 'Mostrar';
   }
+  getMostrarOcultarClienteTooltip() {
+    return this.mostrarCliente ? 'Ocultar' : 'Mostrar';
+  }
+  getMostrarOcultarDetalleTooltip() {
+    return this.mostrarDetalle ? 'Ocultar' : 'Mostrar';
+  }
 
   toggleProductos() {
     this.mostrarProductos = !this.mostrarProductos;
   }
   toggleComprobantes() {
     this.mostrarComprobantes = !this.mostrarComprobantes;
+  }
+  toggleCliente() {
+    this.mostrarCliente = !this.mostrarCliente;
+  }
+  toggleDetalle() {
+    this.mostrarDetalle = !this.mostrarDetalle;
   }
 
   openSwalEliminarProductoTransaccion(producto: any) {
@@ -757,6 +885,9 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
     if (this.inEdicionVenta) {
       this.openCloseEditarVenta();
+    }
+    if (this.inEdicionRetirado) {
+      this.openCloseEditarRetirado();
     }
   }
 
@@ -992,6 +1123,9 @@ export class VentasComponent implements OnInit, OnDestroy {
       if (this.inEdicionDetalles) {
         this.openCloseEditarDetalles();
       }
+      if (this.inEdicionRetirado) {
+        this.openCloseEditarRetirado();
+      }
       this.ventaForm.get('fechaVenta')?.enable();
       this.ventaForm.get('estadoVenta')?.enable();
     } else {
@@ -1110,6 +1244,9 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
     if (this.inEdicionVenta) {
       this.openCloseEditarVenta();
+    }
+    if (this.inEdicionRetirado) {
+      this.openCloseEditarRetirado();
     }
   }
 

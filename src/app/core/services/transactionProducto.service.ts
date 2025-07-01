@@ -7,6 +7,7 @@ import { CompraProveedorDTO } from '../models/request/compraProveedorDTO';
 import { CompraDTO } from '../models/request/compraDTO';
 import { ProductoTransaccionDTO } from '../models/request/productoTransaccionDTO';
 import { BatchUpdateControlDTO } from '../models/request/batchUpdateControlDTO';
+import { ValidatePriceRangeDTO } from '../models/request/validatePriceRangeDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +40,9 @@ export class TransactionProductoService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.api + '/' + 'batch-update-control', JSON.stringify(batch), { headers });
   }
 
-  validatePriceRange() {
-    
+  validatePriceRange(valiateDTO: ValidatePriceRangeDTO) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.api + '/' + 'validate-price-range', JSON.stringify(valiateDTO), { headers });
   }
 
 }

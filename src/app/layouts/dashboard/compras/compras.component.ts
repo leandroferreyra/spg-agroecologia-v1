@@ -45,6 +45,8 @@ import { PagosService } from 'src/app/core/services/pagos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { BatchUpdateControlDTO } from 'src/app/core/models/request/batchUpdateControlDTO';
+import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePriceRangeDTO';
+import { error } from 'console';
 
 @Component({
   selector: 'app-compras',
@@ -648,7 +650,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     if (this.inEdicionDescuentos) {
       this.openCloseEditarDescuentosCompra();
     }
-    if (this.inEdicionFactura) {
+    if (this.inEdicionFactura || this.inAltaFactura) {
       this.openCloseEditarFactura();
     }
   }
@@ -1187,6 +1189,25 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return (data.quantity * data.unit_price).toFixed(2);
   }
 
+  validatePriceRange() {
+    let validatePriceRange = new ValidatePriceRangeDTO();
+    validatePriceRange.actual_role = this.actual_role;
+    validatePriceRange.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
+    validatePriceRange.transaction_uuid = this.productoForm.get('transaction_uuid')?.value;
+    validatePriceRange.unit_price = this.productoForm.get('unit_price')?.value;
+    this.subscription.add(
+      this._transactionProductService.validatePriceRange(validatePriceRange).subscribe({
+        next: res => {
+          console.log(res);
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    );
+  }
+
   confirmarAltaProducto() {
     this.isSubmit = true;
     if (this.productoForm.valid) {
@@ -1349,6 +1370,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
   openModalEditarProveedor() {
     this.modalEditarProveedor.options = this.modalOptions;
     this.modalEditarProveedor.open();
+    // Cerramos todos los edit.
+    if (this.inEdicionFechaCompra) {
+      this.openCloseEditarFechaCompra();
+    }
+    if (this.inEdicionDescuentos) {
+      this.openCloseEditarDescuentosCompra();
+    }
+    if (this.inEdicionFactura || this.inAltaFactura) {
+      this.openCloseEditarFactura();
+    }
   }
 
   editarProveedor() {

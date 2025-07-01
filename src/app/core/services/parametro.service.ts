@@ -10,7 +10,7 @@ import { ParametrosDTO } from '../models/request/parametrosDTO';
 })
 export class ParametroService {
 
-  private apiParametros = '/general-parameters';
+  private apiParametros = '/general_parameters';
 
   constructor(private http: HttpClient) { }
 
