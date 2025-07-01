@@ -111,9 +111,9 @@ export class StocksComponent implements OnInit, OnDestroy {
 
   mostrarCantidad(data: any) {
     if (data.product.measure?.is_integer === 1) {
-      return (+data.initial_amount)?.toFixed(0);
+      return (+data.total_amount)?.toFixed(0);
     } else {
-      return (+data.initial_amount)?.toFixed(2);
+      return (+data.total_amount)?.toFixed(2);
     }
   }
 
