@@ -572,11 +572,18 @@ export class VentasComponent implements OnInit, OnDestroy {
   showDataVenta(venta: any) {
     if (this.ventas.length == 0 || this.selectedVenta && this.selectedVenta.uuid !== venta.uuid) {
       this.isEdicion = false;
+      // Cerramos los edit
+      if (this.inEdicionDetalles) {
+        this.openCloseEditarDetalles();
+      }
+      if (this.inEdicionVenta) {
+        this.openCloseEditarVenta();
+      }
+      if (this.inEdicionRetirado) {
+        this.openCloseEditarRetirado();
+      }
       this.obtenerVentaPorId(venta.uuid);
     }
-    // this.isEdicion = false;
-    // this.location.replaceState(`/dashboard/ventas/${venta.uuid}`);
-    // this.inicializarFormEdit(venta);
   }
 
 

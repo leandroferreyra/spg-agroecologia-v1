@@ -46,7 +46,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { BatchUpdateControlDTO } from 'src/app/core/models/request/batchUpdateControlDTO';
 import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePriceRangeDTO';
-import { error } from 'console';
 
 @Component({
   selector: 'app-compras',
@@ -567,6 +566,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
   showDataCompra(compra: any) {
     if (this.compras.length == 0 || this.selectedCompra && this.selectedCompra.uuid !== compra.uuid) {
       this.isEdicion = false;
+      // Cerramos todos los edit.
+      if (this.inEdicionFechaCompra) {
+        this.openCloseEditarFechaCompra();
+      }
+      if (this.inEdicionDescuentos) {
+        this.openCloseEditarDescuentosCompra();
+      }
+      if (this.inEdicionFactura || this.inAltaFactura) {
+        this.openCloseEditarFactura();
+      }
       this.obtenerCompraPorId(compra.uuid);
     }
   }
@@ -1189,15 +1198,22 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   validatePriceRange() {
+    console.log(this.selectedCompra);
     let validatePriceRange = new ValidatePriceRangeDTO();
     validatePriceRange.actual_role = this.actual_role;
     validatePriceRange.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
-    validatePriceRange.transaction_uuid = this.productoForm.get('transaction_uuid')?.value;
+    validatePriceRange.transaction_uuid = this.selectedCompra.transaction?.uuid;
     validatePriceRange.unit_price = this.productoForm.get('unit_price')?.value;
     this.subscription.add(
       this._transactionProductService.validatePriceRange(validatePriceRange).subscribe({
         next: res => {
           console.log(res);
+          if (res.data?.message === "") {
+            this.confirmarAltaProducto();
+          } else {
+            // El usuario debe confirmar si acepta o no.
+            this.swalMessageToConfirm(res.data?.message);
+          }
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -1205,6 +1221,23 @@ export class ComprasComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  swalMessageToConfirm(message: string) {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: message,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.confirmarAltaProducto();
+      }
+    });
   }
 
   confirmarAltaProducto() {

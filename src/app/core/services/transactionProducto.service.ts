@@ -40,9 +40,14 @@ export class TransactionProductoService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.api + '/' + 'batch-update-control', JSON.stringify(batch), { headers });
   }
 
-  validatePriceRange(valiateDTO: ValidatePriceRangeDTO) {
+  validatePriceRange(validateDTO: ValidatePriceRangeDTO) {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.api + '/' + 'validate-price-range', JSON.stringify(valiateDTO), { headers });
+    let params = new HttpParams();
+    params = params.append('actual_role', validateDTO.actual_role)
+      .append("transaction_uuid", validateDTO.transaction_uuid)
+      .append("product_uuid", validateDTO.product_uuid)
+      .append("unit_price", validateDTO.unit_price);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.api + '/' + 'validate-price-range', { headers, params });
   }
 
 }
