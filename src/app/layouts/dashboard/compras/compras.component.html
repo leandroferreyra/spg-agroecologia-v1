@@ -426,13 +426,21 @@
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
-                <legend class="text-lg font-semibold flex items-center">
-                    <span>Detalles</span>
-                    <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
-                        (click)="openCloseEditarDescuentosCompra()">
-                        <icon-pencil />
+                <legend class="text-lg font-semibold flex items-center justify-between">
+                    <span>
+                        Detalles
+                        <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
+                            (click)="openCloseEditarDescuentosCompra()">
+                            <icon-pencil />
+                        </button>
+                    </span>
+
+                    <button type="button" (click)="toggleDetalles()" class="text-sm hover:underline"
+                        style="color:#000000a3" [ngxTippy]="getMostrarOcultarTooltipDetalles()">
+                        <fa-icon [icon]="mostrarDetalles ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
                     </button>
                 </legend>
+                @if (mostrarDetalles) {
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block font-medium">Subtotal sin descuentos</label>
@@ -483,6 +491,7 @@
                             rows="2"></textarea>
                     </div>
                 </div>
+                }
                 @if (inEdicionDescuentos) {
                 <div class="row mt-3">
                     <div class="col-12 d-flex justify-content-center">

@@ -162,6 +162,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   ultimaUbicacion: any = null;
   mostrarProductos = true;
   mostrarPagos = true;
+  mostrarDetalles = true;
   usuarioLogueado: any;
   proveedorEdit: any;
   inEdicionFechaCompra: boolean = false;
@@ -404,6 +405,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   getMostrarOcultarTooltipPagos() {
     return this.mostrarPagos ? 'Ocultar' : 'Mostrar';
+  }
+
+  getMostrarOcultarTooltipDetalles() {
+    return this.mostrarDetalles ? 'Ocultar' : 'Mostrar';
   }
 
   getCuit() {
@@ -1173,6 +1178,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
   togglePagos() {
     this.mostrarPagos = !this.mostrarPagos;
   }
+  toggleDetalles() {
+    this.mostrarDetalles = !this.mostrarDetalles;
+  }
 
   showCantidad(data: any) {
     if (data.product?.measure?.is_integer === 1) {
@@ -1520,6 +1528,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   openCloseEditarDescuentosCompra() {
     this.inEdicionDescuentos = !this.inEdicionDescuentos;
     if (this.inEdicionDescuentos) {
+      this.mostrarDetalles = true;
       // Cerramos todos los edit.
       if (this.inEdicionFechaCompra) {
         this.openCloseEditarFechaCompra();

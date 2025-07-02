@@ -491,6 +491,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   openCloseEditarDetalles() {
     this.inEdicionDetalles = !this.inEdicionDetalles;
     if (this.inEdicionDetalles) {
+      this.mostrarDetalle = true;
       // Cerramos los edit
       if (this.inEdicionVenta) {
         this.openCloseEditarVenta();
