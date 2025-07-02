@@ -720,14 +720,14 @@
                             </ng-select>
                         </div>
 
-                        <div (keydown.enter)="confirmarAltaProducto()"
+                        <div (keydown.enter)="validatePriceRange()"
                             [ngClass]="isSubmit ? productoForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="quantity">Cantidad</label>
                             <input id="quantity" type="text" [placeholder]="placeholderCantidad" class="form-control"
                                 formControlName="quantity" />
                         </div>
 
-                        <div (keydown.enter)="confirmarAltaProducto()"
+                        <div (keydown.enter)="validatePriceRange()"
                             [ngClass]="isSubmit ? productoForm.controls['unit_price'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="unit_price">Precio unitario</label>
                             <input id="unit_price" type="text" placeholder="" class="form-control"
@@ -821,14 +821,14 @@
                         </div>
 
                         @if (!productoForm.controls['control_propio'].value) {
-                        <div (keydown.enter)="confirmarAltaProducto()"
+                        <div (keydown.enter)="validatePriceRange()"
                             [ngClass]="isSubmit ? productoForm.controls['usuario'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="usuario">Usuario</label>
                             <input id="usuario" type="text" class="form-control" formControlName="usuario" />
                         </div>
                         }
 
-                        <div (keydown.enter)="confirmarAltaProducto()"
+                        <div (keydown.enter)="validatePriceRange()"
                             [ngClass]="isSubmit ? productoForm.controls['password'].errors ? 'has-error' : 'has-success' : ''">
                             <label>Password</label>
                             <div class="input-group">
@@ -838,7 +838,7 @@
                                     style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
                             </div>
                         </div>
-                        <div (keydown.enter)="confirmarAltaProducto()"
+                        <div (keydown.enter)="validatePriceRange()"
                             [ngClass]="isSubmit ? productoForm.controls['control_comments'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="control_comments">Comentarios de control</label>
                             <textarea class="form-control" id="control_comments" formControlName="control_comments"
