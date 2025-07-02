@@ -83,10 +83,9 @@
 
         @for(menu of menuItems ; track menu) {
         <li class="menu nav-item relative" style="cursor: pointer;">
-            <a class="nav-link">
+            <a class="nav-link" (click)="navigateTo(menu.route, $event)">
                 <div class="flex items-center">
-                    <!-- <icon-menu-dashboard class="shrink-0" /> -->
-                    <span class="px-2" (click)="navigateTo(menu.route, $event)">{{ menu.label }}</span>
+                    <span class="px-2">{{ menu.label }}</span>
                 </div>
                 @if(menu.submenu?.length > 0) {
                 <div class="right_arrow">
