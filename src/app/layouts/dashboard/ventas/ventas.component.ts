@@ -91,6 +91,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   mostrarComprobantes = true;
   mostrarCliente = true;
   mostrarDetalle = true;
+  mostrarPagos = true;
   inEdicionProducto: boolean = false;
   inEdicionComprobante: boolean = false;
   inEdicionDetalles: boolean = false;
@@ -807,6 +808,9 @@ export class VentasComponent implements OnInit, OnDestroy {
   getMostrarOcultarDetalleTooltip() {
     return this.mostrarDetalle ? 'Ocultar' : 'Mostrar';
   }
+  getMostrarOcultarPagosTooltip() {
+    return this.mostrarPagos ? 'Ocultar' : 'Mostrar';
+  }
 
   toggleProductos() {
     this.mostrarProductos = !this.mostrarProductos;
@@ -819,6 +823,9 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
   toggleDetalle() {
     this.mostrarDetalle = !this.mostrarDetalle;
+  }
+  togglePagos() {
+    this.mostrarPagos = !this.mostrarPagos;
   }
 
   openSwalEliminarProductoTransaccion(producto: any) {

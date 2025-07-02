@@ -248,18 +248,23 @@
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
+
                 <legend class="text-lg font-semibold px-2 flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Productos
-                        <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
-                            <icon-plus class="w-4 h-4" />
-                        </button>
                     </span>
 
-                    <button type="button" (click)="toggleProductos()" class="text-sm hover:underline"
-                        style="color:#000000a3" [ngxTippy]="getMostrarOcultarProductosTooltip()">
-                        <fa-icon [icon]="mostrarProductos ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
+                            <icon-plus />
+                        </button>
+
+                        <button type="button" (click)="toggleProductos()" class="text-sm hover:underline"
+                            style="color:#000000a3" [ngxTippy]="getMostrarOcultarProductosTooltip()">
+                            <fa-icon [icon]="mostrarProductos ? iconEyeSlash : iconEye"
+                                style="cursor: pointer;"></fa-icon>
+                        </button>
+                    </div>
                 </legend>
 
                 @if(mostrarProductos){
@@ -401,19 +406,23 @@
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
+
                 <legend class="text-lg font-semibold px-2 flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Comprobantes
-                        <button type="button" class="hover:text-primary" (click)="openModalComprobante('NEW')">
-                            <icon-plus class="w-4 h-4" />
-                        </button>
                     </span>
 
-                    <button type="button" (click)="toggleComprobantes()" class="text-sm hover:underline"
-                        style="color:#000000a3" [ngxTippy]="getMostrarOcultarComprobantesTooltip()">
-                        <fa-icon [icon]="mostrarComprobantes ? iconEyeSlash : iconEye"
-                            style="cursor: pointer;"></fa-icon>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="hover:text-primary" (click)="openModalComprobante('NEW')">
+                            <icon-plus />
+                        </button>
+
+                        <button type="button" (click)="toggleComprobantes()" class="text-sm hover:underline"
+                            style="color:#000000a3" [ngxTippy]="getMostrarOcultarComprobantesTooltip()">
+                            <fa-icon [icon]="mostrarComprobantes ? iconEyeSlash : iconEye"
+                                style="cursor: pointer;"></fa-icon>
+                        </button>
+                    </div>
                 </legend>
 
                 @if(mostrarComprobantes) {
@@ -480,12 +489,21 @@
                 <legend class="text-lg font-semibold px-2 flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Pagos
-                        <button type="button" class="hover:text-primary">
-                            <icon-plus class="w-4 h-4" />
-                        </button>
                     </span>
+
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="hover:text-primary">
+                            <icon-plus />
+                        </button>
+
+                        <button type="button" (click)="togglePagos()" class="text-sm hover:underline"
+                            style="color:#000000a3" [ngxTippy]="getMostrarOcultarPagosTooltip()">
+                            <fa-icon [icon]="mostrarPagos ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
+                        </button>
+                    </div>
                 </legend>
 
+                @if(mostrarPagos) {
                 @if (selectedVenta?.transaction?.payments?.length > 0) {
                 <div class="mt-4">
                     <div class="table-responsive">
@@ -520,6 +538,7 @@
                     class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
                     <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee pagos</strong></span>
                 </div>
+                }
                 }
             </fieldset>
 
