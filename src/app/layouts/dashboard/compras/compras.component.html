@@ -96,48 +96,6 @@
 
             </div>
 
-            <!-- <div class="w-full p-4 space-y-4">
-
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div class="flex justify-center md:justify-start w-full md:w-1/2">
-                        <ngb-pagination class="ngb-pagination" [collectionSize]="total_rows" [pageSize]="itemsPerPage"
-                            [(page)]="currentPage" [maxSize]="2" [rotate]="true" [boundaryLinks]="true"
-                            (pageChange)="obtenerCompras()">
-                        </ngb-pagination>
-                    </div>
-
-                    <div class="flex justify-center md:justify-end items-center gap-2 w-full md:w-1/2">
-                        <label for="paginacion" class="mb-0 text-sm text-gray-600">Ítems por página:</label>
-                        <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label"
-                            [clearable]="false" class="custom-select w-24" [dropdownPosition]="'top'"
-                            (change)="obtenerCompras()">
-                        </ng-select>
-                    </div>
-                </div>
-
-                <div class="relative">
-                    <input type="text" placeholder="Buscar compra..." [(ngModel)]="filtroSimpleName"
-                        (input)="obtenerComprasPorFiltroSimple()" class="peer form-input w-full pr-10" />
-                    <div class="absolute top-1/2 right-3 transform -translate-y-1/2 peer-focus:text-primary">
-                        <icon-search />
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <label class="w-12 h-6 relative">
-                        <input type="checkbox"
-                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id="custom_switch_checkbox2" [(ngModel)]="filtroSimpleContiene"
-                            (change)="obtenerComprasPorFiltroSimple();" />
-                        <span for="custom_switch_checkbox2"
-                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                        </span>
-                    </label>
-                    <span>Contiene</span>
-                </div>
-
-            </div> -->
-
         </div>
     </div>
 
@@ -167,8 +125,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4" [formGroup]="compraForm">
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
-                <legend class="text-lg font-semibold px-2 flex items-center justify-between">
-                    <span></span>
+                <legend class="text-lg font-semibold flex items-center">
+                    <span>Fecha y estado</span>
                     <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
                         (click)="openCloseEditarFechaCompra()">
                         <icon-pencil />
@@ -213,7 +171,7 @@
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4">
-                <legend class="text-lg font-semibold px-2 flex items-center justify-between">
+                <legend class="text-lg font-semibold flex items-center">
                     <span>Proveedor</span>
                     <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
                         (click)="openModalEditarProveedor()">
@@ -257,14 +215,14 @@
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4">
-                <legend class="text-lg font-semibold px-2 flex items-center justify-between">
+                <legend class="text-lg font-semibold flex items-center">
                     <span>Factura</span>
                     <div class="flex items-center">
                         @if (selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' ||
                         selectedCompra?.transaction?.current_state?.state?.name === 'Entregada pendiente de factura' ) {
                         @if (!poseeFactura){
                         <div>
-                            <button type="button" class="hover:text-primary" ngxTippy="Agregar"
+                            <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Agregar"
                                 (click)="openCloseEditarFactura('NEW')">
                                 <icon-plus class="mx-auto" />
                             </button>
@@ -338,12 +296,12 @@
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
-                <legend class="text-lg font-semibold px-2 flex justify-between items-center">
+                <legend class="text-lg font-semibold flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Productos
                         @if(selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' ) {
                         <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
-                            <icon-plus class="w-4 h-4" />
+                            <icon-plus />
                         </button>
                         }
                     </span>
@@ -354,9 +312,9 @@
                     </button>
                 </legend>
 
+                @if (mostrarProductos){
                 @if (selectedCompra?.transaction?.transaction_products?.length > 0) {
-                <div *ngIf="mostrarProductos" class="mt-4">
-
+                <div class="mt-4">
                     <div class="table-responsive">
                         <table class="table-hover">
                             <thead class="bg-gray-100">
@@ -464,11 +422,11 @@
                     <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee
                             productos</strong></span>
                 </div>
-                }
+                }}
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
-                <legend class="text-lg font-semibold px-2 flex items-center justify-between">
+                <legend class="text-lg font-semibold flex items-center">
                     <span>Detalles</span>
                     <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
                         (click)="openCloseEditarDescuentosCompra()">
@@ -539,11 +497,11 @@
             </fieldset>
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
-                <legend class="text-lg font-semibold px-2 flex justify-between items-center">
+                <legend class="text-lg font-semibold flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Pagos
                         <button type="button" class="hover:text-primary" (click)="openModalPagos('NEW')">
-                            <icon-plus class="w-4 h-4" />
+                            <icon-plus />
                         </button>
                     </span>
 
@@ -553,8 +511,9 @@
                     </button>
                 </legend>
 
+                @if (mostrarPagos){
                 @if (pagos.length > 0) {
-                <div *ngIf="mostrarPagos" class="mt-4">
+                <div class="mt-4">
                     <div class="table-responsive">
                         <table class="table-hover">
                             <thead class="bg-gray-100">
@@ -613,7 +572,7 @@
                     <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee
                             pagos</strong></span>
                 </div>
-                }
+                }}
             </fieldset>
 
 
@@ -1222,7 +1181,6 @@
         </ng-template>
     </ngx-custom-modal>
 </div>
-
 
 <div>
     <ngx-custom-modal #modalControlarTodos class=" modal-top extra-large-modal animate animate-fade-in">
