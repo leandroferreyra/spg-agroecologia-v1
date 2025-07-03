@@ -961,9 +961,12 @@ export class VentasComponent implements OnInit, OnDestroy {
           ['stock_uuid'].forEach((field) => {
             const control = this.productoForm.get(field);
             control?.setValidators(Validators.required);
+            control?.setValue(null);
             control?.updateValueAndValidity({ emitEvent: false });
           });
+          this.productoForm.get('serial_number')?.setValue(null);
           this.showStocks = true;
+          this.stocks = []; // Se limpia el array
           this.obtenerStocks(producto.uuid);
           if (producto.assign_serial_number === 0 && producto.has_serial_number === 0) {
             // No asigna ni tiene por lo que pide cantidad
