@@ -97,7 +97,6 @@ export class ListadoParametrosGeneralesComponent implements OnInit, OnDestroy {
         next: res => {
           this.spinner.hide();
           this.parametros = res.data;
-          console.log("🚀 ~ ListadoParametrosGeneralesComponent ~ this._indexService.getParametrosWithParam ~ this.parametros:", this.parametros)
           this.modificarPaginacion(res);
         },
         error: error => {
@@ -151,7 +150,6 @@ export class ListadoParametrosGeneralesComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._parametrosService.editParametros(this.parametroForm.get('uuid')?.value, parametro).subscribe({
           next: res => {
-            console.log(res);
             this.obtenerParametros();
             this.spinner.hide();
             this.cerrarModal();
