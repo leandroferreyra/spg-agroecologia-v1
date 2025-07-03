@@ -1,7 +1,7 @@
 export class ProductoTransaccionDTO {
 
     transaction_uuid?: string;
-    product_uuid!: string;
+    product_uuid?: string;
     quantity!: string;
     unit_price!: string;
     control_result?: boolean | null;

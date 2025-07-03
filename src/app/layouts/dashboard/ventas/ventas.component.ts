@@ -920,13 +920,19 @@ export class VentasComponent implements OnInit, OnDestroy {
       if (producto.product.assign_serial_number === 0 && producto.product.has_serial_number === 0) {
         this.mostrarCantidad = true;
         this.showSerialNumber = false;
+        ['stock_uuid'].forEach((field) => {
+          const control = this.productoForm.get(field);
+          control?.setValidators(Validators.required);
+          control?.disable();
+          control?.updateValueAndValidity({ emitEvent: false });
+        });
       } else {
         this.mostrarCantidad = false;
         this.showSerialNumber = true;
-        ['serial_number'].forEach((field) => {
+        ['stock_uuid', 'serial_number'].forEach((field) => {
           const control = this.productoForm.get(field);
           control?.setValidators(Validators.required);
-          control?.enable();
+          control?.disable();
           control?.updateValueAndValidity({ emitEvent: false });
         });
       }
@@ -939,6 +945,7 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   inicializarFormProducto(data?: any) {
     this.productoForm = new FormGroup({
+      transaction_uuid: new FormControl(data ? data.uuid : null, [Validators.required]),
       product_uuid: new FormControl(data ? data.product : null, [Validators.required]),
       stock_uuid: new FormControl(data ? data.stock : null, []),
       serial_number: new FormControl({ value: data ? data.sale_product?.product_instances[0] : null, disabled: true }, []),
@@ -1102,8 +1109,11 @@ export class VentasComponent implements OnInit, OnDestroy {
         )
       } else {
         delete productoTransaccionDTO.transaction_uuid;
+        delete productoTransaccionDTO.stock_uuid;
+        delete productoTransaccionDTO.serial_number;
+        delete productoTransaccionDTO.product_uuid;
         this.subscription.add(
-          this._transactionProductService.editTransactionProduct(this.selectedVenta.transaction?.uuid, productoTransaccionDTO).subscribe({
+          this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, productoTransaccionDTO).subscribe({
             next: res => {
               console.log(res);
               this.tokenService.setToken(res.token);
