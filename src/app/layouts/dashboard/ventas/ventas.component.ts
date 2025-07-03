@@ -209,6 +209,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       "transaction.person.legalEntity",
       "transaction.transactionDocuments.accountDocumentType",
       "transaction.transactionProducts.product",
+      "transaction.transactionProducts.product.productType",
       "transaction.transactionProducts.saleProduct.productInstances",
       "transaction.transactionProducts.saleProduct.stock.batch"
     ];
@@ -871,11 +872,6 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._transactionProductService.deleteTransactionProduct(producto.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
-          // let productos = this.selectedVenta.transaction.transaction_products;
-          // const index = productos.findIndex((p: any) => p.uuid === producto.uuid);
-          // if (index !== -1) {
-          //   productos.splice(index, 1);
-          // }
           this.obtenerVentaPorId(this.selectedVenta.uuid);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
@@ -899,7 +895,9 @@ export class VentasComponent implements OnInit, OnDestroy {
       this.inicializarFormProducto();
     } else {
       this.inEdicionProducto = true;
+      this.inicializarFormProducto(producto);
       this.tituloModal = 'Edición de producto';
+      this.showItems(producto);
     }
     this.modalProducto.options = this.modalOptions;
     this.modalProducto.open();
@@ -915,16 +913,39 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
+  showItems(producto: any) {
+    if (producto.product.product_type?.stock_controlled === 1) {
+      this.showStocks = true;
+      this.obtenerStocks(producto.product.uuid);
+      if (producto.product.assign_serial_number === 0 && producto.product.has_serial_number === 0) {
+        this.mostrarCantidad = true;
+        this.showSerialNumber = false;
+      } else {
+        this.mostrarCantidad = false;
+        this.showSerialNumber = true;
+        ['serial_number'].forEach((field) => {
+          const control = this.productoForm.get(field);
+          control?.setValidators(Validators.required);
+          control?.enable();
+          control?.updateValueAndValidity({ emitEvent: false });
+        });
+      }
+    } else {
+      this.showStocks = false;
+    }
+  }
+
+  compararStocks = (stock1: any, stock2: any) => stock1 && stock2 && stock1.uuid === stock2.uuid;
+
   inicializarFormProducto(data?: any) {
     this.productoForm = new FormGroup({
-      product_uuid: new FormControl(null, [Validators.required]),
-      stock_uuid: new FormControl(null, []),
-      serial_number: new FormControl({ value: null, disabled: true }, []),
-      quantity: new FormControl({ value: null, disabled: false }, []),
-      unit_price: new FormControl(null, [Validators.required]),
+      product_uuid: new FormControl(data ? data.product : null, [Validators.required]),
+      stock_uuid: new FormControl(data ? data.stock : null, []),
+      serial_number: new FormControl({ value: data ? data.sale_product?.product_instances[0] : null, disabled: true }, []),
+      quantity: new FormControl({ value: data ? data.quantity : null, disabled: false }, []),
+      unit_price: new FormControl(data ? data.unit_price : null, [Validators.required]),
     })
     this.onFormProductoChange();
-
   }
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
@@ -1007,7 +1028,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         next: res => {
           this.stocks = res.data.map((stock: any) => ({
             ...stock,
-            nombreCompleto: `${this.datePipe.transform(stock.created_at, 'yyyy-MM-dd')} | (${stock.batch != null ? stock.batch.batch_identification : "Lote único"}) | ${stock.total_amount}`
+            nombreCompleto: this.armarStock(stock)
           }));
         },
         error: error => {
@@ -1016,6 +1037,10 @@ export class VentasComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  armarStock(stock: any) {
+    return `${this.datePipe.transform(stock.created_at, 'yyyy-MM-dd')} | (${stock.batch != null ? stock.batch.batch_identification : "Lote único"}) | ${stock.total_amount}`
   }
 
   obtenerProductosEnPosesion(stock_uuid: string) {
@@ -1033,7 +1058,6 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getProductosEnPosesionWithParam(params, this.actual_role).subscribe({
         next: res => {
-          console.log(res);
           this.productosEnPosesion = res.data;
         },
         error: error => {
@@ -1077,15 +1101,25 @@ export class VentasComponent implements OnInit, OnDestroy {
           })
         )
       } else {
+        delete productoTransaccionDTO.transaction_uuid;
         this.subscription.add(
-          // this._transactionProductService.editTransactionProduct().subscribe({
-          //   next: res => {
-          //     console.log(res);
-          //   },
-          //   error: error => {
-          //     console.error(error);
-          //   }
-          // })
+          this._transactionProductService.editTransactionProduct(this.selectedVenta.transaction?.uuid, productoTransaccionDTO).subscribe({
+            next: res => {
+              console.log(res);
+              this.tokenService.setToken(res.token);
+              this.isSubmit = false;
+              this.inEdicionProducto = false;
+              this.obtenerVentaPorId(this.selectedVenta.uuid);
+              this.cerrarModalProducto();
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              this.isSubmit = false;
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
         )
       }
     }

@@ -630,8 +630,9 @@
                         <div>
                             <label>Stock</label>
                             <ng-select [items]="stocks" bindLabel="nombreCompleto" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay stocks" placeholder=""
-                                class="w-1/3 min-w-[200px]" formControlName="stock_uuid" [selectOnTab]="true"
+                                [compareWith]="compararStocks" style="width: 100%" [virtualScroll]="true"
+                                notFoundText="No hay stocks" placeholder="" class="w-1/3 min-w-[200px]"
+                                formControlName="stock_uuid" [selectOnTab]="true"
                                 [ngClass]="isSubmit ? productoForm.controls['stock_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
                         }

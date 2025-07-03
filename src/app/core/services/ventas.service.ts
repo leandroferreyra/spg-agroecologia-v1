@@ -22,6 +22,7 @@ export class VentasService {
       .append('with[]', "transaction.person.legalEntity")
       .append('with[]', "transaction.person.city.district.country")
       .append('with[]', "transaction.transactionProducts.product.measure")
+      .append('with[]', "transaction.transactionProducts.product.productType")
       .append('with[]', "transaction.transactionProducts.saleProduct.stock.batch")
       .append('with[]', "transaction.transactionProducts.saleProduct.productInstances")
       .append('with[]', "transaction.transactionDocuments.accountDocumentType")
