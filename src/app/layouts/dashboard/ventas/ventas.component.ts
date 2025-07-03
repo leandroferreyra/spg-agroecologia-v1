@@ -913,7 +913,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   showItems(producto: any) {
     if (producto.product.product_type?.stock_controlled === 1) {
       this.showStocks = true;
-      this.obtenerStocks(producto.product.uuid);
+      this.obtenerStocks(producto.product);
       if (producto.product.assign_serial_number === 0 && producto.product.has_serial_number === 0) {
         this.mostrarCantidad = true;
         this.showSerialNumber = false;
@@ -935,6 +935,13 @@ export class VentasComponent implements OnInit, OnDestroy {
       }
     } else {
       this.showStocks = false;
+      this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
+      this.mostrarCantidad = true;
+      ['quantity'].forEach((field) => {
+        const control = this.productoForm.get(field);
+        control?.setValidators(Validators.required);
+        control?.updateValueAndValidity({ emitEvent: false });
+      });
     }
   }
 
@@ -946,7 +953,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       product_uuid: new FormControl({ value: data ? data.product : null, disabled: data ? true : false }, [Validators.required]),
       stock_uuid: new FormControl(data ? data.stock : null, []),
       serial_number: new FormControl({ value: data ? data.sale_product?.product_instances[0] : null, disabled: true }, []),
-      quantity: new FormControl({ value: data ? data.quantity : null, disabled: false }, []),
+      quantity: new FormControl({ value: data ? this.showCantidad(data) : null, disabled: false }, []),
       unit_price: new FormControl(data ? data.unit_price : null, [Validators.required]),
     })
     this.onFormProductoChange();
@@ -954,6 +961,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
+        this.obtenerStocks(producto);
         if (producto.product_type?.stock_controlled === 1) {
           ['stock_uuid'].forEach((field) => {
             const control = this.productoForm.get(field);
@@ -963,10 +971,10 @@ export class VentasComponent implements OnInit, OnDestroy {
           });
           this.productoForm.get('serial_number')?.setValue(null);
           this.showStocks = true;
-          this.stocks = []; // Se limpia el array
-          this.obtenerStocks(producto.uuid);
+          // this.stocks = []; // Se limpia el array
           if (producto.assign_serial_number === 0 && producto.has_serial_number === 0) {
             // No asigna ni tiene por lo que pide cantidad
+            this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
             this.mostrarCantidad = true;
             this.showSerialNumber = false;
             this.productoForm.get('quantity')?.setValue(null);
@@ -978,6 +986,7 @@ export class VentasComponent implements OnInit, OnDestroy {
           } else {
             // Asigna o tiene número de serie
             this.mostrarCantidad = false;
+            this.placeholderCantidad = '';
             this.showSerialNumber = true;
             this.productoForm.get('quantity')?.setValue(1);
             ['quantity'].forEach((field) => {
@@ -987,6 +996,14 @@ export class VentasComponent implements OnInit, OnDestroy {
             });
           }
         } else {
+          this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
+          this.mostrarCantidad = true;
+          this.productoForm.get('quantity')?.setValue(null);
+          ['quantity'].forEach((field) => {
+            const control = this.productoForm.get(field);
+            control?.setValidators(Validators.required);
+            control?.updateValueAndValidity({ emitEvent: false });
+          });
           // No tiene stock controlled por lo que no muestra el select de stocks.
           this.showStocks = false;
           ['stock_uuid'].forEach((field) => {
@@ -1019,14 +1036,14 @@ export class VentasComponent implements OnInit, OnDestroy {
       });
   }
 
-  obtenerStocks(product_uuid: string) {
+  obtenerStocks(producto: any) {
     const params: any = {};
     params.with = ["batch"];
     params.paging = null;
     params.page = null;
     params.order_by = {};
     params.filters = {
-      'product.uuid': { value: product_uuid, op: '=', contiene: false },
+      'product.uuid': { value: producto.uuid, op: '=', contiene: false },
       'total_amount': { value: 0, op: '>', contiene: false },
     };
 
@@ -1035,8 +1052,13 @@ export class VentasComponent implements OnInit, OnDestroy {
         next: res => {
           this.stocks = res.data.map((stock: any) => ({
             ...stock,
-            nombreCompleto: this.armarStock(stock)
+            nombreCompleto: this.armarStock(producto, stock)
           }));
+          if (producto.product_type?.stock_controlled === 0) {
+            // Se setea en el stock_uuid del form el único elemento
+            this.productoForm.get('stock_uuid')?.setValue(this.stocks[0]);
+          }
+          console.log(this.stocks);
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -1046,8 +1068,15 @@ export class VentasComponent implements OnInit, OnDestroy {
     )
   }
 
-  armarStock(stock: any) {
-    return `${this.datePipe.transform(stock.created_at, 'yyyy-MM-dd')} | (${stock.batch != null ? stock.batch.batch_identification : "Lote único"}) | ${stock.total_amount}`
+  armarStock(producto: any, stock: any) {
+    console.log(producto);
+    let amount;
+    if (producto.measure?.is_integer === 1) {
+      amount = (+stock.total_amount).toFixed(0);
+    } else {
+      amount = (+stock.total_amount).toFixed(2);
+    }
+    return `${this.datePipe.transform(stock.created_at, 'yyyy-MM-dd')} | (${stock.batch != null ? stock.batch.batch_identification : "Lote único"}) | ${amount}`
   }
 
   obtenerProductosEnPosesion(stock_uuid: string) {
@@ -1135,6 +1164,7 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   cerrarModalProducto() {
     this.isSubmit = false;
+    this.inEdicionProducto = false;
     this.showStocks = false;
     this.mostrarCantidad = false;
     this.showSerialNumber = false;
