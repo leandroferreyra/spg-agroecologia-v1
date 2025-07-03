@@ -247,7 +247,7 @@
                     <span class="flex items-center gap-2">
                         Productos
                         <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
-                            <icon-pencil />
+                            <icon-plus />
                         </button>
                     </span>
                     <button type="button" (click)="toggleProductos()" class="text-sm hover:underline"
@@ -621,18 +621,40 @@
                             <ng-select [items]="productos$ | async" bindLabel="name" [typeahead]="productoInput$"
                                 [loading]="loadingProductos" [virtualScroll]="true" typeToSearchText='Escriba un nombre'
                                 loadingText="Cargando..." [appendTo]="'body'" placeholder="Buscar producto..."
-                                formControlName="product_uuid"
+                                formControlName="product_uuid" notFoundText="No hay productos"
                                 [ngClass]="isSubmit ? productoForm.controls['product_uuid'].errors ? 'has-error' : 'has-success' : ''">
                             </ng-select>
                         </div>
 
+                        @if(showStocks) {
+                        <div>
+                            <label>Stock</label>
+                            <ng-select [items]="stocks" bindLabel="nombreCompleto" clearAllText="Limpiar"
+                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay stocks" placeholder=""
+                                class="w-1/3 min-w-[200px]" formControlName="stock_uuid" [selectOnTab]="true"
+                                [ngClass]="isSubmit ? productoForm.controls['stock_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                        </div>
+                        }
+
+                        @if(showSerialNumber) {
+                        <div>
+                            <label>Numero de serie</label>
+                            <ng-select [items]="productosEnPosesion" bindLabel="serial_number" clearAllText="Limpiar"
+                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay productos"
+                                placeholder="" class="w-1/3 min-w-[200px]" formControlName="serial_number"
+                                [selectOnTab]="true"
+                                [ngClass]="isSubmit ? productoForm.controls['serial_number'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                        </div>
+                        }
+
+                        @if (mostrarCantidad) {
                         <div (keydown.enter)="confirmarProducto()"
                             [ngClass]="isSubmit ? productoForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="quantity">Cantidad</label>
                             <input id="quantity" type="text" class="form-control" [placeholder]="placeholderCantidad"
                                 formControlName="quantity" />
                         </div>
-
+                        }
 
                         <div (keydown.enter)="confirmarProducto()"
                             [ngClass]="isSubmit ? productoForm.controls['unit_price'].errors ? 'has-error' : 'has-success' : ''">

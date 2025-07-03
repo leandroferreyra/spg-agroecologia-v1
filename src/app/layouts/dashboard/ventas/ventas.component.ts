@@ -21,7 +21,7 @@ import { PagosService } from 'src/app/core/services/pagos.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { TransactionProductoService } from 'src/app/core/services/transactionProducto.service';
-import { UbicacionesService } from 'src/app/core/services/ubicaciones.service';
+import { DatePipe } from '@angular/common';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { VentasService } from 'src/app/core/services/ventas.service';
 import { toggleAnimation } from 'src/app/shared/animations';
@@ -52,6 +52,7 @@ import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTran
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective,
     IconPencilComponent],
   animations: [toggleAnimation],
+  providers: [DatePipe],
   templateUrl: './ventas.component.html',
   styleUrl: './ventas.component.css'
 })
@@ -154,12 +155,18 @@ export class VentasComponent implements OnInit, OnDestroy {
   loadingClientes = false;
   clienteEdit: any;
 
+  productosEnPosesion: any[] = [];
+  stocks: any[] = [];
+  showStocks: boolean = false;
+  showSerialNumber: boolean = false;
+  mostrarCantidad: boolean = false;
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
     private _transactionDocumentsService: FacturaService, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
-    private router: Router) {
+    private router: Router, private datePipe: DatePipe) {
     this.initStore();
   }
   async initStore() {
@@ -911,7 +918,9 @@ export class VentasComponent implements OnInit, OnDestroy {
   inicializarFormProducto(data?: any) {
     this.productoForm = new FormGroup({
       product_uuid: new FormControl(null, [Validators.required]),
-      quantity: new FormControl({ value: null, disabled: data ? false : true }, [Validators.required]),
+      stock_uuid: new FormControl(null, []),
+      serial_number: new FormControl({ value: null, disabled: true }, []),
+      quantity: new FormControl({ value: null, disabled: false }, []),
       unit_price: new FormControl(null, [Validators.required]),
     })
     this.onFormProductoChange();
@@ -920,18 +929,119 @@ export class VentasComponent implements OnInit, OnDestroy {
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
-        // Quantity
-        if (producto) {
-          this.productoForm.get('quantity')?.enable();
-          this.productoForm.get('quantity')?.setValue('');
-          this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
+        if (producto.product_type?.stock_controlled === 1) {
+          ['stock_uuid'].forEach((field) => {
+            const control = this.productoForm.get(field);
+            control?.setValidators(Validators.required);
+            control?.updateValueAndValidity({ emitEvent: false });
+          });
+          this.showStocks = true;
+          this.obtenerStocks(producto.uuid);
+          if (producto.assign_serial_number === 0 && producto.has_serial_number === 0) {
+            // No asigna ni tiene por lo que pide cantidad
+            this.mostrarCantidad = true;
+            this.showSerialNumber = false;
+            this.productoForm.get('quantity')?.setValue(null);
+            ['quantity'].forEach((field) => {
+              const control = this.productoForm.get(field);
+              control?.setValidators(Validators.required);
+              control?.updateValueAndValidity({ emitEvent: false });
+            });
+          } else {
+            // Asigna o tiene número de serie
+            this.mostrarCantidad = false;
+            this.showSerialNumber = true;
+            this.productoForm.get('quantity')?.setValue(1);
+            ['quantity'].forEach((field) => {
+              const control = this.productoForm.get(field);
+              control?.setValidators([]);
+              control?.updateValueAndValidity({ emitEvent: false });
+            });
+          }
         } else {
-          this.productoForm.get('quantity')?.disable();
-          this.productoForm.get('quantity')?.setValue(null);
-          this.placeholderCantidad = '';
+          // No tiene stock controlled por lo que no muestra el select de stocks.
+          this.showStocks = false;
+          ['stock_uuid'].forEach((field) => {
+            const control = this.productoForm.get(field);
+            control?.setValidators([]);
+            control?.updateValueAndValidity({ emitEvent: false });
+          });
         }
       });
 
+    this.productoForm.get('stock_uuid')!.valueChanges.subscribe(
+      (stock: any) => {
+        if (stock && !this.mostrarCantidad) {
+          // Tiene o asigna numero de serie
+          this.obtenerProductosEnPosesion(stock.uuid);
+          ['serial_number'].forEach((field) => {
+            const control = this.productoForm.get(field);
+            control?.setValidators(Validators.required);
+            control?.enable();
+            control?.updateValueAndValidity({ emitEvent: false });
+          });
+        } else {
+          ['serial_number'].forEach((field) => {
+            const control = this.productoForm.get(field);
+            control?.setValidators([]);
+            control?.disable();
+            control?.updateValueAndValidity({ emitEvent: false });
+          });
+        }
+      });
+  }
+
+  obtenerStocks(product_uuid: string) {
+    const params: any = {};
+    params.with = ["batch"];
+    params.paging = null;
+    params.page = null;
+    params.order_by = {};
+    params.filters = {
+      'product.uuid': { value: product_uuid, op: '=', contiene: false },
+      'total_amount': { value: 0, op: '>', contiene: false },
+    };
+
+    this.subscription.add(
+      this._indexService.getStocksWithParam(params, this.actual_role).subscribe({
+        next: res => {
+          this.stocks = res.data.map((stock: any) => ({
+            ...stock,
+            nombreCompleto: `${this.datePipe.transform(stock.created_at, 'yyyy-MM-dd')} | (${stock.batch != null ? stock.batch.batch_identification : "Lote único"}) | ${stock.total_amount}`
+          }));
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
+  }
+
+  obtenerProductosEnPosesion(stock_uuid: string) {
+    const params: any = {};
+    params.with = [];
+    params.paging = null;
+    params.page = null;
+    params.order_by = {
+      'serial_number': 'asc'
+    };
+    params.filters = {
+      'stock_uuid': { value: stock_uuid, op: '=', contiene: false }
+    };
+
+    this.subscription.add(
+      this._indexService.getProductosEnPosesionWithParam(params, this.actual_role).subscribe({
+        next: res => {
+          console.log(res);
+          this.productosEnPosesion = res.data;
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
   }
 
   confirmarProducto() {
@@ -944,6 +1054,8 @@ export class VentasComponent implements OnInit, OnDestroy {
       productoTransaccionDTO.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
       productoTransaccionDTO.quantity = this.productoForm.get('quantity')?.value;
       productoTransaccionDTO.unit_price = this.productoForm.get('unit_price')?.value;
+      productoTransaccionDTO.stock_uuid = this.productoForm.get('stock_uuid')?.value?.uuid;
+      productoTransaccionDTO.serial_number = this.productoForm.get('serial_number')?.value?.serial_number;
       if (!this.inEdicionProducto) {
         this.subscription.add(
           this._transactionProductService.saveTransactionProduct(productoTransaccionDTO).subscribe({
@@ -981,6 +1093,9 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   cerrarModalProducto() {
     this.isSubmit = false;
+    this.showStocks = false;
+    this.mostrarCantidad = false;
+    this.showSerialNumber = false;
     this.modalProducto.close();
   }
 
