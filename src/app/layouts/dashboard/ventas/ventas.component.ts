@@ -222,7 +222,6 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._indexService.getVentasWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.ventas = res.data;
-          console.log("🚀 ~ VentasComponent ~ this._indexService.getComprasClientesWithParam ~ this.ventas:", this.ventas)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -562,8 +561,6 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._ventaService.getVentaById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedVenta = res.data;
-          // console.log("🚀 ~ VentasComponent ~ this._ventaService.getVentaById ~ this.selectedVenta:", this.selectedVenta)
-          // this.obtenerPagos(this.selectedVenta?.transaction?.uuid);
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedVenta.uuid;
           this.location.replaceState(`/dashboard/ventas/${this.selectedVenta.uuid}`);
@@ -1094,7 +1091,6 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._transactionProductService.saveTransactionProduct(productoTransaccionDTO).subscribe({
             next: res => {
-              console.log(res);
               this.tokenService.setToken(res.token);
               this.isSubmit = false;
               this.inEdicionProducto = false;
@@ -1118,7 +1114,6 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, productoTransaccionDTO).subscribe({
             next: res => {
-              console.log(res);
               this.tokenService.setToken(res.token);
               this.isSubmit = false;
               this.inEdicionProducto = false;
@@ -1403,7 +1398,6 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   openModalComprobante(type: string, data?: any) {
-    console.log(data);
     if (type === 'NEW') {
       if (this.isEdicion) {
         this.isEdicion = false;
@@ -1474,11 +1468,8 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._transactionDocumentsService.saveFactura(comprobante).subscribe({
             next: res => {
-              console.log(res);
               this.tokenService.setToken(res.token);
               this.isSubmit = false;
-              // this.obtenerVentas(true);
-              // this.showDataVenta(this.selectedVenta);
               this.obtenerVentaPorId(this.selectedVenta.uuid);
               this.cerrarModalComprobante();
               this.spinner.hide();
@@ -1495,7 +1486,6 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._transactionDocumentsService.editFactura(this.comprobanteForm.get('comprobante_uuid')?.value, comprobante).subscribe({
             next: res => {
-              console.log(res);
               this.tokenService.setToken(res.token);
               this.isSubmit = false;
               this.obtenerVentaPorId(this.selectedVenta.uuid);
