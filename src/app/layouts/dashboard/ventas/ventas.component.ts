@@ -946,7 +946,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   inicializarFormProducto(data?: any) {
     this.productoForm = new FormGroup({
       transaction_uuid: new FormControl(data ? data.uuid : null, []),
-      product_uuid: new FormControl(data ? data.product : null, [Validators.required]),
+      product_uuid: new FormControl({ value: data ? data.product : null, disabled: data ? true : false }, [Validators.required]),
       stock_uuid: new FormControl(data ? data.stock : null, []),
       serial_number: new FormControl({ value: data ? data.sale_product?.product_instances[0] : null, disabled: true }, []),
       quantity: new FormControl({ value: data ? data.quantity : null, disabled: false }, []),
