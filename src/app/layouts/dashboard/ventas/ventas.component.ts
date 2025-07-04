@@ -291,9 +291,9 @@ export class VentasComponent implements OnInit, OnDestroy {
     params.paging = 20;
     params.page = null;
     params.order_by = {};
-    params.filters = {
-      'salable': { value: '1', op: '=', contiene: false },
-    };
+    /* params.filters = {
+      'salable': { value: '1', op: '=', contiene: false }
+    }; */
 
     this.productos$ = this.productoInput$.pipe(
       debounceTime(300),
@@ -306,7 +306,9 @@ export class VentasComponent implements OnInit, OnDestroy {
         }
         params.filters = {
           'name': { value: term, op: 'LIKE', contiene: true },
-          'salable': { value: 1, op: '=', contiene: false }
+          'salable': { value: 1, op: '=', contiene: false },
+          'productStates.possibleProductState.name': { value: 'Vigente', op: '=', contiene: false },
+          'productStates.datetime_to': { value: 'null', op: '=', contiene: false },
         };
 
         return this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
