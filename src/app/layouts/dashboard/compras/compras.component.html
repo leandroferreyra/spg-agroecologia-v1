@@ -1138,7 +1138,7 @@
 
                         <div>
                             <label>Método de pago</label>
-                            <ng-select [items]="metodosDePago" bindLabel="name" bindValue="name" clearAllText="Limpiar"
+                            <ng-select [items]="metodosDePago" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay métodos de pago"
                                 class="w-1/3 min-w-[200px]" formControlName="payment_method" [selectOnTab]="true"
                                 [ngClass]="isSubmitPago ? pagoForm.controls['payment_method'].errors ? 'has-error' : 'has-success' : ''"></ng-select>

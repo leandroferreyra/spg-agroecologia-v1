@@ -156,7 +156,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   ubicaciones: any[] = [];
   pagos: any[] = [];
   monedas: any[] = [];
-  metodosDePago: string[] = ['Efectivo', 'Transferencia Bancaria', 'Tarjeta de Crédito', 'Tarjeta de Débito', 'PayPal', 'Mercado Pago', 'Otro'];
+  // metodosDePago: string[] = ['Efectivo', 'Transferencia Bancaria', 'Tarjeta de Crédito', 'Tarjeta de Débito', 'PayPal', 'Mercado Pago', 'Otro'];
+  metodosDePago: any[] = [];
 
   breadcrumb: any[] = [];
   ultimaUbicacion: any = null;
@@ -490,13 +491,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
       tiposDocumentosContables: this._catalogoService.getTiposCompraDocumentosContables(this.actual_role),
       posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccionCompra(this.actual_role),
       calificaciones: this._catalogoService.getCalificaciones(this.actual_role),
-      monedas: this._indexService.getMonedas(this.actual_role)
+      monedas: this._indexService.getMonedas(this.actual_role),
+      metodosPago: this._indexService.getMetodosDePagoWithParam(null, this.actual_role)
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
         this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
         this.calificaciones = res.calificaciones.data;
         this.monedas = res.monedas.data;
+        this.metodosDePago = res.metodosPago.data;
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -506,7 +509,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   obtenerPagos(uuid: string) {
     const params: any = {};
-    params.with = ["currency"];
+    params.with = ["currency", "paymentMethod"];
     params.paging = 10;
     params.page = 1;
     params.order_by = {
@@ -1738,9 +1741,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;
       pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
-      pago.payment_method = this.pagoForm.get('payment_method')?.value;
+      pago.payment_method_id = this.pagoForm.get('payment_method')?.value;
       if (!this.inEdicionPago) {
         pago.transaction_uuid = this.selectedCompra.transaction?.uuid;
+        console.log(pago);
         this.subscription.add(
           this._pagoService.savePago(pago).subscribe({
             next: res => {

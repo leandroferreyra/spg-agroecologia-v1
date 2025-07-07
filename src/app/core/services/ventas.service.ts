@@ -28,6 +28,7 @@ export class VentasService {
       .append('with[]', "transaction.transactionDocuments.accountDocumentType")
       .append('with[]', "transaction.transactionDocuments.currency")
       .append('with[]', "transaction.payments.currency")
+      .append('with[]', "transaction.payments.paymentMethod")
       ;
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, { headers, params });
   }

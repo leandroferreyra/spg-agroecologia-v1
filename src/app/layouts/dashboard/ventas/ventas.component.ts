@@ -43,6 +43,7 @@ import { CompraDTO, Transaction } from 'src/app/core/models/request/compraDTO';
 import { VentaDTO } from 'src/app/core/models/request/ventaDTO';
 import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTransaccionDTO';
+import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
 
 @Component({
   selector: 'app-ventas',
@@ -63,6 +64,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   @ViewChild('modalCliente') modalCliente!: NgxCustomModalComponent;
   @ViewChild('modalComprobante') modalComprobante!: NgxCustomModalComponent;
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
+  @ViewChild('modalPago') modalPago!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -86,7 +88,10 @@ export class VentasComponent implements OnInit, OnDestroy {
   comprobanteForm!: FormGroup;
   productoForm!: FormGroup;
   newVentaForm!: FormGroup;
+  pagoForm!: FormGroup;
+
   isSubmit = false;
+  isSubmitPago = false;
 
   mostrarProductos = true;
   mostrarComprobantes = true;
@@ -94,6 +99,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   mostrarDetalle = true;
   mostrarPagos = true;
   inEdicionProducto: boolean = false;
+  inEdicionPago: boolean = false;
   inEdicionComprobante: boolean = false;
   inEdicionDetalles: boolean = false;
   inEdicionRetirado: boolean = false;
@@ -145,6 +151,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   posiblesEstadosTransaccion: any[] = [];
   ubicaciones: any[] = [];
   monedas: any[] = [];
+  metodosDePago: any[] = [];
 
   productoInput$ = new Subject<string>();
   productos$!: Observable<any[]>;
@@ -222,6 +229,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._indexService.getVentasWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.ventas = res.data;
+          console.log("🚀 ~ VentasComponent ~ this._indexService.getVentasWithParam ~ this.ventas:", this.ventas)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -324,13 +332,15 @@ export class VentasComponent implements OnInit, OnDestroy {
       tiposDocumentosContables: this._catalogoService.getTiposVentaDocumentosContables(this.actual_role),
       posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccionVenta(this.actual_role),
       // calificaciones: this._catalogoService.getCalificaciones(this.actual_role),
-      monedas: this._indexService.getMonedas(this.actual_role)
+      monedas: this._indexService.getMonedas(this.actual_role),
+      metodos: this._indexService.getMetodosDePagoWithParam(null, this.actual_role)
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
         this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
         // this.calificaciones = res.calificaciones.data;
         this.monedas = res.monedas.data;
+        this.metodosDePago = res.metodos.data;
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -563,6 +573,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._ventaService.getVentaById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedVenta = res.data;
+          console.log("🚀 ~ VentasComponent ~ this._ventaService.getVentaById ~ this.selectedVenta:", this.selectedVenta)
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedVenta.uuid;
           this.location.replaceState(`/dashboard/ventas/${this.selectedVenta.uuid}`);
@@ -1544,6 +1555,158 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   showPrecioTotal(data: any) {
     return (data.quantity * data.unit_price).toFixed(2);
+  }
+
+  openModalPagos(type: string, pago?: any) {
+    if (type === 'NEW') {
+      if (this.isEdicion) {
+        this.isEdicion = false;
+      }
+      this.tituloModal = 'Nuevo pago';
+      this.inicializarFormPago();
+      this.modalPago.options = this.modalOptions;
+      this.modalPago.open();
+    } else {
+      this.inEdicionPago = true;
+      this.tituloModal = 'Edición pago';
+      this.inicializarFormPago(pago);
+      this.modalPago.options = this.modalOptions;
+      this.modalPago.open();
+    }
+    // Cerramos los edit
+    if (this.inEdicionDetalles) {
+      this.openCloseEditarDetalles();
+    }
+    if (this.inEdicionVenta) {
+      this.openCloseEditarVenta();
+    }
+    if (this.inEdicionRetirado) {
+      this.openCloseEditarRetirado();
+    }
+  }
+
+  inicializarFormPago(data?: any) {
+    this.pagoForm = new FormGroup({
+      pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
+      payment_datetime: new FormControl({ value: data ? data.payment_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
+      currency_uuid: new FormControl({ value: data ? data.currency : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+    });
+    this.onChangePagoForm();
+  }
+  onChangePagoForm() {
+    this.pagoForm.get('currency_uuid')!.valueChanges.subscribe(
+      (value: any) => {
+        if (value.name === 'Pesos') {
+          this.pagoForm.get('exchange_rate')?.setValue(1);
+          this.pagoForm.get('exchange_rate')?.disable();
+        } else {
+          this.pagoForm.get('exchange_rate')?.setValue(null);
+          this.pagoForm.get('exchange_rate')?.enable();
+        }
+      });
+  }
+
+  cerrarModalPago() {
+    this.isSubmitPago = false;
+    this.inEdicionPago = false;
+    this.modalPago.close();
+  }
+
+  confirmarPago() {
+    this.isSubmitPago = true;
+    if (this.pagoForm.valid) {
+      this.spinner.show();
+      let pago = new PagoDTO();
+      pago.actual_role = this.actual_role;
+      pago.payment_datetime = this.pagoForm.get('payment_datetime')?.value;
+      pago.amount = this.pagoForm.get('amount')?.value;
+      pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
+      pago.detail = this.pagoForm.get('detail')?.value;
+      pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
+      pago.payment_method_id = this.pagoForm.get('payment_method')?.value;
+      if (!this.inEdicionPago) {
+        pago.transaction_uuid = this.selectedVenta.transaction?.uuid;
+        console.log(pago);
+        this.subscription.add(
+          this._pagoService.savePago(pago).subscribe({
+            next: res => {
+              this.obtenerVentaPorId(this.selectedVenta.uuid);
+              this.cerrarModalPago();
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              console.error(error);
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._pagoService.editPago(this.pagoForm.get('pago_uuid')?.value, pago).subscribe({
+            next: res => {
+              this.obtenerVentaPorId(this.selectedVenta.uuid);
+              this.cerrarModalPago();
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              console.error(error);
+              this.spinner.hide();
+              this.swalService.toastError('top-right', error.error.message);
+            }
+          })
+        )
+      }
+
+    }
+  }
+
+  openSwalEliminarPago(pago: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el pago seleccionado?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarPago(pago);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarPago(pago: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._pagoService.deletePago(pago.uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerVentaPorId(this.selectedVenta.uuid);
+          this.cerrarModalPago();
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
   }
 
 }
