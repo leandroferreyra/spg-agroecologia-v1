@@ -55,7 +55,9 @@ export class ListadoMetodosPagoComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   // Orden y filtro
-  filtros: any = {};
+  filtros: any = {
+    'name': { value: '', op: 'LIKE', contiene: true }
+  };
   showFilter: boolean = false;
   ordenamiento: any = {
     'name': 'asc'
@@ -90,11 +92,11 @@ export class ListadoMetodosPagoComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.spinner.show();
     this.obtenerMetodosPago();
   }
 
   obtenerMetodosPago() {
-    this.spinner.show();
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = [];
