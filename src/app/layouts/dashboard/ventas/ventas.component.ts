@@ -1058,7 +1058,6 @@ export class VentasComponent implements OnInit, OnDestroy {
             // Se setea en el stock_uuid del form el único elemento
             this.productoForm.get('stock_uuid')?.setValue(this.stocks[0]);
           }
-          console.log(this.stocks);
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -1069,7 +1068,6 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   armarStock(producto: any, stock: any) {
-    console.log(producto);
     let amount;
     if (producto.measure?.is_integer === 1) {
       amount = (+stock.total_amount).toFixed(0);

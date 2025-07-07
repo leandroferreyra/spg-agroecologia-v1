@@ -77,6 +77,11 @@ export const DASHBOARD_ROUTES: Routes = [
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Parámetros generales' }
             },
             {
+                path: 'metodos-pago',
+                loadComponent: () => import('./config/listado-metodos-pago/listado-metodos-pago.component').then(m => m.ListadoMetodosPagoComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Métodos de pago' }
+            },
+            {
                 path: 'usuarios',
                 loadComponent: () => import('./config/listado-usuarios/listado-usuarios.component').then(m => m.ListadoUsuariosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['SUPER_ADMIN', 'ADMIN'], title: 'Usuarios' }

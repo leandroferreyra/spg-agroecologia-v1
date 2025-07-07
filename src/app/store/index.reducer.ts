@@ -91,6 +91,7 @@ function getMenuByRole(role: string) {
                         { label: 'Cuentas bancarias de LADIE', route: 'cuentas-bancarias' },
                         { label: 'Categorías de productos', route: 'categorias-productos' },
                         { label: 'Parámetros generales', route: 'parametros-generales' },
+                        { label: 'Métodos de pago', route: 'metodos-pago' },
                     ]
                 },
                 { label: 'Mis datos', route: 'user-profile' },
