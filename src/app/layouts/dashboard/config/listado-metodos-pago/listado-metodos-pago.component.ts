@@ -75,7 +75,7 @@ export class ListadoMetodosPagoComponent implements OnInit, OnDestroy {
   };
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
-    private _metodoService: MetodosPagoService, private spinner: NgxSpinnerService, private tokenService: TokenService) {
+    private _metodoService: MetodosPagoService, private spinner: NgxSpinnerService, private _tokenService: TokenService) {
     this.initStore();
   }
 
@@ -165,7 +165,7 @@ export class ListadoMetodosPagoComponent implements OnInit, OnDestroy {
               this.obtenerMetodosPago();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message);
-              this.tokenService.setToken(res.token);
+              this._tokenService.setToken(res.token);
               this.spinner.hide();
             },
             error: error => {
@@ -182,7 +182,7 @@ export class ListadoMetodosPagoComponent implements OnInit, OnDestroy {
               this.obtenerMetodosPago();
               this.cerrarModal();
               this.swalService.toastSuccess('top-right', res.message)
-              this.tokenService.setToken(res.token);
+              this._tokenService.setToken(res.token);
               this.spinner.hide();
             },
             error: error => {
@@ -230,7 +230,7 @@ export class ListadoMetodosPagoComponent implements OnInit, OnDestroy {
       this._metodoService.deleteMetodo(metodo.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
           this.obtenerMetodosPago();
-          this.tokenService.setToken(res.token);
+          this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
         error: error => {
