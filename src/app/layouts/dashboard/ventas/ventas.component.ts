@@ -327,17 +327,22 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   obtenerCatalogos() {
+    const params: any = {};
+    params.with = [];
+    params.paging = null;
+    params.page = null;
+    params.order_by = { "name": "asc" };
+    params.filters = {};
+
     forkJoin({
       tiposDocumentosContables: this._catalogoService.getTiposVentaDocumentosContables(this.actual_role),
       posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccionVenta(this.actual_role),
-      // calificaciones: this._catalogoService.getCalificaciones(this.actual_role),
       monedas: this._indexService.getMonedas(this.actual_role),
-      metodos: this._indexService.getMetodosDePagoWithParam(null, this.actual_role)
+      metodos: this._indexService.getMetodosDePagoWithParam(params, this.actual_role)
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
         this.posiblesEstadosTransaccion = res.posiblesEstadosTransaccion.data;
-        // this.calificaciones = res.calificaciones.data;
         this.monedas = res.monedas.data;
         this.metodosDePago = res.metodos.data;
       },

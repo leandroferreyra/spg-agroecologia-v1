@@ -156,7 +156,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   ubicaciones: any[] = [];
   pagos: any[] = [];
   monedas: any[] = [];
-  // metodosDePago: string[] = ['Efectivo', 'Transferencia Bancaria', 'Tarjeta de Crédito', 'Tarjeta de Débito', 'PayPal', 'Mercado Pago', 'Otro'];
   metodosDePago: any[] = [];
 
   breadcrumb: any[] = [];
@@ -487,12 +486,19 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   obtenerCatalogos() {
+    const params: any = {};
+    params.with = [];
+    params.paging = null;
+    params.page = null;
+    params.order_by = { "name": "asc" };
+    params.filters = {};
+
     forkJoin({
       tiposDocumentosContables: this._catalogoService.getTiposCompraDocumentosContables(this.actual_role),
       posiblesEstadosTransaccion: this._catalogoService.getPosiblesEstadosTransaccionCompra(this.actual_role),
       calificaciones: this._catalogoService.getCalificaciones(this.actual_role),
       monedas: this._indexService.getMonedas(this.actual_role),
-      metodosPago: this._indexService.getMetodosDePagoWithParam(null, this.actual_role)
+      metodosPago: this._indexService.getMetodosDePagoWithParam(params, this.actual_role)
     }).subscribe({
       next: res => {
         this.tiposDocumentosContables = res.tiposDocumentosContables.data;
@@ -746,7 +752,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.pagoForm = new FormGroup({
       pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
       payment_datetime: new FormControl({ value: data ? data.payment_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
-      payment_method: new FormControl({ value: data ? data.payment_method : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
       currency_uuid: new FormControl({ value: data ? data.currency.name : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
