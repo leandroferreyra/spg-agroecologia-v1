@@ -2,7 +2,7 @@ export class PagoDTO {
 
     transaction_uuid!: string;
     payment_datetime!: string;
-    payment_method_id!: string;
+    payment_method_uuid!: string;
     amount!: number;
     detail!: string;
     currency_uuid!: string;

@@ -1211,7 +1211,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   validatePriceRange() {
-    console.log(this.selectedCompra);
     let validatePriceRange = new ValidatePriceRangeDTO();
     validatePriceRange.actual_role = this.actual_role;
     validatePriceRange.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
@@ -1220,7 +1219,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._transactionProductService.validatePriceRange(validatePriceRange).subscribe({
         next: res => {
-          console.log(res);
           if (res.data?.message === "") {
             this.confirmarAltaProducto();
           } else {
@@ -1741,10 +1739,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;
       pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
-      pago.payment_method_id = this.pagoForm.get('payment_method')?.value;
+      pago.payment_method_uuid = this.pagoForm.get('payment_method')?.value;
       if (!this.inEdicionPago) {
         pago.transaction_uuid = this.selectedCompra.transaction?.uuid;
-        console.log(pago);
         this.subscription.add(
           this._pagoService.savePago(pago).subscribe({
             next: res => {

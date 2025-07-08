@@ -229,7 +229,6 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._indexService.getVentasWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.ventas = res.data;
-          console.log("🚀 ~ VentasComponent ~ this._indexService.getVentasWithParam ~ this.ventas:", this.ventas)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -573,7 +572,6 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._ventaService.getVentaById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedVenta = res.data;
-          console.log("🚀 ~ VentasComponent ~ this._ventaService.getVentaById ~ this.selectedVenta:", this.selectedVenta)
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedVenta.uuid;
           this.location.replaceState(`/dashboard/ventas/${this.selectedVenta.uuid}`);
@@ -1627,10 +1625,9 @@ export class VentasComponent implements OnInit, OnDestroy {
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;
       pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
-      pago.payment_method_id = this.pagoForm.get('payment_method')?.value;
+      pago.payment_method_uuid = this.pagoForm.get('payment_method')?.value;
       if (!this.inEdicionPago) {
         pago.transaction_uuid = this.selectedVenta.transaction?.uuid;
-        console.log(pago);
         this.subscription.add(
           this._pagoService.savePago(pago).subscribe({
             next: res => {
