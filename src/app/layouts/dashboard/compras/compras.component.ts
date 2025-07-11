@@ -728,8 +728,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.modalPago.options = this.modalOptions;
       this.modalPago.open();
     } else {
-      // this.tab1 = 'datos-generales';
-      // this.isEdicion = true;
       this.inEdicionPago = true;
       this.tituloModal = 'Edición pago';
       this.inicializarFormPago(pago);
@@ -752,11 +750,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.pagoForm = new FormGroup({
       pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
       payment_datetime: new FormControl({ value: data ? data.payment_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
-      payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
-      amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : []),
+      amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : []),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
-      currency_uuid: new FormControl({ value: data ? data.currency.name : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
-      exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      currency_uuid: new FormControl({ value: data ? data.currency.name : null, disabled: false }, this.inEdicionPago ? [] : []),
+      exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: false }, this.inEdicionPago ? [] : []),
     });
     this.onChangePagoForm();
   }
@@ -1747,6 +1745,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
       pago.payment_method_uuid = this.pagoForm.get('payment_method')?.value;
       if (!this.inEdicionPago) {
+        this.cleanObject(pago);
         pago.transaction_uuid = this.selectedCompra.transaction?.uuid;
         this.subscription.add(
           this._pagoService.savePago(pago).subscribe({
