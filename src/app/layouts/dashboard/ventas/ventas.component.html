@@ -494,7 +494,7 @@
                                 @for(data of selectedVenta?.transaction?.payments; track data.uuid) {
                                 <tr>
                                     <td class="border px-2 py-1">{{ data.payment_datetime }}</td>
-                                    <td class="border px-2 py-1">{{ data.payment_method.name }}</td>
+                                    <td class="border px-2 py-1">{{ data.payment_method?.name }}</td>
                                     <td class="border px-2 py-1">{{ data.amount }}</td>
                                     <td class="border px-2 py-1">{{ data.detail }}</td>
                                     <td class="border px-2 py-1">{{ data.currency?.name }}</td>

@@ -114,7 +114,6 @@
     <!-- PANEL DERECHO -->
     <div class="panel h-full flex-1 overflow-x-hidden p-0">
 
-        <!-- MENU ICONO OCULTO RESPONSIVE -->
         <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
             <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                 Producto
@@ -128,15 +127,20 @@
                 }
             </h5>
 
-            <div class="flex w-full items-center justify-between sm:w-auto">
-                <div class="flex items-center ltr:mr-4 rtl:ml-4">
-                    <button type="button" class="block hover:text-primary ltr:mr-3 rtl:ml-3 xl:hidden"
-                        (click)="isShowMailMenu = !isShowMailMenu">
-                        <icon-menu />
-                    </button>
-                </div>
+            <div class="flex items-center gap-2 ml-auto">
+                <button type="button" ngxTippy="Editar" (click)="openModalProducto('EDIT', selectedProducto)">
+                    <icon-pencil />
+                </button>
+                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedProducto)">
+                    <icon-trash-lines />
+                </button>
+                <button type="button" class="block hover:text-primary xl:hidden"
+                    (click)="isShowMailMenu = !isShowMailMenu">
+                    <icon-menu />
+                </button>
             </div>
         </div>
+
 
         <!-- TABS -->
         <div class="">
@@ -672,18 +676,6 @@
                             </label>
                             <span>Vendible</span>
                         </div>
-
-                        <!-- <div class="flex items-center gap-2 mt-2">
-                            <label class="w-12 h-6 relative">
-                                <input type="checkbox"
-                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="controlable" />
-                                <span for="custom_switch_checkbox2"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
-                            </label>
-                            <span>Controlable</span>
-                        </div> -->
 
                         <div
                             [ngClass]="isSubmit ? newProductoForm.controls['descripcionControl'].errors ? 'has-error' : 'has-success' : ''">
