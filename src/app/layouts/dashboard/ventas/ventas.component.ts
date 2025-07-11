@@ -935,7 +935,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.showSerialNumber = false;
         ['stock_uuid'].forEach((field) => {
           const control = this.productoForm.get(field);
-          control?.setValidators(Validators.required);
+          // control?.setValidators(Validators.required);
           control?.disable();
           control?.updateValueAndValidity({ emitEvent: false });
         });
@@ -944,7 +944,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.showSerialNumber = true;
         ['stock_uuid', 'serial_number'].forEach((field) => {
           const control = this.productoForm.get(field);
-          control?.setValidators(Validators.required);
+          // control?.setValidators(Validators.required);
           control?.disable();
           control?.updateValueAndValidity({ emitEvent: false });
         });
