@@ -282,8 +282,7 @@
                                     <td class="border px-2 py-1 hover:text-blue-600 hover:underline hover:cursor-pointer"
                                         (click)="irAlProducto($event, data.product)"> {{ data.product.name}}
                                     </td>
-                                    <td class="border px-2 py-1">{{
-                                        data.sale_product?.stock?.batch?.batch_identification}}</td>
+                                    <td class="border px-2 py-1">{{ showBatch(data) }}</td>
                                     <td class="border px-2 py-1">{{
                                         data.sale_product?.product_instances[0]?.serial_number }}</td>
                                     <td class="border px-2 py-1">{{ showCantidad(data) }}</td>

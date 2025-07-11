@@ -1093,6 +1093,13 @@ export class VentasComponent implements OnInit, OnDestroy {
     return `${this.datePipe.transform(stock.created_at, 'yyyy-MM-dd')} | (${stock.batch != null ? stock.batch.batch_identification : "Lote único"}) | ${amount}`
   }
 
+  showBatch(producto: any) {
+    if (producto.sale_product?.stock?.batch != null) {
+      return producto.sale_product?.stock?.batch.batch_identification;
+    }
+    return 'Stock único';
+  }
+
   obtenerProductosEnPosesion(stock_uuid: string) {
     const params: any = {};
     params.with = [];
