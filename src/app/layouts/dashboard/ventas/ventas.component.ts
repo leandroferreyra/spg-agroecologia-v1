@@ -981,7 +981,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         if (producto.product_type?.stock_controlled === 1) {
           ['stock_uuid'].forEach((field) => {
             const control = this.productoForm.get(field);
-            control?.setValidators(Validators.required);
+            // control?.setValidators(Validators.required);
             control?.setValue(null);
             control?.updateValueAndValidity({ emitEvent: false });
           });
@@ -1024,7 +1024,7 @@ export class VentasComponent implements OnInit, OnDestroy {
           this.showStocks = false;
           ['stock_uuid'].forEach((field) => {
             const control = this.productoForm.get(field);
-            control?.setValidators([]);
+            // control?.setValidators([]);
             control?.updateValueAndValidity({ emitEvent: false });
           });
         }
@@ -1037,14 +1037,14 @@ export class VentasComponent implements OnInit, OnDestroy {
           this.obtenerProductosEnPosesion(stock.uuid);
           ['serial_number'].forEach((field) => {
             const control = this.productoForm.get(field);
-            control?.setValidators(Validators.required);
+            // control?.setValidators(Validators.required);
             control?.enable();
             control?.updateValueAndValidity({ emitEvent: false });
           });
         } else {
           ['serial_number'].forEach((field) => {
             const control = this.productoForm.get(field);
-            control?.setValidators([]);
+            // control?.setValidators([]);
             control?.disable();
             control?.updateValueAndValidity({ emitEvent: false });
           });
@@ -1592,11 +1592,11 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.pagoForm = new FormGroup({
       pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
       payment_datetime: new FormControl({ value: data ? data.payment_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
-      payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
-      amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : []),
+      amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : []),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
-      currency_uuid: new FormControl({ value: data ? data.currency : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
-      exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      currency_uuid: new FormControl({ value: data ? data.currency : null, disabled: false }, this.inEdicionPago ? [] : []),
+      exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: false }, this.inEdicionPago ? [] : []),
     });
     this.onChangePagoForm();
   }
@@ -1633,6 +1633,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       pago.payment_method_uuid = this.pagoForm.get('payment_method')?.value;
       if (!this.inEdicionPago) {
         pago.transaction_uuid = this.selectedVenta.transaction?.uuid;
+        this.cleanObject(pago);
         this.subscription.add(
           this._pagoService.savePago(pago).subscribe({
             next: res => {
