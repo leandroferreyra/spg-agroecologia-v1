@@ -1100,7 +1100,20 @@ export class VentasComponent implements OnInit, OnDestroy {
     if (producto.sale_product?.stock?.batch != null) {
       return producto.sale_product?.stock?.batch.batch_identification;
     }
-    return 'Stock único';
+    if (producto.product?.product_type?.stock_controlled === 0) {
+      return 'Sin control de stock';
+    }
+    if (producto.product?.product_type?.stock_controlled === 1 && producto.product?.traceable === 0) {
+      return 'Stock único';
+    }
+    if (producto.product?.product_type?.stock_controlled === 1 && producto.product?.traceable === 1) {
+      if (producto.sale_product?.stock?.batch != null) {
+        return producto.sale_product?.stock?.batch.batch_identification;
+      } else {
+        return '';
+      }
+    }
+    return 'Stock sin condición.';
   }
 
   obtenerProductosEnPosesion(stock_uuid: string) {
