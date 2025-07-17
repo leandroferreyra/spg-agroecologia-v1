@@ -971,23 +971,25 @@ export class VentasComponent implements OnInit, OnDestroy {
       serial_number: new FormControl({ value: data ? data.sale_product?.product_instances[0] : null, disabled: true }, []),
       quantity: new FormControl({ value: data ? this.showCantidad(data) : null, disabled: false }, []),
       unit_price: new FormControl(data ? data.unit_price : null, [Validators.required]),
+      traceable: new FormControl(data ? data.traceable : null, []),
     })
     this.onFormProductoChange();
   }
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
+        this.productoForm.get('traceable')?.setValue(producto.traceable);
         this.obtenerStocks(producto);
         if (producto.product_type?.stock_controlled === 1) {
-          ['stock_uuid'].forEach((field) => {
-            const control = this.productoForm.get(field);
-            // control?.setValidators(Validators.required);
-            control?.setValue(null);
-            control?.updateValueAndValidity({ emitEvent: false });
-          });
+          // ['stock_uuid'].forEach((field) => {
+          //   const control = this.productoForm.get(field);
+          //   control?.setValidators(Validators.required);
+          //   control?.setValue(null);
+          //   control?.updateValueAndValidity({ emitEvent: false });
+          // });
+          this.productoForm.get('stock_uuid')?.setValue(null);
           this.productoForm.get('serial_number')?.setValue(null);
           this.showStocks = true;
-          // this.stocks = []; // Se limpia el array
           if (producto.assign_serial_number === 0 && producto.has_serial_number === 0) {
             // No asigna ni tiene por lo que pide cantidad
             this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
@@ -1022,11 +1024,11 @@ export class VentasComponent implements OnInit, OnDestroy {
           });
           // No tiene stock controlled por lo que no muestra el select de stocks.
           this.showStocks = false;
-          ['stock_uuid'].forEach((field) => {
-            const control = this.productoForm.get(field);
-            // control?.setValidators([]);
-            control?.updateValueAndValidity({ emitEvent: false });
-          });
+          // ['stock_uuid'].forEach((field) => {
+          //   const control = this.productoForm.get(field);
+          //   control?.setValidators([]);
+          //   control?.updateValueAndValidity({ emitEvent: false });
+          // });
         }
       });
 
@@ -1044,7 +1046,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         } else {
           ['serial_number'].forEach((field) => {
             const control = this.productoForm.get(field);
-            // control?.setValidators([]);
+            control?.setValue(null);
             control?.disable();
             control?.updateValueAndValidity({ emitEvent: false });
           });
@@ -1074,6 +1076,7 @@ export class VentasComponent implements OnInit, OnDestroy {
             // Se setea en el stock_uuid del form el único elemento
             this.productoForm.get('stock_uuid')?.setValue(this.stocks[0]);
           }
+          console.log(this.stocks);
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
@@ -1138,6 +1141,10 @@ export class VentasComponent implements OnInit, OnDestroy {
       productoTransaccionDTO.stock_uuid = this.productoForm.get('stock_uuid')?.value?.uuid;
       productoTransaccionDTO.serial_number = this.productoForm.get('serial_number')?.value?.serial_number;
       if (!this.inEdicionProducto) {
+        if (this.productoForm.get('traceable')?.value === 0) {
+          delete productoTransaccionDTO.stock_uuid;
+          delete productoTransaccionDTO.serial_number;
+        }
         this.subscription.add(
           this._transactionProductService.saveTransactionProduct(productoTransaccionDTO).subscribe({
             next: res => {
