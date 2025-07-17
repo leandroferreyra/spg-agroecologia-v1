@@ -123,8 +123,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   iconArrowDown = faArrowDown;
   iconArrowLeft = faArrowLeft;
 
-  // tab1: string = 'datos-generales';
-
   proveedorInput$ = new Subject<string>();
   proveedores$!: Observable<any[]>;
   loadingProveedores = false;
@@ -132,8 +130,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   productoInput$ = new Subject<string>();
   productos$!: Observable<any[]>;
   loadingProductos = false;
-
-  // showInputUbicacion: boolean = false;
 
   placeholderCantidad: string = '';
 
@@ -174,6 +170,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   poseeFactura: boolean = false;
 
   showPassword: boolean = false;
+  showWarningUbicacion: boolean = false;
 
   // Iconos
   iconEye = faEye;
@@ -681,6 +678,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   openModalProducto(type: string, producto?: any) {
+    console.log(this.selectedCompra);
     if (type === 'NEW') {
       if (this.isEdicion) {
         this.isEdicion = false;
@@ -693,15 +691,12 @@ export class ComprasComponent implements OnInit, OnDestroy {
     } else {
       this.inEdicionProducto = true;
       this.tituloModal = 'Edición de producto';
-      // if (producto.product?.product_type?.stock_controlled === 1 && producto.product?.traceable === 1) {
-      //   this.showInputUbicacion = true;
       if (producto.product?.stocks?.length > 0 && producto.product.stocks[0].location !== null) {
         this.getParentsFromLocation(producto.product.stocks[0].location);
         this.obtenerUbicaciones(producto.product.stocks[0].location.uuid);
       } else {
         this.obtenerUbicaciones();
       }
-      // }
       this.inicializarFormProducto(producto);
       this.modalProducto.options = this.modalOptions;
       this.modalProducto.open();
@@ -811,6 +806,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
       location_uuid: new FormControl({ value: data ? this.getLocation(data) : null, disabled: false }, []),
       control_description: new FormControl({ value: data ? data.product.control_description : null, disabled: true }, []),
     });
+    if (this.selectedCompra.transaction?.current_state?.state?.name === 'Entregada pendiente de factura' ||
+      this.selectedCompra.transaction?.current_state?.state?.name === 'Finalizada') {
+      this.productoForm.get('quantity')?.disable();
+      this.productoForm.get('unit_price')?.disable();
+    }
     this.onFormProductoChange();
   }
   onFormProductoChange() {
@@ -873,16 +873,18 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
         });
       });
+
+    this.productoForm.get('location_uuid')!.valueChanges.subscribe(
+      (value: any) => {
+        // console.log(this.selectedProducto);
+        if (this.selectedProducto?.product?.product_type?.stock_controlled === 0 ||
+          this.selectedProducto?.product?.traceable === 0) {
+          this.showWarningUbicacion = true;
+        } else {
+          this.showWarningUbicacion = false;
+        }
+      });
   }
-
-
-  // mostrarCantidad(data: any) {
-  //   if (data.child_product?.measure?.is_integer === 1) {
-  //     return (+data.quantity)?.toFixed(0);
-  //   } else {
-  //     return (+data.quantity)?.toFixed(2);
-  //   }
-  // }
 
   getLocation(data: any) {
     if (data.product.stocks.length > 0) {
@@ -1327,6 +1329,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
           }
           if (this.selectedCompra?.transaction?.current_state?.state?.name === 'Borrador') {
             delete producto.location_uuid;
+          }
+          if (this.selectedCompra.transaction?.current_state?.state?.name === 'Entregada pendiente de factura' ||
+            this.selectedCompra.transaction?.current_state?.state?.name === 'Finalizada') {
+            delete producto.quantity;
+            delete producto.unit_price;
           }
           this.subscription.add(
             this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, producto).subscribe({
@@ -1975,6 +1982,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
             this.spinner.hide();
           },
           error: error => {
+            this.swalService.toastError('top-right', error.error.message);
             this.isSubmit = false;
             this.spinner.hide();
             console.error(error);

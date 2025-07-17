@@ -628,64 +628,6 @@
                                             }" class="form-input" formControlName="transaction_datetime" />
                         </div>
 
-                        <!-- <div (keydown.enter)="confirmarCompra(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['discount1'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="discount1">Descuento 1</label>
-                            <input id="discount1" type="text" placeholder="" class="form-control"
-                                formControlName="discount1" />
-                        </div>
-
-                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['discount2'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="discount2">Descuento 2</label>
-                            <input id="discount2" type="text" placeholder="" class="form-control"
-                                formControlName="discount2" />
-                        </div>
-
-                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['others'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="others">Otros cargos</label>
-                            <input id="others" type="text" placeholder="" class="form-control"
-                                formControlName="others" />
-                        </div>
-
-                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['perceptionIB'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="perceptionIB">Percepción IIBB</label>
-                            <input id="perceptionIB" type="text" placeholder="" class="form-control"
-                                formControlName="perceptionIB" />
-                        </div>
-
-                        <div (keydown.enter)="confirmarCompra(newCompraForm)"
-                            [ngClass]="isSubmit ? newCompraForm.controls['perceptionRG3337'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="perceptionRG3337">Percepción RG3337</label>
-                            <input id="perceptionRG3337" type="text" placeholder="" class="form-control"
-                                formControlName="perceptionRG3337" />
-                        </div>
-                        <div>
-                            <label>Estado transacción</label>
-                            <ng-select [items]="posiblesEstadosTransaccion" bindLabel="name" bindValue="uuid"
-                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
-                                formControlName="possible_transaction_state_uuid" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? newCompraForm.controls['possible_transaction_state_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
-
-                        <div>
-                            <label>Calificación</label>
-                            <ng-select [items]="calificaciones" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay calificaciones"
-                                placeholder="" class="w-1/3 min-w-[200px]" formControlName="qualification_option_uuid"
-                                [selectOnTab]="true" [appendTo]="'body'"
-                                [ngClass]="isSubmit ? newCompraForm.controls['qualification_option_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
-                        <div
-                            [ngClass]="isSubmit ? newCompraForm.controls['qualification_comments'].errors ? 'has-error' : 'has-success' : ''">
-                            <label>Motivo de la calificación</label>
-                            <textarea class="form-control" id="qualification_comments"
-                                formControlName="qualification_comments" rows="1"></textarea>
-                        </div> -->
-
                     </div>
                 </div>
 
@@ -776,7 +718,6 @@
                             </div>
                         </div>
                         }
-                        <!-- } -->
 
                         @if(selectedCompra.transaction?.current_state?.state?.name === 'Borrador') {
                         <div
@@ -853,14 +794,21 @@
                             <textarea class="form-control" id="control_comments" formControlName="control_comments"
                                 rows="1"></textarea>
                         </div>
-                        <!-- } -->
                         }
 
                     </div>
                 </div>
 
-            </form>
+                @if (showWarningUbicacion) {
+                <div
+                    class=" mt-1 flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+                    <span class="ltr:pr-2 rtl:pl-2">* La modificación de la
+                        ubicación de este producto afectará a todos los artículos del mismo
+                        independientemente de la compra en la que se los haya adquirido</span>
+                </div>
+                }
 
+            </form>
 
             <div class="row mt-3">
                 <div class="col-12 d-flex justify-content-center">
