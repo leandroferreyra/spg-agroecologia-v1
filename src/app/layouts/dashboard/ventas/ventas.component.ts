@@ -229,7 +229,6 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._indexService.getVentasWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.ventas = res.data;
-          console.log("🚀 ~ VentasComponent ~ this._indexService.getVentasWithParam ~ this.ventas:", this.ventas)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -1076,7 +1075,6 @@ export class VentasComponent implements OnInit, OnDestroy {
             // Se setea en el stock_uuid del form el único elemento
             this.productoForm.get('stock_uuid')?.setValue(this.stocks[0]);
           }
-          console.log(this.stocks);
         },
         error: error => {
           this.swalService.toastError('top-right', error.error.message);
