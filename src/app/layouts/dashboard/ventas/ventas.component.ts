@@ -934,21 +934,20 @@ export class VentasComponent implements OnInit, OnDestroy {
       if (producto.product.assign_serial_number === 0 && producto.product.has_serial_number === 0) {
         this.mostrarCantidad = true;
         this.showSerialNumber = false;
-        ['stock_uuid'].forEach((field) => {
-          const control = this.productoForm.get(field);
-          // control?.setValidators(Validators.required);
-          control?.disable();
-          control?.updateValueAndValidity({ emitEvent: false });
-        });
+        // ['stock_uuid'].forEach((field) => {
+        //   const control = this.productoForm.get(field);
+        // control?.disable();
+        //   control?.updateValueAndValidity({ emitEvent: false });
+        // });
       } else {
         this.mostrarCantidad = false;
         this.showSerialNumber = true;
-        ['stock_uuid', 'serial_number'].forEach((field) => {
-          const control = this.productoForm.get(field);
-          // control?.setValidators(Validators.required);
-          control?.disable();
-          control?.updateValueAndValidity({ emitEvent: false });
-        });
+        // ['stock_uuid', 'serial_number'].forEach((field) => {
+        //   const control = this.productoForm.get(field);
+        // control?.setValidators(Validators.required);
+        // control?.disable();
+        //   control?.updateValueAndValidity({ emitEvent: false });
+        // });
       }
     } else {
       this.showStocks = false;
@@ -969,7 +968,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       transaction_uuid: new FormControl(data ? data.uuid : null, []),
       product_uuid: new FormControl({ value: data ? data.product : null, disabled: data ? true : false }, [Validators.required]),
       stock_uuid: new FormControl(data ? data.stock : null, []),
-      serial_number: new FormControl({ value: data ? data.sale_product?.product_instances[0] : null, disabled: true }, []),
+      serial_number: new FormControl({ value: data ? data.sale_product?.product_instances[0] : null, disabled: false }, []),
       quantity: new FormControl({ value: data ? this.showCantidad(data) : null, disabled: false }, []),
       unit_price: new FormControl(data ? data.unit_price : null, [Validators.required]),
       traceable: new FormControl(data ? data.traceable : null, []),
@@ -1179,8 +1178,8 @@ export class VentasComponent implements OnInit, OnDestroy {
         )
       } else {
         delete productoTransaccionDTO.transaction_uuid;
-        delete productoTransaccionDTO.stock_uuid;
-        delete productoTransaccionDTO.serial_number;
+        // delete productoTransaccionDTO.stock_uuid;
+        // delete productoTransaccionDTO.serial_number;
         delete productoTransaccionDTO.product_uuid;
         this.subscription.add(
           this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, productoTransaccionDTO).subscribe({
