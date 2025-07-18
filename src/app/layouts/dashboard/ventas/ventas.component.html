@@ -246,9 +246,11 @@
                 <legend class="text-lg font-semibold flex justify-between items-center">
                     <span class="flex items-center gap-2">
                         Productos
+                        @if (selectedVenta?.transaction?.current_state?.state?.name !== 'Finalizada') {
                         <button type="button" class="hover:text-primary" (click)="openModalProducto('NEW')">
                             <icon-plus />
                         </button>
+                        }
                     </span>
                     <button type="button" (click)="toggleProductos()" class="text-sm hover:underline"
                         style="color:#000000a3" [ngxTippy]="getMostrarOcultarProductosTooltip()">
@@ -291,6 +293,8 @@
 
                                     <td class="border px-2 py-1">
                                         <div class="flex items-center">
+                                            @if (selectedVenta?.transaction?.current_state?.state?.name !==
+                                            'Finalizada') {
                                             <div>
                                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
                                                     (click)="openModalProducto('EDIT', data)">
@@ -303,6 +307,7 @@
                                                     <icon-trash-lines />
                                                 </button>
                                             </div>
+                                            }
                                         </div>
                                     </td>
                                 </tr>

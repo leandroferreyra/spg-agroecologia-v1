@@ -577,6 +577,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._ventaService.getVentaById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedVenta = res.data;
+          console.log("🚀 ~ VentasComponent ~ this._ventaService.getVentaById ~ this.selectedVenta:", this.selectedVenta)
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedVenta.uuid;
           this.location.replaceState(`/dashboard/ventas/${this.selectedVenta.uuid}`);
