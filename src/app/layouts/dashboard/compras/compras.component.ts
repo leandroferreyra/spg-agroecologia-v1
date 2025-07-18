@@ -678,7 +678,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   openModalProducto(type: string, producto?: any) {
-    console.log(this.selectedCompra);
     if (type === 'NEW') {
       if (this.isEdicion) {
         this.isEdicion = false;

@@ -78,6 +78,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   isShowMailMenu = false;
   isEdicion: boolean = false;
   selectedVenta: any;
+  selectedProducto: any;
   uuidFromUrl: string = '';
   isLoadingVentas: boolean = true;
   filtroSimpleName: string = '';
@@ -938,6 +939,9 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.showSerialNumber = true;
         // Obtiene el listado de número seriales. 
         this.obtenerProductosEnPosesion(data.stock?.uuid);
+        if (!this.productoForm.get('stock_uuid')?.value) {
+          this.productoForm.get('serial_number')?.disable();
+        }
       }
     } else {
       this.showStocks = false;
@@ -954,6 +958,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   compararStocks = (stock1: any, stock2: any) => stock1 && stock2 && stock1.uuid === stock2.uuid;
 
   inicializarFormProducto(data?: any) {
+    this.selectedProducto = data;
     this.productoForm = new FormGroup({
       transaction_uuid: new FormControl(data ? data.uuid : null, []),
       product_uuid: new FormControl({ value: data ? data.product : null, disabled: data ? true : false }, [Validators.required]),
@@ -1129,13 +1134,14 @@ export class VentasComponent implements OnInit, OnDestroy {
       productoTransaccionDTO.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
       productoTransaccionDTO.quantity = this.productoForm.get('quantity')?.value;
       productoTransaccionDTO.unit_price = this.productoForm.get('unit_price')?.value;
-      productoTransaccionDTO.stock_uuid = this.productoForm.get('stock_uuid')?.value?.uuid;
+      productoTransaccionDTO.stock_uuid = this.productoForm.get('stock_uuid')?.value?.uuid ?? null;
       productoTransaccionDTO.serial_number = this.productoForm.get('serial_number')?.value?.serial_number ?? null;
       if (!this.inEdicionProducto) {
         if (this.productoForm.get('traceable')?.value === 0) {
           delete productoTransaccionDTO.stock_uuid;
           delete productoTransaccionDTO.serial_number;
         }
+        this.cleanObject(productoTransaccionDTO);
         this.subscription.add(
           this._transactionProductService.saveTransactionProduct(productoTransaccionDTO).subscribe({
             next: res => {
@@ -1155,9 +1161,12 @@ export class VentasComponent implements OnInit, OnDestroy {
           })
         )
       } else {
+        // Chequer si se debe enviar parámetros stock y serial
+        this.checkSendStock(productoTransaccionDTO);
+        this.checkSendSerialNumber(productoTransaccionDTO);
+        // console.log(this.selectedProducto);
+        // console.log(this.productoForm);
         delete productoTransaccionDTO.transaction_uuid;
-        // delete productoTransaccionDTO.stock_uuid;
-        // delete productoTransaccionDTO.serial_number;
         delete productoTransaccionDTO.product_uuid;
         this.subscription.add(
           this._transactionProductService.editTransactionProduct(this.productoForm.get('transaction_uuid')?.value, productoTransaccionDTO).subscribe({
@@ -1178,6 +1187,35 @@ export class VentasComponent implements OnInit, OnDestroy {
           })
         )
       }
+    }
+  }
+
+  checkSendStock(productoTransaccionDTO: ProductoTransaccionDTO) {
+    const before = this.selectedProducto.stock?.uuid;
+    const now = this.productoForm.get('stock_uuid')?.value?.uuid;
+    if (!before && now) {
+      productoTransaccionDTO.stock_uuid = now;
+    } else if (before && !now) {
+      productoTransaccionDTO.stock_uuid = null;
+    } else if (before && now && before !== now) {
+      productoTransaccionDTO.stock_uuid = now;
+    } else {
+      delete productoTransaccionDTO.stock_uuid;
+    }
+  }
+
+  checkSendSerialNumber(productoTransaccionDTO: ProductoTransaccionDTO) {
+    const before = this.selectedProducto.sale_product?.uuid;
+    // data.sale_product?.product_instances[0]
+    const now = this.productoForm.get('serial_number')?.value?.uuid;
+    if (!before && now) {
+      productoTransaccionDTO.serial_number = now;
+    } else if (before && !now) {
+      productoTransaccionDTO.serial_number = null;
+    } else if (before && now && before !== now) {
+      productoTransaccionDTO.serial_number = now;
+    } else {
+      delete productoTransaccionDTO.serial_number;
     }
   }
 

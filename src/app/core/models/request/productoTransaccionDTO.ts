@@ -11,8 +11,8 @@ export class ProductoTransaccionDTO {
     password?: string | null;
     control_comments!: string | null;
     location_uuid?: string;
-    serial_number?: string;
-    stock_uuid?: string;
+    serial_number?: string | null;
+    stock_uuid?: string | null;
     actual_role!: string;
     with: string[] = [];
 
