@@ -926,31 +926,22 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
-  showItems(producto: any) {
-    if (producto.product.product_type?.stock_controlled === 1) {
+  showItems(data: any) {
+    if (data.product.product_type?.stock_controlled === 1) {
       this.showStocks = true;
-      this.obtenerStocks(producto.product);
-      if (producto.product.assign_serial_number === 0 && producto.product.has_serial_number === 0) {
+      this.obtenerStocks(data.product);
+      if (data.product.assign_serial_number === 0 && data.product.has_serial_number === 0) {
         this.mostrarCantidad = true;
         this.showSerialNumber = false;
-        // ['stock_uuid'].forEach((field) => {
-        //   const control = this.productoForm.get(field);
-        // control?.disable();
-        //   control?.updateValueAndValidity({ emitEvent: false });
-        // });
       } else {
         this.mostrarCantidad = false;
         this.showSerialNumber = true;
-        // ['stock_uuid', 'serial_number'].forEach((field) => {
-        //   const control = this.productoForm.get(field);
-        // control?.setValidators(Validators.required);
-        // control?.disable();
-        //   control?.updateValueAndValidity({ emitEvent: false });
-        // });
+        // Obtiene el listado de número seriales. 
+        this.obtenerProductosEnPosesion(data.stock?.uuid);
       }
     } else {
       this.showStocks = false;
-      this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
+      this.placeholderCantidad = 'Cantidad en ' + data.measure?.name;
       this.mostrarCantidad = true;
       ['quantity'].forEach((field) => {
         const control = this.productoForm.get(field);
@@ -980,12 +971,6 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.productoForm.get('traceable')?.setValue(producto.traceable);
         this.obtenerStocks(producto);
         if (producto.product_type?.stock_controlled === 1) {
-          // ['stock_uuid'].forEach((field) => {
-          //   const control = this.productoForm.get(field);
-          //   control?.setValidators(Validators.required);
-          //   control?.setValue(null);
-          //   control?.updateValueAndValidity({ emitEvent: false });
-          // });
           this.productoForm.get('stock_uuid')?.setValue(null);
           this.productoForm.get('serial_number')?.setValue(null);
           this.showStocks = true;
@@ -1024,11 +1009,6 @@ export class VentasComponent implements OnInit, OnDestroy {
           // No tiene stock controlled por lo que no muestra el select de stocks.
           this.showStocks = false;
           this.showSerialNumber = false;
-          // ['stock_uuid'].forEach((field) => {
-          //   const control = this.productoForm.get(field);
-          //   control?.setValidators([]);
-          //   control?.updateValueAndValidity({ emitEvent: false });
-          // });
         }
       });
 
@@ -1039,7 +1019,6 @@ export class VentasComponent implements OnInit, OnDestroy {
           this.obtenerProductosEnPosesion(stock.uuid);
           ['serial_number'].forEach((field) => {
             const control = this.productoForm.get(field);
-            // control?.setValidators(Validators.required);
             control?.enable();
             control?.updateValueAndValidity({ emitEvent: false });
           });
