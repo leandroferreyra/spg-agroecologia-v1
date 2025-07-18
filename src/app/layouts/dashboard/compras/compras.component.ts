@@ -1370,7 +1370,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.inEdicionProducto = false;
     this.breadcrumb = [];
     this.ultimaUbicacion = null;
-    // this.showInputUbicacion = false;
+    this.showWarningUbicacion = false;
     this.modalProducto.close();
   }
 
