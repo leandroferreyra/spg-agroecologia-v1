@@ -229,6 +229,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._indexService.getVentasWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.ventas = res.data;
+          console.log("🚀 ~ VentasComponent ~ this._indexService.getVentasWithParam ~ this.ventas:", this.ventas)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -577,7 +578,6 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._ventaService.getVentaById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedVenta = res.data;
-          console.log("🚀 ~ VentasComponent ~ this._ventaService.getVentaById ~ this.selectedVenta:", this.selectedVenta)
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedVenta.uuid;
           this.location.replaceState(`/dashboard/ventas/${this.selectedVenta.uuid}`);
@@ -1152,7 +1152,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       productoTransaccionDTO.quantity = this.productoForm.get('quantity')?.value;
       productoTransaccionDTO.unit_price = this.productoForm.get('unit_price')?.value;
       productoTransaccionDTO.stock_uuid = this.productoForm.get('stock_uuid')?.value?.uuid;
-      productoTransaccionDTO.serial_number = this.productoForm.get('serial_number')?.value?.serial_number;
+      productoTransaccionDTO.serial_number = this.productoForm.get('serial_number')?.value?.serial_number ?? null;
       if (!this.inEdicionProducto) {
         if (this.productoForm.get('traceable')?.value === 0) {
           delete productoTransaccionDTO.stock_uuid;
@@ -1573,6 +1573,28 @@ export class VentasComponent implements OnInit, OnDestroy {
         )
       }
     }
+  }
+
+  onToggleSwitchFactura(data: any) {
+    console.log(data);
+    this.spinner.show();
+    let comprobante = new FacturaDTO();
+    comprobante.is_invoice = !data.is_invoice;
+    comprobante.actual_role = this.actual_role;
+    this.subscription.add(
+      this._transactionDocumentsService.editFactura(data.uuid, comprobante).subscribe({
+        next: res => {
+          this.tokenService.setToken(res.token);
+          this.obtenerVentaPorId(this.selectedVenta.uuid);
+          this.spinner.hide();
+        },
+        error: error => {
+          this.spinner.hide();
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
   }
 
   showCantidad(data: any) {

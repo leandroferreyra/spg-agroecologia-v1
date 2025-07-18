@@ -7,6 +7,7 @@ export class FacturaDTO {
     document_number!: string;
     currency_uuid!: string;
     exchange_rate!: string;
+    is_invoice!: boolean;
 
     with: any[] = [];
     actual_role!: string;

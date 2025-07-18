@@ -412,7 +412,7 @@
                         <table class="table-hover">
                             <thead class="bg-gray-100">
                                 <tr>
-                                    <th class="px-2 py-1">Orden</th>
+                                    <th class="px-2 py-1">Factura</th>
                                     <th class="px-2 py-1">Fecha</th>
                                     <th class="px-2 py-1">Tipo</th>
                                     <th class="px-2 py-1">Número</th>
@@ -426,7 +426,19 @@
                             <tbody>
                                 @for(data of selectedVenta?.transaction?.transaction_documents; track data.uuid) {
                                 <tr>
-                                    <td class="border px-2 py-1">{{ data.order }}</td>
+                                    <td class="border px-2 py-1">
+                                        <div
+                                            class="flex items-center justify-center px-3 font-semibold  ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                                            <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                                <input type="checkbox" [checked]="data.is_invoice"
+                                                    (change)="onToggleSwitchFactura(data)"
+                                                    class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                                    id="custom_switch_checkbox2" />
+                                                <span
+                                                    class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                                            </label>
+                                        </div>
+                                    </td>
                                     <td class="border px-2 py-1">{{ data.document_datetime }}</td>
                                     <td class="border px-2 py-1">{{ data.account_document_type?.name}}</td>
                                     <td class="border px-2 py-1">{{ data.prefix_number }} - {{ data.document_number }}
