@@ -904,7 +904,7 @@ export class VentasComponent implements OnInit, OnDestroy {
         this.isEdicion = false;
       }
       this.tituloModal = 'Nuevo producto';
-      this.obtenerUbicaciones();
+      // this.obtenerUbicaciones();
       this.inicializarFormProducto();
     } else {
       this.inEdicionProducto = true;
@@ -1210,30 +1210,30 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.modalProducto.close();
   }
 
-  obtenerUbicaciones(uuid?: string) {
-    const params: any = {};
-    params.with = ["location.location.location.location"];
-    params.paging = null;
-    params.page = null;
-    params.order_by = {
-      'name': 'asc'
-    };
-    params.filters = {
-      'location_uuid': { value: uuid ? uuid : 'null', op: '=', contiene: false },
-    };
+  // obtenerUbicaciones(uuid?: string) {
+  //   const params: any = {};
+  //   params.with = ["location.location.location.location"];
+  //   params.paging = null;
+  //   params.page = null;
+  //   params.order_by = {
+  //     'name': 'asc'
+  //   };
+  //   params.filters = {
+  //     'location_uuid': { value: uuid ? uuid : 'null', op: '=', contiene: false },
+  //   };
 
-    this.subscription.add(
-      this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
-        next: res => {
-          this.ubicaciones = res.data;
-        },
-        error: error => {
-          this.swalService.toastError('top-right', error.error.message);
-          console.error(error);
-        }
-      })
-    )
-  }
+  //   this.subscription.add(
+  //     this._indexService.getUbicacionesWithParam(params, this.actual_role).subscribe({
+  //       next: res => {
+  //         this.ubicaciones = res.data;
+  //       },
+  //       error: error => {
+  //         this.swalService.toastError('top-right', error.error.message);
+  //         console.error(error);
+  //       }
+  //     })
+  //   )
+  // }
 
   obtenerClientes() {
     const params: any = {};
