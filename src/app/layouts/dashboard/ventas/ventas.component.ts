@@ -1023,6 +1023,7 @@ export class VentasComponent implements OnInit, OnDestroy {
           });
           // No tiene stock controlled por lo que no muestra el select de stocks.
           this.showStocks = false;
+          this.showSerialNumber = false;
           // ['stock_uuid'].forEach((field) => {
           //   const control = this.productoForm.get(field);
           //   control?.setValidators([]);
