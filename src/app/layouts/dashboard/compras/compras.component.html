@@ -111,13 +111,14 @@
                 }
             </h5>
 
-            <div class="flex w-full items-center justify-between sm:w-auto">
-                <div class="flex items-center ltr:mr-4 rtl:ml-4">
-                    <button type="button" class="block hover:text-primary ltr:mr-3 rtl:ml-3 xl:hidden"
-                        (click)="isShowMailMenu = !isShowMailMenu">
-                        <icon-menu />
-                    </button>
-                </div>
+            <div class="flex items-center gap-2 ml-auto">
+                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedCompra)">
+                    <icon-trash-lines />
+                </button>
+                <button type="button" class="block hover:text-primary xl:hidden"
+                    (click)="isShowMailMenu = !isShowMailMenu">
+                    <icon-menu />
+                </button>
             </div>
         </div>
 

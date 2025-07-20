@@ -36,6 +36,7 @@ import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { Title } from '@angular/platform-browser';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 
 @Component({
   selector: 'app-proveedores',
@@ -43,7 +44,7 @@ import { Title } from '@angular/platform-browser';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule
+    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, IconPencilComponent
   ],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.css',

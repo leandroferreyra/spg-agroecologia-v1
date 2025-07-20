@@ -37,6 +37,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { timeStamp } from 'console';
 import { Title } from '@angular/platform-browser';
+import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 
 @Component({
   selector: 'app-clientes',
@@ -44,7 +45,7 @@ import { Title } from '@angular/platform-browser';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent, ContactosPersonaComponent,
-    IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent, FontAwesomeModule, NgbPaginationModule,
+    IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent, FontAwesomeModule, NgbPaginationModule, IconPencilComponent,
     ProductosEnPosesionComponent
   ],
   templateUrl: './clientes.component.html',
