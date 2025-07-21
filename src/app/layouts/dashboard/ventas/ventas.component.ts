@@ -1164,8 +1164,6 @@ export class VentasComponent implements OnInit, OnDestroy {
         // Chequer si se debe enviar parámetros stock y serial
         this.checkSendStock(productoTransaccionDTO);
         this.checkSendSerialNumber(productoTransaccionDTO);
-        // console.log(this.selectedProducto);
-        // console.log(this.productoForm);
         delete productoTransaccionDTO.transaction_uuid;
         delete productoTransaccionDTO.product_uuid;
         this.subscription.add(
@@ -1592,7 +1590,6 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   onToggleSwitchFactura(data: any) {
-    console.log(data);
     this.spinner.show();
     let comprobante = new FacturaDTO();
     comprobante.is_invoice = !data.is_invoice;
