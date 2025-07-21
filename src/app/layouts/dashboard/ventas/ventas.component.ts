@@ -1205,7 +1205,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   checkSendSerialNumber(productoTransaccionDTO: ProductoTransaccionDTO) {
     const before = this.selectedProducto.sale_product?.uuid;
     // data.sale_product?.product_instances[0]
-    const now = this.productoForm.get('serial_number')?.value?.uuid;
+    const now = this.productoForm.get('serial_number')?.value?.serial_number;
     if (!before && now) {
       productoTransaccionDTO.serial_number = now;
     } else if (before && !now) {
@@ -1691,7 +1691,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       pago.amount = this.pagoForm.get('amount')?.value;
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;
-      pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value ? this.pagoForm.get('exchange_rate')?.value : 1;
+      pago.exchange_rate = this.pagoForm.get('exchange_rate')?.value;
       pago.payment_method_uuid = this.pagoForm.get('payment_method')?.value;
       if (!this.inEdicionPago) {
         pago.transaction_uuid = this.selectedVenta.transaction?.uuid;
