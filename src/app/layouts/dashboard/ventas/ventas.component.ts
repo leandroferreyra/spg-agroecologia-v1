@@ -1207,7 +1207,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   checkSendSerialNumber(productoTransaccionDTO: ProductoTransaccionDTO) {
     const before = this.selectedProducto.sale_product?.uuid;
     // data.sale_product?.product_instances[0]
-    const now = this.productoForm.get('serial_number')?.value?.uuid;
+    const now = this.productoForm.get('serial_number')?.value?.serial_number;
     if (!before && now) {
       productoTransaccionDTO.serial_number = now;
     } else if (before && !now) {
