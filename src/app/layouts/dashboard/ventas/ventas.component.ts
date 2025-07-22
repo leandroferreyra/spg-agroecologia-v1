@@ -1019,29 +1019,26 @@ export class VentasComponent implements OnInit, OnDestroy {
 
     this.productoForm.get('stock_uuid')!.valueChanges.subscribe(
       (stock: any) => {
+        const fields = ['serial_number'];
+
+        const setFieldsState = (enable: boolean, clear: boolean = false) => {
+          fields.forEach((field) => {
+            const control = this.productoForm.get(field);
+            if (control) {
+              if (clear) control.setValue(null);
+              enable ? control.enable() : control.disable();
+              control.updateValueAndValidity({ emitEvent: false });
+            }
+          });
+        };
+
         if (!stock) {
-          ['serial_number'].forEach((field) => {
-            const control = this.productoForm.get(field);
-            control?.setValue(null);
-            control?.disable();
-            control?.updateValueAndValidity({ emitEvent: false });
-          });
-        } else if (stock && !this.mostrarCantidad) {
-          // Tiene o asigna numero de serie
+          setFieldsState(false, true); // Deshabilita y limpia
+        } else if (!this.mostrarCantidad) {
           this.obtenerProductosEnPosesion(stock.uuid);
-          ['serial_number'].forEach((field) => {
-            const control = this.productoForm.get(field);
-            control?.enable();
-            control?.setValue(null);
-            control?.updateValueAndValidity({ emitEvent: false });
-          });
+          setFieldsState(true, true); // Habilita y limpia
         } else {
-          ['serial_number'].forEach((field) => {
-            const control = this.productoForm.get(field);
-            control?.setValue(null);
-            control?.disable();
-            control?.updateValueAndValidity({ emitEvent: false });
-          });
+          setFieldsState(false, true); // Deshabilita y limpia
         }
       });
   }
