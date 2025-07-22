@@ -1591,6 +1591,16 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   onToggleSwitchFactura(data: any) {
     this.spinner.show();
+    // Cerramos los edit
+    if (this.inEdicionDetalles) {
+      this.openCloseEditarDetalles();
+    }
+    if (this.inEdicionVenta) {
+      this.openCloseEditarVenta();
+    }
+    if (this.inEdicionRetirado) {
+      this.openCloseEditarRetirado();
+    }
     let comprobante = new FacturaDTO();
     comprobante.is_invoice = !data.is_invoice;
     comprobante.actual_role = this.actual_role;
