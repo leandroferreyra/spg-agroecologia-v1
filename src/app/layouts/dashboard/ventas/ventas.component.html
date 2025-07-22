@@ -436,6 +436,7 @@
                                             class="flex items-center justify-center px-3 font-semibold  ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
                                             <label class="relative mb-0 h-4 w-7 cursor-pointer">
                                                 <input type="checkbox" [checked]="data.is_invoice"
+                                                    [disabled]="selectedVenta?.transaction?.current_state?.state?.name == 'Finalizada'"
                                                     (change)="onToggleSwitchFactura(data)"
                                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                                     id="custom_switch_checkbox2" />

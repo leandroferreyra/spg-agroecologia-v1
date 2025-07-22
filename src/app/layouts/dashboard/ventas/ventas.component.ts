@@ -1019,12 +1019,20 @@ export class VentasComponent implements OnInit, OnDestroy {
 
     this.productoForm.get('stock_uuid')!.valueChanges.subscribe(
       (stock: any) => {
-        if (stock && !this.mostrarCantidad) {
+        if (!stock) {
+          ['serial_number'].forEach((field) => {
+            const control = this.productoForm.get(field);
+            control?.setValue(null);
+            control?.disable();
+            control?.updateValueAndValidity({ emitEvent: false });
+          });
+        } else if (stock && !this.mostrarCantidad) {
           // Tiene o asigna numero de serie
           this.obtenerProductosEnPosesion(stock.uuid);
           ['serial_number'].forEach((field) => {
             const control = this.productoForm.get(field);
             control?.enable();
+            control?.setValue(null);
             control?.updateValueAndValidity({ emitEvent: false });
           });
         } else {
