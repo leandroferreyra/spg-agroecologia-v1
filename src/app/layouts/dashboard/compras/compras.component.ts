@@ -34,6 +34,7 @@ import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTran
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { TransactionProductoService } from 'src/app/core/services/transactionProducto.service';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconAutoPaymentComponent } from 'src/app/shared/icon/icon-auto-payment';
 import { FacturaService } from 'src/app/core/services/factura.service';
 import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -53,7 +54,7 @@ import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePrice
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule, IconSettingsComponent,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective,
-    IconPencilComponent
+    IconPencilComponent, IconAutoPaymentComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './compras.component.html',

@@ -244,7 +244,12 @@
                         </div>
                         }
                     </div>
-
+                    <div>
+                        <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Crear pago total"
+                            (click)="openModalEditarProveedor()">
+                            <icon-auto-payment />
+                        </button>
+                    </div>                    
                 </legend>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -281,7 +286,6 @@
                         <label class="block font-medium">Tipo de cambio</label>
                         <input type="text" class="form-control w-full" formControlName="tipoCambio" />
                     </div>
-
                 </div>
                 @if (inEdicionFactura || inAltaFactura) {
                 <div class="row mt-3">
