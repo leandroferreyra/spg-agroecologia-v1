@@ -1992,6 +1992,29 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
   }
 
-
+  crearPagoTotalCompra() {
+    this.spinner.show();
+    let pago = new PagoDTO();
+    pago.actual_role = this.actual_role;
+    pago.transaction_uuid = this.selectedCompra.transaction?.uuid;
+    pago.payment_datetime = new Date().toISOString().split('T')[0];
+    pago.amount = this.selectedCompra.transaction?.total;
+    pago.currency_uuid = this.selectedCompra.transaction?.transaction_documents?.[0].currency?.uuid;
+    pago.exchange_rate = this.selectedCompra.transaction?.transaction_documents?.[0].currency?.current_exchange_rate?.rate;
+    this.subscription.add(
+      this._pagoService.savePago(pago).subscribe({
+        next: res => {
+          this.obtenerCompraPorId(this.selectedCompra.uuid);
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    );
+  }
 
 }

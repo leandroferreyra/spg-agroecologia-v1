@@ -246,10 +246,11 @@
                     </div>
                     <div>
                         <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Crear pago total"
-                            (click)="openModalEditarProveedor()">
+                            (click)="crearPagoTotalCompra()"
+                            [disabled]="!poseeFactura || selectedCompra?.transaction?.transaction_products?.length === 0 ">
                             <icon-auto-payment />
                         </button>
-                    </div>                    
+                    </div>
                 </legend>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
