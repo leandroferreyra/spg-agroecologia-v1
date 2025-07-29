@@ -87,11 +87,6 @@ export const DASHBOARD_ROUTES: Routes = [
                 canActivate: [RoleGuard], data: { expectedRoles: ['SUPER_ADMIN', 'ADMIN'], title: 'Usuarios' }
             },
             {
-                path: 'produccion',
-                loadComponent: () => import('../dashboard/produccion/produccion/produccion.component').then(m => m.ProduccionComponent),
-                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'], title: 'Producción' }
-            },
-            {
                 path: 'proveedores',
                 loadComponent: () => import('./personas/proveedores/proveedores.component').then(m => m.ProveedoresComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'], title: 'Proveedores' }
@@ -120,6 +115,16 @@ export const DASHBOARD_ROUTES: Routes = [
                 path: 'productos/:uuid',
                 loadComponent: () => import('./productos/productos.component').then(m => m.ProductosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'], title: 'Productos' }
+            },
+            {
+                path: 'producciones',
+                loadComponent: () => import('./produccion/produccion.component').then(m => m.ProduccionComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'], title: 'Producción' }
+            },
+            {
+                path: 'producciones/:uuid',
+                loadComponent: () => import('./produccion/produccion.component').then(m => m.ProduccionComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION'], title: 'Producción' }
             },
             {
                 path: 'compras',

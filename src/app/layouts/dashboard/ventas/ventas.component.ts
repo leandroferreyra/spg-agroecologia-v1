@@ -278,10 +278,12 @@ export class VentasComponent implements OnInit, OnDestroy {
       return dato.transaction?.person?.legal_entity.company_name;
     }
   }
+
   showFecha(dato: any) {
-    const soloFecha = dato.transaction?.transaction_datetime?.substring(0, 10);
-    return soloFecha;
+    const date = new Date(dato.replace(' ', 'T'));
+    return date.toLocaleDateString('es-AR');
   }
+
   showDocumento(dato: any) {
     const documentos = dato.transaction?.transaction_documents;
 
@@ -362,7 +364,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       cuit: new FormControl({ value: this.getCuit(), disabled: true }, []),
       tipoDocumento: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.document_type?.name, disabled: true }, []),
       numeroDocumento: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.document_number, disabled: true }, []),
-      fechaVenta: new FormControl({ value: this.selectedVenta?.transaction?.transaction_datetime, disabled: true }, []),
+      fechaVenta: new FormControl({ value: this.showFecha(this.selectedVenta?.transaction?.transaction_datetime), disabled: true }, []),
       estadoVenta: new FormControl({ value: this.selectedVenta?.transaction?.current_state?.state.uuid, disabled: true }, []),
       calle: new FormControl({ value: this.selectedVenta?.transaction?.person?.street_name, disabled: true }, []),
       numero: new FormControl({ value: this.selectedVenta?.transaction?.person?.door_number, disabled: true }, []),
@@ -768,27 +770,32 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.obtenerVentas();
   }
 
-  obtenerComprasPorFiltroAvanzado() {
+  obtenerVentasPorFiltroAvanzado() {
     this.filtroSimpleName = '';
     this.filtroSimpleContiene = true;
     this.filtrosVentas.operator.value = '';
     this.params.extraDateFilters = [];
     // Manejar fechas
     if (this.filtroFechaTransacDesde) {
-      this.params.extraDateFilters.push(['transaction.transaction_datetime', '>=', this.filtroFechaTransacDesde]);
+      this.params.extraDateFilters.push(['transaction.transaction_datetime', '>=', this.convertirFechaADateBackend(this.filtroFechaTransacDesde)]);
     }
     if (this.filtroFechaTransacHasta) {
-      this.params.extraDateFilters.push(['transaction.transaction_datetime', '<=', this.filtroFechaTransacHasta]);
+      this.params.extraDateFilters.push(['transaction.transaction_datetime', '<=', this.convertirFechaADateBackend(this.filtroFechaTransacHasta)]);
     }
     if (this.filtroFechaComprobanteDesde) {
-      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '>=', this.filtroFechaComprobanteDesde]);
+      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '>=', this.convertirFechaADateBackend(this.filtroFechaComprobanteDesde)]);
 
     }
     if (this.filtroFechaComprobanteHasta) {
-      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '<=', this.filtroFechaComprobanteHasta]);
+      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '<=', this.convertirFechaADateBackend(this.filtroFechaComprobanteHasta)]);
 
     }
     this.obtenerVentas();
+  }
+
+  convertirFechaADateBackend(fechaStr: string): string {
+    const [dia, mes, anio] = fechaStr.split('-');
+    return `${anio}-${mes}-${dia}`;
   }
 
   limpiarFiltros() {
@@ -1358,9 +1365,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     const fechaFormateada = form.get('transaction_datetime')?.value instanceof Date
       ? format(form.get('transaction_datetime')?.value, 'yyyy-MM-dd')
       : form.get('transaction_datetime')?.value;
-    transaction.transaction_datetime = fechaFormateada;
-
-    // transaction.possible_transaction_state_uuid = form.get('possible_transaction_state_uuid')?.value;
+    transaction.transaction_datetime = this.convertirFechaADateBackend(fechaFormateada);
     venta.transaction = transaction;
 
     if (!this.isEdicion) {
@@ -1406,7 +1411,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.spinner.show();
     let ventaDTO = new VentaDTO();
     let transaction = new Transaction();
-    transaction.transaction_datetime = this.ventaForm.get('fechaVenta')?.value;
+    transaction.transaction_datetime = this.convertirFechaADateBackend(this.ventaForm.get('fechaVenta')?.value);
     transaction.possible_transaction_state_uuid = this.ventaForm.get('estadoVenta')?.value;
     ventaDTO.transaction = transaction;
     ventaDTO.actual_role = this.actual_role;
@@ -1517,7 +1522,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.comprobanteForm = new FormGroup({
       comprobante_uuid: new FormControl(data ? data.uuid : null, []),
       account_document_type_uuid: new FormControl(data ? data.account_document_type?.uuid : null, [Validators.required]),
-      document_datetime: new FormControl(data ? data.document_datetime : new Date(), []),
+      document_datetime: new FormControl(data ? this.showFecha(data.document_datetime) : new Date(), []),
       prefix_number: new FormControl(data ? data.prefix_number : null, []),
       document_number: new FormControl(data ? data.document_number : null, []),
       currency_uuid: new FormControl({ value: data ? data.currency : null, disabled: false }, [Validators.required]),
@@ -1548,7 +1553,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       const fechaFormateada = this.comprobanteForm.get('document_datetime')?.value instanceof Date
         ? format(this.comprobanteForm.get('document_datetime')?.value, 'yyyy-MM-dd')
         : this.comprobanteForm.get('document_datetime')?.value;
-      comprobante.document_datetime = fechaFormateada;
+      comprobante.document_datetime = this.convertirFechaADateBackend(fechaFormateada);
       comprobante.prefix_number = this.comprobanteForm.get('prefix_number')?.value;
       comprobante.document_number = this.comprobanteForm.get('document_number')?.value;
       comprobante.currency_uuid = this.comprobanteForm.get('currency_uuid')?.value?.uuid;
@@ -1668,7 +1673,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   inicializarFormPago(data?: any) {
     this.pagoForm = new FormGroup({
       pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
-      payment_datetime: new FormControl({ value: data ? data.payment_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_datetime: new FormControl({ value: data ? this.showFecha(data.payment_datetime) : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : []),
       amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : []),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
@@ -1702,7 +1707,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let pago = new PagoDTO();
       pago.actual_role = this.actual_role;
-      pago.payment_datetime = this.pagoForm.get('payment_datetime')?.value;
+      pago.payment_datetime = this.convertirFechaADateBackend(this.pagoForm.get('payment_datetime')?.value);
       pago.amount = this.pagoForm.get('amount')?.value;
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;

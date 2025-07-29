@@ -26,6 +26,7 @@ export class CatalogoService {
   apiMeasures = '/measures';
   apiDocumentosContables = '/account_document_types';
   apiQualification = '/qualification_options';
+  apiUsers = '/users';
 
   constructor(private http: HttpClient) { }
 
@@ -153,6 +154,12 @@ export class CatalogoService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams().append('actual_role', rol);
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiQualification, { headers, params: params });
+  }
+
+  getUsuarios(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams().append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiUsers, { headers, params: params });
   }
 
 }

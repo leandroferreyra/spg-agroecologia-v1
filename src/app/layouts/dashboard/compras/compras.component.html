@@ -138,7 +138,7 @@
                         <label class="block font-medium">Fecha de compra</label>
                         <input type="text" mwlFlatpickr [options]="{ 
                             enableTime: false, 
-                            dateFormat: 'Y-m-d',
+                            dateFormat: 'd-m-Y',
                             time24hr: true,
                             enableSeconds: false
                         }" class="form-input" formControlName="fechaCompra" />
@@ -257,7 +257,7 @@
                         <label class="block font-medium">Fecha de facturacion</label>
                         <input type="text" mwlFlatpickr [options]="{ 
                             enableTime: false, 
-                            dateFormat: 'Y-m-d',
+                            dateFormat: 'd-m-Y',
                             time24hr: true,
                             enableSeconds: false
                         }" class="form-input" formControlName="fechaFacturacion" />
@@ -547,7 +547,7 @@
                             <tbody>
                                 @for(data of pagos; track data.uuid) {
                                 <tr>
-                                    <td class="border px-2 py-1">{{ data.payment_datetime | date:'yyyy-MM-dd' }}</td>
+                                    <td class="border px-2 py-1">{{ data.payment_datetime | date:'dd-MM-yyyy' }}</td>
                                     <td class="border px-2 py-1">{{ data.payment_method?.name }}</td>
                                     <td class="border px-2 py-1">{{ data.detail }}</td>
                                     <td class="border px-2 py-1">{{ data.currency.name }}</td>
@@ -628,7 +628,7 @@
                             <label>Fecha de compra</label>
                             <input type="text" mwlFlatpickr [options]="{ 
                                                 enableTime: false, 
-                                                dateFormat: 'Y-m-d',
+                                                dateFormat: 'd-m-Y',
                                                 time24hr: true,
                                                 enableSeconds: false
                                             }" class="form-input" formControlName="transaction_datetime" />
@@ -903,7 +903,7 @@
                     <label>Fecha transacción desde</label>
                     <input type="text" mwlFlatpickr [options]="{ 
                                         enableTime: false, 
-                                        dateFormat: 'Y-m-d',
+                                        dateFormat: 'd-m-Y',
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaTransacDesde"
@@ -913,7 +913,7 @@
                     <label>Fecha transacción hasta</label>
                     <input type="text" mwlFlatpickr [options]="{ 
                                         enableTime: false, 
-                                        dateFormat: 'Y-m-d',
+                                        dateFormat: 'd-m-Y',
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaTransacHasta"
@@ -943,7 +943,7 @@
                     <label>Fecha factura desde</label>
                     <input type="text" mwlFlatpickr [options]="{ 
                                         enableTime: false, 
-                                        dateFormat: 'Y-m-d',
+                                        dateFormat: 'd-m-Y',
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaFacturaDesde"
@@ -953,7 +953,7 @@
                     <label>Fecha factura hasta</label>
                     <input type="text" mwlFlatpickr [options]="{ 
                                         enableTime: false, 
-                                        dateFormat: 'Y-m-d',
+                                        dateFormat: 'd-m-Y',
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaFacturaHasta"
@@ -1084,7 +1084,7 @@
                             <label>Fecha de pago</label>
                             <input type="text" mwlFlatpickr [options]="{ 
                                                 enableTime: false, 
-                                                dateFormat: 'Y-m-d',
+                                                dateFormat: 'd-m-Y',
                                                 time24hr: true,
                                                 enableSeconds: false
                                             }" class="form-input" formControlName="payment_datetime" />

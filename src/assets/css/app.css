@@ -88,3 +88,7 @@ ng-select.has-error .ng-select-container {
 .tab-disabled {
     opacity: 0.5;
 }
+
+.disable-hover:hover {
+    background-color: inherit !important;
+}

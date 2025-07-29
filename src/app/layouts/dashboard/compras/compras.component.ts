@@ -311,7 +311,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       numero: new FormControl({ value: this.selectedCompra?.transaction?.person?.door_number, disabled: true }, []),
       localidad: new FormControl({ value: this.selectedCompra?.transaction?.person?.city?.name, disabled: true }, []),
       // Facturacion
-      fechaCompra: new FormControl({ value: this.selectedCompra?.transaction?.transaction_datetime, disabled: true }, []),
+      fechaCompra: new FormControl({ value: this.getFecha(this.selectedCompra?.transaction?.transaction_datetime), disabled: true }, []),
       fechaFacturacion: new FormControl({ value: this.getFechaFacturacion(), disabled: true }, []),
       estadoCompra: new FormControl({ value: this.selectedCompra?.transaction?.current_state?.state?.uuid, disabled: true }, []),
       tipoComprobante: new FormControl({ value: this.getTipoComprobante(), disabled: true }, []),
@@ -351,9 +351,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
       });
   }
 
+  getFecha(fecha: string) {
+    const date = new Date(fecha.replace(' ', 'T'));
+    return date.toLocaleDateString('es-AR');
+    // return this.selectedCompra?.transaction?.transaction_datetime;
+  }
+
   getFechaFacturacion() {
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
-      return this.selectedCompra?.transaction?.transaction_documents[0]?.document_datetime;
+      return this.getFecha(this.selectedCompra?.transaction?.transaction_documents[0]?.document_datetime);
     }
     return '';
   }
@@ -573,8 +579,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   showFecha(dato: any) {
-    const soloFecha = dato.transaction?.transaction_datetime?.substring(0, 10);
-    return soloFecha;
+    // const soloFecha = dato.transaction?.transaction_datetime?.substring(0, 10);
+    // return soloFecha;
+
+    const date = new Date(dato.transaction?.transaction_datetime?.replace(' ', 'T'));
+    return date.toLocaleDateString('es-AR');
   }
 
   showDataCompra(compra: any) {
@@ -744,7 +753,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inicializarFormPago(data?: any) {
     this.pagoForm = new FormGroup({
       pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
-      payment_datetime: new FormControl({ value: data ? data.payment_datetime : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_datetime: new FormControl({ value: data ? this.getFecha(data.payment_datetime) : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : []),
       amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : []),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
@@ -1037,7 +1046,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     const fechaFormateada = form.get('transaction_datetime')?.value instanceof Date
       ? format(form.get('transaction_datetime')?.value, 'yyyy-MM-dd')
       : form.get('transaction_datetime')?.value;
-    transaction.transaction_datetime = fechaFormateada;
+    transaction.transaction_datetime = this.convertirFechaADateBackend(fechaFormateada);
     transaction.vat_after_discount = false;
     transaction.discount1 = form.get('discount1')?.value;
     transaction.discount2 = form.get('discount2')?.value;
@@ -1111,19 +1120,24 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.params.extraDateFilters = [];
     // Manejar fechas
     if (this.filtroFechaTransacDesde) {
-      this.params.extraDateFilters.push(['transaction.transaction_datetime', '>=', this.filtroFechaTransacDesde]);
+      this.params.extraDateFilters.push(['transaction.transaction_datetime', '>=', this.convertirFechaADateBackend(this.filtroFechaTransacDesde)]);
     }
     if (this.filtroFechaTransacHasta) {
-      this.params.extraDateFilters.push(['transaction.transaction_datetime', '<=', this.filtroFechaTransacHasta]);
+      this.params.extraDateFilters.push(['transaction.transaction_datetime', '<=', this.convertirFechaADateBackend(this.filtroFechaTransacHasta)]);
     }
     if (this.filtroFechaFacturaDesde) {
-      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '>=', this.filtroFechaFacturaDesde]);
+      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '>=', this.convertirFechaADateBackend(this.filtroFechaFacturaDesde)]);
     }
     if (this.filtroFechaFacturaHasta) {
-      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '<=', this.filtroFechaFacturaHasta]);
+      this.params.extraDateFilters.push(['transaction.transactionDocuments.document_datetime', '<=', this.convertirFechaADateBackend(this.filtroFechaFacturaHasta)]);
     }
     this.params.distinct = true;
     this.obtenerCompras();
+  }
+
+  convertirFechaADateBackend(fechaStr: string): string {
+    const [dia, mes, anio] = fechaStr.split('-');
+    return `${anio}-${mes}-${dia}`;
   }
 
   limpiarFiltros() {
@@ -1507,7 +1521,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.spinner.show();
     let compraDTO = new CompraDTO();
     let transaction = new Transaction();
-    transaction.transaction_datetime = this.compraForm.get('fechaCompra')?.value;
+    transaction.transaction_datetime = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
     transaction.possible_transaction_state_uuid = this.compraForm.get('estadoCompra')?.value;
     compraDTO.transaction = transaction;
     compraDTO.actual_role = this.actual_role;
@@ -1648,7 +1662,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.spinner.show();
     let factura = new FacturaDTO();
     factura.account_document_type_uuid = this.compraForm.get('tipoComprobante')?.value;
-    factura.document_datetime = this.compraForm.get('fechaFacturacion')?.value;
+    factura.document_datetime = this.convertirFechaADateBackend(this.compraForm.get('fechaFacturacion')?.value);
     factura.prefix_number = this.compraForm.get('prefijoComprobante')?.value;
     factura.document_number = this.compraForm.get('documentoComprobante')?.value;
     factura.currency_uuid = this.compraForm.get('moneda')?.value?.uuid;
@@ -1678,8 +1692,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
           next: res => {
             this.tokenService.setToken(res.token);
             this.inEdicionFactura = false;
-            this.selectedCompra.transaction.transaction_documents[0] = res.data;
-            this.inicializarFormEdit();
+            this.obtenerCompras(true);
+
+            // this.selectedCompra.transaction.transaction_documents[0] = res.data;
+            // this.inicializarFormEdit();
             this.spinner.hide();
           },
           error: error => {
@@ -1745,7 +1761,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let pago = new PagoDTO();
       pago.actual_role = this.actual_role;
-      pago.payment_datetime = this.pagoForm.get('payment_datetime')?.value;
+      pago.payment_datetime = this.convertirFechaADateBackend(this.pagoForm.get('payment_datetime')?.value);
       pago.amount = this.pagoForm.get('amount')?.value;
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;

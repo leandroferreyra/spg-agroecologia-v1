@@ -72,6 +72,7 @@ function getMenuByRole(role: string) {
         case 'ADMINISTRACION':
             return [
                 { label: 'Productos', route: 'productos' },
+                { label: 'Producciones', route: 'producciones' },
                 { label: 'Compras', route: 'compras' },
                 { label: 'Ventas', route: 'ventas' },
                 { label: 'Proveedores', route: 'proveedores' },
