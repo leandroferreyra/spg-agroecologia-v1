@@ -86,6 +86,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     'user->responsible.uuid': { value: '', op: 'in', contiene: false }
   };
   ordenamiento: any = {
+    'production_datetime': 'desc',
     'product.name': 'asc'
   };
   filtroSimpleName: string = '';
@@ -165,7 +166,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["product", "batch", "productionStates", "frozenComponents"];
+    this.params.with = ["product", "batch", "currentState"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
