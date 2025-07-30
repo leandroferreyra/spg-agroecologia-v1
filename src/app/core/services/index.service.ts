@@ -82,22 +82,27 @@ export class IndexService {
       if (paramsObj.filters) {
         Object.keys(paramsObj.filters).forEach((key) => {
           const filter = paramsObj.filters[key];
-
           if (filter && filter.value !== '' && filter.value !== null && (Array.isArray(filter.value) && filter.value?.length > 0)) {
             if (key === 'operator') {
               params = params.append(`filters[${filterIndex}]`, `${filter.value}`);
             } else {
-              params = params.append(`filters[${filterIndex}][]`, key);
-              params = params.append(`filters[${filterIndex}][]`, filter.op);
+              params = params.append(`filters[${filterIndex}][0]`, key);
+              params = params.append(`filters[${filterIndex}][1]`, filter.op);
 
               let valueToUse = filter.value;
 
               if (filter.contiene) {
                 valueToUse = `%${filter.value}%`;
+                params = params.append(`filters[${filterIndex}][2]`, valueToUse);
               } else if (filter.op === 'LIKE') {
                 valueToUse = `${filter.value}%`;
+                params = params.append(`filters[${filterIndex}][2]`, valueToUse);
+              } else if (filter.op === 'in') {
+                valueToUse.forEach((value: any) => {
+                  params = params.append(`filters[${filterIndex}][2][]`, value);
+                });
               }
-              params = params.append(`filters[${filterIndex}][]`, valueToUse);
+              
             }
 
             filterIndex++;
