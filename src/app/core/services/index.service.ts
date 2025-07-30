@@ -83,11 +83,7 @@ export class IndexService {
         Object.keys(paramsObj.filters).forEach((key) => {
           const filter = paramsObj.filters[key];
 
-          const isValueArray = Array.isArray(filter.value);
-          const isValid = (
-            (filter && filter.value !== '' && filter.value !== null) ||
-            (isValueArray && filter.value.length > 0)
-          );
+          const isValid = ((filter && filter.value !== '' && filter.value !== null && filter.value?.length > 0));
 
           if (isValid) {
             if (key === 'operator') {
