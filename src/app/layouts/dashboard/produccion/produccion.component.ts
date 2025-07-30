@@ -166,7 +166,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["product", "batch", "currentState"];
+    this.params.with = ["product", "batch", "productionStates", "frozenComponents","currentState"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -176,6 +176,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
+          console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -250,7 +251,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   obtenerCatalogos() {
     forkJoin({
-      estados: this._catalogoService.getPosiblesEstadosProductos(this.actual_role),
+      estados: this._catalogoService.getPosiblesEstadosProduccion(this.actual_role),
       usuarios: this._indexService.getUsuariosWithParam(null, this.actual_role)
     }).subscribe({
       next: res => {
