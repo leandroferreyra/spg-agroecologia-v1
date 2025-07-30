@@ -86,6 +86,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     'user->responsible.uuid': { value: '', op: 'in', contiene: false }
   };
   ordenamiento: any = {
+    'production_datetime': 'desc',
     'product.name': 'asc'
   };
   filtroSimpleName: string = '';
