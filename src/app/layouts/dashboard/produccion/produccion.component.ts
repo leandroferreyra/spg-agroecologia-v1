@@ -80,7 +80,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     'operator': { value: '' },
     'product.name': { value: '', op: 'LIKE', contiene: true },
     'batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
-    'frozenComponent.productInstance.serial_number': { value: '', op: 'LIKE', contiene: true },
+    'frozenComponents.productInstances.serial_number': { value: '', op: 'LIKE', contiene: true },
     'productionStates.possibleProductionState.uuid': { value: '', op: 'in', contiene: false },
     'productionStates.datetime_to': { value: '', op: '=', contiene: false },
     'user->responsible.uuid': { value: '', op: 'in', contiene: false }
