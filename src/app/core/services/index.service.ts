@@ -83,7 +83,13 @@ export class IndexService {
         Object.keys(paramsObj.filters).forEach((key) => {
           const filter = paramsObj.filters[key];
 
-          if (filter && filter.value !== '' && filter.value !== null && (Array.isArray(filter.value) && filter.value?.length > 0)) {
+          const isValueArray = Array.isArray(filter.value);
+          const isValid = (
+            (filter && filter.value !== '' && filter.value !== null) ||
+            (isValueArray && filter.value.length > 0)
+          );
+
+          if (isValid) {
             if (key === 'operator') {
               params = params.append(`filters[${filterIndex}]`, `${filter.value}`);
             } else {

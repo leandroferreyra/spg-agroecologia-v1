@@ -18,6 +18,7 @@ export class CatalogoService {
   apiDocumentos = '/document_types';
   apiPosiblesEstados = '/possible_person_states';
   apiPosiblesEstadosProductos = '/possible_product_states';
+  apiPosiblesEstadosProduccion = '/possible_production_states';
   apiPosiblesEstadosTransaccion = '/possible_transaction_states';
   apiCondicionIva = '/vat_conditions';
   apiTiposDetalleContacto = '/contact_detail_types';
@@ -86,6 +87,13 @@ export class CatalogoService {
     let params = new HttpParams();
     params = params.append('actual_role', rol);
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiPosiblesEstadosProductos, { headers, params: params });
+  }
+
+  getPosiblesEstadosProduccion(rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    let params = new HttpParams();
+    params = params.append('actual_role', rol);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiPosiblesEstadosProduccion, { headers, params: params });
   }
 
   getPosiblesEstadosTransaccionCompra(rol: string): Observable<AuthResponse> {
