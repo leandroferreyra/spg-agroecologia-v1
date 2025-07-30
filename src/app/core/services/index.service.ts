@@ -94,18 +94,18 @@ export class IndexService {
 
               let valueToUse = filter.value;
 
-              if (filter.contiene) {
-                valueToUse = `%${filter.value}%`;
-                params = params.append(`filters[${filterIndex}][2]`, valueToUse);
-              } else if (filter.op === 'LIKE') {
-                valueToUse = `${filter.value}%`;
-                params = params.append(`filters[${filterIndex}][2]`, valueToUse);
-              } else if (filter.op === 'in') {
+              if (filter.op === 'in') {
                 valueToUse.forEach((value: any) => {
                   params = params.append(`filters[${filterIndex}][2][]`, value);
                 });
-              }
-              
+              } else {
+                if (filter.contiene) {
+                  valueToUse = `%${filter.value}%`;
+                } else if (filter.op === 'LIKE') {
+                  valueToUse = `${filter.value}%`;
+                }
+                params = params.append(`filters[${filterIndex}][]`, valueToUse);
+              }              
             }
 
             filterIndex++;
