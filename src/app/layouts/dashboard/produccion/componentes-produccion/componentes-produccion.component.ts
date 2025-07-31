@@ -1,15 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
+import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 
 @Component({
   selector: 'app-componentes-produccion',
   standalone: true,
-  imports: [CommonModule, NgxSpinnerModule],
+  imports: [CommonModule, NgxSpinnerModule, IconPlusComponent, NgSelectModule, FormsModule, ReactiveFormsModule, NgbPaginationModule, IconTrashLinesComponent],
   templateUrl: './componentes-produccion.component.html',
   styleUrl: './componentes-produccion.component.css'
 })
@@ -24,9 +29,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   filtros: any = {
     'production_uuid': { value: '', op: '=', contiene: false },
   };
-  showFilterCompras: boolean = false;
-  ordenamiento: any = {
-  };
+  ordenamiento: any = {};
 
   // Orden, filtro y paginación para compras de proveedor
   MAX_ITEMS_PER_PAGE = 10;
@@ -38,8 +41,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   total_rows: number = 0;
 
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
-    private _swalService: SwalService
-  ) {
+    private _swalService: SwalService) {
 
   }
 
@@ -75,7 +77,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
           console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
-          // this.obtenerProductosPosibles();
           this.spinner.hide();
         },
         error: error => {
@@ -99,4 +100,20 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
+  getCantidad(data: any) {
+    if (data.measure?.is_integer === 1) {
+      return (+data.quantity)?.toFixed(0);
+    } else {
+      return (+data.quantity)?.toFixed(2);
+    }
+  }
+
+  getCantidadTotal(data: any) {
+    let total = +this.produccion.quantity * +data.quantity;
+    if (data.measure?.is_integer === 1) {
+      return (total)?.toFixed(0);
+    } else {
+      return (total)?.toFixed(2);
+    }
+  }
 }

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { ProductoDTO } from '../models/request/productoDTO';
+import { ProduccionDTO } from '../models/request/produccionDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +15,10 @@ export class ProduccionService {
 
   constructor(private http: HttpClient) { }
 
-  // saveProducto(producto: ProductoDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiProduccion, JSON.stringify(producto), { headers });
-  // }
+  saveProduccion(produccion: ProduccionDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiProduccion, JSON.stringify(produccion), { headers });
+  }
 
   // editProducto(uuid: string, producto: ProductoDTO): Observable<AuthResponse> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

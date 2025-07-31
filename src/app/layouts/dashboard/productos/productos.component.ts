@@ -43,6 +43,10 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Route, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconProducirComponent } from 'src/app/shared/icon/icon-producir';
+import { ProduccionService } from 'src/app/core/services/produccion.service';
+import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
+import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 
 @Component({
   selector: 'app-productos',
@@ -51,7 +55,7 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconPencilComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
-    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent
+    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent, IconProducirComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -131,11 +135,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
   isLoadingProductos: boolean = true;
 
   placeholderStocks: string = '';
+  usuarioLogueado: any;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router,
-    private titleService: Title
+    private _produccionService: ProduccionService, private _userLogged: UserLoggedService
   ) {
     this.initStore();
   }
@@ -164,6 +169,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(params => {
       this.uuidFromUrl = params.get('uuid') ?? '';
     });
+    this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
+
     this.spinner.show();
     this.obtenerProductos();
     this.obtenerCatalogos();
@@ -683,6 +690,25 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.location.replaceState(`/dashboard/productos/${p.uuid}`);
     this.inicializarFormEdit(p);
     this.tab1 = 'datos-generales';
+  }
+
+  agregarProduccion() {
+    let produccionDTO = new ProduccionDTO();
+    produccionDTO.actual_role = this.actual_role;
+    produccionDTO.product_uuid = this.selectedProducto.uuid;
+    produccionDTO.production_datetime = "2025-01-01";
+    produccionDTO.quantity = "10";
+    produccionDTO['user->responsible_uuid'] = this.usuarioLogueado.uuid;
+    this.subscription.add(
+      this._produccionService.saveProduccion(produccionDTO).subscribe({
+        next: res => {
+          console.log(res);
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    )
   }
 
 }

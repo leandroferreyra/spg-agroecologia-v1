@@ -1,1 +1,101 @@
-<p>componentes-produccion works!</p>
+<div class="panel pb-4">
+
+    <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
+        <button type="button" ngxTippy="Agregar componente">
+            <icon-plus />
+        </button>
+    </div>
+
+
+    @if (componentes.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee componentes</strong></span>
+    </div>
+    } @else {
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="componentes && componentes.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="componentes && componentes.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ total_rows }}
+            </span>
+        </div>
+    </div>
+
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Orden
+                    </th>
+                    <th>
+                        Nombre
+                    </th>
+                    <th>
+                        Cantidad por producto
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                    <th>
+                        Origen
+                    </th>
+                    <th>
+                        Nota
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of componentes | slice: pageSize | slice: 0:itemsPerPage ; let index = $index; track
+                data.uuid)
+                {
+                <tr>
+                    <td class="whitespace-nowrap"> {{ data.order }} </td>
+                    <td class="whitespace-nowrap"> {{ data.name}} </td>
+                    <td class="whitespace-nowrap"> {{ getCantidad(data) }} </td>
+                    <td class="whitespace-nowrap"> {{ getCantidadTotal(data) }} </td>
+                    <td class="whitespace-nowrap"> {{ data.origin }} </td>
+                    <td class="whitespace-nowrap"> {{ data.note }} </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" ngxTippy="Eliminar">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerComponentesProduccion()" />
+            </div>
+
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerComponentesProduccion()">
+                </ng-select>
+            </div>
+        </div>
+    </div>
+    }
+
+
+</div>

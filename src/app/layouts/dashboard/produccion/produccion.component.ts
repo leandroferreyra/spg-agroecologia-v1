@@ -298,7 +298,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       movimientosEstado: new FormControl({ value: produccion?.production_states, disabled: !this.isEdicion }, [])
     });
     this.onFormEditChange();
-    console.log(this.produccionForm.get('movimientosEstado')?.value);
   }
   onFormEditChange() {
 
