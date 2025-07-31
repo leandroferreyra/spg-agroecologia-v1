@@ -47,6 +47,7 @@ export class IndexService {
   apiParametrosGenerales = '/general_parameters';
   apiMetodosPago = '/payment_methods';
   apiProducciones = '/productions';
+  apiFrozenComponents = '/frozen_components';
 
 
   constructor(private http: HttpClient) { }
@@ -105,7 +106,7 @@ export class IndexService {
                   valueToUse = `${filter.value}%`;
                 }
                 params = params.append(`filters[${filterIndex}][]`, valueToUse);
-              }              
+              }
             }
 
             filterIndex++;
@@ -381,6 +382,11 @@ export class IndexService {
   getProduccionesWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProducciones, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getFrozenComponentsWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiFrozenComponents, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
 }

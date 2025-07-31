@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -35,6 +34,11 @@ import { ProduccionService } from 'src/app/core/services/produccion.service';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
 import { FlatpickrDirective } from 'angularx-flatpickr';
+import { EstadoProduccion } from 'src/app/core/models/enum/estadoProduccion';
+import { TimelineComponent } from './timeline/timeline.component';
+import { ComponentesProduccionComponent } from './componentes-produccion/componentes-produccion.component';
+import { TrazabilidadComponent } from './trazabilidad/trazabilidad.component';
+import { FaltantesComponent } from './faltantes/faltantes.component';
 
 
 @Component({
@@ -42,7 +46,8 @@ import { FlatpickrDirective } from 'angularx-flatpickr';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconPencilComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
-    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, IconSettingsComponent, NgbPaginationModule, FlatpickrDirective],
+    NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, IconSettingsComponent, NgbPaginationModule, FlatpickrDirective,
+    TimelineComponent, ComponentesProduccionComponent, TrazabilidadComponent, FaltantesComponent],
   animations: [toggleAnimation],
   templateUrl: './produccion.component.html',
   styleUrl: './produccion.component.css'
@@ -80,7 +85,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     'operator': { value: '' },
     'product.name': { value: '', op: 'LIKE', contiene: true },
     'batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
-    'frozenComponents.productInstances.serial_number': { value: '', op: 'LIKE', contiene: true },
+    'frozenComponent.productInstance.serial_number': { value: '', op: 'LIKE', contiene: true },
     'productionStates.possibleProductionState.uuid': { value: '', op: 'in', contiene: false },
     'productionStates.datetime_to': { value: '', op: '=', contiene: false },
     'user->responsible.uuid': { value: '', op: 'in', contiene: false }
@@ -118,11 +123,13 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   // measures: any[] = [];
 
   uuidFromUrl: string = '';
-  isLoadingProductos: boolean = true;
+  isLoadingProducciones: boolean = true;
+  tab1: string = 'datos-generales';
 
   placeholderStocks: string = '';
 
   hoveredUuid: string | null = null;
+  estadoProduccion = EstadoProduccion.EN_EJECUCION;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
@@ -166,7 +173,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["product", "batch", "productionStates", "frozenComponents","currentState"];
+    this.params.with = ["product", "creator", "responsible", "currentState", "productionStates.creator"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -176,15 +183,17 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
+          // console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
             this.showProduccionByUuid();
           } else {
-            this.isLoadingProductos = false;
+            this.isLoadingProducciones = false;
             if (this.producciones.length === 0) {
               this.swalService.toastSuccess('center', 'No existen producciones.');
               this.isTabDisabled = true;
+              this.tab1 = 'datos-generales';
               this.selectedProduccion = null;
             } else {
               this.isTabDisabled = false;
@@ -237,11 +246,11 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._produccionService.showProduccion(this.uuidFromUrl, this.actual_role).subscribe({
         next: res => {
           this.showDataProduccion(res.data);
-          this.isLoadingProductos = false;
+          this.isLoadingProducciones = false;
           this.tokenService.setToken(res.token);
         },
         error: error => {
-          // this.isLoadingProductos = false;
+          // this.isLoadingProducciones = false;
           console.error(error);
         }
       })
@@ -277,27 +286,22 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     return ''; // En caso de que no tenga ninguno de los dos
   }
 
-  inicializarFormEdit(producto: any) {
-    this.selectedProduccion = producto;
+  inicializarFormEdit(produccion: any) {
+    this.selectedProduccion = produccion;
+    console.log("🚀 ~ ProduccionComponent ~ inicializarFormEdit ~ this.selectedProduccion:", this.selectedProduccion)
     this.produccionForm = new FormGroup({
-      nombre: new FormControl({ value: producto?.name, disabled: !this.isEdicion }, [Validators.required]),
-      codigo: new FormControl({ value: producto?.code, disabled: !this.isEdicion }, []),
-      tipoProducto: new FormControl({ value: producto?.product_type, disabled: !this.isEdicion }, [Validators.required]),
-      categoria: new FormControl({ value: producto?.product_category?.uuid, disabled: !this.isEdicion }, []),
-      estado: new FormControl({ value: producto?.current_state?.state?.uuid, disabled: !this.isEdicion }, [Validators.required]),
-      estadoComentario: new FormControl({ value: producto?.current_state?.comments, disabled: !this.isEdicion }, []),
-      nomenclatura: new FormControl({ value: producto?.mercosur_nomenclature, disabled: !this.isEdicion }, []),
-      unidad: new FormControl({ value: producto?.measure, disabled: !this.isEdicion }, [Validators.required]),
-      iva: new FormControl({ value: producto?.vat_percent, disabled: !this.isEdicion }, [Validators.required]),
-      pais: new FormControl({ value: producto?.country?.uuid, disabled: !this.isEdicion }, [Validators.required]),
-      asignaNumSerie: new FormControl({ value: producto?.assign_serial_number, disabled: !this.isEdicion }, [Validators.required]),
-      tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: !this.isEdicion }, [Validators.required]),
-      trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
+      producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
+      fechaInicio: new FormControl({ value: this.convertirFechaConHora(produccion?.production_datetime), disabled: !this.isEdicion }, []),
+      cantidad: new FormControl({ value: produccion?.quantity, disabled: !this.isEdicion }, [Validators.required]),
+      responsableCreacion: new FormControl({ value: produccion?.creator?.user_name, disabled: !this.isEdicion }, []),
+      responsableEjecucion: new FormControl({ value: produccion?.responsible?.user_name, disabled: !this.isEdicion }, [Validators.required]),
+      movimientosEstado: new FormControl({ value: produccion?.production_states, disabled: !this.isEdicion }, [])
     });
     this.onFormEditChange();
+    console.log(this.produccionForm.get('movimientosEstado')?.value);
   }
   onFormEditChange() {
-   
+
   }
 
   isFieldDisabled(producto: any) {
@@ -442,10 +446,19 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     //   this.modalProduccion.options = this.modalOptions;
     //   this.modalProduccion.open();
     // } else {
+    // this.tab1 = 'datos-generales';
     //   this.isEdicion = true;
     //   this.tituloModal = 'Edición de producción';
     //   this.inicializarFormEdit(produccion);
     // }
+  }
+
+  convertirFechaConHora(fechaStr: string): string {
+    if (!fechaStr) return '';
+
+    const [fecha, hora] = fechaStr.split(' ');
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}-${mes}-${anio} ${hora}`;
   }
 
   confirmarProduccion(form: FormGroup) {
@@ -615,24 +628,26 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.obtenerProducciones();
   }
 
-  irAlProducto(data: { data: any, event: MouseEvent }) {
-    if (data.event.ctrlKey || data.event.metaKey) {
-      const baseUrl = window.location.origin + window.location.pathname;
-      const url = this.router.serializeUrl(
-        this.router.createUrlTree([`/dashboard/producciones/${data.data.uuid}`])
-      );
-      window.open(`${baseUrl}#${url}`, '_blank');
-    } else {
-      this.produccionAnterior.push(this.selectedProduccion);
-      this.location.replaceState(`/dashboard/producciones/${data.data.uuid}`);
-      this.inicializarFormEdit(data.data);
-    }
-  }
+  // irAlProducto(data: { data: any, event: MouseEvent }) {
+  //   if (data.event.ctrlKey || data.event.metaKey) {
+  //     const baseUrl = window.location.origin + window.location.pathname;
+  //     const url = this.router.serializeUrl(
+  //       this.router.createUrlTree([`/dashboard/producciones/${data.data.uuid}`])
+  //     );
+  //     window.open(`${baseUrl}#${url}`, '_blank');
+  //   } else {
+  //     this.produccionAnterior.push(this.selectedProduccion);
+  //     this.location.replaceState(`/dashboard/producciones/${data.data.uuid}`);
+  //     this.inicializarFormEdit(data.data);
+  //     this.tab1 = 'datos-generales';
+  //   }
+  // }
 
-  volverAProduccionAnterior() {
-    let p = this.produccionAnterior.pop();
-    this.location.replaceState(`/dashboard/producciones/${p.uuid}`);
-    this.inicializarFormEdit(p);
-  }
+  // volverAProduccionAnterior() {
+  //   let p = this.produccionAnterior.pop();
+  //   this.location.replaceState(`/dashboard/producciones/${p.uuid}`);
+  //   this.inicializarFormEdit(p);
+  //   this.tab1 = 'datos-generales';
+  // }
 
 }

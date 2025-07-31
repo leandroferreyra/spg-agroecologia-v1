@@ -1,0 +1,35 @@
+<div class="flex flex-row items-center w-full px-2 py-2 gap-2">
+    <!-- Flecha retroceder -->
+    <button class="text-black text-2xl font-bold disabled:opacity-30" (click)="retroceder()"
+        [disabled]="estadoActualIndex === 0" aria-label="Retroceder">
+        <icon-arrow-left class="rotate-180 mx-auto mb-1 w-5 h-5" />
+    </button>
+
+    <!-- Timeline -->
+    <div class="flex flex-col md:flex-row items-center flex-1">
+        <ng-container *ngFor="let estado of estadosPosibles; let i = index">
+            <!-- Nodo -->
+            <div class="flex flex-col items-center relative mx-2 my-2 shrink-0">
+                <div class="rounded-full bg-white transition-all duration-300 ease-in-out"
+                    [ngClass]="i === estadoActualIndex ? 'w-12 h-12 border-[5px]' : 'w-8 h-8 border-[3px]'"
+                    [style.borderColor]="estado.color"></div>
+
+                <span class="badge text-white text-xs mt-2 px-2 py-0.5 rounded" [style.backgroundColor]="estado.color">
+                    {{ estado.name }}
+                </span>
+            </div>
+
+            <!-- Línea -->
+            <div *ngIf="i < estadosPosibles.length - 1" class="bg-gray-300 mx-1" [ngClass]="{
+          'w-0.5 h-6': true,
+          'md:w-full md:h-0.5': true
+        }"></div>
+        </ng-container>
+    </div>
+
+    <!-- Flecha avanzar -->
+    <button class="text-black text-2xl font-bold disabled:opacity-30" (click)="avanzar()"
+        [disabled]="estadoActualIndex === estadosPosibles.length - 1" aria-label="Avanzar">
+        <icon-arrow-left class="mx-auto mb-1 w-5 h-5" />
+    </button>
+</div>

@@ -32,9 +32,11 @@
                 </button>
             </div>
 
-            <span *ngIf="producciones && producciones.length > 0" class="float-md-end color-gris">
+            @if(producciones) {
+            <span class="float-md-end color-gris">
                 Producciones: {{ total_rows }}
             </span>
+            }
 
             <div class="table-container flex-grow overflow-auto">
                 <div class="table-responsive">
@@ -143,146 +145,140 @@
             </div>
         </div>
 
+        @if(producciones && producciones.length > 0) {
+        <app-timeline [produccion]="selectedProduccion" [estadosPosibles]="estados">
+        </app-timeline>
+        }
 
         <!-- TABS -->
-        <!-- <div class="">
+        <div class="">
+
+            <div class="mt-3 flex flex-wrap">
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{'!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales',
+                                 'cursor-not-allowed tab-disabled': isTabDisabled
+                                }" (click)="!isTabDisabled && (tab1 = 'datos-generales')">
+                    Datos generales
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componentes',
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && (tab1 = 'componentes')">
+                    Componentes
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'trazabilidad',
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && (tab1 = 'trazabilidad')">
+                    Trazabilidad
+                </a>
+
+                <a href="javascript:;"
+                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
+                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'faltantes',
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && (tab1 = 'faltantes')">
+                    Faltantes
+                </a>
+            </div>
+
             <div class="flex-1 text-sm">
-                    @if (producciones.length > 0 && !isLoadingProductos) {
+                <div *ngIf="tab1.toLowerCase() === 'datos-generales'">
+                    @if (producciones.length > 0 && !isLoadingProducciones) {
                     <form [formGroup]="produccionForm" class="p-4">
                         <div class="flex flex-col sm:flex-row">
-                            <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
 
-                                <div (keydown.enter)="confirmarProduccion(produccionForm)">
-                                    <label for="nombre">Nombre</label>
-                                    <input id="nombre" type="text" placeholder="" class="form-control"
-                                        formControlName="nombre" />
-                                </div>
-                                <div (keydown.enter)="confirmarProduccion(produccionForm)">
-                                    <label for="codigo">Código</label>
-                                    <input id="codigo" type="text" placeholder="" class="form-control"
-                                        formControlName="codigo" />
-                                </div>
                                 <div>
-                                    <label for="tipoProducto">Tipo de producto</label>
-                                    <ng-select [items]="tipoProductos" bindLabel="name" clearAllText="Limpiar"
-                                        style="width: 100%" [virtualScroll]="true"
-                                        notFoundText="No hay tipos de producto" placeholder="" [selectOnTab]="true"
-                                        class="w-1/3 min-w-[200px]" formControlName="tipoProducto"></ng-select>
-                                </div>
-                                <div>
-                                    <label for="categoria">Categoría</label>
-                                    <ng-select [items]="categorias" bindLabel="name" bindValue="uuid"
-                                        [selectOnTab]="true" clearAllText="Limpiar" style="width: 100%"
-                                        [virtualScroll]="true" notFoundText="No hay categorías" placeholder=""
-                                        class="w-1/3 min-w-[200px]" formControlName="categoria"></ng-select>
-                                </div>
-                                <div>
-                                    <label for="estado">Estado</label>
-                                    <ng-select [items]="estados" bindLabel="name" bindValue="uuid" [selectOnTab]="true"
-                                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                        notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
-                                        formControlName="estado"></ng-select>
+                                    <label for="producto">Producto</label>
+                                    <input id="producto" type="text" placeholder="" class="form-control"
+                                        formControlName="producto" />
                                 </div>
 
                                 <div>
-                                    <label for="estadoComentario">Comentario del estado</label>
-                                    <textarea class="form-control" id="estadoComentario"
-                                        formControlName="estadoComentario" rows="1"></textarea>
+                                    <label for="cantidad">Cantidad</label>
+                                    <input id="cantidad" type="text" placeholder="" class="form-control"
+                                        formControlName="cantidad" />
                                 </div>
 
                                 <div (keydown.enter)="confirmarProduccion(produccionForm)">
-                                    <label for="nomenclatura">Nomenclatura Mercosur (Pos. Arancelaria)</label>
-                                    <input id="nomenclatura" type="text" placeholder="" class="form-control"
-                                        formControlName="nomenclatura" />
-                                </div>
-                                <div>
-                                    <label for="unidad">Unidad</label>
-                                    <ng-select [items]="measures" bindLabel="name" [selectOnTab]="true"
-                                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                        notFoundText="No hay unidades" placeholder="" class="w-1/3 min-w-[200px]"
-                                        formControlName="unidad"></ng-select>
-                                </div>
-                                <div (keydown.enter)="confirmarProduccion(produccionForm)">
-                                    <label for="iva">IVA (%)</label>
-                                    <input id="iva" type="text" placeholder="" class="form-control"
-                                        formControlName="iva" />
-                                </div>
-
-                                <div>
-                                    <label for="pais">País</label>
-                                    <ng-select [items]="paises" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                        style="width: 100%" [virtualScroll]="true" notFoundText="No hay países"
-                                        [selectOnTab]="true" placeholder="" class="w-1/3 min-w-[200px]"
-                                        formControlName="pais"></ng-select>
-                                </div>
-
-                                <div>
-                                    <label for="comentarios">Comentarios</label>
-                                    <textarea class="form-control" id="comentarios" formControlName="comentarios"
-                                        rows="1"></textarea>
+                                    <label for="fechaInicio">Fecha inicio</label>
+                                    <input id="fechaInicio" type="text" placeholder="" class="form-control"
+                                        formControlName="fechaInicio" />
                                 </div>
 
                                 <div (keydown.enter)="confirmarProduccion(produccionForm)">
-                                    <label for="nombreVenta">Nombre de venta</label>
-                                    <input id="nombreVenta" type="text" placeholder="" class="form-control"
-                                        formControlName="nombreVenta" />
+                                    <label for="responsableCreacion">Responsable de generación</label>
+                                    <input id="responsableCreacion" type="text" placeholder="" class="form-control"
+                                        formControlName="responsableCreacion" />
                                 </div>
 
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="asignaNumSerie" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Asigna número de serie</span>
+                                <div (keydown.enter)="confirmarProduccion(produccionForm)">
+                                    <label for="responsableEjecucion">Responsable de ejecución</label>
+                                    <input id="responsableEjecucion" type="text" placeholder="" class="form-control"
+                                        formControlName="responsableEjecucion" />
                                 </div>
 
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="tieneNumSerie" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Tiene número de serie</span>
-                                </div>
-
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="trazable" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Trazable</span>
-                                </div>
-
-                                <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="vendible" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Vendible</span>
-                                </div>
-
-                                <div>
-                                    <label for="descripcionControl">Descripción control</label>
-                                    <textarea class="form-control" id="descripcionControl"
-                                        formControlName="descripcionControl" rows="1"></textarea>
-                                </div>
                             </div>
                         </div>
+
+
+                        <fieldset class=" mt-4 border border-gray-300 rounded p-4 md:col-span-2">
+                            <legend class="text-lg font-semibold flex justify-between items-center">
+                                <span class="flex items-center gap-2">
+                                    Movimientos
+                                    <!-- <button type="button" class="hover:text-primary"
+                                        (click)="openModalComprobante('NEW')">
+                                        <icon-plus />
+                                    </button> -->
+                                </span>
+                                <!-- <button type="button" (click)="toggleComprobantes()" class="text-sm hover:underline"
+                                    style="color:#000000a3" [ngxTippy]="getMostrarOcultarComprobantesTooltip()">
+                                    <fa-icon [icon]="mostrarComprobantes ? iconEyeSlash : iconEye"
+                                        style="cursor: pointer;"></fa-icon>
+                                </button> -->
+                            </legend>
+                            @if (produccionForm.get('movimientosEstado')?.value?.length > 0) {
+                            <div class="mt-4">
+                                <div class="table-responsive">
+                                    <table class="table-hover">
+                                        <thead class="bg-gray-100">
+                                            <tr>
+                                                <th class="px-2 py-1">Fecha</th>
+                                                <th class="px-2 py-1">Estado</th>
+                                                <th class="px-2 py-1">Usuario</th>
+                                                <th class="px-2 py-1">Justificación</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for(data of produccionForm.get('movimientosEstado')?.value; track
+                                            data.uuid) {
+                                            <tr>
+                                                <td class="border px-2 py-1">{{
+                                                    convertirFechaConHora(data.datetime_from) }}</td>
+                                                <td class="border px-2 py-1">{{ data.state?.name}}</td>
+                                                <td class="border px-2 py-1">{{ data.creator?.user_name }}</td>
+                                                <td class="border px-2 py-1">{{ data.justification }}</td>
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            } @else {
+                            <div
+                                class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+                                <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee
+                                        movimientos</strong></span>
+                            </div>
+                            }
+                        </fieldset>
 
                         @if (isEdicion) {
                         <div class="row mt-3">
@@ -297,8 +293,25 @@
 
                     </form>
                     }
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'componentes'">
+                    <app-componentes-produccion [produccion]="selectedProduccion" [rol]="actual_role">
+                    </app-componentes-produccion>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'trazabilidad'">
+                    <app-trazabilidad [produccion]="selectedProduccion" [rol]="actual_role">
+                    </app-trazabilidad>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'faltantes'">
+                    <app-faltantes [produccion]="selectedProduccion" [rol]="actual_role">
+                    </app-faltantes>
+                </div>
+
             </div>
-        </div> -->
+        </div>
 
     </div>
 
@@ -492,7 +505,7 @@
                             <div class="flex-grow-1">
                                 <label for="serie">Número de serie</label>
                                 <input type="text" id="serie" class="form-control"
-                                    [(ngModel)]="filtros['frozenComponents.productInstances.serial_number'].value"
+                                    [(ngModel)]="filtros['frozenComponent.productInstance.serial_number'].value"
                                     (input)="obtenerProduccionesPorFiltroAvanzado()">
                             </div>
 
