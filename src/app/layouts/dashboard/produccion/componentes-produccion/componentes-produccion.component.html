@@ -69,7 +69,17 @@
                     <td>
                         <div class="flex items-center">
                             <div>
-                                <button type="button" ngxTippy="Eliminar">
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
+                                    <icon-pencil />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Reemplazar">
+                                    <icon-refresh />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                     <icon-trash-lines />
                                 </button>
                             </div>

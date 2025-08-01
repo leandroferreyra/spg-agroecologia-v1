@@ -136,7 +136,7 @@
             <div class="flex items-center gap-2 ml-auto">
                 @if (esProducible(selectedProducto)) {
                 <button type="button" ngxTippy="Producir" (click)="openModalProduccion()">
-                    <icon-producir />
+                    <icon-settings />
                 </button>
                 }
                 <button type="button" ngxTippy="Editar" (click)="openModalProducto('EDIT', selectedProducto)">
@@ -758,13 +758,6 @@
                             <label for="cantidad">Cantidad</label>
                             <input id="cantidad" type="text" placeholder="" class="form-control"
                                 formControlName="cantidad" />
-                        </div>
-
-                        <div (keydown.enter)="confirmarProduccion()"
-                            [ngClass]="isSubmit ? produccionForm.controls['justificacion'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="justificacion">Justificación</label>
-                            <textarea class="form-control" id="justificacion" formControlName="justificacion"
-                                rows="1"></textarea>
                         </div>
 
                     </div>
