@@ -1,4 +1,4 @@
-import { CommonModule, provideImageKitLoader } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, RequiredValidator } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -41,12 +41,13 @@ import { ComprasProductoComponent } from './compras-producto/compras-producto.co
 import { VinculosComponent } from './vinculos/vinculos.component';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Route, Router } from '@angular/router';
-import { Title } from '@angular/platform-browser';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconProducirComponent } from 'src/app/shared/icon/icon-producir';
 import { ProduccionService } from 'src/app/core/services/produccion.service';
 import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
+import { format } from 'date-fns';
+import { FlatpickrDirective } from 'angularx-flatpickr';
 
 @Component({
   selector: 'app-productos',
@@ -55,7 +56,8 @@ import { UserLoggedService } from 'src/app/core/services/user-logged.service';
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconPencilComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
-    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent, IconProducirComponent
+    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent, IconProducirComponent,
+    FlatpickrDirective
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -73,6 +75,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   productoAnterior: any[] = [];
   productoForm!: FormGroup;
   newProductoForm!: FormGroup;
+  produccionForm!: FormGroup;
 
   isEdicion: boolean = false;
   isShowMailMenu = false;
@@ -92,9 +95,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
     'name': { value: '', op: 'LIKE', contiene: true },
     'code': { value: '', op: 'LIKE', contiene: true },
     'productType.uuid': { value: '', op: '=', contiene: false },
+    'productType.can_be_produced': { value: '', op: '=', contiene: false },
     'productCategory.uuid': { value: '', op: '=', contiene: false },
     'productStates.possibleProductState.uuid': { value: '', op: '=', contiene: false },
-    // 'productStates.datetime_to': { value: '', op: '=', contiene: false },
     'mercosur_nomenclature': { value: '', op: 'LIKE', contiene: true },
     'measure.uuid': { value: '', op: '=', contiene: false },
     'stocks.batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
@@ -116,6 +119,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
+  @ViewChild('modalProduccion') modalProduccion!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -658,6 +662,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.filtros['name'].value = '';
     this.filtros['code'].value = '';
     this.filtros['productType.uuid'].value = '';
+    this.filtros['productType.can_be_produced'].value = '';
     this.filtros['productCategory.uuid'].value = '';
     this.filtros['mercosur_nomenclature'].value = '';
     this.filtros['measure.uuid'].value = '';
@@ -692,23 +697,63 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.tab1 = 'datos-generales';
   }
 
-  agregarProduccion() {
-    let produccionDTO = new ProduccionDTO();
-    produccionDTO.actual_role = this.actual_role;
-    produccionDTO.product_uuid = this.selectedProducto.uuid;
-    produccionDTO.production_datetime = "2025-01-01";
-    produccionDTO.quantity = "10";
-    produccionDTO['user->responsible_uuid'] = this.usuarioLogueado.uuid;
-    this.subscription.add(
-      this._produccionService.saveProduccion(produccionDTO).subscribe({
-        next: res => {
-          console.log(res);
-        },
-        error: error => {
-          console.error(error);
-        }
-      })
-    )
+  openModalProduccion() {
+    this.tituloModal = 'Nueva producción';
+    this.inicializarFormProduccion();
+    this.modalProduccion.options = this.modalOptions;
+    this.modalProduccion.open();
   }
+  cerrarModalProduccion() {
+    this.isSubmit = false;
+    this.modalProduccion.close();
+  }
+
+  inicializarFormProduccion() {
+    this.produccionForm = new FormGroup({
+      cantidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      fecha: new FormControl({ value: null, disabled: false }, [Validators.required]),
+    });
+    this.onFormEditChange();
+  }
+
+  esProducible(producto: any) {
+    return producto?.product_type?.can_be_produced === 1;
+  }
+
+  confirmarProduccion() {
+    this.isSubmit = true;
+    if (this.produccionForm.valid) {
+      this.spinner.show();
+      let produccionDTO = new ProduccionDTO();
+      produccionDTO.actual_role = this.actual_role;
+      produccionDTO.product_uuid = this.selectedProducto.uuid;
+      const fechaFormateada = this.produccionForm.get('fecha')?.value instanceof Date
+        ? format(this.produccionForm.get('fecha')?.value, 'yyyy-MM-dd')
+        : this.produccionForm.get('fecha')?.value;
+      produccionDTO.production_datetime = this.convertirFechaADateBackend(fechaFormateada);
+      produccionDTO.quantity = this.produccionForm.get('cantidad')?.value;
+      produccionDTO['user->responsible_uuid'] = this.usuarioLogueado.uuid;
+      this.subscription.add(
+        this._produccionService.saveProduccion(produccionDTO).subscribe({
+          next: res => {
+            this.tokenService.setToken(res.token);
+            this.cerrarModalProduccion();
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+            this.swalService.toastError('top-right', error.error.message);
+          }
+        })
+      )
+    }
+  }
+
+  convertirFechaADateBackend(fechaStr: string): string {
+    const [dia, mes, anio] = fechaStr.split('-');
+    return `${anio}-${mes}-${dia}`;
+  }
+
 
 }
