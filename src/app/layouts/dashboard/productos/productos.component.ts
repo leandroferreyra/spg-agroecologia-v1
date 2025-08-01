@@ -712,6 +712,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.produccionForm = new FormGroup({
       cantidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
       fecha: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      justificacion: new FormControl({ value: null, disabled: false }, []),
     });
     this.onFormEditChange();
   }
@@ -733,6 +734,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       produccionDTO.production_datetime = this.convertirFechaADateBackend(fechaFormateada);
       produccionDTO.quantity = this.produccionForm.get('cantidad')?.value;
       produccionDTO['user->responsible_uuid'] = this.usuarioLogueado.uuid;
+      produccionDTO.justification = this.produccionForm.get('justificacion')?.value;
       this.subscription.add(
         this._produccionService.saveProduccion(produccionDTO).subscribe({
           next: res => {

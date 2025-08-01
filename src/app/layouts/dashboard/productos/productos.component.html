@@ -760,6 +760,13 @@
                                 formControlName="cantidad" />
                         </div>
 
+                        <div (keydown.enter)="confirmarProduccion()"
+                            [ngClass]="isSubmit ? produccionForm.controls['justificacion'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="justificacion">Justificación</label>
+                            <textarea class="form-control" id="justificacion" formControlName="justificacion"
+                                rows="1"></textarea>
+                        </div>
+
                     </div>
                 </div>
             </form>
