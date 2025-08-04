@@ -146,7 +146,8 @@
         </div>
 
         @if(producciones && producciones.length > 0) {
-        <app-timeline [produccion]="selectedProduccion" [estadosPosibles]="estados">
+        <app-timeline [produccion]="selectedProduccion" [estadosPosibles]="estados"
+            (eventTimeline)="changeEstadoProduccion($event)">
         </app-timeline>
         }
 
@@ -207,10 +208,20 @@
                                         formControlName="cantidad" />
                                 </div>
 
-                                <div (keydown.enter)="confirmarProduccion(produccionForm)">
+                                <!-- <div (keydown.enter)="confirmarProduccion(produccionForm)">
                                     <label for="fechaInicio">Fecha inicio</label>
                                     <input id="fechaInicio" type="text" placeholder="" class="form-control"
                                         formControlName="fechaInicio" />
+                                </div> -->
+
+                                <div>
+                                    <label>Fecha de inicio</label>
+                                    <input type="text" mwlFlatpickr [options]="{ 
+                                                enableTime: false, 
+                                                dateFormat: 'd-m-Y',
+                                                time24hr: true,
+                                                enableSeconds: false
+                                            }" class="form-input" formControlName="fechaInicio" />
                                 </div>
 
                                 <div (keydown.enter)="confirmarProduccion(produccionForm)">
@@ -219,10 +230,19 @@
                                         formControlName="responsableCreacion" />
                                 </div>
 
-                                <div (keydown.enter)="confirmarProduccion(produccionForm)">
+                                <!-- <div (keydown.enter)="confirmarProduccion(produccionForm)">
                                     <label for="responsableEjecucion">Responsable de ejecución</label>
                                     <input id="responsableEjecucion" type="text" placeholder="" class="form-control"
                                         formControlName="responsableEjecucion" />
+                                </div> -->
+
+                                <div class="flex-grow-1">
+                                    <label for="usuarios">Responsable de ejecución</label>
+                                    <ng-select [items]="usuarios" bindLabel="user_name" bindValue="uuid"
+                                        clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                        notFoundText="No hay usuarios" class="w-1/3 min-w-[200px]"
+                                        formControlName="responsableEjecucion">
+                                    </ng-select>
                                 </div>
 
                             </div>

@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { ProductoDTO } from '../models/request/productoDTO';
 import { ProduccionDTO } from '../models/request/produccionDTO';
+import { ProduccionEstadoDTO } from '../models/request/produccionEstadoDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +21,15 @@ export class ProduccionService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiProduccion, JSON.stringify(produccion), { headers });
   }
 
-  // editProducto(uuid: string, producto: ProductoDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.put<AuthResponse>(environment.baseUrl + this.apiProduccion + '/' + uuid, JSON.stringify(producto), { headers });
-  // }
+  editProduccion(uuid: string, produccion: ProduccionDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiProduccion + '/' + uuid, JSON.stringify(produccion), { headers });
+  }
+
+  editEstadoProduccion(uuid: string, produccion: ProduccionEstadoDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiProduccion + '/' + uuid, JSON.stringify(produccion), { headers });
+  }
 
   deleteProduccion(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

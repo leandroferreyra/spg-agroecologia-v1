@@ -39,6 +39,8 @@ import { TimelineComponent } from './timeline/timeline.component';
 import { ComponentesProduccionComponent } from './componentes-produccion/componentes-produccion.component';
 import { TrazabilidadComponent } from './trazabilidad/trazabilidad.component';
 import { FaltantesComponent } from './faltantes/faltantes.component';
+import { ProduccionEstadoDTO } from 'src/app/core/models/request/produccionEstadoDTO';
+import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
 
 
 @Component({
@@ -200,7 +202,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
             }
             if (!alta && this.producciones.length > 0) {
               this.isEdicion = false;
-              this.inicializarFormEdit(this.producciones[0]);
+              this.inicializarForm(this.producciones[0]);
               this.location.replaceState(`/dashboard/producciones/${this.producciones[0].uuid}`);
             }
           }
@@ -286,16 +288,16 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     return ''; // En caso de que no tenga ninguno de los dos
   }
 
-  inicializarFormEdit(produccion: any) {
+  inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
-    console.log("🚀 ~ ProduccionComponent ~ inicializarFormEdit ~ this.selectedProduccion:", this.selectedProduccion)
+    console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
       fechaInicio: new FormControl({ value: this.convertirFechaConHora(produccion?.production_datetime), disabled: !this.isEdicion }, []),
-      cantidad: new FormControl({ value: produccion?.quantity, disabled: !this.isEdicion }, [Validators.required]),
-      responsableCreacion: new FormControl({ value: produccion?.creator?.user_name, disabled: !this.isEdicion }, []),
-      responsableEjecucion: new FormControl({ value: produccion?.responsible?.user_name, disabled: !this.isEdicion }, [Validators.required]),
-      movimientosEstado: new FormControl({ value: produccion?.production_states, disabled: !this.isEdicion }, [])
+      cantidad: new FormControl({ value: produccion?.quantity, disabled: true }, [Validators.required]),
+      responsableCreacion: new FormControl({ value: produccion?.creator?.user_name, disabled: true }, []),
+      responsableEjecucion: new FormControl({ value: produccion?.responsible?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      movimientosEstado: new FormControl({ value: produccion?.production_states, disabled: true }, [])
     });
     this.onFormEditChange();
   }
@@ -316,73 +318,71 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
-  inicializarFormNew() {
-    this.newProduccionForm = new FormGroup({
-      nombre: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      codigo: new FormControl({ value: null, disabled: false }, []),
-      tipoProducto: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      categoria: new FormControl({ value: null, disabled: false }, []),
-      estado: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      estadoComentario: new FormControl({ value: null, disabled: false }, []),
-      nomenclatura: new FormControl({ value: null, disabled: false }, []),
-      pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      comentarios: new FormControl({ value: null, disabled: false }, []),
-      nombreVenta: new FormControl({ value: null, disabled: false }, []),
-      descripcionControl: new FormControl({ value: null, disabled: false }, []),
-      asignaNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      stock_minimum: new FormControl({ value: null, disabled: true }, []),
-      stock_optimum: new FormControl({ value: null, disabled: true }, [])
-    });
-    this.onNewForm();
-  }
-  onNewForm() {
-    this.newProduccionForm.get('tipoProducto')!.valueChanges.subscribe(
-      (value) => {
-        if (value && value.stock_controlled === 1) {
-          this.newProduccionForm.get('stock_minimum')?.enable();
-          this.newProduccionForm.get('stock_optimum')?.enable();
-          this.newProduccionForm.get('stock_minimum')?.setValidators(Validators.required)
-          this.newProduccionForm.get('stock_optimum')?.setValidators(Validators.required)
-        } else {
-          this.placeholderStocks = '';
-          this.newProduccionForm.get('stock_minimum')?.setValue(null);
-          this.newProduccionForm.get('stock_optimum')?.setValue(null);
-          this.newProduccionForm.get('stock_minimum')?.disable();
-          this.newProduccionForm.get('stock_optimum')?.disable();
-          this.newProduccionForm.get('stock_minimum')?.clearValidators();
-          this.newProduccionForm.get('stock_optimum')?.clearValidators();
-        }
-        ['stock_minimum', 'stock_optimum'].forEach((field) => {
-          this.newProduccionForm.get(field)?.updateValueAndValidity({ emitEvent: false });
-        });
-      });
+  // inicializarFormNew() {
+  //   this.newProduccionForm = new FormGroup({
+  //     nombre: new FormControl({ value: null, disabled: false }, [Validators.required]),
+  //     codigo: new FormControl({ value: null, disabled: false }, []),
+  //     tipoProducto: new FormControl({ value: null, disabled: false }, [Validators.required]),
+  //     categoria: new FormControl({ value: null, disabled: false }, []),
+  //     estado: new FormControl({ value: null, disabled: false }, [Validators.required]),
+  //     estadoComentario: new FormControl({ value: null, disabled: false }, []),
+  //     nomenclatura: new FormControl({ value: null, disabled: false }, []),
+  //     pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
+  //     unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
+  //     iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
+  //     comentarios: new FormControl({ value: null, disabled: false }, []),
+  //     nombreVenta: new FormControl({ value: null, disabled: false }, []),
+  //     descripcionControl: new FormControl({ value: null, disabled: false }, []),
+  //     asignaNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
+  //     tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
+  //     trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
+  //     vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
+  //     stock_minimum: new FormControl({ value: null, disabled: true }, []),
+  //     stock_optimum: new FormControl({ value: null, disabled: true }, [])
+  //   });
+  //   this.onNewForm();
+  // }
+  // onNewForm() {
+  //   this.newProduccionForm.get('tipoProducto')!.valueChanges.subscribe(
+  //     (value) => {
+  //       if (value && value.stock_controlled === 1) {
+  //         this.newProduccionForm.get('stock_minimum')?.enable();
+  //         this.newProduccionForm.get('stock_optimum')?.enable();
+  //         this.newProduccionForm.get('stock_minimum')?.setValidators(Validators.required)
+  //         this.newProduccionForm.get('stock_optimum')?.setValidators(Validators.required)
+  //       } else {
+  //         this.placeholderStocks = '';
+  //         this.newProduccionForm.get('stock_minimum')?.setValue(null);
+  //         this.newProduccionForm.get('stock_optimum')?.setValue(null);
+  //         this.newProduccionForm.get('stock_minimum')?.disable();
+  //         this.newProduccionForm.get('stock_optimum')?.disable();
+  //         this.newProduccionForm.get('stock_minimum')?.clearValidators();
+  //         this.newProduccionForm.get('stock_optimum')?.clearValidators();
+  //       }
+  //       ['stock_minimum', 'stock_optimum'].forEach((field) => {
+  //         this.newProduccionForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+  //       });
+  //     });
 
-    this.newProduccionForm.get('unidad')!.valueChanges.subscribe(
-      (value) => {
-        if (value) {
-          this.placeholderStocks = 'Cantidad en ' + value.name;
-        } else {
-          this.placeholderStocks = '';
-        }
-      });
-  }
+  //   this.newProduccionForm.get('unidad')!.valueChanges.subscribe(
+  //     (value) => {
+  //       if (value) {
+  //         this.placeholderStocks = 'Cantidad en ' + value.name;
+  //       } else {
+  //         this.placeholderStocks = '';
+  //       }
+  //     });
+  // }
 
-  showDataProduccion(producto: any) {
+  showDataProduccion(produccion: any) {
     this.produccionAnterior = [];
     this.isEdicion = false;
-    this.location.replaceState(`/dashboard/producciones/${producto.uuid}`);
-    this.inicializarFormEdit(producto);
+    this.location.replaceState(`/dashboard/producciones/${produccion.uuid}`);
+    this.uuidFromUrl = produccion.uuid;
+    this.inicializarForm(produccion);
   }
 
-  cancelarEdicion() {
-    this.isEdicion = false;
-    this.inicializarFormEdit(this.selectedProduccion);
-  }
+
 
   openSwalEliminar(data: any) {
     Swal.fire({
@@ -438,18 +438,23 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // if (type === 'NEW') {
     //   if (this.isEdicion) {
     //     this.isEdicion = false;
-    //     this.inicializarFormEdit(this.selectedProduccion); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
+    //     this.inicializarForm(this.selectedProduccion); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
     //   }
     //   this.tituloModal = 'Nueva producción';
     //   this.inicializarFormNew();
     //   this.modalProduccion.options = this.modalOptions;
     //   this.modalProduccion.open();
     // } else {
-    // this.tab1 = 'datos-generales';
-    //   this.isEdicion = true;
-    //   this.tituloModal = 'Edición de producción';
-    //   this.inicializarFormEdit(produccion);
+    this.tab1 = 'datos-generales';
+    this.isEdicion = true;
+    // this.tituloModal = 'Edición de producción';
+    this.inicializarForm(produccion);
     // }
+  }
+
+  cancelarEdicion() {
+    this.isEdicion = false;
+    this.inicializarForm(this.selectedProduccion);
   }
 
   convertirFechaConHora(fechaStr: string): string {
@@ -463,40 +468,15 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   confirmarProduccion(form: FormGroup) {
     this.isSubmit = true;
     if (form.valid) {
-      if ((form.get('asignaNumSerie')?.value === 1 || form.get('asignaNumSerie')?.value === true) &&
-        (form.get('tieneNumSerie')?.value === 1 || form.get('tieneNumSerie')?.value === true)) {
-        this.swalService.toastError('top-right', 'No es posible asignar y tener número de serie al mismo tiempo.');
-        return;
-      }
-      this.spinner.show();
-      let producto = new ProductoDTO();
-      this.armarDTOProducto(producto, form);
-      if (!this.isEdicion) {
+      if (!form.pristine) {
+        this.spinner.show();
+        let produccion = new ProduccionDTO();
+        this.armarDTOProduccion(produccion, form);
         this.subscription.add(
-          this._productoService.saveProducto(producto).subscribe({
+          this._produccionService.editProduccion(this.selectedProduccion.uuid, produccion).subscribe({
             next: res => {
-              this.spinner.hide();
-              this.obtenerProducciones(true);
-              this.cerrarModal();
-              this.showDataProduccion(res.data);
-            },
-            error: error => {
-              this.spinner.hide();
-              this.swalService.toastError('top-right', error.error.message)
-              console.error(error);
-            }
-          })
-        )
-      } else {
-        this.subscription.add(
-          this._productoService.editProducto(this.selectedProduccion.uuid, producto).subscribe({
-            next: res => {
-              this.producciones = [...this.producciones.map(p =>
-                p.uuid === res.data.uuid ? res.data : p
-              )];
               this.isEdicion = false;
-              this.inicializarFormEdit(res.data);
-              this.swalService.toastSuccess('top-right', "Producto actualizado.");
+              this.showProduccionByUuid(); // chequear si esto actualiza el panel de la izquierda.
               this.spinner.hide();
             },
             error: error => {
@@ -506,41 +486,20 @@ export class ProduccionComponent implements OnInit, OnDestroy {
             }
           })
         )
+      } else {
+        this.swalService.toastInfo('top-right', 'El formulario no se modificó.');
       }
+    } else {
+      this.swalService.toastError('top-right', 'Formulario inválido.');
     }
   }
 
-  armarDTOProducto(producto: ProductoDTO, form: FormGroup) {
-    // producto.actual_role = this.actual_role;
-    // producto.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
-    // producto.name = form.get('nombre')?.value;
-    // producto.code = form.get('codigo')?.value;
-    // producto.product_type_uuid = form.get('tipoProducto')?.value.uuid;
-    // producto.product_category_uuid = form.get('categoria')?.value;
-    // let estadoProducto = new ProductState();
-    // estadoProducto.possible_product_state_uuid = form.get('estado')?.value;
-    // estadoProducto.comments = form.get('estadoComentario')?.value;
-    // producto.product_state = estadoProducto;
-    // producto.comments = form.get('comentarios')?.value;
-    // producto.measure_uuid = form.get('unidad')?.value.uuid;
-    // producto.vat_percent = form.get('iva')?.value;
-    // producto.country_uuid = form.get('pais')?.value;
-    // producto.mercosur_nomenclature = form.get('nomenclatura')?.value;
-    // producto.assign_serial_number = form.get('asignaNumSerie')?.value;
-    // producto.has_serial_number = form.get('tieneNumSerie')?.value;
-    // producto.traceable = form.get('trazable')?.value;
-    // producto.salable = form.get('vendible')?.value;
-    // producto.sales_name = form.get('nombreVenta')?.value;
-    // producto.control_description = form.get('descripcionControl')?.value;
-    // if (form.get('tipoProducto')?.value?.stock_controlled === 1) {
-    //   if (form.get('unidad')?.value?.is_integer === 1) {
-    //     producto.minimum = +(+form.get('stock_minimum')?.value)?.toFixed(0);
-    //     producto.optimum = +(+form.get('stock_optimum')?.value)?.toFixed(0);
-    //   } else {
-    //     producto.minimum = +(+form.get('stock_minimum')?.value)?.toFixed(2);
-    //     producto.optimum = +(+form.get('stock_optimum')?.value)?.toFixed(2);
-    //   }
-    // }
+  armarDTOProduccion(produccion: ProduccionDTO, form: FormGroup) {
+    produccion.actual_role = this.actual_role;
+    produccion['user->responsible_uuid'] = form.get('responsableEjecucion')?.value;
+    if (!form.get('fechaInicio')?.pristine) {
+      produccion.production_datetime = this.convertirFechaADateBackend(form.get('fechaInicio')?.value);
+    }
     // if (!this.isEdicion) {
     //   this.cleanObject(producto);
     // }
@@ -627,6 +586,50 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.obtenerProducciones();
   }
 
+
+
+  async changeEstadoProduccion(event: any) {
+    const { value: text, isConfirmed } = await Swal.fire({
+      input: "textarea",
+      inputLabel: "Cambio de estado",
+      inputPlaceholder: "Escriba la justificación acá de ser necesario...",
+      inputAttributes: {
+        "aria-label": "Escriba la justificación acá de ser necesario..."
+      },
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar',
+      confirmButtonText: 'Confirmar'
+    });
+    if (isConfirmed) {
+      this.confirmarCambioEstado(event, text);
+    }
+  }
+
+  confirmarCambioEstado(event: any, justificacion: string) {
+    this.spinner.show();
+    let produccionEstadoDTO = new ProduccionEstadoDTO();
+    produccionEstadoDTO.actual_role = this.actual_role;
+    produccionEstadoDTO.justification = justificacion;
+    produccionEstadoDTO.production_state = event;
+    this.subscription.add(
+      this._produccionService.editEstadoProduccion(this.selectedProduccion.uuid, produccionEstadoDTO).subscribe({
+        next: res => {
+          console.log(res);
+          this.showProduccionByUuid();
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.log(error);
+          this.spinner.hide();
+          this.swalService.toastError('top-right', error.error.message);
+        },
+      })
+    )
+  }
+
+
+
   // irAlProducto(data: { data: any, event: MouseEvent }) {
   //   if (data.event.ctrlKey || data.event.metaKey) {
   //     const baseUrl = window.location.origin + window.location.pathname;
@@ -637,7 +640,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   //   } else {
   //     this.produccionAnterior.push(this.selectedProduccion);
   //     this.location.replaceState(`/dashboard/producciones/${data.data.uuid}`);
-  //     this.inicializarFormEdit(data.data);
+  //     this.inicializarForm(data.data);
   //     this.tab1 = 'datos-generales';
   //   }
   // }
@@ -645,7 +648,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   // volverAProduccionAnterior() {
   //   let p = this.produccionAnterior.pop();
   //   this.location.replaceState(`/dashboard/producciones/${p.uuid}`);
-  //   this.inicializarFormEdit(p);
+  //   this.inicializarForm(p);
   //   this.tab1 = 'datos-generales';
   // }
 

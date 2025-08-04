@@ -454,6 +454,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.productoAnterior = [];
     this.isEdicion = false;
     this.location.replaceState(`/dashboard/productos/${producto.uuid}`);
+    this.uuidFromUrl = producto.uuid;
     this.inicializarFormEdit(producto);
   }
 

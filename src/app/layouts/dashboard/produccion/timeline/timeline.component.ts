@@ -1,9 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { EstadoProduccion } from 'src/app/core/models/enum/estadoProduccion';
 import { IconArrowBackwardComponent } from 'src/app/shared/icon/icon-arrow-backward';
 import { IconArrowForwardComponent } from 'src/app/shared/icon/icon-arrow-forward';
 import { IconArrowLeftComponent } from 'src/app/shared/icon/icon-arrow-left';
+
+export enum TimelineDirection {
+  NEXT = 'next',
+  PREVIOUS = 'previous',
+}
 
 @Component({
   selector: 'app-timeline',
@@ -16,6 +21,9 @@ export class TimelineComponent implements OnInit {
 
   @Input() produccion: any;
   @Input() estadosPosibles: any;
+
+  @Output() eventTimeline = new EventEmitter<any>();
+  timelineDirection = TimelineDirection
 
   constructor() {
   }
@@ -40,16 +48,8 @@ export class TimelineComponent implements OnInit {
     return this.estadosPosibles.findIndex((e: any) => e.name === this.produccion?.current_state?.state?.name);
   }
 
-  avanzar() {
-    // if (this.estadoActualIndex < this.estadosPosibles.length - 1) {
-    //   this.estadoActual = this.estadosPosibles[this.estadoActualIndex + 1].nombre;
-    // }
-  }
-
-  retroceder() {
-    // if (this.estadoActualIndex > 0) {
-    //   this.estadoActual = this.estadosPosibles[this.estadoActualIndex - 1].nombre;
-    // }
+  changeEstado(direction: TimelineDirection = TimelineDirection.NEXT) {
+    this.eventTimeline.emit(direction);
   }
 
 }

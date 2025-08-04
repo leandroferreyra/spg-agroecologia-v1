@@ -1,6 +1,6 @@
 <div class="flex flex-row items-center w-full px-2 py-2 gap-2">
     <!-- Flecha retroceder -->
-    <button class="text-black text-2xl font-bold disabled:opacity-30" (click)="retroceder()"
+    <button class="text-black text-2xl font-bold disabled:opacity-30" (click)="changeEstado(timelineDirection.PREVIOUS)"
         [disabled]="estadoActualIndex === 0" aria-label="Retroceder">
         <icon-arrow-left class="rotate-180 mx-auto mb-1 w-5 h-5" />
     </button>
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Flecha avanzar -->
-    <button class="text-black text-2xl font-bold disabled:opacity-30" (click)="avanzar()"
+    <button class="text-black text-2xl font-bold disabled:opacity-30" (click)="changeEstado(timelineDirection.NEXT)"
         [disabled]="estadoActualIndex === estadosPosibles.length - 1" aria-label="Avanzar">
         <icon-arrow-left class="mx-auto mb-1 w-5 h-5" />
     </button>
