@@ -41,6 +41,7 @@ import { TrazabilidadComponent } from './trazabilidad/trazabilidad.component';
 import { FaltantesComponent } from './faltantes/faltantes.component';
 import { ProduccionEstadoDTO } from 'src/app/core/models/request/produccionEstadoDTO';
 import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
+import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 
 
 @Component({
@@ -63,7 +64,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   actual_role: string = '';
   producciones: any[] = [];
   selectedProduccion: any;
-
+  usuarioLogueado: any;
   produccionAnterior: any[] = [];
   produccionForm!: FormGroup;
   newProduccionForm!: FormGroup;
@@ -134,7 +135,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   estadoProduccion = EstadoProduccion.EN_EJECUCION;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
-    private _productoService: ProductoService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
+    private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
     private tokenService: TokenService, private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute,
     private router: Router
   ) {
@@ -165,6 +166,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(params => {
       this.uuidFromUrl = params.get('uuid') ?? '';
     });
+    this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.spinner.show();
     this.obtenerProducciones();
     this.obtenerCatalogos();
@@ -592,6 +594,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
 
   async changeEstadoProduccion(event: any) {
+    // console.log(this.selectedProduccion);
+    // console.log(this.usuarioLogueado);
     const { value: text, isConfirmed } = await Swal.fire({
       input: "textarea",
       inputLabel: "Cambio de estado",
@@ -601,7 +605,13 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       },
       showCancelButton: true,
       cancelButtonText: 'Cancelar',
-      confirmButtonText: 'Confirmar'
+      confirmButtonText: 'Confirmar',
+      inputValidator: (value) => {
+        if (this.selectedProduccion?.creator?.user_name !== this.usuarioLogueado.user_name && !value) {
+          return 'La justificación es requerida';
+        }
+        return null;
+      },
     });
     if (isConfirmed) {
       this.confirmarCambioEstado(event, text);
