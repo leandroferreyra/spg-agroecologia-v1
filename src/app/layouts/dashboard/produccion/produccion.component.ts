@@ -476,7 +476,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
           this._produccionService.editProduccion(this.selectedProduccion.uuid, produccion).subscribe({
             next: res => {
               this.isEdicion = false;
-              this.showProduccionByUuid(); // chequear si esto actualiza el panel de la izquierda.
+              this.obtenerProducciones(false);
               this.spinner.hide();
             },
             error: error => {
@@ -615,7 +615,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._produccionService.editEstadoProduccion(this.selectedProduccion.uuid, produccionEstadoDTO).subscribe({
         next: res => {
           console.log(res);
-          this.showProduccionByUuid();
+          this.obtenerProducciones(false);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
         },
