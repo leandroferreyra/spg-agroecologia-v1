@@ -290,7 +290,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
-    console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
+    // console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
       fechaInicio: new FormControl({ value: this.convertirFechaConHora(produccion?.production_datetime), disabled: !this.isEdicion }, []),
@@ -375,6 +375,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   // }
 
   showDataProduccion(produccion: any) {
+    // if (produccion.uuid === this.uuidFromUrl) {
+    //   return ;
+    // }
     this.produccionAnterior = [];
     this.isEdicion = false;
     this.location.replaceState(`/dashboard/producciones/${produccion.uuid}`);
