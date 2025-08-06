@@ -13,10 +13,8 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription, forkJoin } from 'rxjs';
-import { ProductoDTO, ProductState } from 'src/app/core/models/request/productoDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
-import { ProductoService } from 'src/app/core/services/producto.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
@@ -320,62 +318,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
-  // inicializarFormNew() {
-  //   this.newProduccionForm = new FormGroup({
-  //     nombre: new FormControl({ value: null, disabled: false }, [Validators.required]),
-  //     codigo: new FormControl({ value: null, disabled: false }, []),
-  //     tipoProducto: new FormControl({ value: null, disabled: false }, [Validators.required]),
-  //     categoria: new FormControl({ value: null, disabled: false }, []),
-  //     estado: new FormControl({ value: null, disabled: false }, [Validators.required]),
-  //     estadoComentario: new FormControl({ value: null, disabled: false }, []),
-  //     nomenclatura: new FormControl({ value: null, disabled: false }, []),
-  //     pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
-  //     unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
-  //     iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
-  //     comentarios: new FormControl({ value: null, disabled: false }, []),
-  //     nombreVenta: new FormControl({ value: null, disabled: false }, []),
-  //     descripcionControl: new FormControl({ value: null, disabled: false }, []),
-  //     asignaNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
-  //     tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
-  //     trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
-  //     vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
-  //     stock_minimum: new FormControl({ value: null, disabled: true }, []),
-  //     stock_optimum: new FormControl({ value: null, disabled: true }, [])
-  //   });
-  //   this.onNewForm();
-  // }
-  // onNewForm() {
-  //   this.newProduccionForm.get('tipoProducto')!.valueChanges.subscribe(
-  //     (value) => {
-  //       if (value && value.stock_controlled === 1) {
-  //         this.newProduccionForm.get('stock_minimum')?.enable();
-  //         this.newProduccionForm.get('stock_optimum')?.enable();
-  //         this.newProduccionForm.get('stock_minimum')?.setValidators(Validators.required)
-  //         this.newProduccionForm.get('stock_optimum')?.setValidators(Validators.required)
-  //       } else {
-  //         this.placeholderStocks = '';
-  //         this.newProduccionForm.get('stock_minimum')?.setValue(null);
-  //         this.newProduccionForm.get('stock_optimum')?.setValue(null);
-  //         this.newProduccionForm.get('stock_minimum')?.disable();
-  //         this.newProduccionForm.get('stock_optimum')?.disable();
-  //         this.newProduccionForm.get('stock_minimum')?.clearValidators();
-  //         this.newProduccionForm.get('stock_optimum')?.clearValidators();
-  //       }
-  //       ['stock_minimum', 'stock_optimum'].forEach((field) => {
-  //         this.newProduccionForm.get(field)?.updateValueAndValidity({ emitEvent: false });
-  //       });
-  //     });
-
-  //   this.newProduccionForm.get('unidad')!.valueChanges.subscribe(
-  //     (value) => {
-  //       if (value) {
-  //         this.placeholderStocks = 'Cantidad en ' + value.name;
-  //       } else {
-  //         this.placeholderStocks = '';
-  //       }
-  //     });
-  // }
-
   showDataProduccion(produccion: any) {
     this.produccionAnterior = [];
     this.isEdicion = false;
@@ -383,8 +325,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.uuidFromUrl = produccion.uuid;
     this.inicializarForm(produccion);
   }
-
-
 
   openSwalEliminar(data: any) {
     Swal.fire({
@@ -436,22 +376,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // this.modalProduccion.close();
   }
 
-  openModalProduccion(type: string, produccion?: any) {
-    // if (type === 'NEW') {
-    //   if (this.isEdicion) {
-    //     this.isEdicion = false;
-    //     this.inicializarForm(this.selectedProduccion); // Esto es para que no quede inconsistente cuando edita, da de alta y cerra el modal de alta.
-    //   }
-    //   this.tituloModal = 'Nueva producción';
-    //   this.inicializarFormNew();
-    //   this.modalProduccion.options = this.modalOptions;
-    //   this.modalProduccion.open();
-    // } else {
+  openModalProduccion(produccion: any) {
     this.tab1 = 'datos-generales';
     this.isEdicion = true;
-    // this.tituloModal = 'Edición de producción';
     this.inicializarForm(produccion);
-    // }
   }
 
   cancelarEdicion() {

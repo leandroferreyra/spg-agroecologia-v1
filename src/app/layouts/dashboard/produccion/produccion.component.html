@@ -49,7 +49,7 @@
                                         <ul *hlMenuItems @toggleAnimation [ngClass]="getDropdownClass(index)">
                                             <li>
                                                 <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                    (click)="openModalProduccion('EDIT', data)">Editar</a>
+                                                    (click)="openModalProduccion(data)">Editar</a>
                                             </li>
                                             <li>
                                                 <a href="javascript:;" *hlMenuItem="let menuItem"
@@ -125,7 +125,7 @@
 
             <div class="flex items-center gap-2 ml-auto">
                 @if(producciones.length > 0 && selectedProduccion) {
-                <button type="button" ngxTippy="Editar" (click)="openModalProduccion('EDIT', selectedProduccion)">
+                <button type="button" ngxTippy="Editar" (click)="openModalProduccion(selectedProduccion)">
                     <icon-pencil />
                 </button>
                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedProduccion)">
