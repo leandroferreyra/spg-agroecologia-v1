@@ -300,7 +300,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
         next: res => {
           this.reemplazos = res.data;
-          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerReemplazos ~ this.reemplazos:", this.reemplazos)
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
