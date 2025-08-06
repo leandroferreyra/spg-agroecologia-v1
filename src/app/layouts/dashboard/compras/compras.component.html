@@ -229,7 +229,7 @@
                         <div>
                             <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Agregar"
                                 (click)="openCloseEditarFactura('NEW')">
-                                <icon-plus class="mx-auto" />
+                                <icon-plus />
                             </button>
                         </div>
                         }@else {
@@ -247,14 +247,14 @@
                             </button>
                         </div>
                         }
+                        <div>
+                            <button type="button" ngxTippy="Crear pago total" (click)="crearPagoTotalCompra()"
+                                [disabled]="!poseeFactura || selectedCompra?.transaction?.transaction_products?.length === 0 ">
+                                <icon-dollar-sign class="w-7 h-7" />
+                            </button>
+                        </div>
                     </div>
-                    <div>
-                        <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Crear pago total"
-                            (click)="crearPagoTotalCompra()"
-                            [disabled]="!poseeFactura || selectedCompra?.transaction?.transaction_products?.length === 0 ">
-                            <icon-auto-payment />
-                        </button>
-                    </div>
+
                 </legend>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>

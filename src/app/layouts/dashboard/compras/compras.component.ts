@@ -11,7 +11,7 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Observable, Subject, Subscription, debounceTime, distinctUntilChanged, filter, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { Observable, Subject, Subscription, debounceTime, distinctUntilChanged, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -47,6 +47,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { BatchUpdateControlDTO } from 'src/app/core/models/request/batchUpdateControlDTO';
 import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePriceRangeDTO';
+import { IconDollarSignComponent } from 'src/app/shared/icon/icon-dollar-sign';
 
 @Component({
   selector: 'app-compras',
@@ -54,7 +55,7 @@ import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePrice
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule, IconSettingsComponent,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective,
-    IconPencilComponent, IconAutoPaymentComponent
+    IconPencilComponent, IconDollarSignComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './compras.component.html',
