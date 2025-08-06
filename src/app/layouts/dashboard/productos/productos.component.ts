@@ -740,7 +740,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
             this.tokenService.setToken(res.token);
             this.cerrarModalProduccion();
             this.spinner.hide();
-            // this.router.navigate([`/dashboard/producciones/${res.data?.uuid}`])
+            this.router.navigate([`/dashboard/producciones/${res.data?.uuid}`])
           },
           error: error => {
             console.error(error);
