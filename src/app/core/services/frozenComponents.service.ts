@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { ComponenteDTO } from '../models/request/componenteDTO';
+import { FrozenComponentDTO } from '../models/request/frozenComponentDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +20,10 @@ export class FrozenComponentService {
   //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiComponentes, JSON.stringify(componente), { headers });
   // }
 
-  // editComponente(uuid: string, componente: ComponenteDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.put<AuthResponse>(environment.baseUrl + this.apiComponentes + '/' + uuid, JSON.stringify(componente), { headers });
-  // }
+  editComponente(uuid: string, componente: FrozenComponentDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiComponentes + '/' + uuid, JSON.stringify(componente), { headers });
+  }
 
   deleteComponent(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

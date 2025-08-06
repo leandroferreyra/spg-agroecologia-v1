@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { error } from 'console';
+import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
+import { FrozenComponentDTO } from 'src/app/core/models/request/frozenComponentDTO';
 import { FrozenComponentService } from 'src/app/core/services/frozenComponents.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -19,8 +22,8 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-componentes-produccion',
   standalone: true,
-  imports: [CommonModule, NgxSpinnerModule, IconPlusComponent, NgSelectModule, FormsModule, ReactiveFormsModule, NgbPaginationModule, 
-    IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule],
+  imports: [CommonModule, NgxSpinnerModule, IconPlusComponent, NgSelectModule, FormsModule, ReactiveFormsModule, NgbPaginationModule,
+    IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent],
   templateUrl: './componentes-produccion.component.html',
   styleUrl: './componentes-produccion.component.css'
 })
@@ -30,7 +33,16 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   @Input() rol!: string;
   private subscription: Subscription = new Subscription();
 
+  @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
+  modalOptions: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: false
+  };
+  tituloModal: string = '';
+
   componentes: any[] = []
+  componenteForm!: FormGroup;
 
   filtros: any = {
     'production_uuid': { value: '', op: '=', contiene: false },
@@ -47,6 +59,13 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   itemsInPage = this.itemsPerPage;
   pageSize: number = 0;
   total_rows: number = 0;
+
+  isSubmit = false;
+
+  origenes: any[] = ['Sin selección', 'Lote', 'Provisto por terceros'];
+  stocks: any[] = [];
+  proveedores: any[] = [];
+
 
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
     private _swalService: SwalService, private _frozenComponentService: FrozenComponentService) {
@@ -72,7 +91,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   obtenerComponentesProduccion() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["measure", "stock", "supplier"];
+    params.with = ["measure", "stock", "supplier", "possibleStocks"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -165,4 +184,86 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       })
     )
   }
+
+  openModalComponente(data: any) {
+    this.obtenerProveedoresByComponente(data.uuid);
+    this.stocks = data.possible_stocks;
+    console.log(data);
+    this.tituloModal = 'Edición de componente';
+    this.inicializarFormComponente(data);
+    this.modalComponente.options = this.modalOptions;
+    this.modalComponente.open();
+  }
+  cerrarModal() {
+    this.isSubmit = false;
+    this.modalComponente.close();
+  }
+
+  inicializarFormComponente(data: any) {
+    this.componenteForm = new FormGroup({
+      uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
+      origin: new FormControl({ value: data ? data.origin : null, disabled: false }, []),
+      stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: false }, []),
+      supplier_uuid: new FormControl({ value: data ? data.supplier?.uuid : null, disabled: false }, []),
+      note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
+    })
+  }
+
+  obtenerProveedoresByComponente(uuid: string) {
+    const params: any = {};
+    params.with = [];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = {};
+    params.filters = {
+      'products.uuid': { value: uuid, op: '=', contiene: false },
+    };
+    this.subscription.add(
+      this._indexService.getProveedoresWithParam(params, this.rol).subscribe({
+        next: res => {
+          this.proveedores = res.data;
+          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerProveedoresByComponente ~ this.proveedores:", this.proveedores)
+          this._tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  confirmarComponente() {
+    this.isSubmit = true;
+    if (this.componenteForm.valid) {
+      let componente = new FrozenComponentDTO();
+      this.armarDTOComponente(componente);
+      this.subscription.add(
+        this._frozenComponentService.editComponente(this.componenteForm.get('uuid')?.value, componente).subscribe({
+          next: res => {
+            console.log(res);
+            this.obtenerComponentesProduccion();
+            this.cerrarModal();
+          },
+          error: error => {
+            console.error(error);
+            this._swalService.toastError('top-right', error.error.message);
+          }
+        })
+      );
+    }
+  }
+
+  armarDTOComponente(componente: FrozenComponentDTO) {
+    componente.actual_role = this.rol;
+    componente.origin = this.componenteForm.get('origin')?.value;
+    componente.stock_uuid = this.componenteForm.get('stock_uuid')?.value;
+    componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
+    componente.note = this.componenteForm.get('note')?.value;
+  }
+
+
+
 }

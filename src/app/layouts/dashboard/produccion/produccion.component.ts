@@ -107,13 +107,13 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   iconArrowDown = faArrowDown;
   iconArrowLeft = faArrowLeft;
 
-  // Referencia al modal para crear y editar países.
-  @ViewChild('modalProduccion') modalProduccion!: NgxCustomModalComponent;
-  modalOptions: ModalOptions = {
-    closeOnOutsideClick: false,
-    hideCloseButton: true,
-    closeOnEscape: false
-  };
+  // Referencia al modal para crear y editar
+  // @ViewChild('modalProduccion') modalProduccion!: NgxCustomModalComponent;
+  // modalOptions: ModalOptions = {
+  //   closeOnOutsideClick: false,
+  //   hideCloseButton: true,
+  //   closeOnEscape: false
+  // };
   tituloModal: string = '';
 
   // Catalogos
@@ -436,7 +436,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   cerrarModal() {
     this.isSubmit = false;
-    this.modalProduccion.close();
+    // this.modalProduccion.close();
   }
 
   openModalProduccion(type: string, produccion?: any) {
