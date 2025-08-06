@@ -110,7 +110,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
+          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -276,7 +276,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProveedoresWithParam(params, this.rol).subscribe({
         next: res => {
           this.proveedores = res.data;
-          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerProveedoresByComponente ~ this.proveedores:", this.proveedores)
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -297,7 +296,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._frozenComponentService.editComponente(this.componenteForm.get('uuid')?.value, componente).subscribe({
           next: res => {
-            console.log(res);
+            // console.log(res);
             this.obtenerComponentesProduccion();
             this.cerrarModal();
           },
@@ -391,7 +390,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     if (this.reemplazoForm.valid) {
 
     }
-    console.log(this.reemplazoForm);
+    // console.log(this.reemplazoForm);
   }
 
 }
