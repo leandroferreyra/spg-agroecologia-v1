@@ -1362,7 +1362,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     let transaction = new Transaction();
     transaction.person_uuid = form.get('person_uuid')?.value.person.uuid;
     const fechaFormateada = form.get('transaction_datetime')?.value instanceof Date
-      ? format(form.get('transaction_datetime')?.value, 'yyyy-MM-dd')
+      ? format(form.get('transaction_datetime')?.value, 'dd-MM-yyyy')
       : form.get('transaction_datetime')?.value;
     transaction.transaction_datetime = this.convertirFechaADateBackend(fechaFormateada);
     venta.transaction = transaction;
