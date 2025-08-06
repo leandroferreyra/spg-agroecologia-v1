@@ -134,6 +134,7 @@
             </h5>
 
             <div class="flex items-center gap-2 ml-auto">
+                @if(productos.length > 0 && selectedProducto) {
                 @if (esProducible(selectedProducto)) {
                 <button type="button" ngxTippy="Producir" (click)="openModalProduccion()">
                     <icon-settings />
@@ -145,6 +146,7 @@
                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedProducto)">
                     <icon-trash-lines />
                 </button>
+                }
                 <button type="button" class="block hover:text-primary xl:hidden"
                     (click)="isShowMailMenu = !isShowMailMenu">
                     <icon-menu />

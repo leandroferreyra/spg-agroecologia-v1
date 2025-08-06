@@ -124,12 +124,14 @@
             </h5>
 
             <div class="flex items-center gap-2 ml-auto">
+                @if(producciones.length > 0 && selectedProduccion) {
                 <button type="button" ngxTippy="Editar" (click)="openModalProduccion('EDIT', selectedProduccion)">
                     <icon-pencil />
                 </button>
                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedProduccion)">
                     <icon-trash-lines />
                 </button>
+                }
                 <button type="button" class="block hover:text-primary xl:hidden"
                     (click)="isShowMailMenu = !isShowMailMenu">
                     <icon-menu />
