@@ -377,9 +377,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   // }
 
   showDataProduccion(produccion: any) {
-    // if (produccion.uuid === this.uuidFromUrl) {
-    //   return ;
-    // }
+    console.log(produccion);
     this.produccionAnterior = [];
     this.isEdicion = false;
     this.location.replaceState(`/dashboard/producciones/${produccion.uuid}`);

@@ -32,9 +32,11 @@
                 </button>
             </div>
 
-            <span *ngIf="ventas && ventas.length > 0" class="float-md-end color-gris">
+            @if (ventas) {
+            <span class="float-md-end color-gris">
                 Ventas {{ total_rows }}
             </span>
+            }
 
             <div class="table-container flex-grow overflow-auto">
                 <div class="table-responsive">
@@ -106,15 +108,17 @@
         <div class="flex flex-wrap-reverse items-center justify-between ml-4 mt-2 gap-2 p-2">
             <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                 Venta
-                @if(ventas.length > 0 && selectedVenta) {
+                <!-- @if(ventas.length > 0 && selectedVenta) {
                 {{selectedVenta.name}}
-                }
+                } -->
             </h5>
 
             <div class="flex items-center gap-2 ml-auto">
+                @if(ventas.length > 0 && selectedVenta) {
                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedVenta)">
                     <icon-trash-lines />
                 </button>
+                }
                 <button type="button" class="block hover:text-primary xl:hidden"
                     (click)="isShowMailMenu = !isShowMailMenu">
                     <icon-menu />
