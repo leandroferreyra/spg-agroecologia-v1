@@ -64,16 +64,18 @@
                     <td class="whitespace-nowrap"> {{ data.name}} </td>
                     <td class="whitespace-nowrap"> {{ getCantidad(data) }} </td>
                     <td class="whitespace-nowrap"> {{ getCantidadTotal(data) }} </td>
-                    <td class="whitespace-nowrap"> {{ data.origin }} </td>
+                    <td class="whitespace-nowrap"> {{ getOrigen(data) }} </td>
                     <td class="whitespace-nowrap"> {{ data.note }} </td>
                     <td>
                         <div class="flex items-center">
+                            @if(isAllowEdit(data)) {
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
                                     (click)="openModalComponente(data);">
                                     <icon-pencil />
                                 </button>
                             </div>
+                            }
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Reemplazar"
                                     (click)="openModalReemplazos(data)">
@@ -119,31 +121,88 @@
         <ng-template #modalBody>
             <form [formGroup]="componenteForm" class="p-4">
                 <div class="flex flex-col sm:flex-row">
-                    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-1">
 
-                        <div>
-                            <label for="origin">Origen</label>
-                            <ng-select [items]="origenes" bindLabel="name" bindValue="name" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay orígenes"
-                                class="w-1/3 min-w-[200px]" formControlName="origin" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? componenteForm.controls['origin'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
+                        <div class="table-responsive">
+                            <table class="table-hover">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-2 py-1"></th>
+                                        <th class="px-2 py-1">Origen</th>
+                                        <th class="px-2 py-1">Detalle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border px-2 py-1">
+                                            <div
+                                                class="flex items-center justify-center px-3 font-semibold  ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                                                <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                                    <input type="checkbox"
+                                                        (change)="switchOrigen('Sin selección', $event)"
+                                                        [checked]="componenteForm.get('origin')?.value === 'Sin selección'"
+                                                        class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                                        id="custom_switch_checkbox2" />
+                                                    <span
+                                                        class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="border px-2 py-1">Sin selección</td>
+                                        <td class="border px-2 py-1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border px-2 py-1">
+                                            <div
+                                                class="flex items-center justify-center px-3 font-semibold  ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                                                <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                                    <input type="checkbox" (change)="switchOrigen('Lote', $event)"
+                                                        [checked]="componenteForm.get('origin')?.value === 'Lote'"
+                                                        class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                                        id="custom_switch_checkbox2" />
+                                                    <span
+                                                        class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="border px-2 py-1">Lote</td>
+                                        <td class="border px-2 py-1">
+                                            <ng-select [items]="stocks" [appendTo]="'body'" bindLabel="nombreCompleto" bindValue="uuid"
+                                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                                notFoundText="No hay datos" class="w-1/3 min-w-[200px]"
+                                                formControlName="stock_uuid"
+                                                [ngClass]="isSubmit ? componenteForm.controls['stock_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border px-2 py-1">
+                                            <div
+                                                class="flex items-center justify-center px-3 font-semibold  ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                                                <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                                    <input type="checkbox"
+                                                        (change)="switchOrigen('Provisto por terceros', $event)"
+                                                        [checked]="componenteForm.get('origin')?.value === 'Provisto por terceros'"
+                                                        class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                                        id="custom_switch_checkbox2" />
+                                                    <span
+                                                        class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="border px-2 py-1">Provisto por terceros</td>
+                                        <td class="border px-2 py-1">
+                                            <ng-select [items]="proveedores" [appendTo]="'body'" bindLabel="user_name"
+                                                bindValue="uuid" clearAllText="Limpiar" style="width: 100%"
+                                                [virtualScroll]="true" notFoundText="No hay datos"
+                                                class="w-1/3 min-w-[200px]" formControlName="supplier_uuid"
+                                                [ngClass]="isSubmit ? componenteForm.controls['supplier_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                            </ng-select>
+                                        </td>
+                                    </tr>
 
-                        <div>
-                            <label for="stock_uuid">Stock</label>
-                            <ng-select [items]="stocks" bindLabel="batch.batch_identification" bindValue="uuid"
-                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                notFoundText="No hay stocks" class="w-1/3 min-w-[200px]" formControlName="stock_uuid"
-                                [selectOnTab]="true"
-                                [ngClass]="isSubmit ? componenteForm.controls['stock_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
-                        </div>
-
-                        <div>
-                            <label for="supplier_uuid">Proveedor</label>
-                            <ng-select [items]="proveedores" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay proveedores"
-                                class="w-1/3 min-w-[200px]" formControlName="supplier_uuid" [selectOnTab]="true"
-                                [ngClass]="isSubmit ? componenteForm.controls['supplier_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                                </tbody>
+                            </table>
                         </div>
 
                         <div
@@ -151,6 +210,7 @@
                             <label for="note">Nota</label>
                             <textarea class="form-control" id="note" formControlName="note" rows="1"></textarea>
                         </div>
+
 
                     </div>
                 </div>

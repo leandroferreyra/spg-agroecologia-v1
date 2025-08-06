@@ -67,7 +67,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   isSubmit = false;
 
-  origenes: any[] = ['Sin selección', 'Lote', 'Provisto por terceros'];
+  origenes: any[] = [
+    { key: 'lote', label: 'Lote', tieneSelect: true },
+    { key: 'terceros', label: 'Provisto por terceros', tieneSelect: true },
+    { key: 'ss', label: 'Sin selección', tieneSelect: false }
+  ];
   stocks: any[] = [];
   proveedores: any[] = [];
 
@@ -96,7 +100,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   obtenerComponentesProduccion() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["measure", "stock", "supplier", "possibleStocks.batch"];
+    params.with = ["productType", "measure", "stock", "supplier", "possibleStocks.batch"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -149,6 +153,30 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
+  getOrigen(data: any) {
+    if (data.product_type?.stock_controlled === 0) {
+      return 'Sin control de stock';
+    }
+    if (data.product_type?.stock_controlled === 1 && data.traceable === 0) {
+      // console.log('STOCK ÚNICO');
+      // return 'Stock unico';
+    }
+    if (data.product_type?.stock_controlled === 1 && data.traceable === 1) {
+      // console.log('N LOTES');
+      // return 'N Stocks';
+      // (aclaración: los stocks que se muestran son los que tienen cantidad disponible suficiente, es decir total_amount >= Cantidad total necesaria, 
+      // pero los que se permiten seleccionar son que tienen cantidad disponible > 0)
+    }
+    return data.origin;
+  }
+
+  isAllowEdit(data: any) {
+    if (data.product_type?.stock_controlled === 0) {
+      return false;
+    }
+    return true;
+  }
+
   openSwalEliminar(componente: any) {
     Swal.fire({
       title: '',
@@ -192,16 +220,37 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   openModalComponente(data: any) {
     this.obtenerProveedoresByComponente(data.uuid);
-    this.stocks = data.possible_stocks;
-    console.log(data);
+    // this.stocks = data.possible_stocks;
+    // this.stocks = this.stocks.map((stock: any) => ({
+    //   ...stock,
+    //   nombreCompleto: this.armarStock(data, stock)
+    // }));
+    this.stocks = (data.possible_stocks || [])
+      .filter((stock: any) => +stock.total_amount >= +this.getCantidadTotal(data))
+      .map((stock: any) => ({
+        ...stock,
+        nombreCompleto: this.armarStock(data, stock)
+      }));
+
     this.tituloModal = 'Edición de componente';
     this.inicializarFormComponente(data);
     this.modalComponente.options = this.modalOptions;
     this.modalComponente.open();
   }
+
   cerrarModal() {
     this.isSubmit = false;
     this.modalComponente.close();
+  }
+
+  armarStock(componente: any, stock: any) {
+    let amount;
+    if (componente.measure?.is_integer === 1) {
+      amount = (+stock.total_amount).toFixed(0);
+    } else {
+      amount = (+stock.total_amount).toFixed(2);
+    }
+    return `${stock.batch != null ? stock.batch.batch_identification : "Lote único"} | ${amount}`;
   }
 
   inicializarFormComponente(data: any) {
@@ -268,6 +317,31 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
     componente.note = this.componenteForm.get('note')?.value;
   }
+
+  switchOrigen(origen: any, event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      this.componenteForm.get('origin')?.setValue(origen);
+      if (origen === 'Provisto por terceros') {
+        this.componenteForm.get('supplier_uuid')?.setValidators(Validators.required);
+        this.componenteForm.get('stock_uuid')?.clearValidators();
+      } else if (origen === 'Lote') {
+        this.componenteForm.get('stock_uuid')?.setValidators(Validators.required);
+        this.componenteForm.get('supplier_uuid')?.clearValidators();
+      } else if (origen === 'Sin selección') {
+        this.componenteForm.get('supplier_uuid')?.clearValidators();
+        this.componenteForm.get('stock_uuid')?.clearValidators();
+      }
+    } else {
+      this.componenteForm.get('origin')?.setValue(null);
+      this.componenteForm.get('supplier_uuid')?.clearValidators();
+      this.componenteForm.get('stock_uuid')?.clearValidators();
+    }
+    ['supplier_uuid', 'stock_uuid'].forEach((field) => {
+      this.componenteForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
 
   openModalReemplazos(data: any) {
     this.obtenerReemplazos(data);

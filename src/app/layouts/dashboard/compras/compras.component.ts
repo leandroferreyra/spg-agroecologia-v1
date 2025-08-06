@@ -582,15 +582,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return factura;
   }
 
-  // showFecha(dato: any) {
-  //   const date = new Date(dato.transaction?.transaction_datetime?.replace(' ', 'T'));
-  //   return date.toLocaleDateString('es-AR', {
-  //     day: '2-digit',
-  //     month: '2-digit',
-  //     year: 'numeric'
-  //   });
-  // }
-
   showDataCompra(compra: any) {
     if (this.compras.length == 0 || this.selectedCompra && this.selectedCompra.uuid !== compra.uuid) {
       this.isEdicion = false;
