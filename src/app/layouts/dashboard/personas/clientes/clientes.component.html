@@ -126,12 +126,14 @@
                 </h5>
 
                 <div class="flex items-center gap-2 ml-auto">
+                    @if (clientes.length > 0 && selectedCliente) {
                     <button type="button" ngxTippy="Editar" (click)="editarUsuario(selectedCliente)">
                         <icon-pencil />
                     </button>
                     <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedCliente)">
                         <icon-trash-lines />
                     </button>
+                    }
                     <button type="button" class="block hover:text-primary xl:hidden"
                         (click)="isShowMailMenu = !isShowMailMenu">
                         <icon-menu />
