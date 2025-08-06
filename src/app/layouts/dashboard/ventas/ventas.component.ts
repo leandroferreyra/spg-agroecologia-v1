@@ -280,7 +280,11 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   showFecha(dato: any) {
     const date = new Date(dato.replace(' ', 'T'));
-    return date.toLocaleDateString('es-AR');
+    return date.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 
   showDocumento(dato: any) {

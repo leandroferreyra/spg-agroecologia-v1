@@ -354,8 +354,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   getFecha(fecha: string) {
     const date = new Date(fecha.replace(' ', 'T'));
-    return date.toLocaleDateString('es-AR');
-    // return this.selectedCompra?.transaction?.transaction_datetime;
+    return date.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 
   getFechaFacturacion() {
@@ -579,13 +582,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
     return factura;
   }
 
-  showFecha(dato: any) {
-    // const soloFecha = dato.transaction?.transaction_datetime?.substring(0, 10);
-    // return soloFecha;
-
-    const date = new Date(dato.transaction?.transaction_datetime?.replace(' ', 'T'));
-    return date.toLocaleDateString('es-AR');
-  }
+  // showFecha(dato: any) {
+  //   const date = new Date(dato.transaction?.transaction_datetime?.replace(' ', 'T'));
+  //   return date.toLocaleDateString('es-AR', {
+  //     day: '2-digit',
+  //     month: '2-digit',
+  //     year: 'numeric'
+  //   });
+  // }
 
   showDataCompra(compra: any) {
     if (this.compras.length == 0 || this.selectedCompra && this.selectedCompra.uuid !== compra.uuid) {
@@ -1137,7 +1141,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   convertirFechaADateBackend(fechaStr: string): string {
-    const [dia, mes, anio] = fechaStr.split('-');
+    const fechaNormalizada = fechaStr.replace(/[\/()]/g, '-');
+    const [dia, mes, anio] = fechaNormalizada.split('-');
     return `${anio}-${mes}-${dia}`;
   }
 

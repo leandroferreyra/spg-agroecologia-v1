@@ -46,7 +46,8 @@
                             <tr style="cursor: pointer;"
                                 [ngClass]="{'bg-blue-200': selectedCompra?.uuid === data.uuid}">
                                 <td (click)="showDataCompra(data);" style="font-size: 12px;">
-                                    <b>{{ showName(data) }}</b> - {{showFactura(data)}} - {{showFecha(data)}}
+                                    <b>{{ showName(data) }}</b> - {{showFactura(data)}} -
+                                    {{getFecha(data.transaction?.transaction_datetime)}}
                                 </td>
                                 <td class="w-0 text-right align-middle">
                                     <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">

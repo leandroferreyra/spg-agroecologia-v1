@@ -240,7 +240,11 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   showFecha(dato: any) {
     const date = new Date(dato.production_datetime.replace(' ', 'T'));
-    return date.toLocaleDateString('es-AR');
+    return date.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 
   showProduccionByUuid() {
