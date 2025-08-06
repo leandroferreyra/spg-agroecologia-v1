@@ -91,7 +91,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   obtenerComponentesProduccion() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["measure", "stock", "supplier", "possibleStocks"];
+    params.with = ["measure", "stock", "supplier", "possibleStocks.batch"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;

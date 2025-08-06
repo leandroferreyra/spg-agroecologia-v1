@@ -32,9 +32,11 @@
                 </button>
             </div>
 
-            <span *ngIf="compras && compras.length > 0" class="float-md-end color-gris">
+            @if(compras){
+            <span *ngIf="compras" class="float-md-end color-gris">
                 Compras: {{ total_rows }}
             </span>
+            }
 
             <div class="table-container flex-grow overflow-auto">
                 <div class="table-responsive">
@@ -112,9 +114,11 @@
             </h5>
 
             <div class="flex items-center gap-2 ml-auto">
+                @if(compras.length > 0 && selectedCompra) {
                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedCompra)">
                     <icon-trash-lines />
                 </button>
+                }
                 <button type="button" class="block hover:text-primary xl:hidden"
                     (click)="isShowMailMenu = !isShowMailMenu">
                     <icon-menu />
