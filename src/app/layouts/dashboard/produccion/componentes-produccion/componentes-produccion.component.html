@@ -75,7 +75,8 @@
                                 </button>
                             </div>
                             <div>
-                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Reemplazar">
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Reemplazar"
+                                    (click)="openModalReemplazos(data)">
                                     <icon-refresh />
                                 </button>
                             </div>
@@ -130,9 +131,10 @@
 
                         <div>
                             <label for="stock_uuid">Stock</label>
-                            <ng-select [items]="stocks" bindLabel="batch.batch_identification" bindValue="uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay stocks"
-                                class="w-1/3 min-w-[200px]" formControlName="stock_uuid" [selectOnTab]="true"
+                            <ng-select [items]="stocks" bindLabel="batch.batch_identification" bindValue="uuid"
+                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                notFoundText="No hay stocks" class="w-1/3 min-w-[200px]" formControlName="stock_uuid"
+                                [selectOnTab]="true"
                                 [ngClass]="isSubmit ? componenteForm.controls['stock_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
 
@@ -147,8 +149,7 @@
                         <div
                             [ngClass]="isSubmit ? componenteForm.controls['note'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="note">Nota</label>
-                            <textarea class="form-control" id="note" formControlName="note"
-                                rows="1"></textarea>
+                            <textarea class="form-control" id="note" formControlName="note" rows="1"></textarea>
                         </div>
 
                     </div>
@@ -162,6 +163,44 @@
                     </button>
                     <button id="back-button-with-border" type="button" class="btn btn-wd"
                         (click)="cerrarModal()">Cancelar</button>
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<div>
+    <ngx-custom-modal #modalReemplazo class=" modal-top large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <div class="position-relative text-center w-100">
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
+            </div>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <form [formGroup]="reemplazoForm" class="p-4">
+                <div class="flex flex-col sm:flex-row">
+                    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-1">
+
+                        <div>
+                            <label>Reemplazos</label>
+                            <ng-select [items]="reemplazos" bindLabel="name" bindValue="name" clearAllText="Limpiar"
+                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay reemplazos"
+                                class="w-1/3 min-w-[200px]" formControlName="uuid" [selectOnTab]="true"
+                                [ngClass]="isSubmit ? reemplazoForm.controls['uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <button class="btn btn-primary mr-3" (click)="confirmarReemplazo()">
+                        Confirmar
+                    </button>
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cerrarModalReemplazo()">Cancelar</button>
                 </div>
             </div>
         </ng-template>

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { error } from 'console';
@@ -9,6 +9,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { FrozenComponentDTO } from 'src/app/core/models/request/frozenComponentDTO';
+import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePriceRangeDTO';
 import { FrozenComponentService } from 'src/app/core/services/frozenComponents.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -34,6 +35,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
+  @ViewChild('modalReemplazo') modalReemplazo!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -41,8 +43,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   };
   tituloModal: string = '';
 
-  componentes: any[] = []
+  componentes: any[] = [];
   componenteForm!: FormGroup;
+
+  reemplazos: any[] = []
+  reemplazoForm!: FormGroup;
 
   filtros: any = {
     'production_uuid': { value: '', op: '=', contiene: false },
@@ -264,6 +269,56 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     componente.note = this.componenteForm.get('note')?.value;
   }
 
+  openModalReemplazos(data: any) {
+    this.obtenerReemplazos(data);
+    this.inicializarFormReemplazo();
+    this.tituloModal = 'Seleccionar reemplazo';
+    this.modalReemplazo.options = this.modalOptions;
+    this.modalReemplazo.open();
+  }
+  cerrarModalReemplazo() {
+    this.isSubmit = false;
+    this.modalReemplazo.close();
+  }
 
+  inicializarFormReemplazo() {
+    this.reemplazoForm = new FormGroup({
+      uuid: new FormControl({ value: null, disabled: false }, [Validators.required])
+    })
+  }
+
+  obtenerReemplazos(data: any) {
+    const params: any = {};
+    params.with = ["product", "replacement"];
+    params.paging = this.itemsPerPage;
+    params.page = this.currentPage;
+    params.order_by = this.ordenamiento;
+    params.filters = {
+      'product_uuid': { value: data.uuid, op: '=', contiene: false },
+    }
+    this.subscription.add(
+      this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
+        next: res => {
+          this.reemplazos = res.data;
+          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerReemplazos ~ this.reemplazos:", this.reemplazos)
+          this._tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  confirmarReemplazo() {
+    this.isSubmit = true;
+    if (this.reemplazoForm.valid) {
+
+    }
+    console.log(this.reemplazoForm);
+  }
 
 }
