@@ -225,12 +225,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     //   ...stock,
     //   nombreCompleto: this.armarStock(data, stock)
     // }));
-    this.stocks = (data.possible_stocks || [])
-      .filter((stock: any) => +stock.total_amount >= +this.getCantidadTotal(data))
-      .map((stock: any) => ({
-        ...stock,
-        nombreCompleto: this.armarStock(data, stock)
-      }));
+    this.stocks = (data.possible_stocks || []).map((stock: any) => ({
+      ...stock,
+      nombreCompleto: this.armarStock(data, stock),
+      disabled: +stock.total_amount < +this.getCantidadTotal(data)
+    }));
 
     this.tituloModal = 'Edición de componente';
     this.inicializarFormComponente(data);
@@ -300,10 +299,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             // console.log(res);
             this.obtenerComponentesProduccion();
             this.cerrarModal();
-             this.spinner.hide();
+            this.spinner.hide();
           },
           error: error => {
-             this.spinner.hide();
+            this.spinner.hide();
             console.error(error);
             this._swalService.toastError('top-right', error.error.message);
           }
