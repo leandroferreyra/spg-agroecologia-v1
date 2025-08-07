@@ -137,10 +137,14 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   getCantidadStockByComponent(stock: any) {
     if (this.selectedComponent.measure?.is_integer === 1) {
-      return (+stock.total_amount)?.toFixed(0);
+      return +(+stock.total_amount)?.toFixed(0);
     } else {
-      return (+stock.total_amount)?.toFixed(2);
+      return +(+stock.total_amount)?.toFixed(2);
     }
+  }
+
+  showName(stock: any) {
+    return stock.batch ? stock.batch.batch_identification : 'Lote único';
   }
 
   getCantidad(data: any) {
@@ -154,9 +158,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   getCantidadTotal(data: any) {
     let total = +this.produccion.quantity * +data.quantity;
     if (data.measure?.is_integer === 1) {
-      return (total)?.toFixed(0);
+      return +(total)?.toFixed(0);
     } else {
-      return (total)?.toFixed(2);
+      return +(total)?.toFixed(2);
     }
   }
 
