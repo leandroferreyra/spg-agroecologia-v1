@@ -291,6 +291,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   confirmarComponente() {
     this.isSubmit = true;
     if (this.componenteForm.valid) {
+      this.spinner.show();
       let componente = new FrozenComponentDTO();
       this.armarDTOComponente(componente);
       this.subscription.add(
@@ -299,8 +300,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             // console.log(res);
             this.obtenerComponentesProduccion();
             this.cerrarModal();
+             this.spinner.hide();
           },
           error: error => {
+             this.spinner.hide();
             console.error(error);
             this._swalService.toastError('top-right', error.error.message);
           }

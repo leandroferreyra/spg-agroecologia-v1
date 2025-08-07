@@ -129,7 +129,7 @@
                                     <tr>
                                         <th class="px-2 py-1"></th>
                                         <th class="px-2 py-1">Origen</th>
-                                        <th class="px-2 py-1">Detalle</th>
+                                        <th class="px-2 py-1">Detalle (Lote | Cantidad disponible)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -167,10 +167,10 @@
                                         </td>
                                         <td class="border px-2 py-1">Lote</td>
                                         <td class="border px-2 py-1">
-                                            <ng-select [items]="stocks" [appendTo]="'body'" bindLabel="nombreCompleto" bindValue="uuid"
-                                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                                notFoundText="No hay datos" class="w-1/3 min-w-[200px]"
-                                                formControlName="stock_uuid"
+                                            <ng-select [items]="stocks" [appendTo]="'body'" bindLabel="nombreCompleto"
+                                                bindValue="uuid" clearAllText="Limpiar" style="width: 100%"
+                                                [virtualScroll]="true" notFoundText="No hay datos"
+                                                class="w-1/3 min-w-[200px]" formControlName="stock_uuid"
                                                 [ngClass]="isSubmit ? componenteForm.controls['stock_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                             </ng-select>
                                         </td>
