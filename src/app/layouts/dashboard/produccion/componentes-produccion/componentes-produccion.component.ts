@@ -3,13 +3,11 @@ import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { error } from 'console';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { FrozenComponentDTO } from 'src/app/core/models/request/frozenComponentDTO';
-import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePriceRangeDTO';
 import { FrozenComponentService } from 'src/app/core/services/frozenComponents.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -44,6 +42,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   tituloModal: string = '';
 
   componentes: any[] = [];
+  selectedComponent: any;
   componenteForm!: FormGroup;
 
   reemplazos: any[] = []
@@ -136,6 +135,14 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
+  getCantidadStockByComponent(stock: any) {
+    if (this.selectedComponent.measure?.is_integer === 1) {
+      return (+stock.total_amount)?.toFixed(0);
+    } else {
+      return (+stock.total_amount)?.toFixed(2);
+    }
+  }
+
   getCantidad(data: any) {
     if (data.measure?.is_integer === 1) {
       return (+data.quantity)?.toFixed(0);
@@ -219,19 +226,14 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   openModalComponente(data: any) {
+    this.selectedComponent = data;
     this.obtenerProveedoresByComponente(data.uuid);
-    // this.stocks = data.possible_stocks;
-    // this.stocks = this.stocks.map((stock: any) => ({
-    //   ...stock,
-    //   nombreCompleto: this.armarStock(data, stock)
-    // }));
     this.stocks = (data.possible_stocks || []).map((stock: any) => ({
       ...stock,
-      nombreCompleto: this.armarStock(data, stock),
+      // nombreCompleto: this.armarStock(data, stock),
       disabled: +stock.total_amount < +this.getCantidadTotal(data)
     }));
-
-    this.tituloModal = 'Edición de componente';
+    this.tituloModal = `Selección de origen de "${data.name}"`;
     this.inicializarFormComponente(data);
     this.modalComponente.options = this.modalOptions;
     this.modalComponente.open();
@@ -242,15 +244,16 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.modalComponente.close();
   }
 
-  armarStock(componente: any, stock: any) {
-    let amount;
-    if (componente.measure?.is_integer === 1) {
-      amount = (+stock.total_amount).toFixed(0);
-    } else {
-      amount = (+stock.total_amount).toFixed(2);
-    }
-    return `${stock.batch != null ? stock.batch.batch_identification : "Lote único"} | ${amount}`;
-  }
+
+  // armarStock(componente: any, stock: any) {
+  //   let amount;
+  //   if (componente.measure?.is_integer === 1) {
+  //     amount = (+stock.total_amount).toFixed(0);
+  //   } else {
+  //     amount = (+stock.total_amount).toFixed(2);
+  //   }
+  //   return `${stock.batch != null ? stock.batch.batch_identification : "Lote único"} | ${amount}`;
+  // }
 
   inicializarFormComponente(data: any) {
     this.componenteForm = new FormGroup({
@@ -319,30 +322,34 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     componente.note = this.componenteForm.get('note')?.value;
   }
 
-  switchOrigen(origen: any, event: Event) {
+  switchOrigen(origen: any, event: Event, stock?: any) {
     const checked = (event.target as HTMLInputElement).checked;
     if (checked) {
       this.componenteForm.get('origin')?.setValue(origen);
       if (origen === 'Provisto por terceros') {
         this.componenteForm.get('supplier_uuid')?.setValidators(Validators.required);
         this.componenteForm.get('stock_uuid')?.clearValidators();
+        this.componenteForm.get('stock_uuid')?.setValue(null);
       } else if (origen === 'Lote') {
         this.componenteForm.get('stock_uuid')?.setValidators(Validators.required);
         this.componenteForm.get('supplier_uuid')?.clearValidators();
+        this.componenteForm.get('stock_uuid')?.setValue(stock.uuid);
       } else if (origen === 'Sin selección') {
         this.componenteForm.get('supplier_uuid')?.clearValidators();
         this.componenteForm.get('stock_uuid')?.clearValidators();
+        this.componenteForm.get('stock_uuid')?.setValue(null);
       }
     } else {
       this.componenteForm.get('origin')?.setValue(null);
       this.componenteForm.get('supplier_uuid')?.clearValidators();
       this.componenteForm.get('stock_uuid')?.clearValidators();
+      this.componenteForm.get('stock_uuid')?.setValue(null);
+
     }
     ['supplier_uuid', 'stock_uuid'].forEach((field) => {
       this.componenteForm.get(field)?.updateValueAndValidity({ emitEvent: false });
     });
   }
-
 
   openModalReemplazos(data: any) {
     this.obtenerReemplazos(data);
