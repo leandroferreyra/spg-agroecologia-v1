@@ -94,7 +94,7 @@
                             <label class="relative mb-0 h-4 w-7 cursor-pointer">
                                 <input type="checkbox" (change)="obtenerProveedores();"
                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                    id="custom_switch_checkbox2"
+                                    id="contiene"
                                     [(ngModel)]="filtros['person.human.firstname'].contiene" />
                                 <span
                                     class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
@@ -308,8 +308,8 @@
                                         <label class="w-12 h-6 relative">
                                             <input type="checkbox"
                                                 class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                id="custom_switch_checkbox2" formControlName="percepcionRG3337" />
-                                            <span for="custom_switch_checkbox2"
+                                                id="percepcionRG3337" formControlName="percepcionRG3337" />
+                                            <span for="percepcionRG3337"
                                                 class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                             </span>
                                         </label>
@@ -320,8 +320,8 @@
                                         <label class="w-12 h-6 relative">
                                             <input type="checkbox"
                                                 class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                id="custom_switch_checkbox2" formControlName="percepcionIIBB" />
-                                            <span for="custom_switch_checkbox2"
+                                                id="percepcionIIBB" formControlName="percepcionIIBB" />
+                                            <span for="percepcionIIBB"
                                                 class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                             </span>
                                         </label>
@@ -422,8 +422,8 @@
                     <label class="w-12 h-6 relative">
                         <input type="checkbox"
                             class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id="custom_switch_checkbox2" (change)="toggleFilter()" />
-                        <span for="custom_switch_checkbox2"
+                            id="filtro" (change)="toggleFilter()" />
+                        <span for="filtro"
                             class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                         </span>
                     </label>
@@ -505,8 +505,8 @@
                                     <label class="w-12 h-6 relative">
                                         <input type="checkbox"
                                             class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" [checked]="isProveedor(data)" disabled />
-                                        <span for="custom_switch_checkbox2"
+                                            id="custom_switch_checkbox1" [checked]="isProveedor(data)" disabled />
+                                        <span for="custom_switch_checkbox1"
                                             class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                         </span>
                                     </label>
@@ -517,8 +517,8 @@
                                     <label class="w-12 h-6 relative">
                                         <input type="checkbox"
                                             class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" [checked]="isCliente(data)" disabled />
-                                        <span for="custom_switch_checkbox2"
+                                            id="custom_switch_checkbox2c" [checked]="isCliente(data)" disabled />
+                                        <span for="custom_switch_checkbox2c"
                                             class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                         </span>
                                     </label>
@@ -691,8 +691,8 @@
                                 <label class="w-12 h-6 relative">
                                     <input type="checkbox"
                                         class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" formControlName="percepcionRG3337" />
-                                    <span for="custom_switch_checkbox2"
+                                        id="custom_switch_checkbox2a" formControlName="percepcionRG3337" />
+                                    <span for="custom_switch_checkbox2a"
                                         class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                     </span>
                                 </label>
@@ -703,8 +703,8 @@
                                 <label class="w-12 h-6 relative">
                                     <input type="checkbox"
                                         class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                        id="custom_switch_checkbox2" formControlName="percepcionIIBB" />
-                                    <span for="custom_switch_checkbox2"
+                                        id="custom_switch_checkbox2b" formControlName="percepcionIIBB" />
+                                    <span for="custom_switch_checkbox2b"
                                         class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                     </span>
                                 </label>
@@ -789,14 +789,14 @@
                         <div class="d-flex flex-wrap align-items-center gap-3">
                             @if(this.filtroTipoPersona === 'fisica' || this.filtroTipoPersona === 'todos') {
                             <div class="flex-grow-1">
-                                <label for="nombre">Nombre</label>
-                                <input type="text" id="nombre" class="form-control"
+                                <label for="nombre2">Nombre</label>
+                                <input type="text" id="nombre2" class="form-control"
                                     [(ngModel)]="filtros['person.human.firstname'].value"
                                     (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
                             <div class="flex-grow-1">
-                                <label for="apellido">Apellido</label>
-                                <input type="text" id="apellido" class="form-control"
+                                <label for="apellido2">Apellido</label>
+                                <input type="text" id="apellido2" class="form-control"
                                     [(ngModel)]="filtros['person.human.lastname'].value"
                                     (input)="obtenerProveedoresPorFiltroAvanzado(filtroSimple)">
                             </div>
