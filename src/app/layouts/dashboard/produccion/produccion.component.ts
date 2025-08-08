@@ -175,7 +175,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["product", "creator", "responsible", "currentState", "productionStates.creator"];
+    this.params.with = ["product.measure", "creator", "responsible", "currentState", "productionStates.creator"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -298,7 +298,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
       fechaInicio: new FormControl({ value: this.convertirFechaConHora(produccion?.production_datetime), disabled: !this.isEdicion }, []),
-      cantidad: new FormControl({ value: produccion?.quantity, disabled: true }, [Validators.required]),
+      cantidad: new FormControl({ value: this.showCantidad(produccion?.quantity), disabled: true }, [Validators.required]),
       responsableCreacion: new FormControl({ value: produccion?.creator?.user_name, disabled: true }, []),
       responsableEjecucion: new FormControl({ value: produccion?.responsible?.uuid, disabled: !this.isEdicion }, [Validators.required]),
       movimientosEstado: new FormControl({ value: produccion?.production_states, disabled: true }, [])
@@ -314,11 +314,14 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     return !this.isEdicion || producto.product_type?.stock_controlled !== 1;
   }
 
-  mostrarCantidad(data: any, stock: string) {
-    if (data.measure?.is_integer === 1) {
-      return (+stock)?.toFixed(0);
+  showCantidad(data: any) {
+    if (!data) {
+      return;
+    }
+    if (this.selectedProduccion?.product?.measure?.is_integer === 1) {
+      return (+data)?.toFixed(0);
     } else {
-      return (+stock)?.toFixed(2);
+      return (+data)?.toFixed(2);
     }
   }
 
@@ -523,8 +526,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
 
   async changeEstadoProduccion(event: any) {
-    // console.log(this.selectedProduccion);
-    // console.log(this.usuarioLogueado);
     const { value: text, isConfirmed } = await Swal.fire({
       input: "textarea",
       inputLabel: "Cambio de estado",
@@ -556,7 +557,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._produccionService.editEstadoProduccion(this.selectedProduccion.uuid, produccionEstadoDTO).subscribe({
         next: res => {
-          console.log(res);
           this.obtenerProducciones(false);
           this.tokenService.setToken(res.token);
           this.spinner.hide();

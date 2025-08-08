@@ -151,6 +151,7 @@
                                         <td><strong>Cantidad disponible</strong></td>
                                         <td><strong>Producción máxima</strong></td>
                                     </tr>
+                                    @if(stocks.length > 0) {
                                     @for(data of stocks ; track data.uuid) {
                                     <tr>
                                         <td class="border px-2 py-1">
@@ -172,7 +173,14 @@
                                         <td class="border px-2 py-1"> {{getProduccionMaxima(data)}} </td>
                                     </tr>
                                     }
+                                    } @else {
+                                    <tr>
+                                        <td class="border px-2 py-1"></td>
+                                        <td class="border px-2 py-1" colspan="3">No hay lotes disponibles</td>
+                                    </tr>
+                                    }
 
+                                    @if(selectedComponent?.product_type?.can_be_provided === 1) {
                                     <tr>
                                         <td></td>
                                         <td></td>
@@ -204,6 +212,7 @@
                                             </ng-select>
                                         </td>
                                     </tr>
+                                    }
 
                                 </tbody>
                             </table>
