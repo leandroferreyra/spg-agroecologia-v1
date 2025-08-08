@@ -174,7 +174,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
-          console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
+          // console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -259,16 +259,11 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: res => {
         this.estados = res.estados.data;
-        console.log(res.usuarios)
         this.usuariosParaFiltrar = res.usuarios.data.map((usuario: any) => ({
           ...usuario,
           disabled: usuario.production_count === 0
         }));
         this.usuarios = res.usuarios.data;
-        // this.usuarios = res.usuarios.data.map((usuario: any) => ({
-        //   ...usuario,
-        //   disabled: usuario.uuid === this.selectedProduccion?.responsible?.uuid
-        // }));
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -565,7 +560,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
           this.spinner.hide();
         },
         error: error => {
-          console.log(error);
+          console.error(error);
           this.spinner.hide();
           this.swalService.toastError('top-right', error.error.message);
         },
