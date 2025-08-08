@@ -224,12 +224,6 @@
                                         formControlName="responsableCreacion" />
                                 </div>
 
-                                <!-- <div (keydown.enter)="confirmarProduccion(produccionForm)">
-                                    <label for="responsableEjecucion">Responsable de ejecución</label>
-                                    <input id="responsableEjecucion" type="text" placeholder="" class="form-control"
-                                        formControlName="responsableEjecucion" />
-                                </div> -->
-
                                 <div class="flex-grow-1">
                                     <label for="usuarios">Responsable de ejecución</label>
                                     <ng-select [items]="usuarios" bindLabel="user_name" bindValue="uuid"
@@ -409,7 +403,7 @@
 
                             <div class="flex-grow-1">
                                 <label for="usuarios">Usuarios</label>
-                                <ng-select [items]="usuarios" bindLabel="user_name" bindValue="uuid"
+                                <ng-select [items]="usuariosParaFiltrar" bindLabel="user_name" bindValue="uuid"
                                     clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                     notFoundText="No hay usuarioss" class="w-1/3 min-w-[200px]" [multiple]="true"
                                     [(ngModel)]="filtros['user->responsible.uuid'].value"

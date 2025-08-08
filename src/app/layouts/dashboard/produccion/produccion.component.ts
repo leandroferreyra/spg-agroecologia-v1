@@ -105,23 +105,12 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   iconArrowDown = faArrowDown;
   iconArrowLeft = faArrowLeft;
 
-  // Referencia al modal para crear y editar
-  // @ViewChild('modalProduccion') modalProduccion!: NgxCustomModalComponent;
-  // modalOptions: ModalOptions = {
-  //   closeOnOutsideClick: false,
-  //   hideCloseButton: true,
-  //   closeOnEscape: false
-  // };
   tituloModal: string = '';
 
   // Catalogos
-  // paises: any[] = [];
-  // categorias: any[] = [];
   estados: any[] = [];
   usuarios: any[] = [];
-  // proveedores: any[] = [];
-  // tipoProductos: any[] = [];
-  // measures: any[] = [];
+  usuariosParaFiltrar: any[] = [];
 
   uuidFromUrl: string = '';
   isLoadingProducciones: boolean = true;
@@ -185,7 +174,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
-          // console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
+          console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -270,11 +259,16 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: res => {
         this.estados = res.estados.data;
-        this.usuarios = res.usuarios.data;
-        this.usuarios = this.usuarios.map(usuario => ({
+        console.log(res.usuarios)
+        this.usuariosParaFiltrar = res.usuarios.data.map((usuario: any) => ({
           ...usuario,
           disabled: usuario.production_count === 0
         }));
+        this.usuarios = res.usuarios.data;
+        // this.usuarios = res.usuarios.data.map((usuario: any) => ({
+        //   ...usuario,
+        //   disabled: usuario.uuid === this.selectedProduccion?.responsible?.uuid
+        // }));
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -294,6 +288,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
+    this.setUsuariosConDisabled();
     // console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
@@ -307,6 +302,14 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
   onFormEditChange() {
 
+  }
+
+  private setUsuariosConDisabled() {
+    if (!this.selectedProduccion) return;
+    this.usuarios = this.usuarios.map(usuario => ({
+      ...usuario,
+      disabled: usuario.uuid === this.selectedProduccion.responsible?.uuid
+    }));
   }
 
   isFieldDisabled(producto: any) {

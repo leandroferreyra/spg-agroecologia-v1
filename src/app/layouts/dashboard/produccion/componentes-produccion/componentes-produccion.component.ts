@@ -235,7 +235,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   openModalComponente(data: any) {
     this.selectedComponent = data;
-    console.log("🚀 ~ ComponentesProduccionComponent ~ openModalComponente ~ this.selectedComponent:", this.selectedComponent)
+    // console.log("🚀 ~ ComponentesProduccionComponent ~ openModalComponente ~ this.selectedComponent:", this.selectedComponent)
     this.obtenerProveedoresByComponente(data.uuid);
     this.stocks = (data.possible_stocks || []).map((stock: any) => ({
       ...stock,
