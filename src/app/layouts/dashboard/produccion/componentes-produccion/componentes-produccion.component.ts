@@ -143,6 +143,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
+  getProduccionMaxima(stock: any) {
+    return +stock.total_amount / +this.produccion.quantity;
+  }
+
   showName(stock: any) {
     return stock.batch ? stock.batch.batch_identification : 'Lote único';
   }
