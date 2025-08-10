@@ -99,7 +99,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   obtenerComponentesProduccion() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["productType", "measure", "stock", "supplier", "possibleStocks.batch"];
+    params.with = ["productType", "measure", "stock", "supplier", "possibleStocks.batch", "stock.batch"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -173,14 +173,13 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       return 'Sin control de stock';
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 0) {
-      // console.log('STOCK ÚNICO');
-      // return 'Stock unico';
+      // Lote único
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 1) {
-      // console.log('N LOTES');
-      // return 'N Stocks';
-      // (aclaración: los stocks que se muestran son los que tienen cantidad disponible suficiente, es decir total_amount >= Cantidad total necesaria, 
-      // pero los que se permiten seleccionar son que tienen cantidad disponible > 0)
+      // N lotes
+    }
+    if (data.origin === 'Lote') {
+      return data.stock?.batch?.batch_identification;
     }
     return data.origin;
   }
