@@ -17,6 +17,8 @@ import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
+import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-componentes-produccion',
@@ -76,7 +78,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
 
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
-    private _swalService: SwalService, private _frozenComponentService: FrozenComponentService) {
+    private _swalService: SwalService, private _frozenComponentService: FrozenComponentService, private router: Router,
+    private location: Location) {
 
   }
 
@@ -408,6 +411,17 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
     }
     // console.log(this.reemplazoForm);
+  }
+
+  irAlProducto(event: MouseEvent, data: any) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const urlTree = this.router.createUrlTree([`/dashboard/productos/${data.uuid}`]);
+    const url = this.router.serializeUrl(urlTree);
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`${baseUrl}#${url}`, '_blank');
+    } else {
+      this.router.navigate([`/dashboard/productos/${data.uuid}`]);
+    }
   }
 
 }
