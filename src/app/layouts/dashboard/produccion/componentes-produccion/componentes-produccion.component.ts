@@ -364,7 +364,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   openModalReemplazos(data: any) {
     this.reemplazos = data.product?.replacements;
-    console.log("🚀 ~ ComponentesProduccionComponent ~ openModalReemplazos ~ this.reemplazos:", this.reemplazos)
+    // console.log("🚀 ~ ComponentesProduccionComponent ~ openModalReemplazos ~ this.reemplazos:", this.reemplazos)
     // this.obtenerReemplazos(data);
     this.inicializarFormReemplazo();
     this.tituloModal = 'Seleccionar reemplazo';
