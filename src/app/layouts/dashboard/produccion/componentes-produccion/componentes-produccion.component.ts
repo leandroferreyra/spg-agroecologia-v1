@@ -102,7 +102,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   obtenerComponentesProduccion() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["productType", "measure", "stock", "supplier", "possibleStocks.batch", "stock.batch"];
+    params.with = ["productType", "measure", "stock.batch", "supplier", "possibleStocks.batch", "product.replacements"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -363,7 +363,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   openModalReemplazos(data: any) {
-    this.obtenerReemplazos(data);
+    this.reemplazos = data.product?.replacements;
+    console.log("🚀 ~ ComponentesProduccionComponent ~ openModalReemplazos ~ this.reemplazos:", this.reemplazos)
+    // this.obtenerReemplazos(data);
     this.inicializarFormReemplazo();
     this.tituloModal = 'Seleccionar reemplazo';
     this.modalReemplazo.options = this.modalOptions;
@@ -380,30 +382,30 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     })
   }
 
-  obtenerReemplazos(data: any) {
-    const params: any = {};
-    params.with = ["product", "replacement"];
-    params.paging = this.itemsPerPage;
-    params.page = this.currentPage;
-    params.order_by = this.ordenamiento;
-    params.filters = {
-      'product_uuid': { value: data.uuid, op: '=', contiene: false },
-    }
-    this.subscription.add(
-      this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
-        next: res => {
-          this.reemplazos = res.data;
-          this._tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          this._swalService.toastError('top-right', error.error.message);
-          console.error(error);
-          this.spinner.hide();
-        }
-      })
-    )
-  }
+  // obtenerReemplazos(data: any) {
+  //   const params: any = {};
+  //   params.with = ["product", "replacement"];
+  //   params.paging = this.itemsPerPage;
+  //   params.page = this.currentPage;
+  //   params.order_by = this.ordenamiento;
+  //   params.filters = {
+  //     'product_uuid': { value: data.uuid, op: '=', contiene: false },
+  //   }
+  //   this.subscription.add(
+  //     this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
+  //       next: res => {
+  //         this.reemplazos = res.data;
+  //         this._tokenService.setToken(res.token);
+  //         this.spinner.hide();
+  //       },
+  //       error: error => {
+  //         this._swalService.toastError('top-right', error.error.message);
+  //         console.error(error);
+  //         this.spinner.hide();
+  //       }
+  //     })
+  //   )
+  // }
 
   confirmarReemplazo() {
     this.isSubmit = true;
@@ -415,12 +417,12 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   irAlProducto(event: MouseEvent, data: any) {
     const baseUrl = window.location.origin + window.location.pathname;
-    const urlTree = this.router.createUrlTree([`/dashboard/productos/${data.uuid}`]);
+    const urlTree = this.router.createUrlTree([`/dashboard/productos/${data.product?.uuid}`]);
     const url = this.router.serializeUrl(urlTree);
     if (event.ctrlKey || event.metaKey) {
       window.open(`${baseUrl}#${url}`, '_blank');
     } else {
-      this.router.navigate([`/dashboard/productos/${data.uuid}`]);
+      this.router.navigate([`/dashboard/productos/${data.product?.uuid}`]);
     }
   }
 
