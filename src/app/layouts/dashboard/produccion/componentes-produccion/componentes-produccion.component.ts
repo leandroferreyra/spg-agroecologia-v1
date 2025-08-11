@@ -6,7 +6,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Subscription } from 'rxjs';
+import { concat, debounceTime, distinctUntilChanged, finalize, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { FrozenComponentDTO } from 'src/app/core/models/request/frozenComponentDTO';
 import { FrozenComponentService } from 'src/app/core/services/frozenComponents.service';
 import { IndexService } from 'src/app/core/services/index.service';
@@ -74,7 +74,12 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     { key: 'ss', label: 'Sin selección', tieneSelect: false }
   ];
   stocks: any[] = [];
-  proveedores: any[] = [];
+
+  proveedorInput$ = new Subject<string>();
+  // searchProveedor$ = new Subject<string>();
+  // initialProveedor$ = new Subject<string>();
+  proveedores$: Observable<any[]> = of([]);
+  loadingProveedores = false;
 
 
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
@@ -102,7 +107,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   obtenerComponentesProduccion() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["productType", "measure", "stock.batch", "supplier", "possibleStocks.batch", "product.replacements"];
+    params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+      "possibleStocks.batch", "product.replacements"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -237,15 +243,21 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   openModalComponente(data: any) {
     this.selectedComponent = data;
-    // console.log("🚀 ~ ComponentesProduccionComponent ~ openModalComponente ~ this.selectedComponent:", this.selectedComponent)
-    this.obtenerProveedoresByComponente(data.uuid);
+    this.inicializarFormComponente(data);
+
+    // Si ya tiene proveedor seleccionado, precargarlo en la lista
+    // if (data.supplier) {
+    //   this.proveedores$ = of([{
+    //     ...data.supplier,
+    //     nombreCompleto: this.bindName(data.supplier)
+    //   }]);
+    // }
+    this.obtenerProveedoresByComponente(data);
     this.stocks = (data.possible_stocks || []).map((stock: any) => ({
       ...stock,
-      // nombreCompleto: this.armarStock(data, stock),
       disabled: +stock.total_amount < +this.getCantidadTotal(data)
     }));
     this.tituloModal = `Selección de origen de "${data.name}"`;
-    this.inicializarFormComponente(data);
     this.modalComponente.options = this.modalOptions;
     this.modalComponente.open();
   }
@@ -271,34 +283,89 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
       origin: new FormControl({ value: data ? data.origin : null, disabled: false }, []),
       stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: false }, []),
-      supplier_uuid: new FormControl({ value: data ? data.supplier?.uuid : null, disabled: false }, []),
+      supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: false }, []),
       note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
     })
   }
 
-  obtenerProveedoresByComponente(uuid: string) {
-    const params: any = {};
-    params.with = [];
-    params.paging = this.itemsPerPage;
-    params.page = this.currentPage;
-    params.order_by = {};
-    params.filters = {
-      'products.uuid': { value: uuid, op: '=', contiene: false },
+  obtenerProveedoresByComponente(data?: any) {
+    const params: any = {
+      with: [
+        "person.city",
+        "person.city.district",
+        "person.city.district.country",
+        "person.human",
+        "person.human.gender",
+        "person.human.documentType",
+        "person.human.user",
+        "person.legalEntity"
+      ],
+      paging: 10,
+      page: 1,
+      order_by: {},
+      filters: {}
     };
-    this.subscription.add(
-      this._indexService.getProveedoresWithParam(params, this.rol).subscribe({
-        next: res => {
-          this.proveedores = res.data;
-          this._tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          this._swalService.toastError('top-right', error.error.message);
-          console.error(error);
-          this.spinner.hide();
+
+    // Si ya tiene proveedor seleccionado, lo ponemos como valor inicial del control
+    if (data?.supplier) {
+      const supplierConNombre = {
+        ...data.supplier,
+        nombreCompleto: this.bindName(data.supplier)
+      };
+
+      this.componenteForm.get('supplier_uuid')?.setValue(supplierConNombre);
+
+      // También lo cargamos como primer valor en la lista
+      this.proveedores$ = of([supplierConNombre]);
+    }
+
+    // Ahora configuramos la búsqueda
+    const busqueda$ = this.proveedorInput$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => this.loadingProveedores = true),
+      switchMap((term: string) => {
+        if (!term || term.trim().length < 2) {
+          this.loadingProveedores = false;
+          // Si no hay búsqueda, devolvemos el proveedor inicial (si existe) o lista vacía
+          return data?.supplier
+            ? of([{
+              ...data.supplier,
+              nombreCompleto: this.bindName(data.supplier)
+            }])
+            : of([]);
         }
+
+        params.filters = {
+          operator: { value: 'OR' },
+          'person.human.firstname': { value: term, op: 'LIKE', contiene: true },
+          'person.human.lastname': { value: term, op: 'LIKE', contiene: true },
+          'person.legalEntity.company_name': { value: term, op: 'LIKE', contiene: true }
+        };
+
+        return this._indexService.getProveedoresWithParamAsync(params, this.rol).pipe(
+          map((res: any) =>
+            res.data.map((proveedor: any) => ({
+              ...proveedor,
+              nombreCompleto: this.bindName(proveedor)
+            }))
+          ),
+          finalize(() => this.loadingProveedores = false)
+        );
       })
-    )
+    );
+
+    this.proveedores$ = busqueda$;
+  }
+
+  bindName(data: any): string {
+    if (!data.person) return '';
+    if (data.person.human) {
+      return data.person.human.firstname + ' ' + data.person.human.lastname;
+    } else if (data.person.legal_entity) {
+      return data.person.legal_entity.company_name;
+    }
+    return '';
   }
 
   confirmarComponente() {
@@ -329,7 +396,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     componente.actual_role = this.rol;
     componente.origin = this.componenteForm.get('origin')?.value;
     componente.stock_uuid = this.componenteForm.get('stock_uuid')?.value;
-    componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value;
+    componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value?.uuid;
     componente.note = this.componenteForm.get('note')?.value;
   }
 
@@ -364,8 +431,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   openModalReemplazos(data: any) {
     this.reemplazos = data.product?.replacements;
-    // console.log("🚀 ~ ComponentesProduccionComponent ~ openModalReemplazos ~ this.reemplazos:", this.reemplazos)
-    // this.obtenerReemplazos(data);
     this.inicializarFormReemplazo();
     this.tituloModal = 'Seleccionar reemplazo';
     this.modalReemplazo.options = this.modalOptions;
@@ -381,31 +446,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       uuid: new FormControl({ value: null, disabled: false }, [Validators.required])
     })
   }
-
-  // obtenerReemplazos(data: any) {
-  //   const params: any = {};
-  //   params.with = ["product", "replacement"];
-  //   params.paging = this.itemsPerPage;
-  //   params.page = this.currentPage;
-  //   params.order_by = this.ordenamiento;
-  //   params.filters = {
-  //     'product_uuid': { value: data.uuid, op: '=', contiene: false },
-  //   }
-  //   this.subscription.add(
-  //     this._indexService.getReemplazosWithParam(params, this.rol).subscribe({
-  //       next: res => {
-  //         this.reemplazos = res.data;
-  //         this._tokenService.setToken(res.token);
-  //         this.spinner.hide();
-  //       },
-  //       error: error => {
-  //         this._swalService.toastError('top-right', error.error.message);
-  //         console.error(error);
-  //         this.spinner.hide();
-  //       }
-  //     })
-  //   )
-  // }
 
   confirmarReemplazo() {
     this.isSubmit = true;

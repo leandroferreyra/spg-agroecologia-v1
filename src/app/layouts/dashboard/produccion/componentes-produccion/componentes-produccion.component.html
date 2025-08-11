@@ -208,10 +208,12 @@
                                         </td>
                                         <td class="border px-2 py-1">Provisto por terceros</td>
                                         <td class="border px-2 py-1" colspan="2">
-                                            <ng-select [items]="proveedores" [appendTo]="'body'" bindLabel="user_name"
-                                                bindValue="uuid" clearAllText="Limpiar" style="width: 100%"
-                                                [virtualScroll]="true" notFoundText="No hay datos"
-                                                class="w-1/3 min-w-[200px]" formControlName="supplier_uuid"
+
+                                            <ng-select [items]="proveedores$ | async" bindLabel="nombreCompleto"
+                                                [typeahead]="proveedorInput$" [loading]="loadingProveedores"
+                                                [virtualScroll]="true" typeToSearchText='Escriba un nombre'
+                                                loadingText="Cargando..." [appendTo]="'body'"
+                                                placeholder="Buscar proveedor..." formControlName="supplier_uuid"
                                                 [ngClass]="isSubmit ? componenteForm.controls['supplier_uuid'].errors ? 'has-error' : 'has-success' : ''">
                                             </ng-select>
                                         </td>
