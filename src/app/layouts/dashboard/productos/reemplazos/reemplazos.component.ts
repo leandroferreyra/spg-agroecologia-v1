@@ -162,6 +162,7 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
 
         params.filters = {
           'uuid': { value: this.producto.uuid, op: '!=', contiene: false },
+          'name': { value: term, op: 'LIKE', contiene: true }
         };
 
         return this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid).pipe(
