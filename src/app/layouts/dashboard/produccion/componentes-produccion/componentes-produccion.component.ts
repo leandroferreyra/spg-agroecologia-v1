@@ -188,7 +188,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       // N lotes
     }
     if (data.origin === 'Lote') {
-      return data.stock?.batch?.batch_identification;
+      return data.stock?.batch ? data.stock?.batch.batch_identification : 'Lote único';
     }
     return data.origin;
   }
