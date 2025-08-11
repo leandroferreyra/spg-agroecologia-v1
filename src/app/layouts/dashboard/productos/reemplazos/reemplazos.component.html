@@ -121,15 +121,6 @@
                     <div class="col-md-12">
                         <form [formGroup]="reemplazoForm" (keydown.enter)="confirmarReemplazo()">
 
-                            <!-- <div class="mb-2">
-                                <label>Productos</label>
-                                <ng-select [items]="productos" bindLabel="name" bindValue="uuid"
-                                    notFoundText="No hay productos" formControlName="replacement_uuid"
-                                    [virtualScroll]="true" [appendTo]="'body'"
-                                    [ngClass]="isSubmit ? reemplazoForm.controls['replacement_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                                </ng-select>
-                            </div> -->
-
                             <div class="mb-2">
                                 <label>Productos</label>
                                 <ng-select [items]="productos$ | async" bindLabel="name" bindValue="uuid" [typeahead]="productoInput$"

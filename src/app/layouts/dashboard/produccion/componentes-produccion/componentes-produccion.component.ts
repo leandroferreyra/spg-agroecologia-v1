@@ -108,7 +108,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-      "possibleStocks.batch", "product.replacements"];
+      "possibleStocks.batch", "product.replacements.replacement"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -118,7 +118,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
+          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();

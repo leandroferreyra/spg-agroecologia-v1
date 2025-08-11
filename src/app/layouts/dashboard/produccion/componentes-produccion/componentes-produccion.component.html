@@ -263,7 +263,7 @@
 
                         <div>
                             <label>Reemplazos</label>
-                            <ng-select [items]="reemplazos" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                            <ng-select [items]="reemplazos" bindLabel="replacement.name" bindValue="replacement.uuid" clearAllText="Limpiar"
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay reemplazos"
                                 class="w-1/3 min-w-[200px]" formControlName="uuid" [selectOnTab]="true"
                                 [ngClass]="isSubmit ? reemplazoForm.controls['uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
