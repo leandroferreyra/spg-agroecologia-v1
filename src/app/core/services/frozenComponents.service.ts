@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { ComponenteDTO } from '../models/request/componenteDTO';
 import { FrozenComponentDTO } from '../models/request/frozenComponentDTO';
+import { RolDTO } from '../models/request/rolDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,11 @@ export class FrozenComponentService {
   editComponente(uuid: string, componente: FrozenComponentDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.put<AuthResponse>(environment.baseUrl + this.apiComponentes + '/' + uuid, JSON.stringify(componente), { headers });
+  }
+
+  replaceComponente(uuidFrozen: string, uuidReplacement: string, rolDTO: RolDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiComponentes + '/' + uuidFrozen + '/replace/' + uuidReplacement, JSON.stringify(rolDTO), { headers });
   }
 
   deleteComponent(uuid: string, rolActual: string): Observable<AuthResponse> {

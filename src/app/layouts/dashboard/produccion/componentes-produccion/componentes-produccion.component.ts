@@ -19,6 +19,7 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { RolDTO } from 'src/app/core/models/request/rolDTO';
 
 @Component({
   selector: 'app-componentes-produccion',
@@ -430,7 +431,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   openModalReemplazos(data: any) {
-    this.reemplazos = data.product?.replacements;
+    this.selectedComponent = data;
+    this.reemplazos = (data.product?.replacements || []).filter(
+      (replacement: any) => replacement?.current_state?.state?.name !== 'Vigente'
+    );
     this.inicializarFormReemplazo();
     this.tituloModal = 'Seleccionar reemplazo';
     this.modalReemplazo.options = this.modalOptions;
@@ -450,9 +454,25 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   confirmarReemplazo() {
     this.isSubmit = true;
     if (this.reemplazoForm.valid) {
-
+      this.spinner.show();
+      let rolDTO = new RolDTO();
+      rolDTO.actual_role = this.rol;
+      this.subscription.add(
+        this._frozenComponentService.replaceComponente(this.selectedComponent.uuid, this.reemplazoForm.get('uuid')?.value, rolDTO).subscribe({
+          next: res => {
+            this.obtenerComponentesProduccion();
+            this._tokenService.setToken(res.token);
+            this.spinner.hide();
+            this.cerrarModalReemplazo();
+          },
+          error: error => {
+            this.spinner.hide();
+            this._swalService.toastError('top-right', error.error.message);
+            console.error(error);
+          },
+        })
+      )
     }
-    // console.log(this.reemplazoForm);
   }
 
   irAlProducto(event: MouseEvent, data: any) {

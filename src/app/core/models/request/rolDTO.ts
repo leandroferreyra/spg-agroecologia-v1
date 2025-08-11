@@ -1,7 +1,6 @@
-export class GenericDTO {
+export class RolDTO {
 
     actual_role!: string;
-    paging!: number;
 
     constructor() { }
 

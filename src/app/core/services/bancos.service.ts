@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
-import { GenericDTO } from '../models/request/genericDTO';
 import { BancoDTO } from '../models/request/bancoDTO';
 
 @Injectable({
