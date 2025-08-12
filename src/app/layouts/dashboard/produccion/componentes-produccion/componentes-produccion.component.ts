@@ -119,7 +119,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -438,7 +437,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     let reemplazos = (data.product?.replacements || []).filter(
       (replacement: any) => replacement?.replacement?.current_state?.state?.name === 'Vigente'
     );
-    return reemplazos.length > 0;
+    return (reemplazos.length > 0 && this.produccion.current_state?.state?.name === 'Borrador');
   }
 
   openModalReemplazos(data: any) {
