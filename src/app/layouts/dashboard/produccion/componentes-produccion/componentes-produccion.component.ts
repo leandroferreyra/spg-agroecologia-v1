@@ -109,11 +109,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch", "product.replacements.replacement"];
+      params.with = ["productType", "measure", "stock.batch", "stock.location", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+        "possibleStocks.batch", "possibleStocks.location", "product.replacements.replacement"];
     } else {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch","product"];
+      params.with = ["productType", "measure", "stock.batch", "stock.location", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+        "possibleStocks.batch", "possibleStocks.location", "product"];
     }
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
@@ -193,7 +193,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       // N lotes
     }
     if (data.origin === 'Lote') {
-      return data.stock?.batch ? data.stock?.batch.batch_identification : 'Lote único';
+      return data.stock?.batch ? data.stock?.batch.batch_identification + ' - ' + data.stock?.location?.name : 'Lote único';
     } else if (data.origin === 'Provisto por terceros') {
       return data.origin + ' - ' + this.bindName(data.supplier);
     } else {
@@ -253,14 +253,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   openModalComponente(data: any) {
     this.selectedComponent = data;
     this.inicializarFormComponente(data);
-
-    // Si ya tiene proveedor seleccionado, precargarlo en la lista
-    // if (data.supplier) {
-    //   this.proveedores$ = of([{
-    //     ...data.supplier,
-    //     nombreCompleto: this.bindName(data.supplier)
-    //   }]);
-    // }
     this.obtenerProveedoresByComponente(data);
     this.stocks = (data.possible_stocks || []).map((stock: any) => ({
       ...stock,
@@ -275,17 +267,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.isSubmit = false;
     this.modalComponente.close();
   }
-
-
-  // armarStock(componente: any, stock: any) {
-  //   let amount;
-  //   if (componente.measure?.is_integer === 1) {
-  //     amount = (+stock.total_amount).toFixed(0);
-  //   } else {
-  //     amount = (+stock.total_amount).toFixed(2);
-  //   }
-  //   return `${stock.batch != null ? stock.batch.batch_identification : "Lote único"} | ${amount}`;
-  // }
 
   inicializarFormComponente(data: any) {
     this.componenteForm = new FormGroup({

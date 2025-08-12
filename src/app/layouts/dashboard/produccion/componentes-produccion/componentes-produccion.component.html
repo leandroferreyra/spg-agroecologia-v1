@@ -146,7 +146,7 @@
                                             </div>
                                         </td>
                                         <td class="border px-2 py-1">Sin selección</td>
-                                        <td class="border px-2 py-1" colspan="2"></td>
+                                        <td class="border px-2 py-1" colspan="3"></td>
                                     </tr>
 
                                     <tr>
@@ -154,6 +154,7 @@
                                         <td></td>
                                         <td><strong>Cantidad disponible</strong></td>
                                         <td><strong>Producción máxima</strong></td>
+                                        <td><strong>Ubicación</strong></td>
                                     </tr>
                                     @if(stocks.length > 0) {
                                     @for(data of stocks ; track data.uuid) {
@@ -176,12 +177,13 @@
                                         <td class="border px-2 py-1"> {{showName(data)}} </td>
                                         <td class="border px-2 py-1"> {{getCantidadStockByComponent(data)}} </td>
                                         <td class="border px-2 py-1"> {{getProduccionMaxima(data)}} </td>
+                                        <td class="border px-2 py-1"> {{ data.location?.name}} </td>
                                     </tr>
                                     }
                                     } @else {
                                     <tr>
                                         <td class="border px-2 py-1"></td>
-                                        <td class="border px-2 py-1" colspan="3">No hay lotes disponibles</td>
+                                        <td class="border px-2 py-1" colspan="4">No hay lotes disponibles</td>
                                     </tr>
                                     }
 
@@ -209,7 +211,7 @@
                                             </div>
                                         </td>
                                         <td class="border px-2 py-1">Provisto por terceros</td>
-                                        <td class="border px-2 py-1" colspan="2">
+                                        <td class="border px-2 py-1" colspan="3">
 
                                             <ng-select [items]="proveedores$ | async" bindLabel="nombreCompleto"
                                                 [typeahead]="proveedorInput$" [loading]="loadingProveedores"
