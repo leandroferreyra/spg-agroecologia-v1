@@ -28,6 +28,7 @@ import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
     imports: [CommonModule, RouterLink, RouterLinkActive, FontAwesomeModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
         NgxCustomModalComponent, NgScrollbarModule, MenuModule, IconUserComponent, IconMenuComponent, IconCaretDownComponent],
     templateUrl: './header.html',
+    styleUrl: './header.css',
     animations: [toggleAnimation],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
@@ -129,19 +130,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
         });
     }
 
-    navigateTo(route: string, event: MouseEvent) {
-        if (route) {
-            const urlTree = this.router.createUrlTree([`/dashboard/${route}`]);
-            const serializedUrl = this.router.serializeUrl(urlTree);
+    // navigateTo(route: string, event: MouseEvent) {
+    //     if (route) {
+    //         const urlTree = this.router.createUrlTree([`/dashboard/${route}`]);
+    //         const serializedUrl = this.router.serializeUrl(urlTree);
 
-            if (event.ctrlKey || event.metaKey) {
-                const baseUrl = window.location.origin + window.location.pathname;
-                window.open(`${baseUrl}#${serializedUrl}`, '_blank');
-            } else {
-                this.router.navigate([`/dashboard/${route}`]);
-            }
-        }
-    }
+    //         if (event.ctrlKey || event.metaKey) {
+    //             const baseUrl = window.location.origin + window.location.pathname;
+    //             window.open(`${baseUrl}#${serializedUrl}`, '_blank');
+    //         } else {
+    //             this.router.navigate([`/dashboard/${route}`]);
+    //         }
+    //     }
+    // }
 
     openModalCambiarRol() {
         this.modalCambioRol.options = this.modalOptions;
