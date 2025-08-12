@@ -524,6 +524,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
 
   async changeEstadoProduccion(event: any) {
+    console.log(this.selectedProduccion);
     const { value: text, isConfirmed } = await Swal.fire({
       input: "textarea",
       inputLabel: "Cambio de estado",
@@ -535,7 +536,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       cancelButtonText: 'Cancelar',
       confirmButtonText: 'Confirmar',
       inputValidator: (value) => {
-        if (this.selectedProduccion?.creator?.user_name !== this.usuarioLogueado.user_name && !value) {
+        if (this.selectedProduccion?.creator?.user_name !== this.usuarioLogueado.user_name && !value || 
+            (this.selectedProduccion?.current_state?.state?.name === 'Liberado' && event === 'previous' && !value) 
+        ) {
           return 'La justificación es requerida';
         }
         return null;
