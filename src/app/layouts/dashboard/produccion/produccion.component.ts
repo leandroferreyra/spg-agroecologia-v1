@@ -524,29 +524,54 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
 
   async changeEstadoProduccion(event: any) {
-    const { value: text, isConfirmed } = await Swal.fire({
-      input: "textarea",
-      inputLabel: "Cambio de estado",
-      inputPlaceholder: "Escriba la justificación acá de ser necesario...",
-      inputAttributes: {
-        "aria-label": "Escriba la justificación acá de ser necesario..."
-      },
-      showCancelButton: true,
-      cancelButtonText: 'Cancelar',
-      confirmButtonText: 'Confirmar',
-      inputValidator: (value) => {
-        if (this.selectedProduccion?.creator?.user_name !== this.usuarioLogueado.user_name && !value || 
-            (this.selectedProduccion?.current_state?.state?.name === 'Liberado' && event === 'previous' && !value) 
-        ) {
-          return 'La justificación es requerida';
-        }
-        return null;
-      },
-    });
+    const requiereJustificacion =
+      (this.selectedProduccion?.creator?.user_name !== this.usuarioLogueado.user_name) ||
+      (this.selectedProduccion?.current_state?.state?.name === 'Liberado' && event === 'previous');
+
+    let text: string;
+    let isConfirmed = false;
+
+    if (requiereJustificacion) {
+      // Modal con input
+      const result = await Swal.fire({
+        input: "textarea",
+        inputLabel: "Cambio de estado",
+        inputPlaceholder: "Escriba la justificación acá de ser necesario...",
+        inputAttributes: {
+          "aria-label": "Escriba la justificación acá de ser necesario..."
+        },
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Confirmar',
+        inputValidator: (value) => {
+          if (!value) {
+            return 'La justificación es requerida';
+          }
+          return null;
+        },
+      });
+
+      text = result.value;
+      isConfirmed = result.isConfirmed;
+    } else {
+      // Modal solo de confirmación
+      const result = await Swal.fire({
+        title: "¿Confirmar cambio de estado?",
+        icon: "question",
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        confirmButtonText: 'Confirmar'
+      });
+
+      isConfirmed = result.isConfirmed;
+      text = '';
+    }
+
     if (isConfirmed) {
       this.confirmarCambioEstado(event, text);
     }
   }
+
 
   confirmarCambioEstado(event: any, justificacion: string) {
     this.spinner.show();
