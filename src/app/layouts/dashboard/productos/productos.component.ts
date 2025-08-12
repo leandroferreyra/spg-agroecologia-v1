@@ -134,6 +134,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   proveedores: any[] = [];
   tipoProductos: any[] = [];
   measures: any[] = [];
+  usuarios: any[] = [];
 
   uuidFromUrl: string = '';
   isLoadingProductos: boolean = true;
@@ -260,7 +261,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
       estados: this._catalogoService.getPosiblesEstadosProductos(this.actual_role),
       tipoProductos: this._catalogoService.getTipoProductos(this.actual_role),
       measures: this._catalogoService.getMeasures(this.actual_role),
-      proveedores: this._indexService.getProveedores(this.actual_role)
+      proveedores: this._indexService.getProveedores(this.actual_role),
+      usuarios: this._indexService.getUsuariosWithParam(null, this.actual_role)
     }).subscribe({
       next: res => {
         this.paises = res.paises.data;
@@ -273,6 +275,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
           ...proveedor,
           nombreCompleto: this.getNombreProveedor(proveedor)
         }));
+        this.usuarios = res.usuarios.data;
       },
       error: error => {
         console.error('Error cargando catalogos:', error);
@@ -699,6 +702,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.produccionForm = new FormGroup({
       cantidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
       fecha: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
+      responsable: new FormControl({ value: null, disabled: false }, [Validators.required]),
     });
     this.onFormEditChange();
   }
@@ -719,7 +723,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
         : this.produccionForm.get('fecha')?.value;
       produccionDTO.production_datetime = this.convertirFechaADateBackend(fechaFormateada);
       produccionDTO.quantity = this.produccionForm.get('cantidad')?.value;
-      produccionDTO['user->responsible_uuid'] = this.usuarioLogueado.uuid;
+      produccionDTO['user->responsible_uuid'] = this.produccionForm.get('responsable')?.value;
       this.subscription.add(
         this._produccionService.saveProduccion(produccionDTO).subscribe({
           next: res => {

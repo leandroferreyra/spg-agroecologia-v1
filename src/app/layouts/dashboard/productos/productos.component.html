@@ -751,6 +751,15 @@
                                 formControlName="cantidad" />
                         </div>
 
+                        <div class="flex-grow-1">
+                            <label for="usuarios">Responsable de ejecución</label>
+                            <ng-select [items]="usuarios" bindLabel="user_name" bindValue="uuid" clearAllText="Limpiar"
+                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay usuarios"
+                                class="w-1/3 min-w-[200px]" formControlName="responsable"
+                                [ngClass]="isSubmit ? produccionForm.controls['responsable'].errors ? 'has-error' : 'has-success' : ''">
+                            </ng-select>
+                        </div>
+
                     </div>
                 </div>
             </form>
