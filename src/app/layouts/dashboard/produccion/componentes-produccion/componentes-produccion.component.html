@@ -78,7 +78,7 @@
                                 </button>
                             </div>
                             }
-                            @if (data.product?.replacements.length > 0) {
+                            @if (hasReplacement(data)) {
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Reemplazar"
                                     (click)="openModalReemplazos(data)">
@@ -263,9 +263,10 @@
 
                         <div>
                             <label>Reemplazos</label>
-                            <ng-select [items]="reemplazos" bindLabel="replacement.name" bindValue="replacement.uuid" clearAllText="Limpiar"
-                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay reemplazos"
-                                class="w-1/3 min-w-[200px]" formControlName="uuid" [selectOnTab]="true"
+                            <ng-select [items]="reemplazos" bindLabel="replacement.name" bindValue="replacement.uuid"
+                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                notFoundText="No hay reemplazos" class="w-1/3 min-w-[200px]" formControlName="uuid"
+                                [selectOnTab]="true"
                                 [ngClass]="isSubmit ? reemplazoForm.controls['uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
 

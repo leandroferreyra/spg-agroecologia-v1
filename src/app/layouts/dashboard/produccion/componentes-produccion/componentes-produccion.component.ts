@@ -434,11 +434,19 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     });
   }
 
+  hasReplacement(data: any) {
+    let reemplazos = (data.product?.replacements || []).filter(
+      (replacement: any) => replacement?.replacement?.current_state?.state?.name === 'Vigente'
+    );
+    return reemplazos.length > 0;
+  }
+
   openModalReemplazos(data: any) {
     this.selectedComponent = data;
     this.reemplazos = (data.product?.replacements || []).filter(
-      (replacement: any) => replacement?.current_state?.state?.name !== 'Vigente'
+      (replacement: any) => replacement?.replacement?.current_state?.state?.name === 'Vigente'
     );
+    console.log("🚀 ~ ComponentesProduccionComponent ~ openModalReemplazos ~ this.reemplazos:", this.reemplazos)
     this.inicializarFormReemplazo();
     this.tituloModal = 'Seleccionar reemplazo';
     this.modalReemplazo.options = this.modalOptions;
