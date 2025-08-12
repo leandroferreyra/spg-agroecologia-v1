@@ -38,7 +38,7 @@
                             <ul class="sub-menu text-gray-500">
                                 @for(sub of menu.submenu; track sub) {
                                 <li>
-                                    <a (click)="navigateTo(sub.route)">{{sub.label}}</a>
+                                    <a (click)="navigateTo('config/' + sub.route)">{{sub.label}}</a>
                                 </li>
                                 }
                             </ul>
