@@ -113,7 +113,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         "possibleStocks.batch", "product.replacements.replacement"];
     } else {
       params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch"];
+        "possibleStocks.batch","product"];
     }
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
