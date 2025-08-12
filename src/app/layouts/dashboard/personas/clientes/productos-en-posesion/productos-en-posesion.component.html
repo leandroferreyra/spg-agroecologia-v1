@@ -4,7 +4,8 @@
     @if (productos.length === 0) {
     <div
         class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
-        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee productos en posesión</strong></span>
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee productos en
+                posesión</strong></span>
     </div>
     } @else {
     <div class="row mb-2">
@@ -63,7 +64,9 @@
                 @for(data of productos | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
                 <tr>
                     <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.code}} </td>
-                    <td class="whitespace-nowrap">{{ data.sale_products[0]?.transaction_product?.product?.name}} </td>
+                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                        (click)="irAlProducto($event, data)"> {{
+                        data.sale_products[0]?.transaction_product?.product?.name}}</td>
                     <td class="whitespace-nowrap">{{
                         data.sale_products[0]?.transaction_product?.product?.product_type?.name}} </td>
                     <td class="whitespace-nowrap">{{
@@ -75,32 +78,21 @@
             </tbody>
         </table>
 
-        <div class="row mt-4">
-            <div class="col">
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
                 <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
                     [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
                     [boundaryLinks]="true" (pageChange)="obtenerProductosEnPosesion()" />
             </div>
 
-            <div class="col">
-                <div class="row align-items-center float-md-end">
-                    <div class="col-auto">
-                        <label for="paginacion">Ítems por página:</label>
-                    </div>
-                    <div class="col-auto">
-                        <select id="paginacion" class="form-control" (change)="obtenerProductosEnPosesion()"
-                            [(ngModel)]="itemsPerPage">
-                            <option value=5>5</option>
-                            <option value=10>10</option>
-                            <option value=20>20</option>
-                            <option value=50>50</option>
-                            <option value=100>100</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerProductosEnPosesion()">
+                </ng-select>
             </div>
-
         </div>
+
     </div>
     }
 

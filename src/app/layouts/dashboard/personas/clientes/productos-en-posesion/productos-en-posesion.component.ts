@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -61,7 +62,7 @@ export class ProductosEnPosesionComponent implements OnInit, OnDestroy {
   iconArrowDown = faArrowDown;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _compraService: ComprasProveedorService, private _tokenService: TokenService) {
+    private router: Router, private _tokenService: TokenService) {
 
   }
   ngOnInit(): void {
@@ -135,6 +136,17 @@ export class ProductosEnPosesionComponent implements OnInit, OnDestroy {
       this.filtros.alias = { value: '', op: 'LIKE', contiene: true }
       this.filtros.cbu = { value: '', op: 'LIKE', contiene: true }
       this.obtenerProductosEnPosesion();
+    }
+  }
+
+  irAlProducto(event: MouseEvent, data: any) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const urlTree = this.router.createUrlTree([`/dashboard/productos/${data.sale_products[0]?.transaction_product?.product?.uuid}`]);
+    const url = this.router.serializeUrl(urlTree);
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`${baseUrl}#${url}`, '_blank');
+    } else {
+      this.router.navigate([`/dashboard/productos/${data.sale_products[0]?.transaction_product?.product?.uuid}`]);
     }
   }
 

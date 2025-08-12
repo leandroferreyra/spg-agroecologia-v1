@@ -79,7 +79,8 @@
                 <tr>
                     <td class="whitespace-nowrap">{{ data.transaction.transaction_datetime}} </td>
                     <td class="whitespace-nowrap">{{ data.product.code}} </td>
-                    <td class="whitespace-nowrap">{{ data.product.name}} </td>
+                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                        (click)="irAlProducto($event, data)"> {{ data.product.name}}</td>
                     <td class="whitespace-nowrap">{{ data.product.product_type.name}} </td>
                     <td class="whitespace-nowrap">{{ data.product.product_category.name}} </td>
                     <td class="whitespace-nowrap">{{ instancia?.serial_number || '' }}</td>
@@ -92,7 +93,8 @@
                 <tr>
                     <td class="whitespace-nowrap">{{ data.transaction.transaction_datetime}} </td>
                     <td class="whitespace-nowrap">{{ data.product.code}} </td>
-                    <td class="whitespace-nowrap">{{ data.product.name}} </td>
+                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                        (click)="irAlProducto($event, data)"> {{ data.product.name}}</td>
                     <td class="whitespace-nowrap">{{ data.product.product_type.name}} </td>
                     <td class="whitespace-nowrap">{{ data.product.product_category.name}} </td>
                     <td class="whitespace-nowrap"></td>
@@ -106,32 +108,21 @@
             </tbody>
         </table>
 
-        <div class="row mt-4">
-            <div class="col">
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
                 <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
                     [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
                     [boundaryLinks]="true" (pageChange)="obtenerProductosAdquiridos()" />
             </div>
 
-            <div class="col">
-                <div class="row align-items-center float-md-end">
-                    <div class="col-auto">
-                        <label for="paginacion">Ítems por página:</label>
-                    </div>
-                    <div class="col-auto">
-                        <select id="paginacion" class="form-control" (change)="obtenerProductosAdquiridos()"
-                            [(ngModel)]="itemsPerPage">
-                            <option value=5>5</option>
-                            <option value=10>10</option>
-                            <option value=20>20</option>
-                            <option value=50>50</option>
-                            <option value=100>100</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerProductosAdquiridos()">
+                </ng-select>
             </div>
-
         </div>
+
     </div>
     }
 
