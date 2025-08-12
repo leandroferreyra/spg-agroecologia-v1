@@ -524,7 +524,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
 
   async changeEstadoProduccion(event: any) {
-    console.log(this.selectedProduccion);
     const { value: text, isConfirmed } = await Swal.fire({
       input: "textarea",
       inputLabel: "Cambio de estado",
