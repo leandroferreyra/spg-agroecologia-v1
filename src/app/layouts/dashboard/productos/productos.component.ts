@@ -679,6 +679,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   volverAlProductoAnterior() {
     let p = this.productoAnterior.pop();
     this.location.replaceState(`/dashboard/productos/${p.uuid}`);
+    this.isEdicion = false;
     this.inicializarFormEdit(p);
     this.tab1 = 'datos-generales';
   }
