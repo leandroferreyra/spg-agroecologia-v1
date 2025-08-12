@@ -78,7 +78,7 @@ function getMenuByRole(role: string) {
                 { label: 'Proveedores', route: 'proveedores' },
                 { label: 'Clientes', route: 'clientes' },
                 {
-                    label: 'Configuraciones', route: '', submenu: [
+                    label: 'Configuraciones', route: 'config', submenu: [
                         { label: 'Usuarios', route: 'usuarios' },
                         { label: 'Bancos', route: 'bancos' },
                         { label: 'Países', route: 'paises' },

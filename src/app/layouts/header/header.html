@@ -98,7 +98,8 @@
             <ul class="sub-menu">
                 @for(sub of menu.submenu; track sub) {
                 <li>
-                    <a [routerLink]="sub.route" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="cursor-pointer">
+                    <a [routerLink]="'config/' + sub.route" routerLinkActive="active"
+                        [routerLinkActiveOptions]="{ exact: true }" class="cursor-pointer">
                         {{sub.label}}
                     </a>
                 </li>

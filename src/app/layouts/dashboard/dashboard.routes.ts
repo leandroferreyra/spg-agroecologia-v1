@@ -17,72 +17,77 @@ export const DASHBOARD_ROUTES: Routes = [
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION', 'PRODUCCION', 'USUARIO'], title: 'Perfil' }
             },
             {
-                path: 'bancos',
+                path: 'config',
+                loadComponent: () => import('./config/config.component').then(m => m.ConfigComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Configuración' }
+            },
+            {
+                path: 'config/bancos',
                 loadComponent: () => import('./config/listado-bancos/listado-bancos.component').then(m => m.ListadoBancosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Bancos' }
             },
             {
-                path: 'paises',
+                path: 'config/paises',
                 loadComponent: () => import('./config/listado-paises/listado-paises.component').then(m => m.ListadoPaisesComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Países' }
             },
             {
-                path: 'provincias',
+                path: 'config/provincias',
                 loadComponent: () => import('./config/listado-provincias/listado-provincias.component').then(m => m.ListadoProvinciasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Provincias' }
             },
             {
-                path: 'ciudades',
+                path: 'config/ciudades',
                 loadComponent: () => import('./config/listado-ciudades/listado-ciudades.component').then(m => m.ListadoCiudadesComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Ciudades' }
             },
             {
-                path: 'generos',
+                path: 'config/generos',
                 loadComponent: () => import('./config/listado-generos/listado-generos.component').then(m => m.ListadoGenerosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Géneros' }
             },
             {
-                path: 'monedas',
+                path: 'config/monedas',
                 loadComponent: () => import('./config/listado-monedas/listado-monedas.component').then(m => m.ListadoMonedasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Monedas' }
             },
             {
-                path: 'ubicaciones',
+                path: 'config/ubicaciones',
                 loadComponent: () => import('./config/listado-ubicaciones/listado-ubicaciones.component').then(m => m.ListadoUbicacionesComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Ubicaciones' }
             },
             {
-                path: 'exchanges',
+                path: 'config/exchanges',
                 loadComponent: () => import('./config/listado-tipos-de-cambio/listado-tipos-de-cambio.component').then(m => m.ListadoTiposDeCambioComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Tipos de cambio' }
             },
             {
-                path: 'tipos-productos',
+                path: 'config/tipos-productos',
                 loadComponent: () => import('./config/listado-tipos-de-productos/listado-tipos-de-productos.component').then(m => m.ListadoTiposDeProductosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Tipos de producto' }
             },
             {
-                path: 'cuentas-bancarias',
+                path: 'config/cuentas-bancarias',
                 loadComponent: () => import('./config/listado-cuentas-bancarias/listado-cuentas-bancarias.component').then(m => m.ListadoCuentasBancariasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Cuentas bancarias' }
             },
             {
-                path: 'categorias-productos',
+                path: 'config/categorias-productos',
                 loadComponent: () => import('./config/listado-categorias-productos/listado-categorias-productos.component').then(m => m.ListadoCategoriasProductosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Categorias' }
             },
             {
-                path: 'parametros-generales',
+                path: 'config/parametros-generales',
                 loadComponent: () => import('./config/listado-parametros-generales/listado-parametros-generales.component').then(m => m.ListadoParametrosGeneralesComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Parámetros generales' }
             },
             {
-                path: 'metodos-pago',
+                path: 'config/metodos-pago',
                 loadComponent: () => import('./config/listado-metodos-pago/listado-metodos-pago.component').then(m => m.ListadoMetodosPagoComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ADMIN', 'ADMINISTRACION'], title: 'Métodos de pago' }
             },
             {
-                path: 'usuarios',
+                path: 'config/usuarios',
                 loadComponent: () => import('./config/listado-usuarios/listado-usuarios.component').then(m => m.ListadoUsuariosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['SUPER_ADMIN', 'ADMIN'], title: 'Usuarios' }
             },
