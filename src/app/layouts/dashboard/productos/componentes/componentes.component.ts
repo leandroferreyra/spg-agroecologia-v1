@@ -433,7 +433,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
                 this.obtenerComponentes();
                 this.isEdicion = false;
                 this.cerrarModal();
-                this._swalService.toastSuccess('top-right', "Usuario actualizado.");
+                // this._swalService.toastSuccess('top-right', "Usuario actualizado.");
                 this.spinner.hide();
               },
               error: error => {

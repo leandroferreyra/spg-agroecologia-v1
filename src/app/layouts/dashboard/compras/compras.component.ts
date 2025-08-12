@@ -1228,27 +1228,30 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   validatePriceRange() {
-    let validatePriceRange = new ValidatePriceRangeDTO();
-    validatePriceRange.actual_role = this.actual_role;
-    validatePriceRange.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
-    validatePriceRange.transaction_uuid = this.selectedCompra.transaction?.uuid;
-    validatePriceRange.unit_price = this.productoForm.get('unit_price')?.value;
-    this.subscription.add(
-      this._transactionProductService.validatePriceRange(validatePriceRange).subscribe({
-        next: res => {
-          if (res.data?.message === "") {
-            this.confirmarAltaProducto();
-          } else {
-            // El usuario debe confirmar si acepta o no.
-            this.swalMessageToConfirm(res.data?.message);
+    this.isSubmit = true;
+    if (this.productoForm.valid) {
+      let validatePriceRange = new ValidatePriceRangeDTO();
+      validatePriceRange.actual_role = this.actual_role;
+      validatePriceRange.product_uuid = this.productoForm.get('product_uuid')?.value?.uuid;
+      validatePriceRange.transaction_uuid = this.selectedCompra.transaction?.uuid;
+      validatePriceRange.unit_price = this.productoForm.get('unit_price')?.value;
+      this.subscription.add(
+        this._transactionProductService.validatePriceRange(validatePriceRange).subscribe({
+          next: res => {
+            if (res.data?.message === "") {
+              this.confirmarAltaProducto();
+            } else {
+              // El usuario debe confirmar si acepta o no.
+              this.swalMessageToConfirm(res.data?.message);
+            }
+          },
+          error: error => {
+            this.swalService.toastError('top-right', error.error.message);
+            console.error(error);
           }
-        },
-        error: error => {
-          this.swalService.toastError('top-right', error.error.message);
-          console.error(error);
-        }
-      })
-    );
+        })
+      );
+    }
   }
 
   swalMessageToConfirm(message: string) {
