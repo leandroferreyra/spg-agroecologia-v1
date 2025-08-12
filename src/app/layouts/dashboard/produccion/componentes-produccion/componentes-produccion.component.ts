@@ -446,7 +446,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.reemplazos = (data.product?.replacements || []).filter(
       (replacement: any) => replacement?.replacement?.current_state?.state?.name === 'Vigente'
     );
-    console.log("🚀 ~ ComponentesProduccionComponent ~ openModalReemplazos ~ this.reemplazos:", this.reemplazos)
     this.inicializarFormReemplazo();
     this.tituloModal = 'Seleccionar reemplazo';
     this.modalReemplazo.options = this.modalOptions;
