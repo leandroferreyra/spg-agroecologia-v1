@@ -174,7 +174,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
-          // console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -284,7 +283,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
     this.setUsuariosConDisabled();
-    // console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
       fechaInicio: new FormControl({ value: this.convertirFechaConHora(produccion?.production_datetime), disabled: !this.isEdicion }, []),

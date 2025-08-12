@@ -533,8 +533,4 @@ export class ContactosPersonaComponent implements OnInit, OnDestroy {
 
   }
 
-  showDataContacto(data: any) {
-    console.log(data);
-  }
-
 }

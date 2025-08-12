@@ -37,10 +37,8 @@ export class TimelineComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['produccion'] && changes['produccion'].currentValue) {
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
-      // console.log('Producción actualizada: ', this.produccion);
     }
     if (changes['estadosPosibles'] && changes['estadosPosibles'].currentValue) {
-      // console.log('Estados posibles actualizados: ', this.estadosPosibles);
     }
   }
 

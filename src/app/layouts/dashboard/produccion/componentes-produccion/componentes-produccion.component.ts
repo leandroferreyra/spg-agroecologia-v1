@@ -386,7 +386,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._frozenComponentService.editComponente(this.componenteForm.get('uuid')?.value, componente).subscribe({
           next: res => {
-            // console.log(res);
             this.obtenerComponentesProduccion();
             this.cerrarModal();
             this.spinner.hide();

@@ -881,7 +881,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
     this.productoForm.get('location_uuid')!.valueChanges.subscribe(
       (value: any) => {
-        // console.log(this.selectedProducto);
         if (this.selectedProducto?.product?.product_type?.stock_controlled === 0 ||
           this.selectedProducto?.product?.traceable === 0) {
           this.showWarningUbicacion = true;
