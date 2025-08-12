@@ -137,6 +137,7 @@
                                                     <input type="checkbox"
                                                         (change)="switchOrigen('Sin selección', $event)"
                                                         [checked]="componenteForm.get('origin')?.value === 'Sin selección'"
+                                                        [disabled]="componenteForm.get('origin')?.value === 'Sin selección'"
                                                         class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                                         id="custom_switch_checkbox2" />
                                                     <span
@@ -162,7 +163,8 @@
                                                 class="flex items-center justify-center px-3 font-semibold  ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
                                                 <label class="relative mb-0 h-4 w-7 cursor-pointer">
                                                     <input type="checkbox" (change)="switchOrigen('Lote', $event, data)"
-                                                        [disabled]="getCantidadStockByComponent(data) < getCantidadTotal(selectedComponent)"
+                                                        [disabled]="getCantidadStockByComponent(data) < getCantidadTotal(selectedComponent) || 
+                                                        componenteForm.get('origin')?.value === 'Lote' && componenteForm.get('stock_uuid')?.value === data.uuid"
                                                         [checked]="componenteForm.get('origin')?.value === 'Lote' && componenteForm.get('stock_uuid')?.value === data.uuid"
                                                         class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                                         id="custom_switch_checkbox2" />
@@ -198,6 +200,7 @@
                                                     <input type="checkbox"
                                                         (change)="switchOrigen('Provisto por terceros', $event)"
                                                         [checked]="componenteForm.get('origin')?.value === 'Provisto por terceros'"
+                                                        [disabled]="componenteForm.get('origin')?.value === 'Provisto por terceros'"
                                                         class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                                         id="custom_switch_checkbox2" />
                                                     <span
