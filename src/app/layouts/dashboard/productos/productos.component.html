@@ -229,7 +229,7 @@
                     @if (productos.length > 0 && !isLoadingProductos) {
                     <form [formGroup]="productoForm" class="p-4">
                         <div class="flex flex-col sm:flex-row">
-                            <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
 
                                 <div (keydown.enter)="confirmarProducto(productoForm)">
                                     <label for="nombre">Nombre</label>

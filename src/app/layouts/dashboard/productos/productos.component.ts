@@ -180,7 +180,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.obtenerCatalogos();
   }
 
-  obtenerProductos(alta: boolean = false) {
+    obtenerProductos(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
 
