@@ -645,14 +645,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   inicializarFormNew() {
     this.newVentaForm = new FormGroup({
       transaction_datetime: new FormControl({ value: new Date(), disabled: false }, []),
-      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      // vat_after_discount: new FormControl({ value: null, disabled: false }, []),
-      // discount1: new FormControl({ value: null, disabled: false }, []),
-      // discount2: new FormControl({ value: null, disabled: false }, []),
-      // others: new FormControl({ value: null, disabled: false }, []),
-      // perceptionIB: new FormControl({ value: null, disabled: false }, []),
-      // perceptionRG3337: new FormControl({ value: null, disabled: false }, []),
-      // possible_transaction_state_uuid: new FormControl({ value: null, disabled: false }, []),
+      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required])
     });
     this.onNewForm();
   }

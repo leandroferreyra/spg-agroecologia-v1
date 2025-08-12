@@ -180,7 +180,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.obtenerCatalogos();
   }
 
-    obtenerProductos(alta: boolean = false) {
+  obtenerProductos(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
 
@@ -399,7 +399,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       tieneNumSerie: new FormControl({ value: false, disabled: false }, [Validators.required]),
       trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
       vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
-      // controlable: new FormControl({ value: false, disabled: false }, [Validators.required]),
       stock_minimum: new FormControl({ value: null, disabled: true }, []),
       stock_optimum: new FormControl({ value: null, disabled: true }, [])
     });
@@ -435,19 +434,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.placeholderStocks = '';
         }
       });
-
-    // this.newProductoForm.get('controlable')!.valueChanges.subscribe(
-    //   (value) => {
-    //     if (value) {
-    //       this.newProductoForm.get('descripcionControl')?.enable();
-    //     } else {
-    //       this.newProductoForm.get('descripcionControl')?.setValue(null);
-    //       this.newProductoForm.get('descripcionControl')?.disable();
-    //     }
-    //     ['descripcionControl'].forEach((field) => {
-    //       this.newProductoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
-    //     });
-    //   });
   }
 
   showDataProducto(producto: any) {
@@ -712,7 +698,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   inicializarFormProduccion() {
     this.produccionForm = new FormGroup({
       cantidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      fecha: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      fecha: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
     });
     this.onFormEditChange();
   }
@@ -729,7 +715,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       produccionDTO.actual_role = this.actual_role;
       produccionDTO.product_uuid = this.selectedProducto.uuid;
       const fechaFormateada = this.produccionForm.get('fecha')?.value instanceof Date
-        ? format(this.produccionForm.get('fecha')?.value, 'yyyy-MM-dd')
+        ? format(this.produccionForm.get('fecha')?.value, 'dd-MM-yyyy')
         : this.produccionForm.get('fecha')?.value;
       produccionDTO.production_datetime = this.convertirFechaADateBackend(fechaFormateada);
       produccionDTO.quantity = this.produccionForm.get('cantidad')?.value;
