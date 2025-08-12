@@ -104,7 +104,9 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
   obtenerReemplazos() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["product", "replacement"];
+    params.with = ["product", "replacement.country", "replacement.measure", "replacement.stocks", "replacement.productType", "replacement.productCategory",
+      "replacement.productStates"
+    ];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -176,34 +178,6 @@ export class ReemplazosComponent implements OnInit, OnDestroy {
       })
     );
   }
-
-
-  // obtenerCatalogos() {
-  //   const params: any = {};
-  //   params.with = ["productType", "measure"];
-  //   params.paging = null;
-  //   params.page = null;
-  //   params.order_by = {};
-  //   params.filters = {
-  //     'uuid': { value: this.producto.uuid, op: '!=', contiene: false },
-  //   };
-
-  //   forkJoin({
-  //     productos: this._indexService.getProductosPosiblesWithParam(params, this.rol, this.producto.uuid),
-  //   }).subscribe({
-  //     next: res => {
-  //       this.productos = res.productos.data;
-  //       this.productos = this.productos.map(p => ({
-  //         ...p,
-  //         disabled: this.disableProducto(p) // Solo deshabilita el que coincide
-  //       }));
-
-  //     },
-  //     error: error => {
-  //       console.error('Error cargando catalogos:', error);
-  //     }
-  //   });
-  // }
 
   disableProducto = (item: any): boolean => {
     return (item.uuid === this.producto.uuid) || this.esComponente(item);

@@ -165,7 +165,7 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{'!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales',
                                  'cursor-not-allowed tab-disabled': isTabDisabled
-                                }" (click)="!isTabDisabled && (tab1 = 'datos-generales')">
+                                }" (click)="!isTabDisabled && cambiarTab('datos-generales')">
                     Datos generales
                 </a>
 
@@ -173,7 +173,7 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componentes',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'componentes')">
+                    (click)="!isTabDisabled && cambiarTab('componentes')">
                     Componentes
                 </a>
 
@@ -181,7 +181,7 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componente-de',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'componente-de')">
+                    (click)="!isTabDisabled && cambiarTab('componente-de')">
                     Componente de
                 </a>
 
@@ -189,7 +189,7 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'reemplazos',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'reemplazos')">
+                    (click)="!isTabDisabled && cambiarTab('reemplazos')">
                     Reemplazos
                 </a>
 
@@ -197,21 +197,23 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'proveedores',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'proveedores')">
+                    (click)="!isTabDisabled && cambiarTab('proveedores')">
                     Proveedores
                 </a>
 
                 <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'stocks',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }" (click)="!isTabDisabled && (tab1 = 'stocks')">
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && cambiarTab('stocks')">
                     Stock
                 </a>
 
                 <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'compras',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }" (click)="!isTabDisabled && (tab1 = 'compras')">
+                    'cursor-not-allowed tab-disabled': isTabDisabled }"
+                    (click)="!isTabDisabled && cambiarTab('compras')">
                     Compras
                 </a>
 
@@ -219,7 +221,7 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'vinculos',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'vinculos')">
+                    (click)="!isTabDisabled && cambiarTab('vinculos')">
                     Vínculos
                 </a>
             </div>
@@ -354,19 +356,6 @@
                                     </label>
                                     <span>Vendible</span>
                                 </div>
-
-                                <!-- <div class="flex items-center gap-2 mt-2">
-                                    <label class="w-12 h-6 relative">
-                                        <input type="checkbox"
-                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                            id="custom_switch_checkbox2" formControlName="controlable" />
-                                        <span for="custom_switch_checkbox2"
-                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                        </span>
-                                    </label>
-                                    <span>Controlable</span>
-                                </div> -->
-
 
                                 <div>
                                     <label for="descripcionControl">Descripción control</label>
