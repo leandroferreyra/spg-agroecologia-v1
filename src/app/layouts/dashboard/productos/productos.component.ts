@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, RequiredValidator } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, RequiredValidator, FormArray, FormBuilder } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -42,7 +42,6 @@ import { VinculosComponent } from './vinculos/vinculos.component';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Route, Router } from '@angular/router';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
-import { IconProducirComponent } from 'src/app/shared/icon/icon-producir';
 import { ProduccionService } from 'src/app/core/services/produccion.service';
 import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
@@ -142,10 +141,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
   placeholderStocks: string = '';
   usuarioLogueado: any;
 
+  modoSeries: any
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router,
-    private _produccionService: ProduccionService, private _userLogged: UserLoggedService
+    private _produccionService: ProduccionService, private _userLogged: UserLoggedService, private formBuilder: FormBuilder
   ) {
     this.initStore();
   }
@@ -699,12 +700,81 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   inicializarFormProduccion() {
-    this.produccionForm = new FormGroup({
+    this.produccionForm = this.formBuilder.group({
       cantidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
       fecha: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
       responsable: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      modoSeries: new FormControl({ value: 'manual', disabled: false }, []),
+      series: this.formBuilder.array([]),
+      serieBase: new FormControl({ value: null, disabled: false }, []),
     });
-    this.onFormEditChange();
+    this.onChangeFormProduccion();
+  }
+  onChangeFormProduccion() {
+    this.produccionForm.get('cantidad')!.valueChanges.subscribe(
+      (value) => {
+        this.series.clear();
+        if (value && value > 0) {
+          if (this.produccionForm.get('modoSeries')?.value === 'manual') {
+            for (let i = 0; i < value; i++) {
+              this.agregarSerie();
+            }
+          } else {
+            this.produccionForm.get('serieBase')?.setValidators(Validators.required);
+            this.produccionForm.get('serieBase')?.updateValueAndValidity({ emitEvent: false });
+          }
+        }
+      });
+
+    this.produccionForm.get('modoSeries')?.valueChanges.subscribe((value) => {
+      this.regenerarSeries();
+      if (value === 'secuencial') {
+        this.produccionForm.get('serieBase')?.setValidators(Validators.required);
+        this.produccionForm.get('serieBase')?.updateValueAndValidity({ emitEvent: false });
+      } else {
+        this.produccionForm.get('serieBase')?.setValidators([]);
+        this.produccionForm.get('serieBase')?.updateValueAndValidity({ emitEvent: false });
+      }
+    });
+  }
+
+  regenerarSeries() {
+    const cantidad = this.produccionForm.get('cantidad')?.value || 0;
+    const modo = this.produccionForm.get('modoSeries')?.value;
+
+    this.series.clear();
+
+    if (cantidad > 0 && modo === 'manual') {
+      for (let i = 0; i < cantidad; i++) {
+        this.agregarSerie();
+      }
+    }
+  }
+
+  get series(): FormArray {
+    return this.produccionForm.get('series') as FormArray;
+  }
+
+  agregarSerie() {
+    const fieldGroup = this.formBuilder.group({
+      value: ['', Validators.required]
+    });
+    this.series.push(fieldGroup);
+  }
+
+  generarSecuencia() {
+    const cantidad = Number(this.produccionForm.get('cantidad')?.value);
+    const base = Number(this.produccionForm.get('serieBase')?.value);
+
+    if (!cantidad || !base) return;
+
+    this.series.clear();
+
+    for (let i = 0; i < cantidad; i++) {
+      this.series.push(this.formBuilder.group({
+        value: [base + i, Validators.required]
+      }));
+    }
   }
 
   esProducible(producto: any) {
@@ -713,6 +783,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   confirmarProduccion() {
     this.isSubmit = true;
+    console.log(this.series.controls);
     if (this.produccionForm.valid) {
       this.spinner.show();
       let produccionDTO = new ProduccionDTO();
@@ -724,6 +795,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
       produccionDTO.production_datetime = this.convertirFechaADateBackend(fechaFormateada);
       produccionDTO.quantity = this.produccionForm.get('cantidad')?.value;
       produccionDTO['user->responsible_uuid'] = this.produccionForm.get('responsable')?.value;
+      if (this.produccionForm.get('modoSeries')?.value === 'secuencial') {
+        this.generarSecuencia();
+      }
+      const seriesNumeros: number[] = this.series.value.map((s: any) => Number(s.value));
+      produccionDTO.serial_numbers = seriesNumeros;
       this.subscription.add(
         this._produccionService.saveProduccion(produccionDTO).subscribe({
           next: res => {
