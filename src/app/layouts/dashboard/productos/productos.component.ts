@@ -713,15 +713,17 @@ export class ProductosComponent implements OnInit, OnDestroy {
   onChangeFormProduccion() {
     this.produccionForm.get('cantidad')!.valueChanges.subscribe(
       (value) => {
-        this.series.clear();
-        if (value && value > 0) {
-          if (this.produccionForm.get('modoSeries')?.value === 'manual') {
-            for (let i = 0; i < value; i++) {
-              this.agregarSerie();
+        if (this.selectedProducto.assign_serial_number === 1) {
+          this.series.clear();
+          if (value && value > 0) {
+            if (this.produccionForm.get('modoSeries')?.value === 'manual') {
+              for (let i = 0; i < value; i++) {
+                this.agregarSerie();
+              }
+            } else {
+              this.produccionForm.get('serieBase')?.setValidators(Validators.required);
+              this.produccionForm.get('serieBase')?.updateValueAndValidity({ emitEvent: false });
             }
-          } else {
-            this.produccionForm.get('serieBase')?.setValidators(Validators.required);
-            this.produccionForm.get('serieBase')?.updateValueAndValidity({ emitEvent: false });
           }
         }
       });
