@@ -524,7 +524,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   async changeEstadoProduccion(event: any) {
     const requiereJustificacion =
-      (this.selectedProduccion?.creator?.user_name !== this.usuarioLogueado.user_name) ||
+      (this.selectedProduccion?.responsible?.user_name !== this.usuarioLogueado.user_name) ||
       (this.selectedProduccion?.current_state?.state?.name === 'Liberado' && event === 'previous');
 
     let text: string;
