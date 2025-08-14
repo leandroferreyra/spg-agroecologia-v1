@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, RequiredValidator, FormArray, FormBuilder } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, RequiredValidator, FormArray, FormBuilder, AbstractControl } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -785,6 +785,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   confirmarProduccion() {
     this.isSubmit = true;
+    this.produccionForm.markAllAsTouched();
+    this.series.markAllAsTouched();
     if (this.produccionForm.valid) {
       this.spinner.show();
       let produccionDTO = new ProduccionDTO();

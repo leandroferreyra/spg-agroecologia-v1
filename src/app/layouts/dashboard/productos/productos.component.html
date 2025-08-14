@@ -787,18 +787,14 @@
                         <div formArrayName="series" class="col-span-1 sm:col-span-2 flex flex-wrap gap-2 mt-2 w-full">
                             @for(field of series.controls; let i = $index; track field) {
                             <div [formGroupName]="i" class="flex flex-col"
-                                [ngClass]="isSubmit ? field.get('value')?.invalid ? 'has-error' : 'has-success' : ''">
+                                [ngClass]="isSubmit ? isSubmit && field.get('value')?.invalid ? 'has-error' : 'has-success' : ''">
                                 <input id="s" type="text" formControlName="value" placeholder="Serie {{ i + 1 }}"
-                                    class="border p-2 rounded w-32"
-                                    [ngClass]="isSubmit ? field.get('value')?.invalid ? 'has-error' : 'has-success' : ''">
-                                <span *ngIf="isSubmit && field.get('value')?.invalid" class="text-red-500 text-xs mt-1">
-                                    Número requerido
-                                </span>
+                                    class="border p-2 rounded w-32 form-control">
                             </div>
                             }
                         </div>
                         }@else {
-                        <div (keydown.enter)="confirmarProduccion()"
+                        <div (keydown.enter)=" confirmarProduccion()"
                             [ngClass]="isSubmit ? produccionForm.controls['serieBase'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="serieBase">Número secuencial inicial</label>
                             <input id="serieBase" type="text" placeholder="" class="form-control"
