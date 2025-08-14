@@ -177,7 +177,7 @@
                                         <td class="border px-2 py-1"> {{showName(data)}} </td>
                                         <td class="border px-2 py-1"> {{getCantidadStockByComponent(data)}} </td>
                                         <td class="border px-2 py-1"> {{getProduccionMaxima(data)}} </td>
-                                        <td class="border px-2 py-1"> {{ data.location?.name}} </td>
+                                        <td class="border px-2 py-1"> {{ getLocation(data).join(' - ') }} </td>
                                     </tr>
                                     }
                                     } @else {

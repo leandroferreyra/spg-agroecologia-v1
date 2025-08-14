@@ -84,8 +84,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
 
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
-    private _swalService: SwalService, private _frozenComponentService: FrozenComponentService, private router: Router,
-    private location: Location) {
+    private _swalService: SwalService, private _frozenComponentService: FrozenComponentService, private router: Router) {
 
   }
 
@@ -109,11 +108,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
-      params.with = ["productType", "measure", "stock.batch", "stock.location", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch", "possibleStocks.location", "product.replacements.replacement"];
+      params.with = ["productType", "measure", "stock", "stock", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement"];
     } else {
-      params.with = ["productType", "measure", "stock.batch", "stock.location", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch", "possibleStocks.location", "product"];
+      params.with = ["productType", "measure", "stock", "stock", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product"];
     }
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
@@ -124,6 +123,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -201,6 +201,19 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
 
   }
+
+  getLocation(data: any): string[] {
+    if (!data.location) return [];
+    const names: string[] = [];
+
+    if (data.location.location) {
+      names.push(...this.getLocation(data.location));
+    }
+    names.push(data.location.name);
+    return names;
+  }
+
+
 
   isAllowEdit(data: any) {
     if (data.product_type?.stock_controlled === 0) {
