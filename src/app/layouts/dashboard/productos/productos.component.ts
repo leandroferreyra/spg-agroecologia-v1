@@ -56,7 +56,7 @@ import { FlatpickrDirective } from 'angularx-flatpickr';
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
     ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent, IconSettingsComponent,
-    FlatpickrDirective
+    FlatpickrDirective, IconSearchComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',

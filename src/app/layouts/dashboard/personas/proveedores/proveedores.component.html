@@ -24,7 +24,8 @@
                     <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" [disabled]="isEdicion"
                         data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"
                         [ngClass]="{'text-gray-400 cursor-not-allowed': isEdicion}">
-                        <icon-settings class="mx-auto mb-1" />
+                        <icon-search class="mx-auto mb-1" />
+                        <!-- class="w-5 h-5" -->
                         Filtros avanzados
                     </button>
                 </div>
@@ -94,8 +95,7 @@
                             <label class="relative mb-0 h-4 w-7 cursor-pointer">
                                 <input type="checkbox" (change)="obtenerProveedores();"
                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                    id="contiene"
-                                    [(ngModel)]="filtros['person.human.firstname'].contiene" />
+                                    id="contiene" [(ngModel)]="filtros['person.human.firstname'].contiene" />
                                 <span
                                     class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
                             </label>
@@ -421,8 +421,8 @@
                     <span>Filtros de búsqueda</span>
                     <label class="w-12 h-6 relative">
                         <input type="checkbox"
-                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                            id="filtro" (change)="toggleFilter()" />
+                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer" id="filtro"
+                            (change)="toggleFilter()" />
                         <span for="filtro"
                             class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                         </span>
