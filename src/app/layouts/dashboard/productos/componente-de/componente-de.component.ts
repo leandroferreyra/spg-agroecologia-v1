@@ -72,7 +72,8 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
   obtenerComponentes() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["parentProduct", "parentProduct.measure", "parentProduct.productType", "supplier.person.human", "supplier.person.legalEntity"];
+    params.with = ["parentProduct", "parentProduct.measure", "parentProduct.country", "parentProduct.productType",
+      "supplier.person.human", "supplier.person.legalEntity"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
