@@ -788,7 +788,6 @@
                             @for(field of series.controls; let i = $index; track field) {
                             <div [formGroupName]="i" class="flex flex-col"
                                 [ngClass]="isSubmit ? field.get('value')?.invalid ? 'has-error' : 'has-success' : ''">
-                                <!-- <label for="s">Número serie {{i}} </label> -->
                                 <input id="s" type="text" formControlName="value" placeholder="Serie {{ i + 1 }}"
                                     class="border p-2 rounded w-32"
                                     [ngClass]="isSubmit ? field.get('value')?.invalid ? 'has-error' : 'has-success' : ''">
