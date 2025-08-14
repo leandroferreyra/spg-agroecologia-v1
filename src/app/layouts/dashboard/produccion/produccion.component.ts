@@ -164,7 +164,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["product.measure", "creator", "responsible", "currentState", "productionStates.creator"];
+    this.params.with = ["product.measure", "batch", "creator", "responsible", "currentState", "productionStates.creator"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
