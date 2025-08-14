@@ -772,7 +772,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
     for (let i = 0; i < cantidad; i++) {
       this.series.push(this.formBuilder.group({
-        value: [base + i, Validators.required]
+        value: [(base + i).toString(), Validators.required]
       }));
     }
   }
@@ -783,7 +783,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   confirmarProduccion() {
     this.isSubmit = true;
-    console.log(this.series.controls);
     if (this.produccionForm.valid) {
       this.spinner.show();
       let produccionDTO = new ProduccionDTO();
@@ -798,7 +797,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       if (this.produccionForm.get('modoSeries')?.value === 'secuencial') {
         this.generarSecuencia();
       }
-      const seriesNumeros: number[] = this.series.value.map((s: any) => Number(s.value));
+      const seriesNumeros: [] = this.series.value.map((s: any) => s.value);
       produccionDTO.serial_numbers = seriesNumeros;
       this.subscription.add(
         this._produccionService.saveProduccion(produccionDTO).subscribe({
