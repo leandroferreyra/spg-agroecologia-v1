@@ -761,48 +761,32 @@
                             </ng-select>
                         </div>
 
-                        @if (selectedProducto.assign_serial_number === 1) {
-                        <div class="flex-grow-1">
-                            <label>Asignar números de serie</label>
-                            <div class="flex items-center gap-2 mt-2">
-                                <label class="flex items-center cursor-pointer">
-                                    <input type="radio" class="hidden cursor-pointer" value="manual" name="modoSeries"
-                                        formControlName="modoSeries">
-                                    <span class="px-3 py-1 rounded-full transition-colors duration-200"
-                                        [ngClass]="produccionForm.get('modoSeries')?.value === 'manual' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'">
-                                        Manual
-                                    </span>
-                                </label>
-                                <label class="flex items-center cursor-pointer">
-                                    <input type="radio" class="hidden cursor-pointer" value="secuencial"
-                                        name="modoSeries" formControlName="modoSeries">
-                                    <span class="px-3 py-1 rounded-full transition-colors duration-200"
-                                        [ngClass]="produccionForm.get('modoSeries')?.value === 'secuencial' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'">
-                                        Secuencia automática
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
+                        @if (selectedProducto.assign_serial_number === 1 && produccionForm.get('cantidad')?.value > 0) {
+                        <div class="col-span-1 sm:col-span-2 w-full mt-2">
+                            <div class="flex items-center gap-4 mb-2">
+                                <label class="font-medium">Número de serie</label>
 
-                        @if (produccionForm.get('modoSeries')?.value === 'manual'){
-                        <div formArrayName="series" class="col-span-1 sm:col-span-2 flex flex-wrap gap-2 mt-2 w-full">
-                            @for(field of series.controls; let i = $index; track field) {
-                            <div [formGroupName]="i" class="flex flex-col"
-                                [ngClass]="isSubmit ? isSubmit && field.get('value')?.invalid ? 'has-error' : 'has-success' : ''">
-                                <input id="s" type="text" formControlName="value" placeholder="Serie {{ i + 1 }}"
-                                    class="border p-2 rounded w-32 form-control">
+                                @if(series.controls[0].get('value')?.value && produccionForm.get('cantidad')?.value > 1)
+                                {
+                                <button type="button" class="text-blue-500 text-sm underline hover:text-blue-700"
+                                    (click)="generarSecuencia()">
+                                    Generar secuencia
+                                </button>
+                                }
                             </div>
-                            }
-                        </div>
-                        }@else {
-                        <div (keydown.enter)=" confirmarProduccion()"
-                            [ngClass]="isSubmit ? produccionForm.controls['serieBase'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="serieBase">Número secuencial inicial</label>
-                            <input id="serieBase" type="text" placeholder="" class="form-control"
-                                formControlName="serieBase" />
+                            <div formArrayName="series"
+                                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 w-full">
+                                @for(field of series.controls; let i = $index; track field) {
+                                <div [formGroupName]="i"
+                                    [ngClass]="isSubmit ? isSubmit && field.get('value')?.invalid ? 'has-error' : 'has-success' : ''">
+                                    <input type="number" formControlName="value" placeholder="Serie {{ i + 1 }}"
+                                        class="border p-2 rounded w-full form-control">
+                                </div>
+                                }
+                            </div>
                         </div>
                         }
-                        }
+
                     </div>
                 </div>
             </form>

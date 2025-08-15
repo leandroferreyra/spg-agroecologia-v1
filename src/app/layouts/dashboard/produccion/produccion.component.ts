@@ -65,7 +65,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   usuarioLogueado: any;
   produccionAnterior: any[] = [];
   produccionForm!: FormGroup;
-  newProduccionForm!: FormGroup;
 
   isEdicion: boolean = false;
   isShowMailMenu = false;
@@ -164,7 +163,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["product.measure", "batch", "creator", "responsible", "currentState", "productionStates.creator"];
+    this.params.with = ["product.measure", "batch.stocks.productInstances", "creator", "responsible", "currentState", "productionStates.creator",];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -283,6 +282,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
+    console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
     this.setUsuariosConDisabled();
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
@@ -290,12 +290,26 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       cantidad: new FormControl({ value: this.showCantidad(produccion?.quantity), disabled: true }, [Validators.required]),
       responsableCreacion: new FormControl({ value: produccion?.creator?.user_name, disabled: true }, []),
       responsableEjecucion: new FormControl({ value: produccion?.responsible?.uuid, disabled: !this.isEdicion }, [Validators.required]),
-      movimientosEstado: new FormControl({ value: produccion?.production_states, disabled: true }, [])
+      movimientosEstado: new FormControl({ value: produccion?.production_states, disabled: true }, []),
+      asignaNumSerie: new FormControl({ value: produccion?.product?.assign_serial_number, disabled: true }, []),
+      tieneNumSerie: new FormControl({ value: produccion?.product?.has_serial_number, disabled: true }, []),
+      lote: new FormControl({ value: produccion?.batch?.batch_identification, disabled: true }, []),
+      numSerie: new FormControl({ value: this.obtenerSerialNumbers(produccion), disabled: true }, [])
     });
+    console.log(this.produccionForm);
     this.onFormEditChange();
   }
   onFormEditChange() {
 
+  }
+
+  obtenerSerialNumbers(produccion: any): string[] {
+    if (!produccion?.batch?.stocks) return [];
+
+    return produccion.batch.stocks
+      .flatMap((stock: any) => stock.product_instances || [])
+      .map((instance: any) => instance.serial_number)
+      .filter((sn: any) => sn !== undefined && sn !== null);
   }
 
   private setUsuariosConDisabled() {
@@ -604,28 +618,5 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this.router.navigate([`/dashboard/productos/${data.product?.uuid}`]);
     }
   }
-
-
-  // irAlProducto(data: { data: any, event: MouseEvent }) {
-  //   if (data.event.ctrlKey || data.event.metaKey) {
-  //     const baseUrl = window.location.origin + window.location.pathname;
-  //     const url = this.router.serializeUrl(
-  //       this.router.createUrlTree([`/dashboard/producciones/${data.data.uuid}`])
-  //     );
-  //     window.open(`${baseUrl}#${url}`, '_blank');
-  //   } else {
-  //     this.produccionAnterior.push(this.selectedProduccion);
-  //     this.location.replaceState(`/dashboard/producciones/${data.data.uuid}`);
-  //     this.inicializarForm(data.data);
-  //     this.tab1 = 'datos-generales';
-  //   }
-  // }
-
-  // volverAProduccionAnterior() {
-  //   let p = this.produccionAnterior.pop();
-  //   this.location.replaceState(`/dashboard/producciones/${p.uuid}`);
-  //   this.inicializarForm(p);
-  //   this.tab1 = 'datos-generales';
-  // }
 
 }

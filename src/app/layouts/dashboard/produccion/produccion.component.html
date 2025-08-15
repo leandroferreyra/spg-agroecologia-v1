@@ -116,13 +116,7 @@
                 @if(producciones.length > 0 && selectedProduccion) {
                 <span class="text-blue-600 underline cursor-pointer"
                     (click)="irAlProducto($event, selectedProduccion)">{{selectedProduccion.product?.name}}</span>
-                <!-- {{selectedProduccion.product?.name}} -->
                 }
-                <!-- @if(produccionAnterior.length > 0) {
-                <a class="text-sm text-blue-600 hover:underline cursor-pointer" (click)="volverAProduccionAnterior()">
-                    ( Volver a la producción anterior {{produccionAnterior[produccionAnterior.length - 1]?.name}} )
-                </a>
-                } -->
             </h5>
 
             <div class="flex items-center gap-2 ml-auto">
@@ -204,12 +198,6 @@
                                         formControlName="cantidad" />
                                 </div>
 
-                                <!-- <div (keydown.enter)="confirmarProduccion(produccionForm)">
-                                    <label for="fechaInicio">Fecha inicio</label>
-                                    <input id="fechaInicio" type="text" placeholder="" class="form-control"
-                                        formControlName="fechaInicio" />
-                                </div> -->
-
                                 <div>
                                     <label>Fecha de inicio</label>
                                     <input type="text" mwlFlatpickr [options]="{ 
@@ -234,6 +222,48 @@
                                         formControlName="responsableEjecucion">
                                     </ng-select>
                                 </div>
+
+                                <div>
+                                    <label for="lote">Lote/Partida</label>
+                                    <input id="lote" type="text" placeholder="" class="form-control"
+                                        formControlName="lote" />
+                                </div>
+
+                                <div class="flex items-center gap-2 mt-2">
+                                    <label class="w-12 h-6 relative">
+                                        <input type="checkbox"
+                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                            id="custom_switch_checkbox2" formControlName="asignaNumSerie" />
+                                        <span for="custom_switch_checkbox2"
+                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                        </span>
+                                    </label>
+                                    <span>Asigna número de serie</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 mt-2">
+                                    <label class="w-12 h-6 relative">
+                                        <input type="checkbox"
+                                            class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                            id="custom_switch_checkbox2" formControlName="tieneNumSerie" />
+                                        <span for="custom_switch_checkbox2"
+                                            class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                        </span>
+                                    </label>
+                                    <span>Tiene número de serie</span>
+                                </div>
+
+                                @if (produccionForm.get('numSerie')?.value?.length > 0) {
+                                <div class="col-span-1 sm:col-span-3 mt-2">
+                                    <label class="font-medium mb-1 block">Números de serie</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        @for(data of produccionForm.get('numSerie')?.value; track data) {
+                                        <input type="text" class="form-control w-32 border p-2 rounded" [value]="data"
+                                            disabled />
+                                        }
+                                    </div>
+                                </div>
+                                }
 
                             </div>
                         </div>

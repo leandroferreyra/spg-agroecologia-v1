@@ -704,9 +704,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       cantidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
       fecha: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
       responsable: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      modoSeries: new FormControl({ value: 'manual', disabled: false }, []),
-      series: this.formBuilder.array([]),
-      serieBase: new FormControl({ value: null, disabled: false }, []),
+      series: this.formBuilder.array([])
     });
     this.onChangeFormProduccion();
   }
@@ -716,41 +714,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
         if (this.selectedProducto.assign_serial_number === 1) {
           this.series.clear();
           if (value && value > 0) {
-            if (this.produccionForm.get('modoSeries')?.value === 'manual') {
-              for (let i = 0; i < value; i++) {
-                this.agregarSerie();
-              }
-            } else {
-              this.produccionForm.get('serieBase')?.setValidators(Validators.required);
-              this.produccionForm.get('serieBase')?.updateValueAndValidity({ emitEvent: false });
+            for (let i = 0; i < value; i++) {
+              this.agregarSerie();
             }
           }
         }
       });
-
-    this.produccionForm.get('modoSeries')?.valueChanges.subscribe((value) => {
-      this.regenerarSeries();
-      if (value === 'secuencial') {
-        this.produccionForm.get('serieBase')?.setValidators(Validators.required);
-        this.produccionForm.get('serieBase')?.updateValueAndValidity({ emitEvent: false });
-      } else {
-        this.produccionForm.get('serieBase')?.setValidators([]);
-        this.produccionForm.get('serieBase')?.updateValueAndValidity({ emitEvent: false });
-      }
-    });
-  }
-
-  regenerarSeries() {
-    const cantidad = this.produccionForm.get('cantidad')?.value || 0;
-    const modo = this.produccionForm.get('modoSeries')?.value;
-
-    this.series.clear();
-
-    if (cantidad > 0 && modo === 'manual') {
-      for (let i = 0; i < cantidad; i++) {
-        this.agregarSerie();
-      }
-    }
   }
 
   get series(): FormArray {
@@ -765,17 +734,16 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   generarSecuencia() {
-    const cantidad = Number(this.produccionForm.get('cantidad')?.value);
-    const base = Number(this.produccionForm.get('serieBase')?.value);
+    const cantidad = this.series.length;
+    const base = Number(this.series.at(0).get('value')?.value);
 
-    if (!cantidad || !base) return;
+    if (!base || isNaN(base)) {
+      this.swalService.toastError('top-right', "Los números de serie debe ser numéricos.")
+      return;
+    }
 
-    this.series.clear();
-
-    for (let i = 0; i < cantidad; i++) {
-      this.series.push(this.formBuilder.group({
-        value: [(base + i).toString(), Validators.required]
-      }));
+    for (let i = 1; i < cantidad; i++) {
+      this.series.at(i).get('value')?.setValue((base + i).toString());
     }
   }
 
@@ -798,10 +766,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       produccionDTO.production_datetime = this.convertirFechaADateBackend(fechaFormateada);
       produccionDTO.quantity = this.produccionForm.get('cantidad')?.value;
       produccionDTO['user->responsible_uuid'] = this.produccionForm.get('responsable')?.value;
-      if (this.produccionForm.get('modoSeries')?.value === 'secuencial') {
-        this.generarSecuencia();
-      }
-      const seriesNumeros: [] = this.series.value.map((s: any) => s.value);
+      const seriesNumeros: [] = this.series.value.map((s: any) => s.value.toString());
       produccionDTO.serial_numbers = seriesNumeros;
       this.subscription.add(
         this._produccionService.saveProduccion(produccionDTO).subscribe({

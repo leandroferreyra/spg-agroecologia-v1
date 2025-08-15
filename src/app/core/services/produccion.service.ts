@@ -42,11 +42,12 @@ export class ProduccionService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .append('actual_role', rol)
-      .append('with[]', "product")
+      .append('with[]', "product.measure")
       .append('with[]', "creator")
       .append('with[]', "responsible")
       .append('with[]', "currentState")
-      .append('with[]', "productionStates.creator");
+      .append('with[]', "productionStates.creator")
+      .append('with[]', "batch.stocks.productInstances");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProduccion + '/' + uuid, { headers, params });
   }
 
