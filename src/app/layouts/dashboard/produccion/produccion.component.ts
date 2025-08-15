@@ -393,8 +393,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
 
   openModalProduccion(produccion: any) {
+    this.isEdicion = !this.isEdicion;
     this.tab1 = 'datos-generales';
-    this.isEdicion = true;
     this.inicializarForm(produccion);
   }
 
