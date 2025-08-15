@@ -4,6 +4,21 @@
         <button type="button" ngxTippy="Agregar componente">
             <icon-plus />
         </button>
+
+        <div class="flex items-center gap-2">
+            <!-- @if (ocultarSinStock) { -->
+            <span>Ocultar componentes sin control de stock</span>
+            <!-- } @else {
+            <span>Ver todos los componentes</span>
+            } -->
+            <label class="w-12 h-6 relative">
+                <input type="checkbox" class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                    id="custom_switch_checkbox2" (change)="toggleTodos()" />
+                <span for="custom_switch_checkbox2"
+                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                </span>
+            </label>
+        </div>
     </div>
 
 
@@ -59,6 +74,7 @@
                 @for(data of componentes | slice: pageSize | slice: 0:itemsPerPage ; let index = $index; track
                 data.uuid)
                 {
+                @if(!(ocultarSinStock && data.product_type?.stock_controlled === 0)) {
                 <tr>
                     <td class="whitespace-nowrap"> {{ data.order }} </td>
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
@@ -88,6 +104,7 @@
                         </div>
                     </td>
                 </tr>
+                }
                 }
             </tbody>
         </table>

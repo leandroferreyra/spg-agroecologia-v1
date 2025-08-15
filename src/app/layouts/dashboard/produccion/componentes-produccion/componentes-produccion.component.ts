@@ -51,6 +51,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   reemplazos: any[] = []
   reemplazoForm!: FormGroup;
 
+  ocultarSinStock = false;
+
   filtros: any = {
     'production_uuid': { value: '', op: '=', contiene: false },
   };
@@ -180,7 +182,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     } else {
       return +(total)?.toFixed(2);
     }
-  }
+  } 
 
   getOrigen(data: any) {
     if (data.product_type?.stock_controlled === 0) {
@@ -494,4 +496,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
+  toggleTodos() {
+    this.ocultarSinStock = !this.ocultarSinStock;
+    // this.compras.forEach(compra => {
+    //   this.productosExpandido[compra.uuid] = this.expandirTodo;
+    // });
+  }
 }
