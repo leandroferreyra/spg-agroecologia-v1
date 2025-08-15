@@ -282,7 +282,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
-    console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
     this.setUsuariosConDisabled();
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
@@ -296,7 +295,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       lote: new FormControl({ value: produccion?.batch?.batch_identification, disabled: true }, []),
       numSerie: new FormControl({ value: this.obtenerSerialNumbers(produccion), disabled: true }, [])
     });
-    console.log(this.produccionForm);
     this.onFormEditChange();
   }
   onFormEditChange() {
