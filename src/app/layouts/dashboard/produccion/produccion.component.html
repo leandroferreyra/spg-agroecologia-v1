@@ -19,7 +19,6 @@
                     data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" [ngClass]="{
                         'text-gray-400 cursor-not-allowed': isEdicion
                       }">
-                    <!-- <icon-settings class="mx-auto mb-1" /> -->
                     <icon-search class="mx-auto mb-1" />
                     Filtros avanzados
                 </button>
@@ -115,7 +114,9 @@
             <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                 Producción
                 @if(producciones.length > 0 && selectedProduccion) {
-                {{selectedProduccion.product?.name}}
+                <span class="text-blue-600 underline cursor-pointer"
+                    (click)="irAlProducto($event, selectedProduccion)">{{selectedProduccion.product?.name}}</span>
+                <!-- {{selectedProduccion.product?.name}} -->
                 }
                 <!-- @if(produccionAnterior.length > 0) {
                 <a class="text-sm text-blue-600 hover:underline cursor-pointer" (click)="volverAProduccionAnterior()">

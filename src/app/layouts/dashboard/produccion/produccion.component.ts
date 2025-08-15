@@ -594,6 +594,16 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     )
   }
 
+  irAlProducto(event: MouseEvent, data: any) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const urlTree = this.router.createUrlTree([`/dashboard/productos/${data.product?.uuid}`]);
+    const url = this.router.serializeUrl(urlTree);
+    if (event.ctrlKey || event.metaKey) {
+      window.open(`${baseUrl}#${url}`, '_blank');
+    } else {
+      this.router.navigate([`/dashboard/productos/${data.product?.uuid}`]);
+    }
+  }
 
 
   // irAlProducto(data: { data: any, event: MouseEvent }) {
