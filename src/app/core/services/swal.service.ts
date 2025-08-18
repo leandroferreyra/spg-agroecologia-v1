@@ -33,7 +33,7 @@ export class SwalService {
     });
   }
 
-  toastInfo(position: SweetAlertPosition, message: string) {
+  toastInfo(position: SweetAlertPosition, message: string, timer: number = 2000) {
     Swal.fire({
       position: position,
       toast: true,
@@ -41,7 +41,7 @@ export class SwalService {
       icon: "info",
       title: message,
       showConfirmButton: false,
-      timer: 2000
+      timer: timer
     });
   }
 

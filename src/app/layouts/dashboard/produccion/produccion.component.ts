@@ -118,7 +118,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   placeholderStocks: string = '';
 
   hoveredUuid: string | null = null;
-  estadoProduccion = EstadoProduccion.EN_EJECUCION;
+  // estadoProduccion = EstadoProduccion.EN_EJECUCION;
+  hayProductosTerceros: boolean = false;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
@@ -596,6 +597,17 @@ export class ProduccionComponent implements OnInit, OnDestroy {
           this.obtenerProducciones(false);
           this.tokenService.setToken(res.token);
           this.spinner.hide();
+          if (this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next') {
+            const mensaje = this.hayProductosTerceros ? 'Asegurate de que el producto esté identifica y almacenado. Advertencia: el producto tiene componentes provistos por terceros' :
+              'Asegurate de que el producto esté identifica y almacenado';
+            Swal.fire({
+              position: 'center',
+              toast: true,
+              width: '60em',
+              icon: "info",
+              title: mensaje
+            });
+          }
         },
         error: error => {
           console.error(error);
@@ -615,6 +627,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     } else {
       this.router.navigate([`/dashboard/productos/${data.product?.uuid}`]);
     }
+  }
+
+  recibirAvisoProvistoPorTerceros(valor: any) {
+    this.hayProductosTerceros = valor;
   }
 
 }

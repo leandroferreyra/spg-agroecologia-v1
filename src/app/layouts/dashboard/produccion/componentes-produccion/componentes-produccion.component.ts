@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -34,6 +34,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   @Input() produccion: any;
   @Input() rol!: string;
   private subscription: Subscription = new Subscription();
+  @Output() tieneProductosTerceros = new EventEmitter<boolean>();
 
   @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
   @ViewChild('modalReemplazo') modalReemplazo!: NgxCustomModalComponent;
@@ -125,6 +126,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          const hayTerceros = this.componentes.some(componente => componente.origin === 'Provisto por terceros');
+          this.tieneProductosTerceros.emit(hayTerceros);
           // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);

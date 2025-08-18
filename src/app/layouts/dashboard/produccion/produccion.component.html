@@ -328,7 +328,8 @@
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'componentes'">
-                    <app-componentes-produccion [produccion]="selectedProduccion" [rol]="actual_role">
+                    <app-componentes-produccion [produccion]="selectedProduccion" [rol]="actual_role"
+                        (tieneProductosTerceros)="recibirAvisoProvistoPorTerceros($event)">
                     </app-componentes-produccion>
                 </div>
 
