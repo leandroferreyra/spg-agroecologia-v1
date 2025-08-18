@@ -1,0 +1,10 @@
+.tippy-box.note-tip {
+    max-width: min(90vw, 700px) !important;
+    z-index: 9999;
+}
+
+.tippy-box.note-tip .tippy-content {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}

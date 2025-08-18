@@ -633,4 +633,17 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.hayProductosTerceros = valor;
   }
 
+  showJustificacion(justificacion: string) {
+    if (!justificacion) return '';
+    if (justificacion.length <= 21) {
+      return justificacion;
+    }
+    return justificacion.slice(0, 18) + '...';
+  }
+
+  getTooltipJustificacion(justificacion: string) {
+    const v = (justificacion ?? '').toString();
+    return v.replace(/(\S{20})/g, '$1\u200B');
+  }
+
 }

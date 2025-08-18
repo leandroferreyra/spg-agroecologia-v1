@@ -305,7 +305,16 @@
                                                     convertirFechaConHora(data.datetime_from) }}</td>
                                                 <td class="border px-2 py-1">{{ data.state?.name}}</td>
                                                 <td class="border px-2 py-1">{{ data.creator?.user_name }}</td>
-                                                <td class="border px-2 py-1">{{ data.justification }}</td>
+                                                <td class="border px-2 py-1"
+                                                    [ngxTippy]="getTooltipJustificacion(data.justification) || null"
+                                                    tippyClass="note-tip" [tippyProps]="{
+                                                                        placement: 'top',           
+                                                                        theme: 'light',             
+                                                                        maxWidth: 800,               
+                                                                        popperOptions: { modifiers: [{ name: 'preventOverflow', options: { boundary: 'viewport' } }] }
+                                                                    }">
+                                                    {{ showJustificacion(data.justification) }}
+                                                </td>
                                             </tr>
                                             }
                                         </tbody>

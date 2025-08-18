@@ -1,12 +1,12 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { concat, debounceTime, distinctUntilChanged, finalize, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { FrozenComponentDTO } from 'src/app/core/models/request/frozenComponentDTO';
 import { FrozenComponentService } from 'src/app/core/services/frozenComponents.service';
 import { IndexService } from 'src/app/core/services/index.service';
@@ -17,7 +17,6 @@ import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
-import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { RolDTO } from 'src/app/core/models/request/rolDTO';
 
@@ -25,7 +24,7 @@ import { RolDTO } from 'src/app/core/models/request/rolDTO';
   selector: 'app-componentes-produccion',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, IconPlusComponent, NgSelectModule, FormsModule, ReactiveFormsModule, NgbPaginationModule,
-    IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent],
+    IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent, NgxTippyModule],
   templateUrl: './componentes-produccion.component.html',
   styleUrl: './componentes-produccion.component.css'
 })
@@ -80,11 +79,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   stocks: any[] = [];
 
   proveedorInput$ = new Subject<string>();
-  // searchProveedor$ = new Subject<string>();
-  // initialProveedor$ = new Subject<string>();
   proveedores$: Observable<any[]> = of([]);
   loadingProveedores = false;
-
 
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
     private _swalService: SwalService, private _frozenComponentService: FrozenComponentService, private router: Router) {
@@ -92,7 +88,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
   }
   ngOnDestroy(): void {
 
@@ -296,6 +291,19 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: false }, []),
       note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
     })
+  }
+
+  showNota(nota: string) {
+    if (!nota) return '';
+    if (nota.length <= 21) {
+      return nota;
+    }
+    return nota.slice(0, 18) + '...';
+  }
+
+  getTooltipNota(nota: string) {
+    const v = (nota ?? '').toString();
+    return v.replace(/(\S{20})/g, '$1\u200B'); // zero-width space cada 20 chars
   }
 
   obtenerProveedoresByComponente(data?: any) {

@@ -78,13 +78,21 @@
                 {
                 @if(!(ocultarSinStock && data.product_type?.stock_controlled === 0)) {
                 <tr>
-                    <td class="whitespace-nowrap"> {{ data.order }} </td>
-                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                    <td> {{ data.order }} </td>
+                    <td class="hover:text-blue-600 hover:underline hover:cursor-pointer"
                         (click)="irAlProducto($event, data)"> {{ data.name}}</td>
-                    <td class="whitespace-nowrap"> {{ getCantidad(data) }} </td>
-                    <td class="whitespace-nowrap"> {{ getCantidadTotal(data) }} </td>
-                    <td class="whitespace-nowrap"> {{ getOrigen(data) }} </td>
-                    <td class="whitespace-nowrap"> {{ data.note }} </td>
+                    <td> {{ getCantidad(data) }} </td>
+                    <td> {{ getCantidadTotal(data) }} </td>
+                    <td> {{ getOrigen(data) }} </td>
+                    <td class="whitespace-nowrap" [ngxTippy]="getTooltipNota(data.note) || null" tippyClass="note-tip"
+                        [tippyProps]="{
+                                        placement: 'top',           
+                                        theme: 'light',             
+                                        maxWidth: 800,               
+                                        popperOptions: { modifiers: [{ name: 'preventOverflow', options: { boundary: 'viewport' } }] }
+                                    }">
+                        {{ showNota(data.note) }}
+                    </td>
                     @if (!isEstadoTerminadoLiberado()) {
                     <td>
                         <div class="flex items-center">
@@ -254,6 +262,16 @@
                             <label for="note">Nota</label>
                             <textarea class="form-control" id="note" formControlName="note" rows="1"></textarea>
                         </div>
+
+                        <!-- <div
+                            [ngClass]="isSubmit ? componenteForm.controls['note'].errors ? 'has-error' : 'has-success' : ''">
+
+                            <label for="note">Nota</label>
+                            <textarea class="form-control" id="note" formControlName="note" rows="1"></textarea>
+                            <small>
+                                {{ componenteForm.get('note')?.value?.length || 0 }} caracteres
+                            </small>
+                        </div> -->
 
 
                     </div>
