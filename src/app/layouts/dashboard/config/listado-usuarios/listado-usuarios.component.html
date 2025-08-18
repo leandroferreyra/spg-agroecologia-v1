@@ -19,6 +19,13 @@
                     </label>
                 </div>
                 <div class="form-check form-check-inline">
+                    <label class="inline-flex" for="radioSuper">
+                        <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault" id="radioSuper"
+                            value="SUPER_ADMIN" [(ngModel)]="filtros['roles.name'].value" (change)="obtenerUsuarios()">
+                        <span style="cursor: pointer;">Super admin</span>
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
                     <label class="inline-flex" for="radioAdministracion">
                         <input class="form-checkbox rounded-full" type="radio" name="flexRadioDefault"
                             id="radioAdministracion" value="ADMINISTRACION" [(ngModel)]="filtros['roles.name'].value"

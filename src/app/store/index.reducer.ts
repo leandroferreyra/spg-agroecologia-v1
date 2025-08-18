@@ -68,6 +68,7 @@ export function indexReducer(state = initialState, action: any) {
 
 function getMenuByRole(role: string) {
     switch (role) {
+        case 'SUPER_ADMIN':
         case 'ADMIN':
         case 'ADMINISTRACION':
             return [

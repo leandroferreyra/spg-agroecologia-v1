@@ -93,11 +93,11 @@ export class AuthService {
   cambioRol(rol: any) {
     localStorage.setItem('userRole', rol);
     this.storeData.dispatch({ type: 'setUserRole', payload: rol });
-    if (rol === Constantes.ADMIN || rol === Constantes.ADMINISTRACION) {
-      this.router.navigate(['/dashboard/bancos']);
+    if (rol === Constantes.ADMIN || rol === Constantes.ADMINISTRACION || Constantes.SUPER_ADMIN) {
+      this.router.navigate(['/dashboard/producciones']);
     }
     if (rol === Constantes.PRODUCCION) {
-      this.router.navigate(['/dashboard/produccion']);
+      this.router.navigate(['/dashboard/producciones']);
     }
     if (rol === Constantes.USUARIO) {
       this.router.navigate(['/dashboard/user-profile']);
