@@ -110,10 +110,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
-      params.with = ["productType", "measure", "stock", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
         "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement"];
     } else {
-      params.with = ["productType", "measure", "stock", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
         "possibleStocks.batch", "possibleStocks.location.location.location.location", "product"];
     }
     params.paging = this.itemsPerPage;
