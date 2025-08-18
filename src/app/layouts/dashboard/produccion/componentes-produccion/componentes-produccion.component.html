@@ -65,9 +65,11 @@
                     <th>
                         Nota
                     </th>
+                    @if (!isEstadoTerminadoLiberado()) {
                     <th>
                         Acciones
                     </th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -83,6 +85,7 @@
                     <td class="whitespace-nowrap"> {{ getCantidadTotal(data) }} </td>
                     <td class="whitespace-nowrap"> {{ getOrigen(data) }} </td>
                     <td class="whitespace-nowrap"> {{ data.note }} </td>
+                    @if (!isEstadoTerminadoLiberado()) {
                     <td>
                         <div class="flex items-center">
                             @if(isAllowEdit(data)) {
@@ -103,6 +106,7 @@
                             }
                         </div>
                     </td>
+                    }
                 </tr>
                 }
                 }
