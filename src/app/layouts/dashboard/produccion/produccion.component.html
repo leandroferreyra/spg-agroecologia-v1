@@ -149,8 +149,8 @@
                 <a href="javascript:;"
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{'!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales',
-                                 'cursor-not-allowed tab-disabled': isTabDisabled
-                                }" (click)="!isTabDisabled && (tab1 = 'datos-generales')">
+                                 'cursor-not-allowed tab-disabled': isTabDisabled 
+                                }"  (click)="!isTabDisabled && cambiarTab('datos-generales')">
                     Datos generales
                 </a>
 
@@ -158,7 +158,7 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componentes',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'componentes')">
+                    (click)="!isTabDisabled && cambiarTab('componentes')">
                     Componentes
                 </a>
 
@@ -166,7 +166,7 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'trazabilidad',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'trazabilidad')">
+                    (click)="!isTabDisabled && cambiarTab('trazabilidad')">
                     Trazabilidad
                 </a>
 
@@ -174,7 +174,7 @@
                     class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                     [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'faltantes',
                     'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && (tab1 = 'faltantes')">
+                    (click)="!isTabDisabled && cambiarTab('faltantes')" >
                     Faltantes
                 </a>
             </div>

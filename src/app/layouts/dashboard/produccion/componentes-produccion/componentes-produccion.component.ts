@@ -107,10 +107,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
       params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement"];
+        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement", "possibleStocks.productInstances"];
     } else {
       params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product"];
+        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product", "possibleStocks.productInstances"];
     }
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
@@ -290,6 +290,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: false }, []),
       supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: false }, []),
       note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
+      product_instances: new FormControl({ value: null, disabled: false }, []),
     })
   }
 
@@ -415,6 +416,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     componente.stock_uuid = this.componenteForm.get('stock_uuid')?.value;
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value?.uuid;
     componente.note = this.componenteForm.get('note')?.value;
+    // componente.product_intances = [];
+    // if (componente.origin !== 'Lote') {
+    //   delete componente.product_intances;  
+    // }
   }
 
   switchOrigen(origen: any, event: Event, stock?: any) {

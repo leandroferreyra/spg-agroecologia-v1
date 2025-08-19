@@ -153,6 +153,17 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(params => {
       this.uuidFromUrl = params.get('uuid') ?? '';
     });
+
+    this.route.queryParamMap.subscribe(params => {
+      const tab = params.get('tab')?.toLowerCase();
+      const validTabs = ['datos-generales', 'componentes', 'trazabilidad', 'faltantes'];
+      if (tab && validTabs.includes(tab)) {
+        this.tab1 = tab;
+      } else {
+        this.tab1 = 'datos-generales';
+      }
+    });
+
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.spinner.show();
     this.obtenerProducciones();
@@ -174,11 +185,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
-          // console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
-            this.showProduccionByUuid();
+            this.showProduccionByUuid(false);
           } else {
             this.isLoadingProducciones = false;
             if (this.producciones.length === 0) {
@@ -191,8 +201,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
             }
             if (!alta && this.producciones.length > 0) {
               this.isEdicion = false;
-              this.inicializarForm(this.producciones[0]);
-              this.location.replaceState(`/dashboard/producciones/${this.producciones[0].uuid}`);
+              const first = this.producciones[0];
+              this.uuidFromUrl = first.uuid;
+              this.inicializarForm(first);
+              this.updateTabQueryParam('datos-generales', this.uuidFromUrl);
             }
           }
           this.spinner.hide();
@@ -236,16 +248,15 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     });
   }
 
-  showProduccionByUuid() {
+  showProduccionByUuid(updateTab: boolean = true) {
     this.subscription.add(
       this._produccionService.showProduccion(this.uuidFromUrl, this.actual_role).subscribe({
         next: res => {
-          this.showDataProduccion(res.data);
+          this.showDataProduccion(res.data, updateTab);
           this.isLoadingProducciones = false;
           this.tokenService.setToken(res.token);
         },
         error: error => {
-          // this.isLoadingProducciones = false;
           console.error(error);
         }
       })
@@ -335,11 +346,14 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
-  showDataProduccion(produccion: any) {
+  showDataProduccion(produccion: any, updateTab: boolean = true) {
     this.produccionAnterior = [];
     this.isEdicion = false;
-    this.location.replaceState(`/dashboard/producciones/${produccion.uuid}`);
     this.uuidFromUrl = produccion.uuid;
+    if (updateTab) {
+      this.tab1 = 'datos-generales';
+    }
+    this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
     this.inicializarForm(produccion);
   }
 
@@ -644,6 +658,26 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   getTooltipJustificacion(justificacion: string) {
     const v = (justificacion ?? '').toString();
     return v.replace(/(\S{20})/g, '$1\u200B');
+  }
+
+  cambiarTab(tab: string) {
+    this.cancelarEdicion();
+    this.tab1 = tab;
+    this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
+  }
+
+  updateTabQueryParam(tab: string, uuid: string) {
+    if (!uuid) return;
+    const mergedQueryParams = {
+      ...this.route.snapshot.queryParams,
+      tab
+    };
+    const tree = this.router.createUrlTree(
+      ['/dashboard/producciones', uuid],
+      { queryParams: mergedQueryParams }
+    );
+    const url = this.router.serializeUrl(tree);
+    this.location.replaceState(url);
   }
 
 }
