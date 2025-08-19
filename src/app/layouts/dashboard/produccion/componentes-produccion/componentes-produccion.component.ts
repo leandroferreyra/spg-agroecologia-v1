@@ -293,7 +293,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: false }, []),
       supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: false }, []),
       note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
-      product_instances: new FormControl({ value: null, disabled: data.assign_serial_number === 0 }, []),
+      product_instances: new FormControl({ value: null, disabled: data.product.assign_serial_number === 0 }, []),
     });
   }
 
@@ -421,7 +421,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value?.uuid;
     componente.note = this.componenteForm.get('note')?.value;
     componente.product_intances = this.componenteForm.get('product_instances')?.value;
-    if (componente.origin !== 'Lote' || this.selectedComponent.assign_serial_number === 0) {
+    if (componente.origin !== 'Lote' || this.selectedComponent.product?.assign_serial_number === 0) {
       delete componente.product_intances;
     }
   }
