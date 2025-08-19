@@ -560,7 +560,7 @@
                         </div>
                         <div>
                             <label for="tipoProducto">Tipo de producto</label>
-                            <ng-select [items]="tipoProductos" bindLabel="name" clearAllText="Limpiar"
+                            <ng-select [items]="tipoProductos" bindLabel="name" clearAllText="Limpiar" 
                                 style="width: 100%" [virtualScroll]="true" notFoundText="No hay tipos de producto"
                                 placeholder="" class="w-1/3 min-w-[200px]" formControlName="tipoProducto"
                                 [selectOnTab]="true"
@@ -733,7 +733,7 @@
 
             <form [formGroup]="produccionForm" class="p-4">
                 <div class="flex flex-col sm:flex-row">
-                    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
 
                         <div
                             [ngClass]="isSubmit ? produccionForm.controls['fecha'].errors ? 'has-error' : 'has-success' : ''">

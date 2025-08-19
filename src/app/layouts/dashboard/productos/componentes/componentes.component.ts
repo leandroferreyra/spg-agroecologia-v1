@@ -673,7 +673,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
 
   isProductoCompuesto() {
-    return this.producto.product_type?.product_compound === 1;
+    return this.producto?.product_type?.product_compound === 1;
   }
 
   goToProduct(event: MouseEvent, data: any) {
