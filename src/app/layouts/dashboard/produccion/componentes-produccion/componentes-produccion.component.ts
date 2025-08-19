@@ -106,10 +106,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances",
         "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement", "possibleStocks.productInstances"];
     } else {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
+      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances",
         "possibleStocks.batch", "possibleStocks.location.location.location.location", "product", "possibleStocks.productInstances"];
     }
     params.paging = this.itemsPerPage;
@@ -121,7 +121,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
+          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -145,6 +145,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         this.itemsInPage = this.currentPage * this.itemsPerPage;
       }
     }
+  }
+
+  shouldSendSerialNumber(data: any) {
+
   }
 
   getCantidadStockByComponent(stock: any) {
@@ -274,6 +278,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.tituloModal = `Selección de origen de "${data.name}"`;
     this.modalComponente.options = this.modalOptions;
     this.modalComponente.open();
+
   }
 
   cerrarModal() {
@@ -288,8 +293,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: false }, []),
       supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: false }, []),
       note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
-      product_instances: new FormControl({ value: null, disabled: false }, []),
-    })
+      product_instances: new FormControl({ value: null, disabled: data.assign_serial_number === 0 }, []),
+    });
   }
 
   showNota(nota: string) {
@@ -415,10 +420,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     componente.stock_uuid = this.componenteForm.get('stock_uuid')?.value;
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value?.uuid;
     componente.note = this.componenteForm.get('note')?.value;
-    // componente.product_intances = [];
-    // if (componente.origin !== 'Lote') {
-    //   delete componente.product_intances;  
-    // }
+    componente.product_intances = this.componenteForm.get('product_instances')?.value;
+    if (componente.origin !== 'Lote' || this.selectedComponent.assign_serial_number === 0) {
+      delete componente.product_intances;
+    }
   }
 
   switchOrigen(origen: any, event: Event, stock?: any) {

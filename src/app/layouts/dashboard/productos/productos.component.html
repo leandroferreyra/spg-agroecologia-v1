@@ -55,7 +55,7 @@
                                             @if (esProducible(data)) {
                                             <li>
                                                 <a href="javascript:;" *hlMenuItem="let menuItem"
-                                                    (click)="openModalProduccion()">Producir</a>
+                                                    (click)="openModalProduccion(data)">Producir</a>
                                             </li>
                                             }
                                             <li>
@@ -137,7 +137,7 @@
             <div class="flex items-center gap-2 ml-auto">
                 @if(productos.length > 0 && selectedProducto) {
                 @if (esProducible(selectedProducto)) {
-                <button type="button" ngxTippy="Producir" (click)="openModalProduccion()">
+                <button type="button" ngxTippy="Producir" (click)="openModalProduccion(selectedProducto)">
                     <icon-settings />
                 </button>
                 }
@@ -761,7 +761,7 @@
                             </ng-select>
                         </div>
 
-                        @if (selectedProducto.assign_serial_number === 1 && produccionForm.get('cantidad')?.value > 0) {
+                        @if (productoAProducir.assign_serial_number === 1 && produccionForm.get('cantidad')?.value > 0) {
                         <div class="col-span-1 sm:col-span-2 w-full mt-2">
                             <div class="flex items-center gap-4 mb-2">
                                 <label class="font-medium">Número de serie</label>

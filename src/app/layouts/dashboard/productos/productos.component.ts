@@ -140,7 +140,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   placeholderStocks: string = '';
   usuarioLogueado: any;
-
+  productoAProducir: any
   modoSeries: any
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
@@ -688,8 +688,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.tab1 = 'datos-generales';
   }
 
-  openModalProduccion() {
-    this.tituloModal = 'Nueva producción';
+  openModalProduccion(data: any) {
+    this.productoAProducir = data;
+    this.tituloModal = `Nueva producción de '${this.productoAProducir.name}'`;
     this.inicializarFormProduccion();
     this.modalProduccion.options = this.modalOptions;
     this.modalProduccion.open();
@@ -711,7 +712,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   onChangeFormProduccion() {
     this.produccionForm.get('cantidad')!.valueChanges.subscribe(
       (value) => {
-        if (this.selectedProducto.assign_serial_number === 1) {
+        if (this.productoAProducir.assign_serial_number === 1) {
           this.series.clear();
           if (value && value > 0) {
             for (let i = 0; i < value; i++) {
@@ -759,7 +760,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let produccionDTO = new ProduccionDTO();
       produccionDTO.actual_role = this.actual_role;
-      produccionDTO.product_uuid = this.selectedProducto.uuid;
+      produccionDTO.product_uuid = this.productoAProducir.uuid;
       const fechaFormateada = this.produccionForm.get('fecha')?.value instanceof Date
         ? format(this.produccionForm.get('fecha')?.value, 'dd-MM-yyyy')
         : this.produccionForm.get('fecha')?.value;

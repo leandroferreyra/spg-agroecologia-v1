@@ -641,10 +641,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
-  // recibirAvisoProvistoPorTerceros(valor: any) {
-  //   this.hayProductosTerceros = valor;
-  // }
-
   showJustificacion(justificacion: string) {
     if (!justificacion) return '';
     if (justificacion.length <= 21) {
