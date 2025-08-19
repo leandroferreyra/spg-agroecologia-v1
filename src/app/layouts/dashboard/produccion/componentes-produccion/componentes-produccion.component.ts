@@ -293,9 +293,17 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: false }, []),
       supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: false }, []),
       note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
-      product_instances: new FormControl({ value: null, disabled: data.product.assign_serial_number === 0 }, []),
+      product_instances: new FormControl({ value: data ? data.product_instances : null, disabled: data.assign_serial_number === 0 }, []),
     });
+    if (data && data.origin === 'Lote' && this.selectedComponent.assign_serial_number === 1) {
+      this.componenteForm.get('product_instances')?.setValidators(Validators.required);
+      this.componenteForm.get('product_instances')?.updateValueAndValidity({ emitEvent: false });
+
+    }
   }
+
+  compareByUuid = (a: any, b: any): boolean => a?.uuid === b?.uuid;
+
 
   showNota(nota: string) {
     if (!nota) return '';
@@ -420,9 +428,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     componente.stock_uuid = this.componenteForm.get('stock_uuid')?.value;
     componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value?.uuid;
     componente.note = this.componenteForm.get('note')?.value;
-    componente.product_intances = this.componenteForm.get('product_instances')?.value;
-    if (componente.origin !== 'Lote' || this.selectedComponent.product?.assign_serial_number === 0) {
-      delete componente.product_intances;
+    const productInstances = this.componenteForm.get('product_instances')?.value ?? [];
+    const uuids = productInstances.map((pi: any) => pi.uuid);
+    componente.product_instances = uuids;
+    if (componente.origin !== 'Lote' || this.selectedComponent.assign_serial_number === 0) {
+      delete componente.product_instances;
     }
   }
 
@@ -434,23 +444,29 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         this.componenteForm.get('supplier_uuid')?.setValidators(Validators.required);
         this.componenteForm.get('stock_uuid')?.clearValidators();
         this.componenteForm.get('stock_uuid')?.setValue(null);
+        this.componenteForm.get('product_instances')?.clearValidators();
       } else if (origen === 'Lote') {
         this.componenteForm.get('stock_uuid')?.setValidators(Validators.required);
         this.componenteForm.get('supplier_uuid')?.clearValidators();
         this.componenteForm.get('stock_uuid')?.setValue(stock.uuid);
+        if (this.selectedComponent.assign_serial_number === 1) {
+          this.componenteForm.get('product_instances')?.setValidators(Validators.required);
+        }
       } else if (origen === 'Sin selección') {
         this.componenteForm.get('supplier_uuid')?.clearValidators();
         this.componenteForm.get('stock_uuid')?.clearValidators();
         this.componenteForm.get('stock_uuid')?.setValue(null);
+        this.componenteForm.get('product_instances')?.clearValidators();
       }
     } else {
       this.componenteForm.get('origin')?.setValue(null);
       this.componenteForm.get('supplier_uuid')?.clearValidators();
       this.componenteForm.get('stock_uuid')?.clearValidators();
+      this.componenteForm.get('product_instances')?.clearValidators();
       this.componenteForm.get('stock_uuid')?.setValue(null);
 
     }
-    ['supplier_uuid', 'stock_uuid'].forEach((field) => {
+    ['supplier_uuid', 'stock_uuid', 'product_instances'].forEach((field) => {
       this.componenteForm.get(field)?.updateValueAndValidity({ emitEvent: false });
     });
   }

@@ -210,10 +210,10 @@
                                         <td class="border px-2 py-1"> {{ getLocation(data).join(' - ') }} </td>
                                         <td class="border px-2 py-1">
                                             <ng-select [items]="data.product_instances" bindLabel="serial_number"
-                                                bindValue="uuid" clearAllText="Limpiar" style="width: 100%"
-                                                [virtualScroll]="true" notFoundText="No hay números de serie"
-                                                class="w-1/3 min-w-[200px]" formControlName="product_instances"
-                                                [selectOnTab]="true" multiple="true" [closeOnSelect]="false"
+                                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                                notFoundText="No hay números de serie" class="w-1/3 min-w-[200px]"
+                                                formControlName="product_instances" [selectOnTab]="true" multiple="true"
+                                                [closeOnSelect]="false" [compareWith]="compareByUuid"
                                                 [ngClass]="isSubmit ? componenteForm.controls['product_instances'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                                         </td>
                                     </tr>
