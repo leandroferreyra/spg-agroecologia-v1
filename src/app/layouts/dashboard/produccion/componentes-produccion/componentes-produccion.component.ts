@@ -33,7 +33,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   @Input() produccion: any;
   @Input() rol!: string;
   private subscription: Subscription = new Subscription();
-  @Output() tieneProductosTerceros = new EventEmitter<boolean>();
+  @Output() refreshComponentes = new EventEmitter<any>();
 
   @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
   @ViewChild('modalReemplazo') modalReemplazo!: NgxCustomModalComponent;
@@ -121,8 +121,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          const hayTerceros = this.componentes.some(componente => componente.origin === 'Provisto por terceros');
-          this.tieneProductosTerceros.emit(hayTerceros);
           // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
@@ -224,46 +222,46 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  openSwalEliminar(componente: any) {
-    Swal.fire({
-      title: '',
-      text: `¿Desea eliminar el componente de producción ${componente.name}?`,
-      icon: 'info',
-      confirmButtonText: 'Confirmar',
-      showDenyButton: true,
-      denyButtonText: 'Cancelar',
-      didRender: () => {
-        const cancelButton = Swal.getDenyButton();
-        if (cancelButton) {
-          cancelButton.setAttribute('id', 'back-button-with-border');
-        }
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.eliminarComponente(componente);
-      } else if (result.isDenied) {
+  // openSwalEliminar(componente: any) {
+  //   Swal.fire({
+  //     title: '',
+  //     text: `¿Desea eliminar el componente de producción ${componente.name}?`,
+  //     icon: 'info',
+  //     confirmButtonText: 'Confirmar',
+  //     showDenyButton: true,
+  //     denyButtonText: 'Cancelar',
+  //     didRender: () => {
+  //       const cancelButton = Swal.getDenyButton();
+  //       if (cancelButton) {
+  //         cancelButton.setAttribute('id', 'back-button-with-border');
+  //       }
+  //     }
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       this.eliminarComponente(componente);
+  //     } else if (result.isDenied) {
 
-      }
-    })
-  }
+  //     }
+  //   })
+  // }
 
-  eliminarComponente(producto: any) {
-    this.spinner.show();
-    this.subscription.add(
-      this._frozenComponentService.deleteComponent(producto.uuid, this.rol.toUpperCase()).subscribe({
-        next: res => {
-          this.obtenerComponentesProduccion();
-          this._tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          console.error(error);
-          this._swalService.toastError('top-right', error.error.message);
-          this.spinner.hide();
-        }
-      })
-    )
-  }
+  // eliminarComponente(producto: any) {
+  //   this.spinner.show();
+  //   this.subscription.add(
+  //     this._frozenComponentService.deleteComponent(producto.uuid, this.rol.toUpperCase()).subscribe({
+  //       next: res => {
+  //         this.obtenerComponentesProduccion();
+  //         this._tokenService.setToken(res.token);
+  //         this.spinner.hide();
+  //       },
+  //       error: error => {
+  //         console.error(error);
+  //         this._swalService.toastError('top-right', error.error.message);
+  //         this.spinner.hide();
+  //       }
+  //     })
+  //   )
+  // }
 
   openModalComponente(data: any) {
     this.selectedComponent = data;
@@ -399,6 +397,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             this.obtenerComponentesProduccion();
             this.cerrarModal();
             this.spinner.hide();
+            this.refreshComponentes.emit();
           },
           error: error => {
             this.spinner.hide();
