@@ -184,7 +184,7 @@
                                         <td><strong>Cantidad disponible</strong></td>
                                         <td><strong>Producción máxima</strong></td>
                                         <td><strong>Ubicación</strong></td>
-                                        <td><strong>Números de serie</strong></td>
+                                        <!-- <td><strong>Números de serie</strong></td> -->
                                     </tr>
                                     @if(stocks.length > 0) {
                                     @for(data of stocks ; track data.uuid) {
@@ -208,7 +208,19 @@
                                         <td class="border px-2 py-1"> {{getCantidadStockByComponent(data)}} </td>
                                         <td class="border px-2 py-1"> {{getProduccionMaxima(data)}} </td>
                                         <td class="border px-2 py-1"> {{ getLocation(data).join(' - ') }} </td>
-                                        <td class="border px-2 py-1">
+                                        <!-- <td class="border px-2 py-1">
+                                            <ng-select [items]="data.product_instances" bindLabel="serial_number"
+                                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
+                                                notFoundText="No hay números de serie" class="w-1/3 min-w-[200px]"
+                                                formControlName="product_instances" [selectOnTab]="true" multiple="true"
+                                                [closeOnSelect]="false" [compareWith]="compareByUuid"
+                                                [ngClass]="isSubmit ? componenteForm.controls['product_instances'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                                        </td> -->
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td class="border px-2 py-1"><strong>Números de serie</strong></td>
+                                        <td class="border px-2 py-1" colspan="4">
                                             <ng-select [items]="data.product_instances" bindLabel="serial_number"
                                                 clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                                 notFoundText="No hay números de serie" class="w-1/3 min-w-[200px]"
