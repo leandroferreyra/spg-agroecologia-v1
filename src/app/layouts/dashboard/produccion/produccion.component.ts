@@ -612,8 +612,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
           this.tokenService.setToken(res.token);
           this.spinner.hide();
           if (this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next') {
-            const mensaje = this.hayProductosTerceros ? 'Asegurate de que el producto esté identifica y almacenado. Advertencia: el producto tiene componentes provistos por terceros' :
-              'Asegurate de que el producto esté identifica y almacenado';
+            const mensaje = 'Asegurate de que el producto esté identificado y almacenado.' +
+              (this.hayProductosTerceros ? '<br><br>Advertencia: el producto tiene componentes provistos por terceros.' : '');
             Swal.fire({
               position: 'center',
               toast: true,
