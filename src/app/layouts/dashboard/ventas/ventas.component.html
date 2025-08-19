@@ -742,6 +742,17 @@
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
                         <div
+                            [ngClass]="isSubmit ? newVentaForm.controls['transaction_datetime'].errors ? 'has-error' : 'has-success' : ''">
+                            <label>Fecha de venta</label>
+                            <input type="text" mwlFlatpickr [options]="{ 
+                                                enableTime: false, 
+                                                dateFormat: 'd-m-Y',
+                                                time24hr: true,
+                                                enableSeconds: false
+                                            }" class="form-input" formControlName="transaction_datetime" />
+                        </div>
+
+                        <div
                             [ngClass]="isSubmit ? newVentaForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="person_uuid">Cliente</label>
                             <ng-select [items]="clientes$ | async" bindLabel="nombreCompleto"
@@ -753,16 +764,6 @@
                             </ng-select>
                         </div>
 
-                        <div
-                            [ngClass]="isSubmit ? newVentaForm.controls['transaction_datetime'].errors ? 'has-error' : 'has-success' : ''">
-                            <label>Fecha de venta</label>
-                            <input type="text" mwlFlatpickr [options]="{ 
-                                                enableTime: false, 
-                                                dateFormat: 'd-m-Y',
-                                                time24hr: true,
-                                                enableSeconds: false
-                                            }" class="form-input" formControlName="transaction_datetime" />
-                        </div>
                     </div>
                 </div>
             </form>

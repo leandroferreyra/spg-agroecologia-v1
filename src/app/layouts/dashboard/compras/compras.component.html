@@ -619,17 +619,6 @@
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
                         <div
-                            [ngClass]="isSubmit ? newCompraForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="person_uuid">Proveedor</label>
-                            <ng-select [items]="proveedores$ | async" bindLabel="nombreCompleto"
-                                [typeahead]="proveedorInput$" [loading]="loadingProveedores" [virtualScroll]="true"
-                                typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
-                                placeholder="Buscar proveedor..." formControlName="person_uuid"
-                                [ngClass]="isSubmit ? newCompraForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
-                            </ng-select>
-                        </div>
-
-                        <div
                             [ngClass]="isSubmit ? newCompraForm.controls['transaction_datetime'].errors ? 'has-error' : 'has-success' : ''">
                             <label>Fecha de compra</label>
                             <input type="text" mwlFlatpickr [options]="{ 
@@ -638,6 +627,17 @@
                                                 time24hr: true,
                                                 enableSeconds: false
                                             }" class="form-input" formControlName="transaction_datetime" />
+                        </div>
+
+                        <div
+                            [ngClass]="isSubmit ? newCompraForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="person_uuid">Proveedor</label>
+                            <ng-select [items]="proveedores$ | async" bindLabel="nombreCompleto"
+                                [typeahead]="proveedorInput$" [loading]="loadingProveedores" [virtualScroll]="true"
+                                typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
+                                placeholder="Buscar proveedor..." formControlName="person_uuid"
+                                [ngClass]="isSubmit ? newCompraForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                            </ng-select>
                         </div>
 
                     </div>
