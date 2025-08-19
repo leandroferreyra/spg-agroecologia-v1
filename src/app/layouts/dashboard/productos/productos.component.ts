@@ -175,6 +175,15 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(params => {
       this.uuidFromUrl = params.get('uuid') ?? '';
     });
+    this.route.queryParamMap.subscribe(params => {
+      const tab = params.get('tab')?.toLowerCase();
+      const validTabs = ['datos-generales', 'componentes', 'componente-de', 'reemplazos', 'proveedores', 'stocks', 'compras', 'vinculos'];
+      if (tab && validTabs.includes(tab)) {
+        this.tab1 = tab;
+      } else {
+        this.tab1 = 'datos-generales';
+      }
+    });
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
 
     this.spinner.show();
@@ -201,7 +210,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
-            this.showProductByUuid();
+            this.showProductByUuid(false);
           } else {
             this.isLoadingProductos = false;
             if (this.productos.length === 0) {
@@ -214,8 +223,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
             }
             if (!alta && this.productos.length > 0) {
               this.isEdicion = false;
-              this.inicializarFormEdit(this.productos[0]);
-              this.location.replaceState(`/dashboard/productos/${this.productos[0].uuid}`);
+              const first = this.productos[0];
+              this.uuidFromUrl = first.uuid;
+              this.inicializarFormEdit(first);
+              this.updateTabQueryParam('datos-generales', this.uuidFromUrl);
+
             }
           }
           this.spinner.hide();
@@ -239,11 +251,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
   }
 
-  showProductByUuid() {
+  showProductByUuid(updateTab: boolean = true) {
     this.subscription.add(
       this._productoService.showProduct(this.uuidFromUrl, this.actual_role).subscribe({
         next: res => {
-          this.showDataProducto(res.data);
+          this.showDataProducto(res.data, updateTab);
           this.isLoadingProductos = false;
           this.tokenService.setToken(res.token);
         },
@@ -439,11 +451,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
       });
   }
 
-  showDataProducto(producto: any) {
+  showDataProducto(producto: any, updateTab: boolean = true) {
     this.productoAnterior = [];
     this.isEdicion = false;
-    this.location.replaceState(`/dashboard/productos/${producto.uuid}`);
     this.uuidFromUrl = producto.uuid;
+    if (updateTab) {
+      this.tab1 = 'datos-generales';
+    }
+    this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
     this.inicializarFormEdit(producto);
   }
 
@@ -795,6 +810,21 @@ export class ProductosComponent implements OnInit, OnDestroy {
   cambiarTab(tab: string) {
     this.cancelarEdicion();
     this.tab1 = tab;
+    this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
+  }
+
+  updateTabQueryParam(tab: string, uuid: string) {
+    if (!uuid) return;
+    const mergedQueryParams = {
+      ...this.route.snapshot.queryParams,
+      tab
+    };
+    const tree = this.router.createUrlTree(
+      ['/dashboard/productos', uuid],
+      { queryParams: mergedQueryParams }
+    );
+    const url = this.router.serializeUrl(tree);
+    this.location.replaceState(url);
   }
 
 
