@@ -82,6 +82,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   proveedores$: Observable<any[]> = of([]);
   loadingProveedores = false;
 
+  serialesPorLote: Record<string, any[]> = {};
+
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
     private _swalService: SwalService, private _frozenComponentService: FrozenComponentService, private router: Router) {
 
@@ -298,7 +300,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     if (data && data.origin === 'Lote' && this.selectedComponent.assign_serial_number === 1) {
       this.componenteForm.get('product_instances')?.setValidators(Validators.required);
       this.componenteForm.get('product_instances')?.updateValueAndValidity({ emitEvent: false });
-
     }
   }
 
@@ -411,6 +412,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             this.cerrarModal();
             this.spinner.hide();
             this.refreshComponentes.emit();
+            this.limpiarSerialesDeOtroLote();
           },
           error: error => {
             this.spinner.hide();
@@ -436,8 +438,22 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
+  limpiarSerialesDeOtroLote() {
+    const formValue = this.componenteForm.get('stock_uuid')?.value;
+    if (!formValue) return;
+    // Limpiar todos los product_instances de otros lotes
+    Object.keys(this.serialesPorLote).forEach(uuid => {
+      if (uuid !== formValue) {
+        delete this.serialesPorLote[uuid];
+      }
+    });
+  }
+
   switchOrigen(origen: any, event: Event, stock?: any) {
     const checked = (event.target as HTMLInputElement).checked;
+
+    const stockUuidAnterior = this.componenteForm.get('stock_uuid')?.value;
+    const serialesAnteriores = this.componenteForm.get('product_instances')?.value;
     if (checked) {
       this.componenteForm.get('origin')?.setValue(origen);
       if (origen === 'Provisto por terceros') {
@@ -450,7 +466,15 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         this.componenteForm.get('supplier_uuid')?.clearValidators();
         this.componenteForm.get('stock_uuid')?.setValue(stock.uuid);
         if (this.selectedComponent.assign_serial_number === 1) {
-          this.componenteForm.get('product_instances')?.setValidators(Validators.required);
+          const control = this.componenteForm.get('product_instances');
+          control?.setValidators(Validators.required);
+          if (stockUuidAnterior && serialesAnteriores?.length) {
+            this.serialesPorLote[stockUuidAnterior] = serialesAnteriores;
+          }
+          const prev = this.serialesPorLote[stock.uuid] ?? [];
+          const disponibles = stock.product_instances?.map((p: any) => p.uuid) ?? [];
+          const restaurados = prev.filter((p: any) => disponibles.includes(p.uuid));
+          control?.setValue(restaurados);
         }
       } else if (origen === 'Sin selección') {
         this.componenteForm.get('supplier_uuid')?.clearValidators();
@@ -464,7 +488,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this.componenteForm.get('stock_uuid')?.clearValidators();
       this.componenteForm.get('product_instances')?.clearValidators();
       this.componenteForm.get('stock_uuid')?.setValue(null);
-
     }
     ['supplier_uuid', 'stock_uuid', 'product_instances'].forEach((field) => {
       this.componenteForm.get(field)?.updateValueAndValidity({ emitEvent: false });
