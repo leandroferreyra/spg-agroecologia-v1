@@ -603,7 +603,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     produccionEstadoDTO.actual_role = this.actual_role;
     produccionEstadoDTO.justification = justificacion;
     produccionEstadoDTO.production_state = event;
-    produccionEstadoDTO.with = ['frozenComponents'];
+    if (event === 'next') {
+      produccionEstadoDTO.with = ['frozenComponents'];
+    }
     this.subscription.add(
       this._produccionService.editEstadoProduccion(this.selectedProduccion.uuid, produccionEstadoDTO).subscribe({
         next: res => {
