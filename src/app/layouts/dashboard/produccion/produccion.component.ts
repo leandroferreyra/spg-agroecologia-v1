@@ -170,7 +170,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["product.measure", "batch.stocks.productInstances", "creator", "responsible", "currentState", "productionStates.creator",];
+    // this.params.with = ["product.measure", "batch.stocks.productInstances", "creator", "responsible", "currentState", "productionStates.creator",];
+    this.params.with = ["product", "batch", "currentState"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -183,9 +184,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
-            this.showProduccionByUuid(false);
+            this.showProduccionByUuid(this.uuidFromUrl, false);
           } else {
-            this.isLoadingProducciones = false;
             if (this.producciones.length === 0) {
               this.swalService.toastSuccess('center', 'No existen producciones.');
               this.isTabDisabled = true;
@@ -198,7 +198,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
               this.isEdicion = false;
               const first = this.producciones[0];
               this.uuidFromUrl = first.uuid;
-              this.inicializarForm(first);
+              this.showProduccionByUuid(first.uuid, false);
               this.updateTabQueryParam('datos-generales', this.uuidFromUrl);
             }
           }
@@ -211,6 +211,21 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       })
     )
   }
+  showProduccionByUuid(uuid: string, updateTab: boolean = true) {
+    this.subscription.add(
+      this._produccionService.showProduccion(uuid, this.actual_role).subscribe({
+        next: res => {
+          this.showDataProduccion(res.data, updateTab);
+          this.isLoadingProducciones = false;
+          this.tokenService.setToken(res.token);
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    )
+  }
+
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
@@ -241,21 +256,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       month: '2-digit',
       year: 'numeric'
     });
-  }
-
-  showProduccionByUuid(updateTab: boolean = true) {
-    this.subscription.add(
-      this._produccionService.showProduccion(this.uuidFromUrl, this.actual_role).subscribe({
-        next: res => {
-          this.showDataProduccion(res.data, updateTab);
-          this.isLoadingProducciones = false;
-          this.tokenService.setToken(res.token);
-        },
-        error: error => {
-          console.error(error);
-        }
-      })
-    )
   }
 
   obtenerCatalogos() {
