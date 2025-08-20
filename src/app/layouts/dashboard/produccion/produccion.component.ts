@@ -116,8 +116,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   isLoadingProducciones: boolean = true;
   tab1: string = 'datos-generales';
 
-  hayProductosTerceros: boolean = false;
-
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
     private tokenService: TokenService, private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute,
@@ -611,10 +609,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         next: res => {
           this.obtenerProducciones(false);
           this.tokenService.setToken(res.token);
-          this.hayProductosTerceros = res.data?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
+          let hayProductosTerceros = res.data?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
           if (this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next') {
             const mensaje = 'Asegurate de que el producto esté identificado y almacenado.' +
-              (this.hayProductosTerceros ? '<br><br>Advertencia: el producto tiene componentes provistos por terceros.' : '');
+              (hayProductosTerceros ? '<br><br>Advertencia: el producto tiene componentes provistos por terceros.' : '');
             Swal.fire({
               position: 'center',
               toast: true,
