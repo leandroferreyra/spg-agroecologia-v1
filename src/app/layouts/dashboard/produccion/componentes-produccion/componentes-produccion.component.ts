@@ -301,10 +301,13 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this.componenteForm.get('product_instances')?.setValidators(Validators.required);
       this.componenteForm.get('product_instances')?.updateValueAndValidity({ emitEvent: false });
     }
+    this.onChange();
+  }
+  onChange() {
+
   }
 
   compareByUuid = (a: any, b: any): boolean => a?.uuid === b?.uuid;
-
 
   showNota(nota: string) {
     if (!nota) return '';
