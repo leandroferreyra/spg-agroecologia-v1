@@ -146,7 +146,7 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-generales',
                         'cursor-not-allowed tab-disabled': isTabDisabled }"
-                        (click)="!isTabDisabled && (tab1 = 'datos-generales')">
+                        (click)="!isTabDisabled && cambiarTab('datos-generales')">
                         Datos generales
                     </a>
 
@@ -154,7 +154,7 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'datos-de-contacto',
                         'cursor-not-allowed tab-disabled': isTabDisabled  }"
-                        (click)="!isTabDisabled && (tab1 = 'datos-de-contacto')">
+                        (click)="!isTabDisabled && cambiarTab('datos-de-contacto')">
                         Datos de contacto
                     </a>
 
@@ -162,7 +162,7 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'personas-de-contacto',
                         'cursor-not-allowed tab-disabled': isTabDisabled  }"
-                        (click)="!isTabDisabled && (tab1 = 'personas-de-contacto')">
+                        (click)="!isTabDisabled && cambiarTab('personas-de-contacto')">
                         Personas de contacto
                     </a>
 
@@ -170,7 +170,7 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'cuentas-bancarias',
                         'cursor-not-allowed tab-disabled': isTabDisabled  }"
-                        (click)="!isTabDisabled && (tab1 = 'cuentas-bancarias')">
+                        (click)="!isTabDisabled && cambiarTab('cuentas-bancarias')">
                         Cuentas bancarias
                     </a>
 
@@ -178,7 +178,7 @@
                         class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
                         [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'compras',
                         'cursor-not-allowed tab-disabled': isTabDisabled  }"
-                        (click)="!isTabDisabled && (tab1 = 'compras')">
+                        (click)="!isTabDisabled && cambiarTab('compras')">
                         Compras
                     </a>
                 </div>

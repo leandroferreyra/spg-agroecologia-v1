@@ -60,7 +60,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   store: any;
   private subscription: Subscription = new Subscription();
   actual_role: string = '';
-  componentes: any[] = [];
+  // componentes: any[] = [];
   producciones: any[] = [];
   selectedProduccion: any;
   usuarioLogueado: any;
@@ -292,7 +292,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
     this.setUsuariosConDisabled();
-    this.obtenerComponentesProduccion();
+    // this.obtenerComponentesProduccion();
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
       fechaInicio: new FormControl({ value: this.convertirFechaConHora(produccion?.production_datetime), disabled: !this.isEdicion }, []),
@@ -603,12 +603,13 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     produccionEstadoDTO.actual_role = this.actual_role;
     produccionEstadoDTO.justification = justificacion;
     produccionEstadoDTO.production_state = event;
+    produccionEstadoDTO.with = ['frozenComponents'];
     this.subscription.add(
       this._produccionService.editEstadoProduccion(this.selectedProduccion.uuid, produccionEstadoDTO).subscribe({
         next: res => {
           this.obtenerProducciones(false);
           this.tokenService.setToken(res.token);
-          this.spinner.hide();
+          this.hayProductosTerceros = res.data?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
           if (this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next') {
             const mensaje = 'Asegurate de que el producto esté identificado y almacenado.' +
               (this.hayProductosTerceros ? '<br><br>Advertencia: el producto tiene componentes provistos por terceros.' : '');
@@ -620,6 +621,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
               title: mensaje
             });
           }
+          this.spinner.hide();
         },
         error: error => {
           console.error(error);
@@ -672,46 +674,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     );
     const url = this.router.serializeUrl(tree);
     this.location.replaceState(url);
-  }
-
-  obtenerComponentesProduccion() {
-    // Inicializamos un objeto vacío para los parámetros
-    const params: any = {};
-    if (this.selectedProduccion.current_state?.state?.name === 'Borrador') {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement", "possibleStocks.productInstances"];
-    } else {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity",
-        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product", "possibleStocks.productInstances"];
-    }
-    params.paging = null;
-    params.page = null;
-    params.order_by = {
-      'order': 'asc'
-    };
-    params.filters = {
-      'production_uuid': { value: '', op: '=', contiene: false },
-    };
-
-    this.subscription.add(
-      this._indexService.getFrozenComponentsWithParam(params, this.actual_role).subscribe({
-        next: res => {
-          this.componentes = res.data;
-          this.hayProductosTerceros = this.componentes.some(componente => componente.origin === 'Provisto por terceros');
-          this.tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          this.swalService.toastError('top-right', error.error.message);
-          console.error(error);
-          this.spinner.hide();
-        }
-      })
-    )
-  }
-
-  recibeNotificacionRefresh() {
-    this.obtenerComponentesProduccion();
   }
 
 }

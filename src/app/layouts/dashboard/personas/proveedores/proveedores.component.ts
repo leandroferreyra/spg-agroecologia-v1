@@ -33,7 +33,7 @@ import { ContactosPersonaComponent } from '../shared/contactos-persona/contactos
 import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
@@ -159,7 +159,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private titleService: Title) {
+    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private router: Router) {
     this.initStore();
   }
 
@@ -200,6 +200,15 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(params => {
       this.uuidFromUrl = params.get('uuid') ?? '';
     });
+    this.route.queryParamMap.subscribe(params => {
+      const tab = params.get('tab')?.toLowerCase();
+      const validTabs = ['datos-generales', 'datos-de-contacto', 'personas-de-contacto', 'cuentas-bancarias', 'compras'];
+      if (tab && validTabs.includes(tab)) {
+        this.tab1 = tab;
+      } else {
+        this.tab1 = 'datos-generales';
+      }
+    });
     this.spinner.show();
     this.inicializarForm();
     this.obtenerProveedores();
@@ -224,7 +233,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
-            this.showProveedorByUuid();
+            this.showProveedorByUuid(false);
           } else {
             this.isLoadingProveedores = false;
             if (this.proveedores.length === 0) {
@@ -237,8 +246,11 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
             }
             if (!alta && this.proveedores.length > 0) {
               this.isEdicion = false;
-              this.inicializarForm(this.proveedores[0]);
-              this.location.replaceState(`/dashboard/proveedores/${this.proveedores[0].uuid}`);
+              const first = this.proveedores[0];
+              this.uuidFromUrl = first.uuid;
+              this.inicializarForm(first);
+              this.updateTabQueryParam('datos-generales', this.uuidFromUrl);
+
             }
           }
           this.spinner.hide();
@@ -251,16 +263,15 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     )
   }
 
-  showProveedorByUuid() {
+  showProveedorByUuid(updateTab: boolean = true) {
     this.subscription.add(
       this._proveedoresService.showProveedor(this.uuidFromUrl, this.actual_role).subscribe({
         next: res => {
-          this.showDataProveedor(res.data);
+          this.showDataProveedor(res.data, updateTab);
           this.tokenService.setToken(res.token);
           this.isLoadingProveedores = false;
         },
         error: error => {
-          // this.isLoadingProductos = false;
           console.error(error);
         }
       })
@@ -400,10 +411,14 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
   }
 
-  showDataProveedor(proveedor: any) {
+  showDataProveedor(proveedor: any, updateTab: boolean = true) {
     this.isEdicion = false;
+    this.uuidFromUrl = proveedor.uuid;
+    if (updateTab) {
+      this.tab1 = 'datos-generales';
+    }
+    this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
     this.inicializarForm(proveedor);
-    this.location.replaceState(`/dashboard/proveedores/${proveedor.uuid}`);
   }
 
   editarUsuario(proveedor: any) {
@@ -940,6 +955,26 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     filtroInput.value = '';
     this.filtros.operator.value = '';
     this.obtenerProveedores();
+  }
+
+  updateTabQueryParam(tab: string, uuid: string) {
+    if (!uuid) return;
+    const mergedQueryParams = {
+      ...this.route.snapshot.queryParams,
+      tab
+    };
+    const tree = this.router.createUrlTree(
+      ['/dashboard/proveedores', uuid],
+      { queryParams: mergedQueryParams }
+    );
+    const url = this.router.serializeUrl(tree);
+    this.location.replaceState(url);
+  }
+
+  cambiarTab(tab: string) {
+    this.cancelarEdicion();
+    this.tab1 = tab;
+    this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
   }
 
 }

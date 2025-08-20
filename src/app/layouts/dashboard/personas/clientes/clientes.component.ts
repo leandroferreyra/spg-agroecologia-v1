@@ -153,7 +153,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _clienteService: ClientesService, private spinner: NgxSpinnerService, private tokenService: TokenService,
-    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private titleService: Title) {
+    private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private router: Router) {
     this.initStore();
   }
 
@@ -189,6 +189,17 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe(params => {
       this.uuidFromUrl = params.get('uuid') ?? '';
     });
+
+    this.route.queryParamMap.subscribe(params => {
+      const tab = params.get('tab')?.toLowerCase();
+      const validTabs = ['datos-generales', 'datos-de-contacto', 'personas-de-contacto', 'compras', 'productos-adquiridos', 'productos-adquiridos'];
+      if (tab && validTabs.includes(tab)) {
+        this.tab1 = tab;
+      } else {
+        this.tab1 = 'datos-generales';
+      }
+    });
+
     this.spinner.show();
     this.obtenerClientes();
     this.obtenerCatalogos();
@@ -213,7 +224,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
-            this.showClienteByUuid();
+            this.showClienteByUuid(false);
           } else {
             this.isLoadingClientes = false;
             if (this.clientes.length === 0) {
@@ -226,8 +237,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
             }
             if (!alta && this.clientes.length > 0) {
               this.isEdicion = false;
-              this.inicializarForm(this.clientes[0]);
-              this.location.replaceState(`/dashboard/clientes/${this.clientes[0].uuid}`);
+              const first = this.clientes[0];
+              this.uuidFromUrl = first.uuid;
+              this.inicializarForm(first);
+              this.updateTabQueryParam('datos-generales', this.uuidFromUrl);
+
             }
           }
           this.spinner.hide();
@@ -240,11 +254,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
     )
   }
 
-  showClienteByUuid() {
+  showClienteByUuid(updateTab: boolean = true) {
     this.subscription.add(
       this._clienteService.showCliente(this.uuidFromUrl, this.actual_role).subscribe({
         next: res => {
-          this.showDataCliente(res.data);
+          this.showDataCliente(res.data, updateTab);
           this.tokenService.setToken(res.token);
           this.isLoadingClientes = false;
         },
@@ -403,10 +417,14 @@ export class ClientesComponent implements OnInit, OnDestroy {
     }
   }
 
-  showDataCliente(cliente: any) {
+  showDataCliente(cliente: any, updateTab: boolean = true) {
     this.isEdicion = false;
+    this.uuidFromUrl = cliente.uuid;
+    if (updateTab) {
+      this.tab1 = 'datos-generales';
+    }
+    this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
     this.inicializarForm(cliente);
-    this.location.replaceState(`/dashboard/clientes/${cliente.uuid}`);
   }
 
   editarUsuario(cliente: any) {
@@ -912,6 +930,26 @@ export class ClientesComponent implements OnInit, OnDestroy {
       this.filtros.operator.value = '';
     }
     this.obtenerClientes();
+  }
+
+  updateTabQueryParam(tab: string, uuid: string) {
+    if (!uuid) return;
+    const mergedQueryParams = {
+      ...this.route.snapshot.queryParams,
+      tab
+    };
+    const tree = this.router.createUrlTree(
+      ['/dashboard/clientes', uuid],
+      { queryParams: mergedQueryParams }
+    );
+    const url = this.router.serializeUrl(tree);
+    this.location.replaceState(url);
+  }
+
+  cambiarTab(tab: string) {
+    this.cancelarEdicion();
+    this.tab1 = tab;
+    this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
   }
 
 }

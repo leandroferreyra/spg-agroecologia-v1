@@ -33,7 +33,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   @Input() produccion: any;
   @Input() rol!: string;
   private subscription: Subscription = new Subscription();
-  @Output() refreshComponentes = new EventEmitter<any>();
+  // @Output() refreshComponentes = new EventEmitter<any>();
 
   @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
   @ViewChild('modalReemplazo') modalReemplazo!: NgxCustomModalComponent;
@@ -414,7 +414,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             this.obtenerComponentesProduccion();
             this.cerrarModal();
             this.spinner.hide();
-            this.refreshComponentes.emit();
+            // this.refreshComponentes.emit();
             this.limpiarSerialesDeOtroLote();
           },
           error: error => {
