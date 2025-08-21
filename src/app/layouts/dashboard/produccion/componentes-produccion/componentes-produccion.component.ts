@@ -162,7 +162,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   getProduccionMaxima(stock: any) {
-    return Math.floor(+stock.total_amount / +this.produccion.quantity);
+    return Math.floor(+stock.total_amount / this.getCantidadTotal(this.selectedComponent));
   }
 
   showName(stock: any) {
