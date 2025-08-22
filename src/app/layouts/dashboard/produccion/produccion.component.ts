@@ -66,6 +66,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   usuarioLogueado: any;
   produccionAnterior: any[] = [];
   produccionForm!: FormGroup;
+  liberacionForm!: FormGroup;
 
   isEdicion: boolean = false;
   isShowMailMenu = false;
@@ -115,6 +116,13 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   uuidFromUrl: string = '';
   isLoadingProducciones: boolean = true;
   tab1: string = 'datos-generales';
+
+  @ViewChild('modalLiberacion') modalLiberacion!: NgxCustomModalComponent;
+  modalOptions: ModalOptions = {
+    closeOnOutsideClick: false,
+    hideCloseButton: true,
+    closeOnEscape: false
+  };
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
@@ -546,12 +554,22 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
 
   async changeEstadoProduccion(event: any) {
-    const requiereJustificacion =
-      (this.selectedProduccion?.responsible?.user_name !== this.usuarioLogueado.user_name) ||
-      (this.selectedProduccion?.current_state?.state?.name === 'Liberado' && event === 'previous');
+    const pasaALiberado = this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next';
+
+    const requiereJustificacion = !pasaALiberado && 
+      ((this.selectedProduccion?.responsible?.user_name !== this.usuarioLogueado.user_name) ||
+      (this.selectedProduccion?.current_state?.state?.name === 'Liberado' && event === 'previous'));
+
 
     let text: string;
     let isConfirmed = false;
+
+    if (this.selectedProduccion?.responsible?.user_name === this.usuarioLogueado.user_name &&
+      this.selectedProduccion?.current_state?.state?.name === 'Terminado'
+      && event === 'next') {
+      this.swalService.toastError('top-right', 'Una producción no puede ser liberada por el responsable de la misma');
+      return;
+    }
 
     if (requiereJustificacion) {
       // Modal con input
@@ -590,7 +608,11 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     }
 
     if (isConfirmed) {
-      this.confirmarCambioEstado(event, text);
+      if (pasaALiberado) {
+        this.openModalLiberacion(event, text);
+      } else {
+        this.confirmarCambioEstado(event, text);
+      }
     }
   }
 
@@ -609,18 +631,18 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         next: res => {
           this.obtenerProducciones(false);
           this.tokenService.setToken(res.token);
-          let hayProductosTerceros = res.data?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
-          if (this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next') {
-            const mensaje = 'Asegurate de que el producto esté identificado y almacenado.' +
-              (hayProductosTerceros ? '<br><br>Advertencia: el producto tiene componentes provistos por terceros.' : '');
-            Swal.fire({
-              position: 'center',
-              toast: true,
-              width: '60em',
-              icon: "info",
-              title: mensaje
-            });
-          }
+          // let hayProductosTerceros = res.data?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
+          // if (this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next') {
+          //   const mensaje = 'Asegurate de que el producto esté identificado y almacenado.' +
+          //     (hayProductosTerceros ? '<br><br>Advertencia: el producto tiene componentes provistos por terceros.' : '');
+          //   Swal.fire({
+          //     position: 'center',
+          //     toast: true,
+          //     width: '60em',
+          //     icon: "info",
+          //     title: mensaje
+          //   });
+          // }
           this.spinner.hide();
         },
         error: error => {
@@ -674,6 +696,31 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     );
     const url = this.router.serializeUrl(tree);
     this.location.replaceState(url);
+  }
+
+  openModalLiberacion(evento: string, justificacion: string) {
+    this.liberacionForm = new FormGroup({
+      identificado: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      terceros: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      evento: new FormControl({ value: evento, disabled: true }, []),
+      justificacion: new FormControl({ value: justificacion, disabled: true }, []),
+    });
+    this.modalLiberacion.options = this.modalOptions;
+    this.modalLiberacion.open();
+  }
+
+  confirmarLiberacion() {
+    // this.confirmarCambioEstado(event, text);
+    if (this.liberacionForm.get('identificado')?.value && this.liberacionForm.get('terceros')?.value) {
+      this.cerrarModalLiberacion();
+      this.confirmarCambioEstado(this.liberacionForm.get('evento')?.value, this.liberacionForm.get('justificacion')?.value);
+    } else {
+      this.swalService.toastError('top-right', 'Algo está mal.');
+    }
+  }
+
+  cerrarModalLiberacion() {
+    this.modalLiberacion.close();
   }
 
 }
