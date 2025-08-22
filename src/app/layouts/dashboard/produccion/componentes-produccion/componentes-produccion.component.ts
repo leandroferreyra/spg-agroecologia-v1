@@ -123,7 +123,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
+          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -194,16 +194,22 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       // Lote único
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 1) {
-      // N lotes
+      if (this.isFaltante(data)) {
+        return 'Faltante';
+      }
     }
     if (data.origin === 'Lote') {
       return data.stock?.batch ? data.stock?.batch.batch_identification : 'Lote único';
     } else if (data.origin === 'Provisto por terceros') {
-      return data.origin + ' - ' + this.bindName(data.supplier);
+      return data.origin;
     } else {
       return data.origin;
     }
 
+  }
+
+  isProvistoPorTerceros(data: any) {
+    return data.origin === 'Provisto por terceros';
   }
 
   getLocation(data: any): string[] {
@@ -226,6 +232,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       return false;
     }
     return true;
+  }
+
+  isFaltante(data: any): boolean {
+    return (data.origin === 'Sin selección' && data.possible_stocks?.length === 0);
   }
 
   // openSwalEliminar(componente: any) {
@@ -320,6 +330,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   getTooltipNota(nota: string) {
     const v = (nota ?? '').toString();
     return v.replace(/(\S{20})/g, '$1\u200B'); // zero-width space cada 20 chars
+  }
+
+  getSupplierTooltip(supplier: any) {
+    return supplier ? this.bindName(supplier) : '';
   }
 
   obtenerProveedoresByComponente(data?: any) {

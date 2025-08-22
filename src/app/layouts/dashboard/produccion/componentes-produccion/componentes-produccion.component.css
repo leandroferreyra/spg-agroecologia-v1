@@ -8,3 +8,7 @@
     overflow-wrap: anywhere;
     word-break: break-word;
 }
+
+.color-provisto {
+    color: #F0F !important;
+}
