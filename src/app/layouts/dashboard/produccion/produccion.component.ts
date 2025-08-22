@@ -302,7 +302,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
       fechaInicio: new FormControl({ value: this.convertirFechaConHora(produccion?.production_datetime), disabled: !this.isEdicion }, []),
-      cantidad: new FormControl({ value: this.showCantidad(produccion?.quantity), disabled: true }, [Validators.required]),
+      cantidad: new FormControl({ value: this.showCantidad(produccion?.quantity), disabled: this.allowEditCantidad() }, [Validators.required]),
       responsableCreacion: new FormControl({ value: produccion?.creator?.user_name, disabled: true }, []),
       responsableEjecucion: new FormControl({ value: produccion?.responsible?.uuid, disabled: !this.isEdicion }, [Validators.required]),
       movimientosEstado: new FormControl({ value: produccion?.production_states, disabled: true }, []),
@@ -315,6 +315,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
   onFormEditChange() {
 
+  }
+
+  allowEditCantidad() {
+    return !(this.isEdicion && this.selectedProduccion?.current_state?.state?.name === 'Borrador');
   }
 
   obtenerSerialNumbers(produccion: any): string[] {
@@ -462,6 +466,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   armarDTOProduccion(produccion: ProduccionDTO, form: FormGroup) {
     produccion.actual_role = this.actual_role;
     produccion['user->responsible_uuid'] = form.get('responsableEjecucion')?.value;
+    produccion.quantity = form.get('cantidad')?.value;
     if (!form.get('fechaInicio')?.pristine) {
       produccion.production_datetime = this.convertirFechaADateBackend(form.get('fechaInicio')?.value);
     }
@@ -556,9 +561,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   async changeEstadoProduccion(event: any) {
     const pasaALiberado = this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next';
 
-    const requiereJustificacion = !pasaALiberado && 
+    const requiereJustificacion = !pasaALiberado &&
       ((this.selectedProduccion?.responsible?.user_name !== this.usuarioLogueado.user_name) ||
-      (this.selectedProduccion?.current_state?.state?.name === 'Liberado' && event === 'previous'));
+        (this.selectedProduccion?.current_state?.state?.name === 'Liberado' && event === 'previous'));
 
 
     let text: string;
