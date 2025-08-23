@@ -43,6 +43,7 @@ export class ProduccionService {
     const params = new HttpParams()
       .append('actual_role', rol)
       .append('with[]', "product.measure")
+      .append('with[]', "frozenComponents")
       .append('with[]', "creator")
       .append('with[]', "responsible")
       .append('with[]', "currentState")

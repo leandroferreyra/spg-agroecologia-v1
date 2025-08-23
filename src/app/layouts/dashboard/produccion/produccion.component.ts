@@ -189,6 +189,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
+          // console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -628,9 +629,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     produccionEstadoDTO.actual_role = this.actual_role;
     produccionEstadoDTO.justification = justificacion;
     produccionEstadoDTO.production_state = event;
-    if (event === 'next') {
-      produccionEstadoDTO.with = ['frozenComponents'];
-    }
+    // if (event === 'next') {
+    //   produccionEstadoDTO.with = ['frozenComponents'];
+    // }
     this.subscription.add(
       this._produccionService.editEstadoProduccion(this.selectedProduccion.uuid, produccionEstadoDTO).subscribe({
         next: res => {
@@ -706,22 +707,39 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   openModalLiberacion(evento: string, justificacion: string) {
     this.liberacionForm = new FormGroup({
       identificado: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      terceros: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      terceros: new FormControl({ value: null, disabled: false }, []),
       evento: new FormControl({ value: evento, disabled: true }, []),
       justificacion: new FormControl({ value: justificacion, disabled: true }, []),
     });
+    let hayProductosTerceros = this.selectedProduccion?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
+    if (hayProductosTerceros) {
+      this.liberacionForm.get('terceros')?.setValidators([Validators.required]);
+      this.liberacionForm.get('terceros')?.updateValueAndValidity({ emitEvent: false });
+    } else {
+      this.liberacionForm.get('terceros')?.disable();
+    }
     this.modalLiberacion.options = this.modalOptions;
     this.modalLiberacion.open();
   }
 
   confirmarLiberacion() {
-    // this.confirmarCambioEstado(event, text);
-    if (this.liberacionForm.get('identificado')?.value && this.liberacionForm.get('terceros')?.value) {
-      this.cerrarModalLiberacion();
-      this.confirmarCambioEstado(this.liberacionForm.get('evento')?.value, this.liberacionForm.get('justificacion')?.value);
-    } else {
-      this.swalService.toastError('top-right', 'Algo está mal.');
+    const identificado = this.liberacionForm.get('identificado')?.value;
+    const terceros = this.liberacionForm.get('terceros')?.value;
+    let hayProductosTerceros = this.selectedProduccion?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
+    // Validar campo obligatorio "identificado"
+    if (!identificado) {
+      this.swalService.toastError('top-right', 'Debés confirmar que los productos están identificados.');
+      return;
     }
+    // Si hay productos provistos por terceros, entonces también es obligatorio tildar el checkbox de terceros
+    if (hayProductosTerceros && !terceros) {
+      this.swalService.toastError('top-right', 'Debés aceptar que hay componentes provistos por terceros.');
+      return;
+    }
+    const evento = this.liberacionForm.get('evento')?.value;
+    const justificacion = this.liberacionForm.get('justificacion')?.value;
+    this.cerrarModalLiberacion();
+    this.confirmarCambioEstado(evento, justificacion);
   }
 
   cerrarModalLiberacion() {
