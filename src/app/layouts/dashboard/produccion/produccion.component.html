@@ -146,39 +146,43 @@
 
             <div class="mt-3 flex flex-wrap">
 
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{
-                            '!border-b-4 !border-secondary text-secondary font-semibold bg-white shadow-md rounded-t-lg':
+                <a href="javascript:;" class="flex items-center border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary 
+                    hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
+                            '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'datos-generales',
                             'cursor-not-allowed tab-disabled': isTabDisabled
                         }" (click)="!isTabDisabled && cambiarTab('datos-generales')">
                     Datos generales
                 </a>
 
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'componentes',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && cambiarTab('componentes')">
+                <a href="javascript:;" class="flex items-center border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary 
+                    hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
+                            '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
+                            tab1.toLowerCase() === 'componentes',
+                            'cursor-not-allowed tab-disabled': isTabDisabled
+                        }" (click)="!isTabDisabled && cambiarTab('componentes')">
                     Componentes
                 </a>
 
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'trazabilidad',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && cambiarTab('trazabilidad')">
+                <a href="javascript:;" class="flex items-center border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary 
+                    hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
+                            '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
+                            tab1.toLowerCase() === 'trazabilidad',
+                            'cursor-not-allowed tab-disabled': isTabDisabled
+                        }" (click)="!isTabDisabled && cambiarTab('trazabilidad')">
                     Trazabilidad
                 </a>
 
-                <a href="javascript:;"
-                    class="flex items-center border-t-2 border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary hover:text-secondary dark:bg-transparent dark:hover:bg-[#191e3a]"
-                    [ngClass]="{ '!border-secondary text-secondary dark:bg-[#191e3a]': tab1.toLowerCase() === 'faltantes',
-                    'cursor-not-allowed tab-disabled': isTabDisabled }"
-                    (click)="!isTabDisabled && cambiarTab('faltantes')">
+
+                <a href="javascript:;" class="flex items-center border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary 
+                    hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
+                            '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
+                            tab1.toLowerCase() === 'faltantes',
+                            'cursor-not-allowed tab-disabled': isTabDisabled
+                        }" (click)="!isTabDisabled && cambiarTab('faltantes')">
                     Faltantes
                 </a>
+
             </div>
 
             <div class="flex-1 text-sm">
