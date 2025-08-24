@@ -124,6 +124,18 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     closeOnEscape: false
   };
 
+  // Manejo de filtros activos.
+  activeFilters: Array<{ key: string; label: string; display: string }> = [];
+  private readonly FILTER_LABELS: Record<string, string> = {
+    'product.name': 'Nombre',
+    'batch.batch_identification': 'Lote',
+    'frozenComponent.productInstance.serial_number': 'N° de serie',
+    'productionStates.possibleProductionState.uuid': 'Estados',
+    'user->responsible.uuid': 'Usuarios',
+    '__fecha_desde__': 'Fecha desde',
+    '__fecha_hasta__': 'Fecha hasta',
+  };
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
     private tokenService: TokenService, private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute,
@@ -553,7 +565,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.filtroFechaProduccionDesde = '';
     this.filtroFechaProduccionHasta = '';
     this.params.extraDateFilters = [];
-
+    this.activeFilters = [];
     this.obtenerProducciones();
   }
 
@@ -745,5 +757,77 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   cerrarModalLiberacion() {
     this.modalLiberacion.close();
   }
+
+
+
+  buildActiveFilters(): void {
+    const list: Array<{ key: string; label: string; display: string }> = [];
+
+    const pushIf = (key: string, label: string, value: any, extra: string = '') => {
+      if (value !== null && value !== undefined && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+        list.push({ key, label, display: `${value}${extra}` });
+      }
+    };
+
+    pushIf('product.name', 'Nombre', this.filtros['product.name'].value, this.filtros['product.name'].contiene ? ' (contiene)' : '');
+    pushIf('batch.batch_identification', 'Lote', this.filtros['batch.batch_identification'].value, this.filtros['batch.batch_identification'].contiene ? ' (contiene)' : '');
+    pushIf('frozenComponent.productInstance.serial_number', 'N° de serie', this.filtros['frozenComponent.productInstance.serial_number'].value);
+    pushIf('__fecha_desde__', 'Fecha desde', this.filtroFechaProduccionDesde);
+    pushIf('__fecha_hasta__', 'Fecha hasta', this.filtroFechaProduccionHasta);
+
+    // Estados (convertir UUID a nombre)
+    const estados = this.filtros['productionStates.possibleProductionState.uuid'].value;
+    if (Array.isArray(estados) && estados.length > 0) {
+      const nombres = (this.estados || [])
+        .filter(e => estados.includes(e.uuid))
+        .map(e => e.name)
+        .join(', ');
+      list.push({ key: 'productionStates.possibleProductionState.uuid', label: 'Estados', display: nombres });
+    }
+
+    // Usuarios
+    const users = this.filtros['user->responsible.uuid'].value;
+    if (Array.isArray(users) && users.length > 0) {
+      const nombres = (this.usuariosParaFiltrar || [])
+        .filter(u => users.includes(u.uuid))
+        .map(u => u.user_name)
+        .join(', ');
+      list.push({ key: 'user->responsible.uuid', label: 'Usuarios', display: nombres });
+    }
+
+
+
+    this.activeFilters = list;
+  }
+
+  clearFilter(key: string): void {
+    switch (key) {
+      case 'product.name':
+        this.filtros[key].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case 'batch.batch_identification':
+        this.filtros[key].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case 'frozenComponent.productInstance.serial_number':
+        this.filtros[key].value = '';
+        break;
+      case 'productionStates.possibleProductionState.uuid':
+      case 'user->responsible.uuid':
+        this.filtros[key].value = [];
+        break;
+      case '__fecha_desde__':
+        this.filtroFechaProduccionDesde = '';
+        break;
+      case '__fecha_hasta__':
+        this.filtroFechaProduccionHasta = '';
+        break;
+    }
+
+    this.buildActiveFilters();
+    this.obtenerProduccionesPorFiltroAvanzado();
+  }
+
 
 }
