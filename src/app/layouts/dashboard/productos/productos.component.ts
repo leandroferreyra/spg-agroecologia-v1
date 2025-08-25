@@ -140,8 +140,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   placeholderStocks: string = '';
   usuarioLogueado: any;
-  productoAProducir: any
-  modoSeries: any
+  productoAProducir: any;
+
+  // Manejo de filtros activos.
+  activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -677,6 +679,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.filtros['assign_serial_number'].value = '';
     this.filtros['productStates.possibleProductState.uuid'].value = '';
     delete this.filtros['productStates.datetime_to'];
+    this.activeFilters = [];
     this.obtenerProductos();
   }
 
@@ -827,5 +830,111 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.location.replaceState(url);
   }
 
+  buildActiveFilters(): void {
+    const list: Array<{ key: string; label: string; display: string }> = [];
+
+    const pushIf = (key: string, label: string, value: any, extra: string = '') => {
+      if (value !== null && value !== undefined && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+        list.push({ key, label, display: `${value}${extra}` });
+      }
+    };
+
+    pushIf('name', 'Nombre', this.filtros['name'].value, this.filtros['name'].contiene ? ' (contiene)' : '');
+    pushIf('code', 'Código', this.filtros['code'].value);
+    pushIf('mercosur_nomenclature', 'Nomenclatura', this.filtros['mercosur_nomenclature'].value, this.filtros['mercosur_nomenclature'].contiene ? ' (contiene)' : '');
+    pushIf('stocks.batch.batch_identification', 'Lote', this.filtros['stocks.batch.batch_identification'].value, this.filtros['stocks.batch.batch_identification'].contiene ? ' (contiene)' : '');
+    pushIf('assign_serial_number', 'Asigna n° serie', this.sendValueSiNo(this.filtros['assign_serial_number'].value));
+    pushIf('traceable', 'Trazable', this.sendValueSiNo(this.filtros['traceable'].value));
+    pushIf('productType.can_be_produced', 'Producible', this.sendValueSiNo(this.filtros['productType.can_be_produced'].value));
+
+    // Estados (convertir UUID a nombre)
+    const estados = this.filtros['productStates.possibleProductState.uuid'].value;
+    if (estados) {
+      this.pushById(estados, 'productStates.possibleProductState.uuid', 'Estados', this.estados, list);
+    }
+
+    // Tipos de producto (convertir UUID a nombre)
+    const tiposProducto = this.filtros['productType.uuid'].value;
+    if (tiposProducto) {
+      this.pushById(tiposProducto, 'productType.uuid', 'Tipos de producto', this.tipoProductos, list);
+    }
+
+    // Categorias (convertir UUID a nombre)
+    const categoria = this.filtros['productCategory.uuid'].value;
+    if (categoria) {
+      this.pushById(categoria, 'productCategory.uuid', 'Categorías', this.categorias, list);
+    }
+
+    // Unidades (convertir UUID a nombre)
+    const unidad = this.filtros['measure.uuid'].value;
+    if (unidad) {
+      this.pushById(unidad, 'measure.uuid', 'Unidad', this.measures, list);
+    }
+
+    const proveedor = this.filtros['suppliers.uuid'].value;
+    if (proveedor) {
+      this.pushById(proveedor, 'suppliers.uuid', 'Proveedor', this.proveedores, list);
+    }
+
+    this.activeFilters = list;
+  }
+
+  sendValueSiNo(value: any) {
+    if (!value) {
+      return value;
+    }
+    if (value === '1') {
+      return 'Si'
+    }
+    return 'No';
+  }
+
+  pushWhenArray(filtroValue: any, filtroName: string, label: string, array: any, list: Array<{ key: string; label: string; display: string }>) {
+    if (Array.isArray(filtroValue) && filtroValue.length > 0) {
+      const nombres = (array || [])
+        .filter((e: any) => filtroValue.includes(e.uuid))
+        .map((e: any) => e.name)
+        .join(', ');
+      list.push({ key: filtroName, label: label, display: nombres });
+    }
+  }
+
+  pushById(filtroValue: any, filtroName: string, label: string, array: any, list: Array<{ key: string; label: string; display: string }>) {
+    if (filtroName === 'suppliers.uuid') {
+      const item = array.find((e: any) => e.uuid === filtroValue);
+      const nombre = item.person?.human ? item.person.human.firstname + ' ' + item.person.human.lastname : item.person.legal_entity.company_name;
+      list.push({ key: filtroName, label: label, display: nombre });
+
+    } else {
+      const item = array.find((e: any) => e.uuid === filtroValue);
+      list.push({ key: filtroName, label: label, display: item.name });
+    }
+  }
+
+  clearFilter(key: string): void {
+    switch (key) {
+      case 'name':
+      case 'code':
+      case 'mercosur_nomenclature':
+      case 'stocks.batch.batch_identification':
+        this.filtros[key].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case 'productStates.possibleProductState.uuid':
+      case 'productType.uuid':
+      case 'user->responsible.uuid':
+      case 'productCategory.uuid':
+      case 'measure.uuid':
+      case 'suppliers.uuid':
+      case 'productType.can_be_produced':
+      case 'assign_serial_number':
+      case 'traceable':
+        this.filtros[key].value = '';
+        break;
+    }
+
+    this.buildActiveFilters();
+    this.obtenerProductosPorFiltroAvanzado();
+  }
 
 }
