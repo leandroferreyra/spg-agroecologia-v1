@@ -84,6 +84,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   serialesPorLote: Record<string, any[]> = {};
 
+  expandirTodo = false;
+  componentesExpandido: { [uuid: string]: boolean } = {}; // Estado de expansión de cada compra
+
+
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
     private _swalService: SwalService, private _frozenComponentService: FrozenComponentService, private router: Router) {
 
@@ -280,7 +284,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   // }
 
   openModalComponente(data: any) {
-    this.selectedComponent = data;
+    // this.toggleComponente(data);
     this.inicializarFormComponente(data);
     this.obtenerProveedoresByComponente(data);
     this.stocks = (data.possible_stocks || []).map((stock: any) => ({
@@ -290,7 +294,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.tituloModal = `Selección de origen de "${data.name}"`;
     this.modalComponente.options = this.modalOptions;
     this.modalComponente.open();
-
   }
 
   cerrarModal() {
@@ -576,5 +579,16 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   toggleTodos() {
     this.ocultarSinStock = !this.ocultarSinStock;
+  }
+
+  toggleComponente(data: any) {
+    this.componentesExpandido[data.uuid] = !this.componentesExpandido[data.uuid];
+  }
+
+  toggleTodosExpandidos() {
+    this.expandirTodo = !this.expandirTodo;
+    this.componentes.forEach(compra => {
+      this.componentesExpandido[compra.uuid] = this.expandirTodo;
+    });
   }
 }
