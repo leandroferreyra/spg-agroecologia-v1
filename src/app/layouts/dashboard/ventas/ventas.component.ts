@@ -1054,7 +1054,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     params.order_by = {};
     params.filters = {
       'product.uuid': { value: producto.uuid, op: '=', contiene: false },
-      'total_amount': { value: 0, op: '>', contiene: false },
+      'available_amount': { value: 0, op: '>', contiene: false },
     };
 
     this.subscription.add(
@@ -1080,9 +1080,9 @@ export class VentasComponent implements OnInit, OnDestroy {
   armarStock(producto: any, stock: any) {
     let amount;
     if (producto.measure?.is_integer === 1) {
-      amount = (+stock.total_amount).toFixed(0);
+      amount = (+stock.available_amount).toFixed(0);
     } else {
-      amount = (+stock.total_amount).toFixed(2);
+      amount = (+stock.available_amount).toFixed(2);
     }
     return `${this.datePipe.transform(stock.created_at, 'yyyy-MM-dd')} | (${stock.batch != null ? stock.batch.batch_identification : "Lote único"}) | ${amount}`
   }

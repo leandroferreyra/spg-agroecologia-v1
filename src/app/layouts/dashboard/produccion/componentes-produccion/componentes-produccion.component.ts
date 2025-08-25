@@ -155,14 +155,14 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   getCantidadStockByComponent(stock: any) {
     if (this.selectedComponent.measure?.is_integer === 1) {
-      return +(+stock.total_amount)?.toFixed(0);
+      return +(+stock.available_amount)?.toFixed(0);
     } else {
-      return +(+stock.total_amount)?.toFixed(2);
+      return +(+stock.available_amount)?.toFixed(2);
     }
   }
 
   getProduccionMaxima(stock: any) {
-    return Math.floor(+stock.total_amount / this.getCantidadTotal(this.selectedComponent));
+    return Math.floor(+stock.available_amount / this.getCantidadTotal(this.selectedComponent));
   }
 
   showName(stock: any) {
@@ -285,7 +285,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.obtenerProveedoresByComponente(data);
     this.stocks = (data.possible_stocks || []).map((stock: any) => ({
       ...stock,
-      disabled: +stock.total_amount < +this.getCantidadTotal(data)
+      disabled: +stock.available_amount < +this.getCantidadTotal(data)
     }));
     this.tituloModal = `Selección de origen de "${data.name}"`;
     this.modalComponente.options = this.modalOptions;
