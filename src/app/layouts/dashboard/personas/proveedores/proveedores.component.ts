@@ -1035,20 +1035,14 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   clearFilter(key: string): void {
     switch (key) {
       case 'person.human.firstname':
-        this.filtros[key].value = '';
-        this.filtros[key].contiene = true;
-        break;
       case 'person.human.lastname':
+      case 'person.legalEntity.company_name':
         this.filtros[key].value = '';
         this.filtros[key].contiene = true;
         break;
       case 'person.human.document_number':
+      case 'batch_prefix':
         this.filtros[key].value = '';
-        this.filtros[key].contiene = true;
-        break;
-      case 'person.legalEntity.company_name':
-        this.filtros[key].value = '';
-        this.filtros[key].contiene = true;
         break;
       case 'person.legalEntity.cuit':
         this.filtros[key].value = '';
@@ -1059,9 +1053,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
         this.filtroTipoPersona = 'todos';
         this.filtros['person.human.uuid'].value = ''
         this.filtros['person.legalEntity.uuid'].value = ''
-        break;
-      case 'batch_prefix':
-        this.filtros[key].value = ''
         break;
     }
 

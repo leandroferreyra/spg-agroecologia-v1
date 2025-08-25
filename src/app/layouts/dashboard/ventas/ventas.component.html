@@ -32,6 +32,23 @@
                 </button>
             </div>
 
+            <div class="text-[0.85em] mt-2">
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                    <ng-container *ngFor="let f of activeFilters">
+                        <span class="inline-flex items-center gap-2 rounded-full bg-[#f1f5f9] px-3 py-1 text-gray-700
+                 border border-gray-300 shadow-sm dark:bg-[#1e293b] dark:border-gray-600 dark:text-white transition">
+                            <span class="font-medium whitespace-nowrap">{{ f.label }}:</span>
+                            <span class="opacity-80 truncate max-w-[150px]">{{ f.display }}</span>
+                            <button type="button" class="ml-1 h-5 w-5 inline-flex items-center justify-center rounded-full
+                   hover:bg-red-100 dark:hover:bg-red-900 text-gray-500 hover:text-red-600 transition"
+                                (click)="clearFilter(f.key)" aria-label="Quitar filtro">
+                                ✕
+                            </button>
+                        </span>
+                    </ng-container>
+                </div>
+            </div>
+
             @if (ventas) {
             <span class="float-md-end color-gris">
                 Ventas {{ total_rows }}
@@ -608,8 +625,6 @@
 
 </div>
 
-
-
 <div>
     <ngx-custom-modal #modalCliente class=" modal-top large-modal animate animate-fade-in">
         <ng-template #modalHeader>
@@ -880,7 +895,7 @@
                                 <label class="inline-flex items-center" for="radioTodos">
                                     <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                         id="radioTodos" value="todos" [(ngModel)]="filtroTipoPersona"
-                                        (change)="changeTipoPersona()">
+                                        (change)="changeTipoPersona(); buildActiveFilters() ">
                                     <span class="ml-2 cursor-pointer">Todos</span>
                                 </label>
                             </div>
@@ -888,7 +903,7 @@
                                 <label class="inline-flex items-center" for="radioFisica">
                                     <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                         id="radioFisica" value="fisica" [(ngModel)]="filtroTipoPersona"
-                                        (change)="changeTipoPersona()">
+                                        (change)="changeTipoPersona(); buildActiveFilters()">
                                     <span class="ml-2 cursor-pointer">Física</span>
                                 </label>
                             </div>
@@ -896,7 +911,7 @@
                                 <label class="inline-flex items-center" for="radioJuridica">
                                     <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                         id="radioJuridica" value="juridica" [(ngModel)]="filtroTipoPersona"
-                                        (change)="changeTipoPersona()">
+                                        (change)="changeTipoPersona(); buildActiveFilters()">
                                     <span class="ml-2 cursor-pointer">Jurídica</span>
                                 </label>
                             </div>
@@ -908,13 +923,13 @@
                         <label for="nombre">Nombre</label>
                         <input type="text" id="nombre" class="form-control"
                             [(ngModel)]="filtrosVentas['transaction.person.human.firstname'].value"
-                            (input)="obtenerVentasPorFiltroAvanzado()">
+                            (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()">
                     </div>
                     <div class="flex-grow-1">
                         <label for="apellido">Apellido</label>
                         <input type="text" id="apellido" class="form-control"
                             [(ngModel)]="filtrosVentas['transaction.person.human.lastname'].value"
-                            (input)="obtenerVentasPorFiltroAvanzado()">
+                            (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()">
                     </div>
                     }
                     @if(this.filtroTipoPersona === 'juridica' || this.filtroTipoPersona === 'todos') {
@@ -922,7 +937,7 @@
                         <label for="razon">Razón Social</label>
                         <input type="text" id="razon" class="form-control"
                             [(ngModel)]="filtrosVentas['transaction.person.legalEntity.company_name'].value"
-                            (input)="obtenerVentasPorFiltroAvanzado()">
+                            (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()">
                     </div>
                     }
                 </fieldset>
@@ -934,7 +949,7 @@
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaTransacDesde"
-                        (input)="obtenerVentasPorFiltroAvanzado()" />
+                        (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()" />
                 </div>
                 <div class="col-md-12 pr-1 mb-3">
                     <label>Fecha transacción hasta</label>
@@ -944,7 +959,7 @@
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaTransacHasta"
-                        (input)="obtenerVentasPorFiltroAvanzado()" />
+                        (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()" />
                 </div>
                 <div class="flex-grow-1">
                     <label>Tipo de comprobante contable</label>
@@ -952,19 +967,19 @@
                         clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                         notFoundText="No hay tipos de comprobantes contables" class="w-1/3 min-w-[200px]"
                         [(ngModel)]="filtrosVentas['transaction.transactionDocuments.accountDocumentType.uuid'].value"
-                        (change)="obtenerVentasPorFiltroAvanzado()"></ng-select>
+                        (change)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()"></ng-select>
                 </div>
                 <div class="flex-grow-1">
                     <label for="prefijo">Prefijo (comprobante contable)</label>
                     <input type="text" id="prefijo" class="form-control"
                         [(ngModel)]="filtrosVentas['transaction.transactionDocuments.prefix_number'].value"
-                        (input)="obtenerVentasPorFiltroAvanzado()">
+                        (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()">
                 </div>
                 <div class="flex-grow-1">
                     <label for="documento">Número de documento (comprobante contable)</label>
                     <input type="text" id="documento" class="form-control"
                         [(ngModel)]="filtrosVentas['transaction.transactionDocuments.document_number'].value"
-                        (input)="obtenerVentasPorFiltroAvanzado()">
+                        (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()">
                 </div>
                 <div class="col-md-12 pr-1 mb-3">
                     <label>Fecha Comprobante desde</label>
@@ -974,7 +989,7 @@
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaComprobanteDesde"
-                        (input)="obtenerVentasPorFiltroAvanzado()" />
+                        (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()" />
                 </div>
                 <div class="col-md-12 pr-1 mb-3">
                     <label>Fecha Comprobante hasta</label>
@@ -984,14 +999,14 @@
                                         time24hr: true,
                                         enableSeconds: false
                                     }" class="form-input" [(ngModel)]="filtroFechaComprobanteHasta"
-                        (input)="obtenerVentasPorFiltroAvanzado()" />
+                        (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()" />
                 </div>
                 <div style="width: 100%;">
                     <label for="switchRightLote">Lote</label>
                     <div class="flex">
                         <input id="switchRightLote" type="text" placeholder=""
                             [(ngModel)]="filtrosVentas['batch.batch_identification'].value"
-                            (input)="obtenerVentasPorFiltroAvanzado()"
+                            (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()"
                             class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
                         <div
                             class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
@@ -1000,7 +1015,7 @@
                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                     id="custom_switch_checkbox2"
                                     [(ngModel)]="filtrosVentas['batch.batch_identification'].contiene"
-                                    (change)="obtenerVentasPorFiltroAvanzado()" />
+                                    (change)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()" />
                                 <span
                                     class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
                             </label>
@@ -1013,7 +1028,7 @@
                     <div class="flex">
                         <input id="switchRight" type="text" placeholder=""
                             [(ngModel)]="filtrosVentas['batch.stocks.productInstances.serial_number'].value"
-                            (input)="obtenerVentasPorFiltroAvanzado()"
+                            (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()"
                             class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
                         <div
                             class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
@@ -1022,7 +1037,7 @@
                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                     id="custom_switch_checkbox2"
                                     [(ngModel)]="filtrosVentas['batch.stocks.productInstances.serial_number'].contiene"
-                                    (change)="obtenerVentasPorFiltroAvanzado()" />
+                                    (change)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()" />
                                 <span
                                     class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
                             </label>
@@ -1038,7 +1053,7 @@
                         typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
                         placeholder="Buscar producto..."
                         [(ngModel)]="filtrosVentas['transaction.transactionProducts.product.uuid'].value"
-                        (change)="obtenerVentasPorFiltroAvanzado()">
+                        (change)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()">
                     </ng-select>
                 </div>
 

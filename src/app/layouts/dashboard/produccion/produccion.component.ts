@@ -771,9 +771,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   clearFilter(key: string): void {
     switch (key) {
       case 'product.name':
-        this.filtros[key].value = '';
-        this.filtros[key].contiene = true;
-        break;
       case 'batch.batch_identification':
         this.filtros[key].value = '';
         this.filtros[key].contiene = true;

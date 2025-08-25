@@ -997,17 +997,8 @@ export class ClientesComponent implements OnInit, OnDestroy {
   clearFilter(key: string): void {
     switch (key) {
       case 'person.human.firstname':
-        this.filtros[key].value = '';
-        this.filtros[key].contiene = true;
-        break;
       case 'person.human.lastname':
-        this.filtros[key].value = '';
-        this.filtros[key].contiene = true;
-        break;
       case 'person.human.document_number':
-        this.filtros[key].value = '';
-        this.filtros[key].contiene = true;
-        break;
       case 'person.legalEntity.company_name':
         this.filtros[key].value = '';
         this.filtros[key].contiene = true;
@@ -1015,7 +1006,6 @@ export class ClientesComponent implements OnInit, OnDestroy {
       case 'person.legalEntity.cuit':
         this.filtros[key].value = '';
         this.filtros['person.human.cuit'].value = '';
-        this.filtros[key].contiene = true;
         break;
       case '__tipo_persona__':
         this.filtroTipoPersona = 'todos';

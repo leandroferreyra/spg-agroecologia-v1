@@ -152,6 +152,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   ubicaciones: any[] = [];
   monedas: any[] = [];
   metodosDePago: any[] = [];
+  productosGuardados: any[] = [];
 
   productoInput$ = new Subject<string>();
   productos$!: Observable<any[]>;
@@ -167,6 +168,9 @@ export class VentasComponent implements OnInit, OnDestroy {
   showStocks: boolean = false;
   showSerialNumber: boolean = false;
   mostrarCantidad: boolean = false;
+
+  // Manejo de filtros activos.
+  activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -325,8 +329,10 @@ export class VentasComponent implements OnInit, OnDestroy {
         };
 
         return this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
-          map((res: any) => res.data), //
-          finalize(() => this.loadingProductos = false)
+          map((res: any) => {
+            this.productosGuardados = res.data;
+            return res.data;
+          }), finalize(() => this.loadingProductos = false)
         );
       })
     );
@@ -813,7 +819,7 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.filtroFechaComprobanteDesde = '';
     this.filtroFechaComprobanteHasta = '';
     this.params.extraDateFilters = [];
-
+    this.activeFilters = [];
     this.obtenerVentas();
   }
 
@@ -1763,6 +1769,93 @@ export class VentasComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  buildActiveFilters(): void {
+    const list: Array<{ key: string; label: string; display: string }> = [];
+
+    const pushIf = (key: string, label: string, value: any, extra: string = '') => {
+      if (value !== null && value !== undefined && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+        list.push({ key, label, display: `${value}${extra}` });
+      }
+    };
+
+    if (this.filtroTipoPersona && this.filtroTipoPersona !== 'todos') {
+      pushIf(
+        '__tipo_persona__',
+        'Tipo de persona',
+        this.filtroTipoPersona
+      );
+    }
+
+    pushIf('transaction.person.human.firstname', 'Nombre', this.filtrosVentas['transaction.person.human.firstname'].value);
+    pushIf('transaction.person.human.lastname', 'Apellido', this.filtrosVentas['transaction.person.human.lastname'].value);
+    pushIf('transaction.person.legalEntity.company_name', 'Razón social', this.filtrosVentas['transaction.person.legalEntity.company_name'].value);
+    pushIf('transaction.transactionDocuments.prefix_number', 'Prefijo', this.filtrosVentas['transaction.transactionDocuments.prefix_number'].value);
+    pushIf('transaction.transactionDocuments.document_number', 'N° documento contable', this.filtrosVentas['transaction.transactionDocuments.document_number'].value);
+    pushIf('batch.batch_identification', 'Lote', this.filtrosVentas['batch.batch_identification'].value, this.filtrosVentas['batch.batch_identification'].contiene ? ' (contiene)' : '');
+    pushIf('batch.stocks.productInstances.serial_number', 'N° de serie', this.filtrosVentas['batch.stocks.productInstances.serial_number'].value, this.filtrosVentas['batch.stocks.productInstances.serial_number'].contiene ? ' (contiene)' : '');
+    pushIf('__fecha_desde_transaccion__', 'Fecha transacción desde', this.filtroFechaTransacDesde);
+    pushIf('__fecha_hasta_transaccion__', 'Fecha transacción hasta', this.filtroFechaTransacHasta);
+    pushIf('__fecha_desde_comprobante', 'Fecha comprobante desde', this.filtroFechaComprobanteDesde);
+    pushIf('__fecha_hasta_comprobante', 'Fecha comprobante hasta', this.filtroFechaComprobanteHasta);
+
+    // Tipo comprobante contable (convertir UUID a nombre)
+    const tipoComprobanteContable = this.filtrosVentas['transaction.transactionDocuments.accountDocumentType.uuid'].value;
+    if (tipoComprobanteContable) {
+      this.pushById(tipoComprobanteContable, 'transaction.transactionDocuments.accountDocumentType.uuid', 'Tipo comprobante contable', this.tiposDocumentosContables, list);
+    }
+
+    const productoId = this.filtrosVentas['transaction.transactionProducts.product.uuid'].value;
+    if (productoId) {
+      this.pushById(productoId, 'transaction.transactionProducts.product.uuid', 'Producto', this.productosGuardados, list);
+    }
+
+    this.activeFilters = list;
+  }
+
+  pushById(filtroValue: any, filtroName: string, label: string, array: any, list: Array<{ key: string; label: string; display: string }>) {
+    const item = array.find((e: any) => e.uuid === filtroValue);
+    list.push({ key: filtroName, label: label, display: item.name });
+  }
+
+  clearFilter(key: string): void {
+    switch (key) {
+      case '__tipo_persona__':
+        this.filtroTipoPersona = 'todos';
+        this.filtrosVentas['person.human.uuid'].value = ''
+        this.filtrosVentas['person.legalEntity.uuid'].value = ''
+        break;
+      case 'transaction.person.human.firstname':
+      case 'transaction.person.human.lastname':
+      case 'transaction.person.legalEntity.company_name':
+      case 'transaction.transactionDocuments.accountDocumentType.uuid':
+      case 'transaction.transactionDocuments.prefix_number':
+      case 'transaction.transactionDocuments.document_number':
+      case 'transaction.transactionProducts.product.uuid':
+        this.filtrosVentas[key].value = '';
+        break;
+      case 'batch.stocks.productInstances.serial_number':
+      case 'batch.batch_identification':
+        this.filtrosVentas[key].value = '';
+        this.filtrosVentas[key].contiene = true;
+        break;
+      case '__fecha_desde_transaccion__':
+        this.filtroFechaTransacDesde = '';
+        break;
+      case '__fecha_hasta_transaccion__':
+        this.filtroFechaTransacHasta = '';
+        break;
+      case '__fecha_desde_comprobante__':
+        this.filtroFechaComprobanteDesde = '';
+        break;
+      case '__fecha_hasta_comprobante__':
+        this.filtroFechaComprobanteHasta = '';
+        break;
+    }
+
+    this.buildActiveFilters();
+    this.obtenerVentasPorFiltroAvanzado();
   }
 
 }

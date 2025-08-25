@@ -155,6 +155,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   pagos: any[] = [];
   monedas: any[] = [];
   metodosDePago: any[] = [];
+  productosGuardados: any[] = [];
 
   breadcrumb: any[] = [];
   ultimaUbicacion: any = null;
@@ -182,6 +183,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
   isLoadingCompras: boolean = true;
 
   productosSeleccionados: any[] = [];
+
+  // Manejo de filtros activos.
+  activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -461,8 +465,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
         params.filters['name'] = { value: term, op: 'LIKE', contiene: true };
 
         return this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
-          map((res: any) => res.data),
-          finalize(() => this.loadingProductos = false)
+          map((res: any) => {
+            this.productosGuardados = res.data;
+            return res.data;
+          }), finalize(() => this.loadingProductos = false)
         );
       })
     );
@@ -548,17 +554,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   inicializarFormNew() {
     this.newCompraForm = new FormGroup({
-      // qualification_option_uuid: new FormControl({ value: null, disabled: false }, []),
-      // qualification_comments: new FormControl({ value: null, disabled: false }, []),
       transaction_datetime: new FormControl({ value: new Date(), disabled: false }, []),
-      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      // vat_after_discount: new FormControl({ value: null, disabled: false }, []),
-      // discount1: new FormControl({ value: null, disabled: false }, []),
-      // discount2: new FormControl({ value: null, disabled: false }, []),
-      // others: new FormControl({ value: null, disabled: false }, []),
-      // perceptionIB: new FormControl({ value: null, disabled: false }, []),
-      // perceptionRG3337: new FormControl({ value: null, disabled: false }, []),
-      // possible_transaction_state_uuid: new FormControl({ value: null, disabled: false }, []),
+      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required])
     });
     this.onNewForm();
   }
@@ -1155,7 +1152,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.filtroFechaFacturaDesde = '';
     this.filtroFechaFacturaHasta = '';
     this.params.extraDateFilters = [];
-
+    this.activeFilters = [];
     this.obtenerCompras();
   }
 
@@ -2030,6 +2027,94 @@ export class ComprasComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+
+  buildActiveFilters(): void {
+    const list: Array<{ key: string; label: string; display: string }> = [];
+
+    const pushIf = (key: string, label: string, value: any, extra: string = '') => {
+      if (value !== null && value !== undefined && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+        list.push({ key, label, display: `${value}${extra}` });
+      }
+    };
+
+    if (this.filtroTipoPersona && this.filtroTipoPersona !== 'todos') {
+      pushIf(
+        '__tipo_persona__',
+        'Tipo de persona',
+        this.filtroTipoPersona
+      );
+    }
+
+    pushIf('transaction.person.human.firstname', 'Nombre', this.filtros['transaction.person.human.firstname'].value);
+    pushIf('transaction.person.human.lastname', 'Apellido', this.filtros['transaction.person.human.lastname'].value);
+    pushIf('transaction.person.legalEntity.company_name', 'Razón social', this.filtros['transaction.person.legalEntity.company_name'].value);
+    pushIf('transaction.transactionDocuments.prefix_number', 'Prefijo', this.filtros['transaction.transactionDocuments.prefix_number'].value);
+    pushIf('transaction.transactionDocuments.document_number', 'N° documento contable', this.filtros['transaction.transactionDocuments.document_number'].value);
+    pushIf('batch.batch_identification', 'Lote', this.filtros['batch.batch_identification'].value, this.filtros['batch.batch_identification'].contiene ? ' (contiene)' : '');
+    pushIf('batch.stocks.productInstances.serial_number', 'N° de serie', this.filtros['batch.stocks.productInstances.serial_number'].value, this.filtros['batch.stocks.productInstances.serial_number'].contiene ? ' (contiene)' : '');
+    pushIf('__fecha_desde_transaccion__', 'Fecha transacción desde', this.filtroFechaTransacDesde);
+    pushIf('__fecha_hasta_transaccion__', 'Fecha transacción hasta', this.filtroFechaTransacHasta);
+    pushIf('__fecha_desde_factura__', 'Fecha factura desde', this.filtroFechaFacturaDesde);
+    pushIf('__fecha_hasta_factura__', 'Fecha factura hasta', this.filtroFechaFacturaHasta);
+
+    // Tipo comprobante contable (convertir UUID a nombre)
+    const tipoComprobanteContable = this.filtros['transaction.transactionDocuments.accountDocumentType.uuid'].value;
+    if (tipoComprobanteContable) {
+      this.pushById(tipoComprobanteContable, 'transaction.transactionDocuments.accountDocumentType.uuid', 'Tipo comprobante contable', this.tiposDocumentosContables, list);
+    }
+
+    const productoId = this.filtros['transaction.transactionProducts.product.uuid'].value;
+    if (productoId) {
+      this.pushById(productoId, 'transaction.transactionProducts.product.uuid', 'Producto', this.productosGuardados, list);
+    }
+
+    this.activeFilters = list;
+  }
+
+  pushById(filtroValue: any, filtroName: string, label: string, array: any, list: Array<{ key: string; label: string; display: string }>) {
+    const item = array.find((e: any) => e.uuid === filtroValue);
+    list.push({ key: filtroName, label: label, display: item.name });
+  }
+
+  clearFilter(key: string): void {
+    switch (key) {
+      case '__tipo_persona__':
+        this.filtroTipoPersona = 'todos';
+        this.filtros['person.human.uuid'].value = ''
+        this.filtros['person.legalEntity.uuid'].value = ''
+        break;
+      case 'transaction.person.human.firstname':
+      case 'transaction.person.human.lastname':
+      case 'transaction.person.legalEntity.company_name':
+      case 'transaction.transactionDocuments.accountDocumentType.uuid':
+      case 'transaction.transactionDocuments.prefix_number':
+      case 'transaction.transactionDocuments.document_number':
+      case 'transaction.transactionProducts.product.uuid':
+        this.filtros[key].value = '';
+        break;
+      case 'batch.stocks.productInstances.serial_number':
+      case 'batch.batch_identification':
+        this.filtros[key].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case '__fecha_desde_transaccion__':
+        this.filtroFechaTransacDesde = '';
+        break;
+      case '__fecha_hasta_transaccion__':
+        this.filtroFechaTransacHasta = '';
+        break;
+      case '__fecha_desde_factura__':
+        this.filtroFechaFacturaDesde = '';
+        break;
+      case '__fecha_hasta_factura__':
+        this.filtroFechaFacturaHasta = '';
+        break;
+    }
+
+    this.buildActiveFilters();
+    this.obtenerComprasPorFiltroAvanzado();
   }
 
 }
