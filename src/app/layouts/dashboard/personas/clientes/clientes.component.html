@@ -9,11 +9,13 @@
             <!-- PANEL IZQUIERDO -->
 
             <div class="flex h-full flex-col">
+
                 <div class="flex justify-end xl:hidden mb-2">
                     <button (click)="isShowMailMenu = false" class="p-2 hover:text-primary">
                         <icon-menu class="w-5 h-5" />
                     </button>
                 </div>
+
                 <div class="flex items-center justify-between text-md mb-3">
                     <button type="button" class="hover:text-primary" (click)="openModalNuevoCliente()"
                         [disabled]="isEdicion" [ngClass]="{
@@ -29,6 +31,23 @@
                         <icon-search class="mx-auto mb-1" />
                         Filtros avanzados
                     </button>
+                </div>
+
+                <div class="text-[0.85em] mt-2">
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <ng-container *ngFor="let f of activeFilters">
+                            <span class="inline-flex items-center gap-2 rounded-full bg-[#f1f5f9] px-3 py-1 text-gray-700
+                 border border-gray-300 shadow-sm dark:bg-[#1e293b] dark:border-gray-600 dark:text-white transition">
+                                <span class="font-medium whitespace-nowrap">{{ f.label }}:</span>
+                                <span class="opacity-80 truncate max-w-[150px]">{{ f.display }}</span>
+                                <button type="button" class="ml-1 h-5 w-5 inline-flex items-center justify-center rounded-full
+                   hover:bg-red-100 dark:hover:bg-red-900 text-gray-500 hover:text-red-600 transition"
+                                    (click)="clearFilter(f.key)" aria-label="Quitar filtro">
+                                    ✕
+                                </button>
+                            </span>
+                        </ng-container>
+                    </div>
                 </div>
 
                 <span *ngIf="clientes && clientes.length > 0" class="float-md-end color-gris">
@@ -84,8 +103,8 @@
                     </div>
                     <div class="flex w-full">
                         <div class="relative flex-grow">
-                            <input id="switchRight" type="text" placeholder="Buscar cliente..." #filtroSimple
-                                (input)="obtenerClientesPorFiltroSimple(filtroSimple.value)"
+                            <input id="switchRight" type="text" placeholder="Buscar cliente..."
+                                (input)="obtenerClientesPorFiltroSimple()" [(ngModel)]="filtroSimpleName"
                                 class="form-input w-full ltr:rounded-r-none rtl:rounded-l-none" />
                             <div class="absolute top-1/2 -translate-y-1/2 ltr:right-[11px] rtl:left-[11px]">
                                 <icon-search />
@@ -705,7 +724,7 @@
                                     <label class="inline-flex items-center" for="radioTodos">
                                         <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                             id="radioTodos" value="todos" [(ngModel)]="filtroTipoPersona"
-                                            (change)="changeTipoPersona(filtroSimple)">
+                                            (change)="changeTipoPersona(); buildActiveFilters()">
                                         <span class="ml-2 cursor-pointer">Todos</span>
                                     </label>
                                 </div>
@@ -713,7 +732,7 @@
                                     <label class="inline-flex items-center" for="radioFisica">
                                         <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                             id="radioFisica" value="fisica" [(ngModel)]="filtroTipoPersona"
-                                            (change)="changeTipoPersona(filtroSimple)">
+                                            (change)="changeTipoPersona(); buildActiveFilters()">
                                         <span class="ml-2 cursor-pointer">Física</span>
                                     </label>
                                 </div>
@@ -721,7 +740,7 @@
                                     <label class="inline-flex items-center" for="radioJuridica">
                                         <input class="form-radio rounded-full" type="radio" name="flexRadioDefault"
                                             id="radioJuridica" value="juridica" [(ngModel)]="filtroTipoPersona"
-                                            (change)="changeTipoPersona(filtroSimple)">
+                                            (change)="changeTipoPersona(); buildActiveFilters()">
                                         <span class="ml-2 cursor-pointer">Jurídica</span>
                                     </label>
                                 </div>
@@ -735,19 +754,19 @@
                                 <label for="nombre">Nombre</label>
                                 <input type="text" id="nombre" class="form-control"
                                     [(ngModel)]="filtros['person.human.firstname'].value"
-                                    (input)="obtenerClientesPorFiltroAvanzado(filtroSimple)">
+                                    (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()">
                             </div>
                             <div class="flex-grow-1">
                                 <label for="apellido">Apellido</label>
                                 <input type="text" id="apellido" class="form-control"
                                     [(ngModel)]="filtros['person.human.lastname'].value"
-                                    (input)="obtenerClientesPorFiltroAvanzado(filtroSimple)">
+                                    (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()">
                             </div>
                             <div class="flex-grow-1">
                                 <label for="dni">DNI</label>
                                 <input type="text" id="dni" class="form-control"
                                     [(ngModel)]="filtros['person.human.document_number'].value"
-                                    (input)="obtenerClientesPorFiltroAvanzado(filtroSimple)">
+                                    (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()">
                             </div>
                             }
                             @if(this.filtroTipoPersona === 'juridica' || this.filtroTipoPersona === 'todos') {
@@ -755,14 +774,14 @@
                                 <label for="razon">Razón Social</label>
                                 <input type="text" id="razon" class="form-control"
                                     [(ngModel)]="filtros['person.legalEntity.company_name'].value"
-                                    (input)="obtenerClientesPorFiltroAvanzado(filtroSimple)">
+                                    (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()">
                             </div>
                             }
                             <div class="flex-grow-1">
                                 <label for="cuit">CUIT</label>
                                 <input type="text" id="inputCuit" class="form-control"
                                     [(ngModel)]="filtros['person.legalEntity.cuit'].value"
-                                    (input)="obtenerClientesPorFiltroAvanzado(filtroSimple, true)">
+                                    (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()">
                             </div>
                         </div>
 

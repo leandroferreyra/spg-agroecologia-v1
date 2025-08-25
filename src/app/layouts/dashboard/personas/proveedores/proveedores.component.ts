@@ -74,6 +74,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   // Orden y filtro para datos listado proveedores.
   filtroTipoPersona: string = 'todos';
+  filtroSimpleName: string = '';
   // Orden y filtro
   filtros: any = {
     'operator': { value: '' },
@@ -156,6 +157,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   inputCuitRef?: HTMLInputElement;
   uuidFromUrl: string = '';
   isLoadingProveedores: boolean = true;
+
+  // Manejo de filtros activos.
+  activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -803,11 +807,12 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     if (this.inputCuitRef) {
       this.inputCuitRef.value = '';
     }
+    this.activeFilters = [];
     this.obtenerProveedores();
   }
 
-  changeTipoPersona(filtroInput: HTMLInputElement) {
-    filtroInput.value = '';
+  changeTipoPersona() {
+    this.filtroSimpleName = '';
     if (this.inputCuitRef) {
       this.inputCuitRef.value = '';
     }
@@ -934,7 +939,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
   }
 
-  obtenerProveedoresPorFiltroSimple(value: string) {
+  obtenerProveedoresPorFiltroSimple() {
     this.filtroTipoPersona = 'todos';
     this.filtros['batch_prefix'].value = '';
     this.filtros['person.human.uuid'].value = '';
@@ -944,17 +949,35 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.filtros['person.legalEntity.uuid'].value = '';
     this.filtros['person.legalEntity.cuit'].value = '';
 
-    this.filtros['person.human.firstname'].value = value;
-    this.filtros['person.human.lastname'].value = value;
-    this.filtros['person.legalEntity.company_name'].value = value;
-    this.filtros.operator.value = 'OR';
+    if (this.filtroSimpleName) {
+      this.filtros['person.human.firstname'].value = this.filtroSimpleName;
+      this.filtros['person.human.lastname'].value = this.filtroSimpleName;
+      this.filtros['person.legalEntity.company_name'].value = this.filtroSimpleName;
+      this.filtros.operator.value = 'OR';
+    } else {
+      this.filtros['person.human.firstname'].value = '';
+      this.filtros['person.human.lastname'].value = '';
+      this.filtros['person.legalEntity.company_name'].value = '';
+      this.filtros.operator.value = '';
+    }
     this.obtenerProveedores();
   }
 
-  obtenerProveedoresPorFiltroAvanzado(filtroInput: HTMLInputElement) {
-    filtroInput.value = '';
-    this.filtros.operator.value = '';
-    this.obtenerProveedores();
+  obtenerProveedoresPorFiltroAvanzado() {
+    this.filtroSimpleName = '';
+    if (this.filtroTipoPersona === 'todos') {
+      if (this.filtros['person.legalEntity.cuit'].value) { // Si buscó por cuit y es todos se asigna el OR
+        this.filtros['person.human.cuit'].value = this.filtros['person.legalEntity.cuit'].value;
+        this.filtros.operator.value = 'OR';
+      }
+    } else if (this.filtroTipoPersona === 'fisica') {
+      this.filtros['person.human.cuit'].value = this.filtros['person.legalEntity.cuit'].value;
+      this.filtros['person.legalEntity.cuit'].value = '';
+      this.filtros.operator.value = '';
+    } else {
+      // Nada porque es jurídica y ya se le asigna al cuit de la entidad legal.
+      this.filtros.operator.value = '';
+    } this.obtenerProveedores();
   }
 
   updateTabQueryParam(tab: string, uuid: string) {
@@ -975,6 +998,75 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.cancelarEdicion();
     this.tab1 = tab;
     this.updateTabQueryParam(this.tab1, this.uuidFromUrl);
+  }
+
+
+  buildActiveFilters(): void {
+    const list: Array<{ key: string; label: string; display: string }> = [];
+
+    const pushIf = (key: string, label: string, value: any, extra: string = '') => {
+      if (value !== null && value !== undefined && value !== '' && (!Array.isArray(value) || value.length > 0)) {
+        list.push({ key, label, display: `${value}${extra}` });
+      }
+    };
+
+    if (this.filtroTipoPersona && this.filtroTipoPersona !== 'todos') {
+      pushIf(
+        '__tipo_persona__',
+        'Tipo de persona',
+        this.filtroTipoPersona
+      );
+    }
+
+    pushIf('person.human.firstname', 'Nombre', this.filtros['person.human.firstname'].value);
+    pushIf('person.human.lastname', 'Apellido', this.filtros['person.human.lastname'].value);
+    pushIf('person.human.document_number', 'Documento', this.filtros['person.human.document_number'].value);
+    if (this.filtroTipoPersona && this.filtroTipoPersona !== 'fisica') {
+      pushIf('person.legalEntity.cuit', 'Cuit', this.filtros['person.legalEntity.cuit'].value);
+    } else {
+      pushIf('person.human.cuit', 'Cuit', this.filtros['person.human.cuit'].value);
+    }
+    pushIf('person.legalEntity.company_name', 'Razón social', this.filtros['person.legalEntity.company_name'].value);
+    pushIf('batch_prefix', 'Sigla', this.filtros['batch_prefix'].value);
+
+    this.activeFilters = list;
+  }
+
+  clearFilter(key: string): void {
+    switch (key) {
+      case 'person.human.firstname':
+        this.filtros[key].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case 'person.human.lastname':
+        this.filtros[key].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case 'person.human.document_number':
+        this.filtros[key].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case 'person.legalEntity.company_name':
+        this.filtros[key].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case 'person.legalEntity.cuit':
+        this.filtros[key].value = '';
+        this.filtros['person.human.cuit'].value = '';
+        this.filtros[key].contiene = true;
+        break;
+      case '__tipo_persona__':
+        this.filtroTipoPersona = 'todos';
+        this.filtros['person.human.uuid'].value = ''
+        this.filtros['person.legalEntity.uuid'].value = ''
+        break;
+      case 'batch_prefix':
+        this.filtros[key].value = ''
+        break;
+    }
+
+    this.buildActiveFilters();
+    this.obtenerProveedoresPorFiltroAvanzado();
   }
 
 }
