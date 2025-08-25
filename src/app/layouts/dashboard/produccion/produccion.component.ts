@@ -126,15 +126,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
-  private readonly FILTER_LABELS: Record<string, string> = {
-    'product.name': 'Nombre',
-    'batch.batch_identification': 'Lote',
-    'frozenComponent.productInstance.serial_number': 'N° de serie',
-    'productionStates.possibleProductionState.uuid': 'Estados',
-    'user->responsible.uuid': 'Usuarios',
-    '__fecha_desde__': 'Fecha desde',
-    '__fecha_hasta__': 'Fecha hasta',
-  };
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
@@ -190,7 +181,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    // this.params.with = ["product.measure", "batch.stocks.productInstances", "creator", "responsible", "currentState", "productionStates.creator",];
     this.params.with = ["product", "batch", "currentState"];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
@@ -569,8 +559,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.obtenerProducciones();
   }
 
-
-
   async changeEstadoProduccion(event: any) {
     const pasaALiberado = this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next';
 
@@ -641,26 +629,11 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     produccionEstadoDTO.actual_role = this.actual_role;
     produccionEstadoDTO.justification = justificacion;
     produccionEstadoDTO.production_state = event;
-    // if (event === 'next') {
-    //   produccionEstadoDTO.with = ['frozenComponents'];
-    // }
     this.subscription.add(
       this._produccionService.editEstadoProduccion(this.selectedProduccion.uuid, produccionEstadoDTO).subscribe({
         next: res => {
           this.obtenerProducciones(false);
           this.tokenService.setToken(res.token);
-          // let hayProductosTerceros = res.data?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
-          // if (this.selectedProduccion?.current_state?.state?.name === 'Terminado' && event === 'next') {
-          //   const mensaje = 'Asegurate de que el producto esté identificado y almacenado.' +
-          //     (hayProductosTerceros ? '<br><br>Advertencia: el producto tiene componentes provistos por terceros.' : '');
-          //   Swal.fire({
-          //     position: 'center',
-          //     toast: true,
-          //     width: '60em',
-          //     icon: "info",
-          //     title: mensaje
-          //   });
-          // }
           this.spinner.hide();
         },
         error: error => {
@@ -758,8 +731,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.modalLiberacion.close();
   }
 
-
-
   buildActiveFilters(): void {
     const list: Array<{ key: string; label: string; display: string }> = [];
 
@@ -794,9 +765,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         .join(', ');
       list.push({ key: 'user->responsible.uuid', label: 'Usuarios', display: nombres });
     }
-
-
-
     this.activeFilters = list;
   }
 
