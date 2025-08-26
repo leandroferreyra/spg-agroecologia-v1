@@ -284,16 +284,18 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   expandirTodos() {
-    this.expandirTodo = true;
     this.componentes.forEach(componente => {
-      this.expandedRows[componente.uuid] = this.expandirTodo;
-      if (this.expandedRows[componente.uuid]) {
-        this.inicializarFormComponente(componente);
-        this.obtenerProveedoresByComponente(componente);
-        this.stocksByComponente[componente.uuid] = (componente.possible_stocks || []).map((stock: any) => ({
-          ...stock,
-          disabled: +stock.available_amount < +this.getCantidadTotal(componente)
-        }));
+      // Solo expande los que tienen control de stock.
+      if (componente.product_type?.stock_controlled === 1) {
+        this.expandedRows[componente.uuid] = true;
+        if (this.expandedRows[componente.uuid]) {
+          this.inicializarFormComponente(componente);
+          this.obtenerProveedoresByComponente(componente);
+          this.stocksByComponente[componente.uuid] = (componente.possible_stocks || []).map((stock: any) => ({
+            ...stock,
+            disabled: +stock.available_amount < +this.getCantidadTotal(componente)
+          }));
+        }
       }
     });
   }
