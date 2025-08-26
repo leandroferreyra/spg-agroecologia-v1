@@ -131,6 +131,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         next: res => {
           this.componentes = res.data;
           this.modificarPaginacion(res);
+          if (this.expandirTodo) {
+            this.expandirTodos();
+          }
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -317,7 +320,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   expandirTodos() {
-    this.expandirTodo = !this.expandirTodo;
+    this.expandirTodo = true;
     this.componentes.forEach(componente => {
       this.expandedRows[componente.uuid] = this.expandirTodo;
       if (this.expandedRows[componente.uuid]) {
@@ -332,6 +335,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   cerrarTodos() {
+    this.expandirTodo = false;
     this.expandedRows = {};
   }
 
