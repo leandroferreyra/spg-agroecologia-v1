@@ -796,7 +796,8 @@ export class VentasComponent implements OnInit, OnDestroy {
   }
 
   convertirFechaADateBackend(fechaStr: string): string {
-    const [dia, mes, anio] = fechaStr.split('-');
+    const fechaNormalizada = fechaStr.replace(/[\/()]/g, '-');
+    const [dia, mes, anio] = fechaNormalizada.split('-');
     return `${anio}-${mes}-${dia}`;
   }
 
@@ -1528,7 +1529,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       comprobante.transaction_uuid = this.selectedVenta.transaction?.uuid;
       comprobante.account_document_type_uuid = this.comprobanteForm.get('account_document_type_uuid')?.value;
       const fechaFormateada = this.comprobanteForm.get('document_datetime')?.value instanceof Date
-        ? format(this.comprobanteForm.get('document_datetime')?.value, 'yyyy-MM-dd')
+        ? format(this.comprobanteForm.get('document_datetime')?.value, 'dd-MM-yyyy')
         : this.comprobanteForm.get('document_datetime')?.value;
       comprobante.document_datetime = this.convertirFechaADateBackend(fechaFormateada);
       comprobante.prefix_number = this.comprobanteForm.get('prefix_number')?.value;
@@ -1650,7 +1651,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   inicializarFormPago(data?: any) {
     this.pagoForm = new FormGroup({
       pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
-      payment_datetime: new FormControl({ value: data ? this.showFecha(data.payment_datetime) : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_datetime: new FormControl({ value: data ? this.showFecha(data.payment_datetime) : new Date(), disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : []),
       amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : []),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
@@ -1684,7 +1685,10 @@ export class VentasComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let pago = new PagoDTO();
       pago.actual_role = this.actual_role;
-      pago.payment_datetime = this.convertirFechaADateBackend(this.pagoForm.get('payment_datetime')?.value);
+      const fechaFormateada = this.pagoForm.get('payment_datetime')?.value instanceof Date
+        ? format(this.pagoForm.get('payment_datetime')?.value, 'dd-MM-yyyy')
+        : this.pagoForm.get('payment_datetime')?.value;
+      pago.payment_datetime = this.convertirFechaADateBackend(fechaFormateada);
       pago.amount = this.pagoForm.get('amount')?.value;
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;
