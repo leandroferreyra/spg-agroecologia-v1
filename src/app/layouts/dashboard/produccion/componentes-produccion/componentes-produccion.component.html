@@ -145,9 +145,7 @@
                     }
                 </tr>
 
-
-
-                <tr *ngIf="expandedRows[data.uuid]">
+                <tr *ngIf="expandedRows[data.uuid]" class="bg-gray-100 dark:bg-gray-800">
                     <td colspan="7">
                         <form [formGroup]="componenteForms[data.uuid]">
                             <div class="flex flex-col sm:flex-row">
@@ -314,8 +312,6 @@
                         </div>
                     </td>
                 </tr>
-
-
 
                 }
                 }
