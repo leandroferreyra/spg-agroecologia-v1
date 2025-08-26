@@ -357,8 +357,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.compraForm.get('tipoCambio')?.setValue(1);
           this.compraForm.get('tipoCambio')?.disable();
         } else {
-          this.compraForm.get('tipoCambio')?.setValue(null);
-          this.compraForm.get('tipoCambio')?.enable();
+          if (this.inAltaFactura) {
+            this.compraForm.get('tipoCambio')?.setValue(null);
+            this.compraForm.get('tipoCambio')?.enable();
+          }
         }
       });
   }
