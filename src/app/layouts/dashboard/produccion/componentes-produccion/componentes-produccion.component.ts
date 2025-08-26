@@ -16,15 +16,15 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
-import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { RolDTO } from 'src/app/core/models/request/rolDTO';
+import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
 
 @Component({
   selector: 'app-componentes-produccion',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, IconPlusComponent, NgSelectModule, FormsModule, ReactiveFormsModule, NgbPaginationModule,
-    IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent, NgxTippyModule],
+    IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent, NgxTippyModule, IconCaretDownComponent],
   templateUrl: './componentes-produccion.component.html',
   styleUrl: './componentes-produccion.component.css'
 })
@@ -89,6 +89,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   stocksByComponente: { [uuid: string]: any[] } = {};
   proveedoresByComponente: { [uuid: string]: Observable<any[]> } = {};
   proveedorInputByComponente: { [uuid: string]: Subject<string> } = {};
+  isEditing: { [uuid: string]: boolean } = {};
+
   expandirTodo = false;
 
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
@@ -130,6 +132,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          // this.componentes.forEach(element => {
+          //   this.inicializarFormComponente(element);
+          // });
           this.modificarPaginacion(res);
           if (this.expandirTodo) {
             this.expandirTodos();
@@ -244,75 +249,34 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     return (data.origin === 'Sin selección' && data.possible_stocks?.length === 0);
   }
 
-  // openSwalEliminar(componente: any) {
-  //   Swal.fire({
-  //     title: '',
-  //     text: `¿Desea eliminar el componente de producción ${componente.name}?`,
-  //     icon: 'info',
-  //     confirmButtonText: 'Confirmar',
-  //     showDenyButton: true,
-  //     denyButtonText: 'Cancelar',
-  //     didRender: () => {
-  //       const cancelButton = Swal.getDenyButton();
-  //       if (cancelButton) {
-  //         cancelButton.setAttribute('id', 'back-button-with-border');
-  //       }
-  //     }
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       this.eliminarComponente(componente);
-  //     } else if (result.isDenied) {
-
-  //     }
-  //   })
-  // }
-
-  // eliminarComponente(producto: any) {
-  //   this.spinner.show();
-  //   this.subscription.add(
-  //     this._frozenComponentService.deleteComponent(producto.uuid, this.rol.toUpperCase()).subscribe({
-  //       next: res => {
-  //         this.obtenerComponentesProduccion();
-  //         this._tokenService.setToken(res.token);
-  //         this.spinner.hide();
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //         this._swalService.toastError('top-right', error.error.message);
-  //         this.spinner.hide();
-  //       }
-  //     })
-  //   )
-  // }
-
-  // openModalComponente(data: any) {
-  // this.selectedComponent = data;
-  // this.inicializarFormComponente(data);
-  // this.obtenerProveedoresByComponente(data);
-  // this.stocks = (data.possible_stocks || []).map((stock: any) => ({
-  //   ...stock,
-  //   disabled: +stock.available_amount < +this.getCantidadTotal(data)
-  // }));
-  // this.tituloModal = `Selección de origen de "${data.name}"`;
-  // this.modalComponente.options = this.modalOptions;
-  // this.modalComponente.open();
-  // }
-
   toggleComponente(data: any) {
     const uuid = data.uuid;
     this.expandedRows[uuid] = !this.expandedRows[uuid];
     if (this.expandedRows[uuid]) {
-      this.inicializarFormComponente(data);
-      this.obtenerProveedoresByComponente(data);
-      this.stocksByComponente[uuid] = (data.possible_stocks || []).map((stock: any) => ({
-        ...stock,
-        disabled: +stock.available_amount < +this.getCantidadTotal(data)
-      }));
+      this.inicializarFormularioComponente(data);
     }
-    // if (this.expandedRows.length === 0) {
-    //   this.expandirTodo = false;
-    // }
+  }
 
+  inicializarFormularioComponente(data: any) {
+    this.isEditing[data.uuid] = false;
+    this.inicializarFormComponente(data);
+    this.obtenerProveedoresByComponente(data);
+    this.stocksByComponente[data.uuid] = (data.possible_stocks || []).map((stock: any) => ({
+      ...stock,
+      disabled: +stock.available_amount < +this.getCantidadTotal(data)
+    }));
+  }
+
+  habilitarEdicion(data: any) {
+    this.isEditing[data.uuid] = true;
+    this.componenteForms[data.uuid].get('supplier_uuid')?.enable();
+    this.componenteForms[data.uuid].get('note')?.enable();
+  }
+
+  cancelarEdicion(data: any) {
+    this.isEditing[data.uuid] = false;
+    this.componenteForms[data.uuid].get('supplier_uuid')?.disable();
+    this.componenteForms[data.uuid].get('note')?.disable();
   }
 
   getFormControl(uuid: string, controlName: string): FormControl {
@@ -346,11 +310,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   inicializarFormComponente(data: any) {
     this.componenteForm = new FormGroup({
-      uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
-      origin: new FormControl({ value: data ? data.origin : null, disabled: false }, []),
-      stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: false }, []),
-      supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: false }, []),
-      note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
+      uuid: new FormControl({ value: data ? data.uuid : null, disabled: !this.isEditing[data.uuid] }, []),
+      origin: new FormControl({ value: data ? data.origin : null, disabled: !this.isEditing[data.uuid] }, []),
+      stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: !this.isEditing[data.uuid] }, []),
+      supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: !this.isEditing[data.uuid] }, []),
+      note: new FormControl({ value: data ? data.note : null, disabled: !this.isEditing[data.uuid] }, []),
       product_instances: new FormControl({ value: data ? data.product_instances : null, disabled: data.assign_serial_number === 0 }, []),
     });
     if (data && data.origin === 'Lote' && data.assign_serial_number === 1) {
@@ -466,15 +430,19 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   confirmarComponente(data: any) {
     this.isSubmit = true;
-    if (!this.componenteForms[data.uuid].pristine && this.componenteForms[data.uuid].valid) {
+    if (this.componenteForms[data.uuid].valid) {
       this.spinner.show();
       let componente = new FrozenComponentDTO();
       this.armarDTOComponente(data, componente);
       this.subscription.add(
         this._frozenComponentService.editComponente(this.componenteForms[data.uuid].get('uuid')?.value, componente).subscribe({
           next: res => {
+            this.isSubmit = false;
+            this.isEditing[data.uuid] = false;
+            this.componenteForms[data.uuid].get('note')?.disable();
+            this.componenteForms[data.uuid].get('supplier_uuid')?.disable();
             this.obtenerComponentesProduccion();
-            this.toggleComponente(data);
+            // this.toggleComponente(data);
             this.limpiarSerialesDeOtroLote(data);
             this.spinner.hide();
           },
