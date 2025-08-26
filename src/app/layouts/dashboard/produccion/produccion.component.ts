@@ -21,6 +21,9 @@ import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
 import { IconHorizontalDotsComponent } from 'src/app/shared/icon/icon-horizontal-dots';
 import { IconMenuComponent } from 'src/app/shared/icon/icon-menu';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconExpandComponent } from 'src/app/shared/icon/icon-expand';
+import { IconCollapseComponent } from 'src/app/shared/icon/icon-collapse';
+import { IconExpandAllComponent } from 'src/app/shared/icon/icon-expand-all';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconSettingsComponent } from 'src/app/shared/icon/icon-settings';
@@ -41,14 +44,13 @@ import { ProduccionEstadoDTO } from 'src/app/core/models/request/produccionEstad
 import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 
-
 @Component({
   selector: 'app-produccion',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconPencilComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, IconSettingsComponent, NgbPaginationModule, FlatpickrDirective,
-    TimelineComponent, ComponentesProduccionComponent, TrazabilidadComponent, FaltantesComponent],
+    TimelineComponent, ComponentesProduccionComponent, TrazabilidadComponent, FaltantesComponent, IconExpandComponent, IconCollapseComponent, IconExpandAllComponent],
   animations: [toggleAnimation],
   templateUrl: './produccion.component.html',
   styleUrl: './produccion.component.css'

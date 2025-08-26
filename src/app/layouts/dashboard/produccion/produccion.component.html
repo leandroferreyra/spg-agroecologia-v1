@@ -139,6 +139,15 @@
             <div class="flex items-center gap-2 ml-auto">
                 @if(producciones.length > 0 && selectedProduccion) {
                 <button type="button" ngxTippy="Editar" (click)="openModalProduccion(selectedProduccion)">
+                    <icon-expand-all />
+                </button>
+                <button type="button" ngxTippy="Editar" (click)="openModalProduccion(selectedProduccion)">
+                    <icon-expand />
+                </button>
+                <button type="button" ngxTippy="Editar" (click)="openModalProduccion(selectedProduccion)">
+                    <icon-collapse />
+                </button>
+                <button type="button" ngxTippy="Editar" (click)="openModalProduccion(selectedProduccion)">
                     <icon-pencil />
                 </button>
                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedProduccion)">
