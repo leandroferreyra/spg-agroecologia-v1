@@ -19,8 +19,6 @@ export class UserService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .append('actual_role', rol)
-      .append('with[]', 'human.person.city')
-      .append('with[]', 'human.person.city.district')
       .append('with[]', 'human.person.city.district.country')
       .append('with[]', 'human.gender')
       .append('with[]', 'roles')
@@ -33,8 +31,6 @@ export class UserService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .append('actual_role', rol)
-      .append('with[]', 'human.person.city')
-      .append('with[]', 'human.person.city.district')
       .append('with[]', 'human.person.city.district.country')
       .append('with[]', 'human.gender')
       .append('with[]', 'roles')

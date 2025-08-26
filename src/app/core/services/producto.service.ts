@@ -37,6 +37,7 @@ export class ProductoService {
       .append('actual_role', rol)
       .append('with[]', "productType")
       .append('with[]', "productCategory")
+      .append('with[]', "currentState")
       .append('with[]', "productStates")
       .append('with[]', "measure")
       .append('with[]', "country")

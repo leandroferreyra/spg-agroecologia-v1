@@ -199,7 +199,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
+    params.with = ["productType", "productCategory", "currentState", "productStates", "measure", "country", "stocks"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -590,7 +590,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   armarDTOProducto(producto: ProductoDTO, form: FormGroup) {
     producto.actual_role = this.actual_role;
-    producto.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
+    producto.with = ["productType", "productCategory", "currentState", "productStates", "measure", "country", "stocks"];
     producto.name = form.get('nombre')?.value;
     producto.code = form.get('codigo')?.value;
     producto.product_type_uuid = form.get('tipoProducto')?.value.uuid;
