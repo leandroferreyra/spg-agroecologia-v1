@@ -84,6 +84,13 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   serialesPorLote: Record<string, any[]> = {};
 
+  expandedRows: { [uuid: string]: boolean } = {};
+  componenteForms: { [uuid: string]: FormGroup } = {};
+  stocksByComponente: { [uuid: string]: any[] } = {};
+  proveedoresByComponente: { [uuid: string]: Observable<any[]> } = {};
+  proveedorInputByComponente: { [uuid: string]: Subject<string> } = {};
+  expandirTodo = false;
+
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
     private _swalService: SwalService, private _frozenComponentService: FrozenComponentService, private router: Router) {
 
@@ -123,7 +130,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -149,20 +155,17 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
-  shouldSendSerialNumber(data: any) {
 
-  }
-
-  getCantidadStockByComponent(stock: any) {
-    if (this.selectedComponent.measure?.is_integer === 1) {
+  getCantidadStockByComponent(data: any, stock: any) {
+    if (data.measure?.is_integer === 1) {
       return +(+stock.available_amount)?.toFixed(0);
     } else {
       return +(+stock.available_amount)?.toFixed(2);
     }
   }
 
-  getProduccionMaxima(stock: any) {
-    return Math.floor(+stock.available_amount / this.getCantidadTotal(this.selectedComponent));
+  getProduccionMaxima(data: any, stock: any) {
+    return Math.floor(+stock.available_amount / this.getCantidadTotal(data));
   }
 
   showName(stock: any) {
@@ -279,24 +282,63 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   //   )
   // }
 
-  openModalComponente(data: any) {
-    this.selectedComponent = data;
-    this.inicializarFormComponente(data);
-    this.obtenerProveedoresByComponente(data);
-    this.stocks = (data.possible_stocks || []).map((stock: any) => ({
-      ...stock,
-      disabled: +stock.available_amount < +this.getCantidadTotal(data)
-    }));
-    this.tituloModal = `Selección de origen de "${data.name}"`;
-    this.modalComponente.options = this.modalOptions;
-    this.modalComponente.open();
+  // openModalComponente(data: any) {
+  // this.selectedComponent = data;
+  // this.inicializarFormComponente(data);
+  // this.obtenerProveedoresByComponente(data);
+  // this.stocks = (data.possible_stocks || []).map((stock: any) => ({
+  //   ...stock,
+  //   disabled: +stock.available_amount < +this.getCantidadTotal(data)
+  // }));
+  // this.tituloModal = `Selección de origen de "${data.name}"`;
+  // this.modalComponente.options = this.modalOptions;
+  // this.modalComponente.open();
+  // }
+
+  toggleComponente(data: any) {
+    const uuid = data.uuid;
+    this.expandedRows[uuid] = !this.expandedRows[uuid];
+    if (this.expandedRows[uuid]) {
+      this.inicializarFormComponente(data);
+      this.obtenerProveedoresByComponente(data);
+      this.stocksByComponente[uuid] = (data.possible_stocks || []).map((stock: any) => ({
+        ...stock,
+        disabled: +stock.available_amount < +this.getCantidadTotal(data)
+      }));
+    }
+    // if (this.expandedRows.length === 0) {
+    //   this.expandirTodo = false;
+    // }
 
   }
 
-  cerrarModal() {
-    this.isSubmit = false;
-    this.modalComponente.close();
+  getFormControl(uuid: string, controlName: string): FormControl {
+    return this.componenteForms[uuid].get(controlName) as FormControl;
   }
+
+  expandirTodos() {
+    this.expandirTodo = !this.expandirTodo;
+    this.componentes.forEach(componente => {
+      this.expandedRows[componente.uuid] = this.expandirTodo;
+      if (this.expandedRows[componente.uuid]) {
+        this.inicializarFormComponente(componente);
+        this.obtenerProveedoresByComponente(componente);
+        this.stocksByComponente[componente.uuid] = (componente.possible_stocks || []).map((stock: any) => ({
+          ...stock,
+          disabled: +stock.available_amount < +this.getCantidadTotal(componente)
+        }));
+      }
+    });
+  }
+
+  cerrarTodos() {
+    this.expandedRows = {};
+  }
+
+  // cerrarModal(data: any) {
+  // this.isSubmit = false;
+  // this.modalComponente.close();
+  // }
 
   inicializarFormComponente(data: any) {
     this.componenteForm = new FormGroup({
@@ -307,15 +349,13 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       note: new FormControl({ value: data ? data.note : null, disabled: false }, []),
       product_instances: new FormControl({ value: data ? data.product_instances : null, disabled: data.assign_serial_number === 0 }, []),
     });
-    if (data && data.origin === 'Lote' && this.selectedComponent.assign_serial_number === 1) {
+    if (data && data.origin === 'Lote' && data.assign_serial_number === 1) {
       this.componenteForm.get('product_instances')?.setValidators(Validators.required);
       this.componenteForm.get('product_instances')?.updateValueAndValidity({ emitEvent: false });
     }
-    this.onChange();
+    this.componenteForms[data.uuid] = this.componenteForm;
   }
-  onChange() {
 
-  }
 
   compareByUuid = (a: any, b: any): boolean => a?.uuid === b?.uuid;
 
@@ -336,7 +376,17 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     return supplier ? this.bindName(supplier) : '';
   }
 
-  obtenerProveedoresByComponente(data?: any) {
+  obtenerProveedoresByComponente(data: any): void {
+    const uuid = data.uuid;
+
+    // Si no existe aún el Subject, lo creamos
+    if (!this.proveedorInputByComponente[uuid]) {
+      this.proveedorInputByComponente[uuid] = new Subject<string>();
+    }
+
+    const proveedorInput$ = this.proveedorInputByComponente[uuid];
+    const componenteForm = this.componenteForms[uuid];
+
     const params: any = {
       with: [
         "person.city",
@@ -354,33 +404,26 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       filters: {}
     };
 
-    // Si ya tiene proveedor seleccionado, lo ponemos como valor inicial del control
+    // Si ya tiene proveedor cargado
     if (data?.supplier) {
       const supplierConNombre = {
         ...data.supplier,
         nombreCompleto: this.bindName(data.supplier)
       };
 
-      this.componenteForm.get('supplier_uuid')?.setValue(supplierConNombre);
-
-      // También lo cargamos como primer valor en la lista
-      this.proveedores$ = of([supplierConNombre]);
+      componenteForm.get('supplier_uuid')?.setValue(supplierConNombre);
     }
 
-    // Ahora configuramos la búsqueda
-    const busqueda$ = this.proveedorInput$.pipe(
+    const busqueda$ = proveedorInput$.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       tap(() => this.loadingProveedores = true),
       switchMap((term: string) => {
         if (!term || term.trim().length < 2) {
           this.loadingProveedores = false;
-          // Si no hay búsqueda, devolvemos el proveedor inicial (si existe) o lista vacía
+
           return data?.supplier
-            ? of([{
-              ...data.supplier,
-              nombreCompleto: this.bindName(data.supplier)
-            }])
+            ? of([{ ...data.supplier, nombreCompleto: this.bindName(data.supplier) }])
             : of([]);
         }
 
@@ -403,8 +446,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.proveedores$ = busqueda$;
+    this.proveedoresByComponente[uuid] = busqueda$;
   }
+
 
   bindName(data: any): string {
     if (!data.person) return '';
@@ -416,20 +460,19 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  confirmarComponente() {
+  confirmarComponente(data: any) {
     this.isSubmit = true;
-    if (this.componenteForm.valid) {
+    if (!this.componenteForms[data.uuid].pristine && this.componenteForms[data.uuid].valid) {
       this.spinner.show();
       let componente = new FrozenComponentDTO();
-      this.armarDTOComponente(componente);
+      this.armarDTOComponente(data, componente);
       this.subscription.add(
-        this._frozenComponentService.editComponente(this.componenteForm.get('uuid')?.value, componente).subscribe({
+        this._frozenComponentService.editComponente(this.componenteForms[data.uuid].get('uuid')?.value, componente).subscribe({
           next: res => {
             this.obtenerComponentesProduccion();
-            this.cerrarModal();
+            this.toggleComponente(data);
+            this.limpiarSerialesDeOtroLote(data);
             this.spinner.hide();
-            // this.refreshComponentes.emit();
-            this.limpiarSerialesDeOtroLote();
           },
           error: error => {
             this.spinner.hide();
@@ -441,22 +484,22 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
-  armarDTOComponente(componente: FrozenComponentDTO) {
+  armarDTOComponente(data: any, componente: FrozenComponentDTO) {
     componente.actual_role = this.rol;
-    componente.origin = this.componenteForm.get('origin')?.value;
-    componente.stock_uuid = this.componenteForm.get('stock_uuid')?.value;
-    componente.supplier_uuid = this.componenteForm.get('supplier_uuid')?.value?.uuid;
-    componente.note = this.componenteForm.get('note')?.value;
-    const productInstances = this.componenteForm.get('product_instances')?.value ?? [];
+    componente.origin = this.componenteForms[data.uuid].get('origin')?.value;
+    componente.stock_uuid = this.componenteForms[data.uuid].get('stock_uuid')?.value;
+    componente.supplier_uuid = this.componenteForms[data.uuid].get('supplier_uuid')?.value?.uuid;
+    componente.note = this.componenteForms[data.uuid].get('note')?.value;
+    const productInstances = this.componenteForms[data.uuid].get('product_instances')?.value ?? [];
     const uuids = productInstances.map((pi: any) => pi.uuid);
     componente.product_instances = uuids;
-    if (componente.origin !== 'Lote' || this.selectedComponent.assign_serial_number === 0) {
+    if (componente.origin !== 'Lote' || data.assign_serial_number === 0) {
       delete componente.product_instances;
     }
   }
 
-  limpiarSerialesDeOtroLote() {
-    const formValue = this.componenteForm.get('stock_uuid')?.value;
+  limpiarSerialesDeOtroLote(data: any) {
+    const formValue = this.componenteForms[data.uuid].get('stock_uuid')?.value;
     if (!formValue) return;
     // Limpiar todos los product_instances de otros lotes
     Object.keys(this.serialesPorLote).forEach(uuid => {
@@ -466,24 +509,24 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     });
   }
 
-  switchOrigen(origen: any, event: Event, stock?: any) {
+  switchOrigen(data: any, origen: any, event: Event, stock?: any) {
     const checked = (event.target as HTMLInputElement).checked;
 
-    const stockUuidAnterior = this.componenteForm.get('stock_uuid')?.value;
-    const serialesAnteriores = this.componenteForm.get('product_instances')?.value;
+    const stockUuidAnterior = this.componenteForms[data.uuid].get('stock_uuid')?.value;
+    const serialesAnteriores = this.componenteForms[data.uuid].get('product_instances')?.value;
     if (checked) {
-      this.componenteForm.get('origin')?.setValue(origen);
+      this.componenteForms[data.uuid].get('origin')?.setValue(origen);
       if (origen === 'Provisto por terceros') {
-        this.componenteForm.get('supplier_uuid')?.setValidators(Validators.required);
-        this.componenteForm.get('stock_uuid')?.clearValidators();
-        this.componenteForm.get('stock_uuid')?.setValue(null);
-        this.componenteForm.get('product_instances')?.clearValidators();
+        this.componenteForms[data.uuid].get('supplier_uuid')?.setValidators(Validators.required);
+        this.componenteForms[data.uuid].get('stock_uuid')?.clearValidators();
+        this.componenteForms[data.uuid].get('stock_uuid')?.setValue(null);
+        this.componenteForms[data.uuid].get('product_instances')?.clearValidators();
       } else if (origen === 'Lote') {
-        this.componenteForm.get('stock_uuid')?.setValidators(Validators.required);
-        this.componenteForm.get('supplier_uuid')?.clearValidators();
-        this.componenteForm.get('stock_uuid')?.setValue(stock.uuid);
-        if (this.selectedComponent.assign_serial_number === 1) {
-          const control = this.componenteForm.get('product_instances');
+        this.componenteForms[data.uuid].get('stock_uuid')?.setValidators(Validators.required);
+        this.componenteForms[data.uuid].get('supplier_uuid')?.clearValidators();
+        this.componenteForms[data.uuid].get('stock_uuid')?.setValue(stock.uuid);
+        if (data.assign_serial_number === 1) {
+          const control = this.componenteForms[data.uuid].get('product_instances');
           control?.setValidators(Validators.required);
           if (stockUuidAnterior && serialesAnteriores?.length) {
             this.serialesPorLote[stockUuidAnterior] = serialesAnteriores;
@@ -494,20 +537,20 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
           control?.setValue(restaurados);
         }
       } else if (origen === 'Sin selección') {
-        this.componenteForm.get('supplier_uuid')?.clearValidators();
-        this.componenteForm.get('stock_uuid')?.clearValidators();
-        this.componenteForm.get('stock_uuid')?.setValue(null);
-        this.componenteForm.get('product_instances')?.clearValidators();
+        this.componenteForms[data.uuid].get('supplier_uuid')?.clearValidators();
+        this.componenteForms[data.uuid].get('stock_uuid')?.clearValidators();
+        this.componenteForms[data.uuid].get('stock_uuid')?.setValue(null);
+        this.componenteForms[data.uuid].get('product_instances')?.clearValidators();
       }
     } else {
-      this.componenteForm.get('origin')?.setValue(null);
-      this.componenteForm.get('supplier_uuid')?.clearValidators();
-      this.componenteForm.get('stock_uuid')?.clearValidators();
-      this.componenteForm.get('product_instances')?.clearValidators();
-      this.componenteForm.get('stock_uuid')?.setValue(null);
+      this.componenteForms[data.uuid].get('origin')?.setValue(null);
+      this.componenteForms[data.uuid].get('supplier_uuid')?.clearValidators();
+      this.componenteForms[data.uuid].get('stock_uuid')?.clearValidators();
+      this.componenteForms[data.uuid].get('product_instances')?.clearValidators();
+      this.componenteForms[data.uuid].get('stock_uuid')?.setValue(null);
     }
     ['supplier_uuid', 'stock_uuid', 'product_instances'].forEach((field) => {
-      this.componenteForm.get(field)?.updateValueAndValidity({ emitEvent: false });
+      this.componenteForms[data.uuid].get(field)?.updateValueAndValidity({ emitEvent: false });
     });
   }
 
