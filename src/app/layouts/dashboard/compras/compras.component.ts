@@ -233,8 +233,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     // Inicializamos un objeto vacío para los parámetros
-    this.params.with = ["transaction.person.human", "transaction.person.city.district.country", "transaction.person.legalEntity",
-      "transaction.transactionDocuments.accountDocumentType", 'transaction.transactionProducts.product', 'transaction.transactionProducts.product.productType', 'batch', 'batch.stocks.productInstances'];
+    this.params.with = [
+      "transaction.person.human",
+      "transaction.person.city.district.country",
+      "transaction.person.legalEntity",
+      "transaction.transactionDocuments.accountDocumentType",
+      'transaction.transactionProducts.product.productType',
+      'batch.stocks.productInstances',
+      'transaction.currentState'
+    ];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
     this.params.order_by = this.ordenamiento;
@@ -443,7 +450,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   obtenerProductos() {
     const params: any = {};
-    params.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
+    params.with = ["productType", "productCategory", "currentState", "productStates", "measure", "country", "stocks"];
     params.paging = 20;
     params.page = null;
     params.order_by = {};
@@ -529,7 +536,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   obtenerPagos(uuid: string) {
     const params: any = {};
-    params.with = ["currency", "paymentMethod"];
+    params.with = ["currency.currentExchangeRate", "paymentMethod"];
     params.paging = 10;
     params.page = 1;
     params.order_by = {
@@ -940,7 +947,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   obtenerProveedores() {
     const params: any = {};
-    params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+    params.with = ["person.city.district.country", "person.currentState", "person.human.gender",
       "person.human.documentType", "person.human.user", "person.legalEntity"];
     params.paging = 10;
     params.page = 1;
@@ -1465,8 +1472,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
         "transaction.transactionDocuments.currency",
         "transaction.transactionProducts.product.measure",
         "transaction.transactionProducts.controlUser",
+        "transaction.currentState",
         "batch",
-        "qualificationOption"];
+        "qualificationOption"
+      ];
       this.subscription.add(
         this._comprasService.editCompra(this.selectedCompra.uuid, compraDTO).subscribe({
           next: res => {
@@ -1529,6 +1538,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       "transaction.transactionDocuments.currency",
       "transaction.transactionProducts.product.measure",
       "transaction.transactionProducts.controlUser",
+      "transaction.currentState",
       "batch",
       "qualificationOption"];
     this.subscription.add(
@@ -1599,6 +1609,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       "transaction.transactionDocuments.currency",
       "transaction.transactionProducts.product.measure",
       "transaction.transactionProducts.controlUser",
+      "transaction.currentState",
       "batch",
       "qualificationOption"];
     this.subscription.add(

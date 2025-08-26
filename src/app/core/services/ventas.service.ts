@@ -29,7 +29,7 @@ export class VentasService {
       .append('with[]', "transaction.transactionDocuments.currency")
       .append('with[]', "transaction.payments.currency")
       .append('with[]', "transaction.payments.paymentMethod")
-      ;
+      .append('with[]', "transaction.currentState");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiVentas + '/' + uuid, { headers, params });
   }
 

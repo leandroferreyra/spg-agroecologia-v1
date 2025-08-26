@@ -224,7 +224,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     // la lista y no el que acabo de agregar.
 
     this.parametrosProvedores = new ParametrosIndex();
-    this.parametrosProvedores.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender", "person.human.documentType", "person.human.user", "person.legalEntity"];
+    this.parametrosProvedores.with = ["person.city.district.country", "person.human.gender", "person.human.documentType", "person.human.user", "person.legalEntity", "person.currentState"];
     this.parametrosProvedores.page = this.currentPage;
     this.parametrosProvedores.paging = this.itemsPerPage;
     this.parametrosProvedores.order_by = this.ordenamiento;
@@ -506,8 +506,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   }
   armarDTOEdicion(proveedor: ProveedorDTO) {
     proveedor.actual_role = this.actual_role;
-    proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.documentType", "person.legalEntity"];
+    proveedor.with = ["person.city.district.country", "person.human.gender",
+      "person.human.documentType", "person.legalEntity", "person.currentState"];
     proveedor.batch_prefix = this.proveedorForm.get('sigla')?.value;
     proveedor.comments = this.proveedorForm.get('comentarios')?.value;
     proveedor.perception = !!this.proveedorForm.get('percepcionRG3337')?.value;
@@ -740,8 +740,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   armarDtoNuevoProveedor(proveedor: ProveedorDTO) {
     proveedor.actual_role = this.actual_role;
-    proveedor.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
-      "person.human.documentType", "person.legalEntity"];
+    proveedor.with = ["person.city.district.country", "person.human.gender",
+      "person.human.documentType", "person.legalEntity", "person.currentState"];
     proveedor.batch_prefix = this.newProveedorForm.get('sigla')?.value;
     proveedor.comments = this.newProveedorForm.get('comentarios')?.value;
     proveedor.perception = !!this.newProveedorForm.get('percepcionRG3337')?.value;
@@ -848,9 +848,9 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     if (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
-      params.with = ["person", "person.city", "person.city.district", "person.city.district.country", "person.personStates", "gender", "documentType", "person.supplier", "person.customer"];
+      params.with = ["person.city.district.country", "person.currentState", "person.personStates", "gender", "documentType", "person.supplier", "person.customer"];
     } else {
-      params.with = ["person", "person.city", "person.city.district", "person.city.district.country", "person.personStates"];
+      params.with = ["person.city.district.country", "person.currentState", "person.personStates"];
     }
     params.paging = this.itemsPerPage_buscar;
     params.page = this.currentPage_buscar;

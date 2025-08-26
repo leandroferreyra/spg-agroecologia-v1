@@ -216,7 +216,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender", "person.human.documentType", "person.human.user", "person.legalEntity"];
+    params.with = ["person.city.district.country", "person.human.gender", "person.human.documentType", "person.human.user", "person.legalEntity", "person.currentState"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -507,7 +507,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   }
   armarDTOEdicion(cliente: ClienteDTO) {
     cliente.actual_role = this.actual_role;
-    cliente.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+    cliente.with = ["person.city.district.country", "person.currentState", "person.human.gender",
       "person.human.documentType", "person.legalEntity"];
     cliente.comments = this.clienteForm.get('comentarios')?.value;
     cliente.vat_percent = this.clienteForm.get('percepcionIVA')?.value;
@@ -736,7 +736,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   armarDtoNuevoCliente(cliente: ClienteDTO) {
     cliente.actual_role = this.actual_role;
-    cliente.with = ["person.city", "person.city.district", "person.city.district.country", "person.human", "person.human.gender",
+    cliente.with = ["person.city.district.country", "person.currentState", "person.human.gender",
       "person.human.documentType", "person.legalEntity"];
     cliente.comments = this.newClienteForm.get('comentarios')?.value;
     cliente.vat_percent = this.newClienteForm.get('percepcionIVA')?.value;
@@ -810,9 +810,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     if (this.tipoPersonaForm.get('tipoPersona')?.value === 'fisica') {
-      params.with = ["person", "person.city", "person.city.district", "person.city.district.country", "person.personStates", "gender", "documentType", "person.supplier", "person.customer"];
+      params.with = ["person.city.district.country", "person.currentState", "person.personStates", "gender", "documentType", "person.supplier", "person.customer"];
     } else {
-      params.with = ["person", "person.city", "person.city.district", "person.city.district.country", "person.personStates"];
+      params.with = ["person.city.district.country", "person.currentState", "person.personStates"];
     }
     params.paging = this.itemsPerPage_buscar;
     params.page = this.currentPage_buscar;

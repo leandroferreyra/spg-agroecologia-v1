@@ -95,7 +95,9 @@ export class ProductosEnPosesionComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = ["saleProducts.transactionProduct.product.productType",
-      "saleProducts.transactionProduct.product.productCategory"];
+      "saleProducts.transactionProduct.product.productCategory",
+      "saleProducts.currentOwner"
+    ];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
