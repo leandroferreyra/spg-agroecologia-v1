@@ -357,24 +357,28 @@ export class ComprasComponent implements OnInit, OnDestroy {
   onFormEditChange() {
     this.compraForm.get('moneda')!.valueChanges.subscribe((value: any) => {
       const tipoCambioCtrl = this.compraForm.get('tipoCambio');
+      if (!value) return;
 
-      if (value?.name === 'Pesos') {
+      const nuevaMoneda = value?.name;
+      const monedaAnterior = this.ultimaMonedaSeleccionada?.name;
+
+      // CASO 1: Si es Pesos
+      if (nuevaMoneda === 'Pesos') {
         tipoCambioCtrl?.setValue(1);
         tipoCambioCtrl?.disable();
       } else {
         tipoCambioCtrl?.enable();
 
-        const monedaCambiada = this.ultimaMonedaSeleccionada?.name === 'Pesos' && value?.name !== 'Pesos';
+        // CASO 2: Cambio real entre monedas (Pesos <-> otra o USD <-> EUR, etc.)
+        const monedaCambioReal = monedaAnterior && monedaAnterior !== nuevaMoneda;
 
-        if (monedaCambiada) {
+        if (monedaCambioReal) {
           tipoCambioCtrl?.setValue(null);
         }
       }
 
-      // Actualizamos el valor de referencia solo si hubo uno válido
-      if (value) {
-        this.ultimaMonedaSeleccionada = value;
-      }
+      // Actualizamos el valor anterior
+      this.ultimaMonedaSeleccionada = value;
     });
   }
 
