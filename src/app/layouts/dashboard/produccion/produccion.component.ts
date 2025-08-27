@@ -256,21 +256,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     )
   }
 
-  // navigateTo(route: string, event: MouseEvent) {
-  //     if (route) {
-  //         const urlTree = this.router.createUrlTree([`/dashboard/${route}`]);
-  //         const serializedUrl = this.router.serializeUrl(urlTree);
-
-  //         if (event.ctrlKey || event.metaKey) {
-  //             const baseUrl = window.location.origin + window.location.pathname;
-  //             window.open(`${baseUrl}#${serializedUrl}`, '_blank');
-  //         } else {
-  //             this.router.navigate([`/dashboard/${route}`]);
-  //         }
-  //     }
-  // }
-
-
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;
     this.last_page = res.meta.last_page;
