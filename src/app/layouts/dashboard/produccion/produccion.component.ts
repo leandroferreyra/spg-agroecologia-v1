@@ -54,7 +54,7 @@ import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-ite
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconPencilComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, IconSettingsComponent, NgbPaginationModule, FlatpickrDirective,
     TimelineComponent, ComponentesProduccionComponent, TrazabilidadComponent, FaltantesComponent, IconExpandComponent, IconCollapseComponent,
-     IconExpandAllComponent, IconExpandAllComponent2, IconExpandItemComponent, IconCollapseItemComponent],
+    IconExpandAllComponent, IconExpandAllComponent2, IconExpandItemComponent, IconCollapseItemComponent],
   animations: [toggleAnimation],
   templateUrl: './produccion.component.html',
   styleUrl: './produccion.component.css'
@@ -132,6 +132,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
+
+  hayProductosTerceros: boolean = false;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
@@ -702,8 +704,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       evento: new FormControl({ value: evento, disabled: true }, []),
       justificacion: new FormControl({ value: justificacion, disabled: true }, []),
     });
-    let hayProductosTerceros = this.selectedProduccion?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
-    if (hayProductosTerceros) {
+    this.hayProductosTerceros = this.selectedProduccion?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
+    if (this.hayProductosTerceros) {
       this.liberacionForm.get('terceros')?.setValidators([Validators.required]);
       this.liberacionForm.get('terceros')?.updateValueAndValidity({ emitEvent: false });
     } else {
@@ -716,14 +718,14 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   confirmarLiberacion() {
     const identificado = this.liberacionForm.get('identificado')?.value;
     const terceros = this.liberacionForm.get('terceros')?.value;
-    let hayProductosTerceros = this.selectedProduccion?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
+    // let hayProductosTerceros = this.selectedProduccion?.frozen_components?.some((frozen: any) => frozen.origin === 'Provisto por terceros');
     // Validar campo obligatorio "identificado"
     if (!identificado) {
       this.swalService.toastError('top-right', 'Debés confirmar que los productos están identificados.');
       return;
     }
     // Si hay productos provistos por terceros, entonces también es obligatorio tildar el checkbox de terceros
-    if (hayProductosTerceros && !terceros) {
+    if (this.hayProductosTerceros && !terceros) {
       this.swalService.toastError('top-right', 'Debés aceptar que hay componentes provistos por terceros.');
       return;
     }
