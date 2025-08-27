@@ -357,8 +357,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.compraForm.get('tipoCambio')?.setValue(1);
           this.compraForm.get('tipoCambio')?.disable();
         } else {
-          if (this.inAltaFactura) {
+          if (!this.inEdicionFactura) {
             this.compraForm.get('tipoCambio')?.setValue(null);
+            this.compraForm.get('tipoCambio')?.enable();
+          } else {
             this.compraForm.get('tipoCambio')?.enable();
           }
         }
@@ -1702,9 +1704,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
             this.tokenService.setToken(res.token);
             this.inEdicionFactura = false;
             this.obtenerCompras(true);
-
-            // this.selectedCompra.transaction.transaction_documents[0] = res.data;
-            // this.inicializarFormEdit();
             this.spinner.hide();
           },
           error: error => {
