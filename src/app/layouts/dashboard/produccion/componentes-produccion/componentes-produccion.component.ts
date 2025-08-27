@@ -198,18 +198,24 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
+  estadoNoTerminado() {
+    return (this.produccion.current_state?.state?.name !== 'Terminada' &&
+      this.produccion.current_state?.state?.name !== 'Liberada');
+  }
+
+
   getOrigen(data: any) {
     if (data.product_type?.stock_controlled === 0) {
       return 'Sin control de stock';
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 0) {
       // Lote único
-      if (this.isFaltante(data)) {
+      if (this.isFaltante(data) && (this.estadoNoTerminado())) {
         return 'Faltante';
       }
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 1) {
-      if (this.isFaltante(data)) {
+      if (this.isFaltante(data) && (this.estadoNoTerminado())) {
         return 'Faltante';
       }
     }
