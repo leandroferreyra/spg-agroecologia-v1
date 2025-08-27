@@ -328,13 +328,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
       descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
       comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, []),
       nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, []),
-      stock_available: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.available), disabled: true }, []),
-      stock_reserved: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.reserved), disabled: true }, []),
-      stock_samples: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.samples), disabled: true }, []),
-      stock_observed: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.observed), disabled: true }, []),
+      stock_initial: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.initial_amount), disabled: true }, []),
+      stock_available: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.available_amount), disabled: true }, []),
+      stock_reserved: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.reserved_amount), disabled: true }, []),
+      stock_samples: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.samples_amount), disabled: true }, []),
+      stock_observed: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.observed_amount), disabled: true }, []),
       stock_minimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.minimum), disabled: this.isFieldDisabled(producto) }, []),
       stock_optimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.optimum), disabled: this.isFieldDisabled(producto) }, []),
-      stock_initial: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.initial_stock), disabled: true }, []),
       stock_quantity_sold: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.quantity_sold), disabled: true }, []),
     });
     // Habilitar todos los controles si es edición
