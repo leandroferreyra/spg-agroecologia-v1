@@ -2,9 +2,13 @@
 
     <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
 
+        @if (!isEstadoTerminadoLiberado()) {
         <button type="button" ngxTippy="Expandir todo" (click)="expandirTodos()">
             <icon-expand-all2 />
         </button>
+        }@else{
+            <button></button>
+        }
 
         <div class="flex items-center gap-2">
             <span>Ocultar componentes sin control de stock</span>

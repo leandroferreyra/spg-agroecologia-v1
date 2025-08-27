@@ -113,6 +113,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       // Si la produccion cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['production_uuid'].value = this.produccion.uuid;
       this.obtenerComponentesProduccion();
+      if (this.produccion.current_state?.state?.name === 'Terminado') {
+        this.cerrarTodos()
+      }
     }
   }
 
@@ -164,7 +167,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
-
   getCantidadStockByComponent(data: any, stock: any) {
     if (data.measure?.is_integer === 1) {
       return +(+stock.available_amount)?.toFixed(0);
@@ -210,12 +212,12 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 0) {
       // Lote único
-      if (this.isFaltante(data) && (this.estadoNoTerminado())) {
+      if (this.isFaltante(data) && data.origin != 'Lote' && (this.estadoNoTerminado())) {
         return 'Faltante';
       }
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 1) {
-      if (this.isFaltante(data) && (this.estadoNoTerminado())) {
+      if (this.isFaltante(data) && data.origin != 'Lote' && (this.estadoNoTerminado())) {
         return 'Faltante';
       }
     }
@@ -263,7 +265,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       data.possible_stocks.length > 0 &&
       data.possible_stocks.every((lote: any) => (+lote.available_amount || 0) < cantidadNecesaria);
 
-    return sinOrigenYSinStock || todosLosLotesInsuficientes;
+    const noEsLote = data.origin !== 'Lote';
+
+    return noEsLote && (sinOrigenYSinStock || todosLosLotesInsuficientes);
   }
 
   toggleComponente(data: any) {
@@ -294,6 +298,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.isEditing[data.uuid] = false;
     this.componenteForms[data.uuid].get('supplier_uuid')?.disable();
     this.componenteForms[data.uuid].get('note')?.disable();
+    // Se inicializa para que quede como estaba previamente
+    this.inicializarFormComponente(data);
   }
 
   getFormControl(uuid: string, controlName: string): FormControl {
