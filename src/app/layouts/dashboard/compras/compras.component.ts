@@ -187,6 +187,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
+  private ultimaMonedaSeleccionada: any = null;
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService, private titleService: Title,
@@ -345,26 +347,35 @@ export class ComprasComponent implements OnInit, OnDestroy {
       calificacion: new FormControl({ value: this.selectedCompra?.qualification_option?.uuid, disabled: true }, []),
       calificacionComentarios: new FormControl({ value: this.selectedCompra?.qualification_comments, disabled: true }, []),
     });
+    this.ultimaMonedaSeleccionada = this.compraForm.get('moneda')?.value;
+
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
       this.poseeFactura = true;
     }
     this.onFormEditChange();
   }
   onFormEditChange() {
-    this.compraForm.get('moneda')!.valueChanges.subscribe(
-      (value: any) => {
-        if (value.name === 'Pesos') {
-          this.compraForm.get('tipoCambio')?.setValue(1);
-          this.compraForm.get('tipoCambio')?.disable();
-        } else {
-          if (!this.inEdicionFactura) {
-            this.compraForm.get('tipoCambio')?.setValue(null);
-            this.compraForm.get('tipoCambio')?.enable();
-          } else {
-            this.compraForm.get('tipoCambio')?.enable();
-          }
+    this.compraForm.get('moneda')!.valueChanges.subscribe((value: any) => {
+      const tipoCambioCtrl = this.compraForm.get('tipoCambio');
+
+      if (value?.name === 'Pesos') {
+        tipoCambioCtrl?.setValue(1);
+        tipoCambioCtrl?.disable();
+      } else {
+        tipoCambioCtrl?.enable();
+
+        const monedaCambiada = this.ultimaMonedaSeleccionada?.name === 'Pesos' && value?.name !== 'Pesos';
+
+        if (monedaCambiada) {
+          tipoCambioCtrl?.setValue(null);
         }
-      });
+      }
+
+      // Actualizamos el valor de referencia solo si hubo uno válido
+      if (value) {
+        this.ultimaMonedaSeleccionada = value;
+      }
+    });
   }
 
   getFecha(fecha: string) {
