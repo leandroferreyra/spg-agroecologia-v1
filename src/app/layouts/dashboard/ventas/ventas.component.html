@@ -1005,7 +1005,7 @@
                     <label for="switchRightLote">Lote</label>
                     <div class="flex">
                         <input id="switchRightLote" type="text" placeholder=""
-                            [(ngModel)]="filtrosVentas['batch.batch_identification'].value"
+                            [(ngModel)]="filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.batch_identification'].value"
                             (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()"
                             class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
                         <div
@@ -1014,7 +1014,7 @@
                                 <input type="checkbox"
                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                     id="custom_switch_checkbox2"
-                                    [(ngModel)]="filtrosVentas['batch.batch_identification'].contiene"
+                                    [(ngModel)]="filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.batch_identification'].contiene"
                                     (change)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()" />
                                 <span
                                     class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
@@ -1027,7 +1027,7 @@
                     <label for="switchRight">Nro de serie</label>
                     <div class="flex">
                         <input id="switchRight" type="text" placeholder=""
-                            [(ngModel)]="filtrosVentas['batch.stocks.productInstances.serial_number'].value"
+                            [(ngModel)]="filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number'].value"
                             (input)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()"
                             class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
                         <div
@@ -1036,7 +1036,7 @@
                                 <input type="checkbox"
                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                     id="custom_switch_checkbox2"
-                                    [(ngModel)]="filtrosVentas['batch.stocks.productInstances.serial_number'].contiene"
+                                    [(ngModel)]="filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number'].contiene"
                                     (change)="obtenerVentasPorFiltroAvanzado(); buildActiveFilters()" />
                                 <span
                                     class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>

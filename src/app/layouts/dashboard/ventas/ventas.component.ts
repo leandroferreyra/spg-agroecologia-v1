@@ -138,8 +138,8 @@ export class VentasComponent implements OnInit, OnDestroy {
     'transaction.transactionDocuments.document_number': { value: '', op: 'LIKE', contiene: true },
     'transaction.transactionProducts.product.uuid': { value: '', op: '=', contiene: false },
     'transaction.transactionDocuments.accountDocumentType.uuid': { value: '', op: '=', contiene: false },
-    'batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
-    'batch.stocks.productInstances.serial_number': { value: '', op: 'LIKE', contiene: true },
+    'transaction.transactionProducts.saleProduct.stock.batch.batch_identification': { value: '', op: 'LIKE', contiene: true },
+    'transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number': { value: '', op: 'LIKE', contiene: true },
   };
   showFilterVentas: boolean = false;
   ordenamiento: any = {
@@ -304,7 +304,7 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   obtenerProductos() {
     const params: any = {};
-    params.with = ["productType", "productCategory", "productStates", "measure", "country", "stocks"];
+    params.with = ["productType", "productCategory", "currentState", "productStates", "measure", "country", "stocks"];
     params.paging = 20;
     params.page = null;
     params.order_by = {};
@@ -667,8 +667,8 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.filtrosVentas['transaction.transactionDocuments.document_number'].value = '';
     this.filtrosVentas['transaction.transactionProducts.product.uuid'].value = '';
     this.filtrosVentas['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
-    this.filtrosVentas['batch.batch_identification'].value = '';
-    this.filtrosVentas['batch.stocks.productInstances.serial_number'].value = '';
+    this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.batch_identification'].value = '';
+    this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number'].value = '';
     // Limpio las fechas
     this.filtroFechaTransacDesde = '';
     this.filtroFechaTransacHasta = '';
@@ -751,8 +751,8 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.filtrosVentas['transaction.transactionDocuments.document_number'].value = '';
     this.filtrosVentas['transaction.transactionProducts.product.uuid'].value = '';
     this.filtrosVentas['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
-    this.filtrosVentas['batch.batch_identification'].value = '';
-    this.filtrosVentas['batch.stocks.productInstances.serial_number'].value = '';
+    this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.batch_identification'].value = '';
+    this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number'].value = '';
     // Limpio las fechas
     this.filtroFechaTransacDesde = '';
     this.filtroFechaTransacHasta = '';
@@ -812,8 +812,8 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.filtrosVentas['transaction.transactionDocuments.document_number'].value = '';
     this.filtrosVentas['transaction.transactionProducts.product.uuid'].value = '';
     this.filtrosVentas['transaction.transactionDocuments.accountDocumentType.uuid'].value = '';
-    this.filtrosVentas['batch.batch_identification'].value = '';
-    this.filtrosVentas['batch.stocks.productInstances.serial_number'].value = '';
+    this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.batch_identification'].value = '';
+    this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number'].value = '';
     // Limpio las fechas
     this.filtroFechaTransacDesde = '';
     this.filtroFechaTransacHasta = '';
@@ -1797,8 +1797,8 @@ export class VentasComponent implements OnInit, OnDestroy {
     pushIf('transaction.person.legalEntity.company_name', 'Razón social', this.filtrosVentas['transaction.person.legalEntity.company_name'].value);
     pushIf('transaction.transactionDocuments.prefix_number', 'Prefijo', this.filtrosVentas['transaction.transactionDocuments.prefix_number'].value);
     pushIf('transaction.transactionDocuments.document_number', 'N° documento contable', this.filtrosVentas['transaction.transactionDocuments.document_number'].value);
-    pushIf('batch.batch_identification', 'Lote', this.filtrosVentas['batch.batch_identification'].value, this.filtrosVentas['batch.batch_identification'].contiene ? ' (contiene)' : '');
-    pushIf('batch.stocks.productInstances.serial_number', 'N° de serie', this.filtrosVentas['batch.stocks.productInstances.serial_number'].value, this.filtrosVentas['batch.stocks.productInstances.serial_number'].contiene ? ' (contiene)' : '');
+    pushIf('transaction.transactionProducts.saleProduct.stock.batch.batch_identification', 'Lote', this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.batch_identification'].value, this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.batch_identification'].contiene ? ' (contiene)' : '');
+    pushIf('transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number', 'N° de serie', this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number'].value, this.filtrosVentas['transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number'].contiene ? ' (contiene)' : '');
     pushIf('__fecha_desde_transaccion__', 'Fecha transacción desde', this.filtroFechaTransacDesde);
     pushIf('__fecha_hasta_transaccion__', 'Fecha transacción hasta', this.filtroFechaTransacHasta);
     pushIf('__fecha_desde_comprobante', 'Fecha comprobante desde', this.filtroFechaComprobanteDesde);
@@ -1839,8 +1839,8 @@ export class VentasComponent implements OnInit, OnDestroy {
       case 'transaction.transactionProducts.product.uuid':
         this.filtrosVentas[key].value = '';
         break;
-      case 'batch.stocks.productInstances.serial_number':
-      case 'batch.batch_identification':
+      case 'transaction.transactionProducts.saleProduct.stock.batch.stocks.productInstances.serial_number':
+      case 'transaction.transactionProducts.saleProduct.stock.batch.batch_identification':
         this.filtrosVentas[key].value = '';
         this.filtrosVentas[key].contiene = true;
         break;
