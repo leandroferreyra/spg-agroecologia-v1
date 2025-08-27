@@ -22,7 +22,7 @@
                             loguearte</p>
                     </div>
 
-                    <form class="space-y-4 dark:text-white" [formGroup]="loginForm">
+                    <form class="space-y-4 dark:text-white" [formGroup]="loginForm" autocomplete="off">
 
 
                         <div [ngClass]="isSubmitLogin ? loginForm.controls['usuario'].errors ? 'has-error'
@@ -30,12 +30,6 @@
                             <label for=" usuario">Nombre de usuario o Email</label>
                             <input id="usuario" type="text" placeholder="" class="form-control"
                                 formControlName="usuario" />
-                            <!-- <ng-container *ngIf="isSubmitLogin && !loginForm.controls['usuario'].errors">
-                                <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                            </ng-container>
-                            <ng-container *ngIf="isSubmitLogin && loginForm.controls['usuario'].errors">
-                                <p class="mt-1 text-danger">Ingresa usuario</p>
-                            </ng-container> -->
                         </div>
 
                         <div
@@ -47,12 +41,6 @@
                                 <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
                                     style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
                             </div>
-                            <!-- <ng-container *ngIf="isSubmitLogin && !loginForm.controls['password'].errors">
-                                <p class="mt-1 text-[#1abc9c]">¡Perfecto!</p>
-                            </ng-container>
-                            <ng-container *ngIf="isSubmitLogin && loginForm.controls['password'].errors">
-                                <p class="mt-1 text-danger">Ingresa contraseña</p>
-                            </ng-container> -->
                         </div>
 
                         <div class="row">
@@ -63,12 +51,6 @@
                                 </a>
                             </div>
                         </div>
-                        <!-- <div>
-                            <label class="flex cursor-pointer items-center">
-                                <input type="checkbox" class="form-checkbox bg-white dark:bg-black" />
-                                <span class="text-white-dark">Subscribe to weekly newsletter</span>
-                            </label>
-                        </div> -->
                         <button (click)="iniciarSesion()"
                             class="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
                             Inicia sesión
@@ -108,13 +90,6 @@
                                 {{ rol.name }}
                             </span>
                         </button>
-                        <!-- <span style="color: #ada8a8; font-weight: bold;">
-                            {{
-                            rol.name === 'COACH' ? 'Gestionar informes' :
-                            rol.name === 'COACHEE' ? 'Realizar los tests' :
-                            (rol.name === 'ADMIN' || rol.name === 'SUPER_ADMIN') ? 'Administrar sistema' : ''
-                            }}
-                        </span> -->
                     </div>
                     }
                 </div>
@@ -134,8 +109,6 @@
     </ngx-custom-modal>
 </div>
 
-
-<!-- Spinner -->
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
     <p style="font-size: 20px; color: white">Cargando</p>
 </ngx-spinner>
