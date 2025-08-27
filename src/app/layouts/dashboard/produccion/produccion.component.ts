@@ -230,7 +230,18 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       })
     )
   }
-  showProduccionByUuid(uuid: string, updateTab: boolean = true) {
+
+  showProduccionByUuid(uuid: string, updateTab: boolean, event?: MouseEvent) {
+    if (event?.ctrlKey || event?.metaKey) {
+      const baseUrl = window.location.origin + window.location.pathname;
+      const urlTree = this.router.createUrlTree([`/dashboard/producciones/${uuid}`], {
+        queryParams: updateTab ? { tab: 'datos-generales' } : {}
+      });
+      const finalUrl = this.router.serializeUrl(urlTree);
+      window.open(`${baseUrl}#${finalUrl}`, '_blank');
+      return; // No sigue ejecutando lógica interna
+    }
+
     this.subscription.add(
       this._produccionService.showProduccion(uuid, this.actual_role).subscribe({
         next: res => {
@@ -244,6 +255,21 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       })
     )
   }
+
+  // navigateTo(route: string, event: MouseEvent) {
+  //     if (route) {
+  //         const urlTree = this.router.createUrlTree([`/dashboard/${route}`]);
+  //         const serializedUrl = this.router.serializeUrl(urlTree);
+
+  //         if (event.ctrlKey || event.metaKey) {
+  //             const baseUrl = window.location.origin + window.location.pathname;
+  //             window.open(`${baseUrl}#${serializedUrl}`, '_blank');
+  //         } else {
+  //             this.router.navigate([`/dashboard/${route}`]);
+  //         }
+  //     }
+  // }
+
 
   modificarPaginacion(res: any) {
     this.total_rows = res.meta.total;

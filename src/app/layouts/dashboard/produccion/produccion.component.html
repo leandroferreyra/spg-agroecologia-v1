@@ -54,7 +54,7 @@
                             @for(data of producciones ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;"
                                 [ngClass]="{'bg-blue-200': selectedProduccion?.uuid === data.uuid}">
-                                <td (click)="showProduccionByUuid(data.uuid)" style="font-size: 12px;"
+                                <td (click)="showProduccionByUuid(data.uuid, true, $event)" style="font-size: 12px;"
                                     [style.color]="data.current_state?.state?.color">
                                     <b>{{ showName(data) }}</b> - {{showBatch(data)}} - {{showFecha(data)}}
                                 </td>
