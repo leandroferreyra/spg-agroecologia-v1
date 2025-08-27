@@ -19,12 +19,14 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import { Router } from '@angular/router';
 import { RolDTO } from 'src/app/core/models/request/rolDTO';
 import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
+import { IconExpandAllComponent2 } from 'src/app/shared/icon/icon-expand-all2';
 
 @Component({
   selector: 'app-componentes-produccion',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, IconPlusComponent, NgSelectModule, FormsModule, ReactiveFormsModule, NgbPaginationModule,
-    IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent, NgxTippyModule, IconCaretDownComponent],
+    IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent, NgxTippyModule, IconCaretDownComponent,
+    IconExpandAllComponent2],
   templateUrl: './componentes-produccion.component.html',
   styleUrl: './componentes-produccion.component.css'
 })

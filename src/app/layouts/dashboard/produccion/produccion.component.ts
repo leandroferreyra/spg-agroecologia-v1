@@ -43,6 +43,9 @@ import { FaltantesComponent } from './faltantes/faltantes.component';
 import { ProduccionEstadoDTO } from 'src/app/core/models/request/produccionEstadoDTO';
 import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
+import { IconExpandAllComponent2 } from 'src/app/shared/icon/icon-expand-all2';
+import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
+import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-item';
 
 @Component({
   selector: 'app-produccion',
@@ -50,7 +53,8 @@ import { UserLoggedService } from 'src/app/core/services/user-logged.service';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconPencilComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, IconSettingsComponent, NgbPaginationModule, FlatpickrDirective,
-    TimelineComponent, ComponentesProduccionComponent, TrazabilidadComponent, FaltantesComponent, IconExpandComponent, IconCollapseComponent, IconExpandAllComponent],
+    TimelineComponent, ComponentesProduccionComponent, TrazabilidadComponent, FaltantesComponent, IconExpandComponent, IconCollapseComponent,
+     IconExpandAllComponent, IconExpandAllComponent2, IconExpandItemComponent, IconCollapseItemComponent],
   animations: [toggleAnimation],
   templateUrl: './produccion.component.html',
   styleUrl: './produccion.component.css'
