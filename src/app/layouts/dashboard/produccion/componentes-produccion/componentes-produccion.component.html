@@ -2,10 +2,8 @@
 
     <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
 
-        <button type="button" class="ltr:mr-3 rtl:ml-2" (click)="expandirTodos()">
-            <span class="badge badge-outline-info" style="cursor: pointer;">
-                Expandir todo
-            </span>
+        <button type="button" ngxTippy="Expandir todo" (click)="expandirTodos()">
+            <icon-expand-all2 />
         </button>
 
         <div class="flex items-center gap-2">
@@ -103,11 +101,17 @@
                         <div class="flex items-center">
                             @if(isAllowEdit(data)) {
                             <div>
-                                <button type="button" class="ltr:mr-3 rtl:ml-2" (click)="toggleComponente(data);">
-                                    <span class="badge badge-outline-info" style="cursor: pointer;">
-                                        {{ expandedRows[data.uuid] ? 'Contraer' : 'Expandir' }}
-                                    </span>
+                                @if (expandedRows[data.uuid]) {
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" (click)="toggleComponente(data);"
+                                    ngxTippy="Contraer">
+                                    <icon-collapse-item />
                                 </button>
+                                }@else{
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" (click)="toggleComponente(data);"
+                                    ngxTippy="Expandir">
+                                    <icon-expand-item />
+                                </button>
+                                }
                             </div>
                             }
                             @if (hasReplacement(data)) {
@@ -130,12 +134,10 @@
                             <div class="flex flex-col sm:flex-row">
                                 <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-1">
 
-                                    <div class="flex items-center justify-center space-x-2">
+                                    <div class="flex justify-end space-x-2">
                                         <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
                                             (click)="habilitarEdicion(data);">
-                                            <span class="badge badge-outline-info" style="cursor: pointer;">
-                                                Habilitar edición
-                                            </span>
+                                            <icon-pencil />
                                         </button>
                                     </div>
 

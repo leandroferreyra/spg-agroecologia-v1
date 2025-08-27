@@ -20,13 +20,15 @@ import { Router } from '@angular/router';
 import { RolDTO } from 'src/app/core/models/request/rolDTO';
 import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
 import { IconExpandAllComponent2 } from 'src/app/shared/icon/icon-expand-all2';
+import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
+import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-item';
 
 @Component({
   selector: 'app-componentes-produccion',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, IconPlusComponent, NgSelectModule, FormsModule, ReactiveFormsModule, NgbPaginationModule,
     IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent, NgxTippyModule, IconCaretDownComponent,
-    IconExpandAllComponent2],
+    IconExpandAllComponent2, IconExpandItemComponent, IconCollapseItemComponent],
   templateUrl: './componentes-produccion.component.html',
   styleUrl: './componentes-produccion.component.css'
 })
@@ -35,7 +37,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   @Input() produccion: any;
   @Input() rol!: string;
   private subscription: Subscription = new Subscription();
-  // @Output() refreshComponentes = new EventEmitter<any>();
 
   @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
   @ViewChild('modalReemplazo') modalReemplazo!: NgxCustomModalComponent;
@@ -134,9 +135,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          // this.componentes.forEach(element => {
-          //   this.inicializarFormComponente(element);
-          // });
+          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           if (this.expandirTodo) {
             this.expandirTodos();
@@ -205,6 +204,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 0) {
       // Lote único
+      if (this.isFaltante(data)) {
+        return 'Faltante';
+      }
     }
     if (data.product_type?.stock_controlled === 1 && data.traceable === 1) {
       if (this.isFaltante(data)) {
@@ -248,7 +250,14 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   isFaltante(data: any): boolean {
-    return (data.origin === 'Sin selección' && data.possible_stocks?.length === 0);
+    const cantidadNecesaria = this.getCantidadTotal(data);
+    const sinOrigenYSinStock = data.origin === 'Sin selección' && (!data.possible_stocks || data.possible_stocks.length === 0);
+
+    const todosLosLotesInsuficientes = Array.isArray(data.possible_stocks) &&
+      data.possible_stocks.length > 0 &&
+      data.possible_stocks.every((lote: any) => (+lote.available_amount || 0) < cantidadNecesaria);
+
+    return sinOrigenYSinStock || todosLosLotesInsuficientes;
   }
 
   toggleComponente(data: any) {
