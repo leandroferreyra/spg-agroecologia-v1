@@ -138,7 +138,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
+          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           if (this.expandirTodo) {
             this.expandirTodos();
@@ -205,6 +205,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this.produccion.current_state?.state?.name !== 'Liberada');
   }
 
+  tieneControlStock(data: any) {
+    return data.product_type?.stock_controlled === 1;
+  }
 
   getOrigen(data: any) {
     if (data.product_type?.stock_controlled === 0) {
@@ -247,7 +250,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   isEstadoTerminadoLiberado() {
-    return this.produccion.current_state?.state?.name === 'Terminado' || this.produccion.current_state?.state?.name === 'Liberado';
+    return this.produccion?.current_state?.state?.name === 'Terminado' || this.produccion?.current_state?.state?.name === 'Liberado';
   }
 
   isAllowEdit(data: any) {

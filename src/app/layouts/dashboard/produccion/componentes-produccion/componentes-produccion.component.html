@@ -7,7 +7,7 @@
             <icon-expand-all2 />
         </button>
         }@else{
-            <button></button>
+        <button></button>
         }
 
         <div class="flex items-center gap-2">
@@ -77,17 +77,17 @@
                 <tr>
                     <td> {{ data.order }} </td>
                     <td class="hover:text-blue-600 hover:underline hover:cursor-pointer" [ngClass]="{ 
-                            'text-red-500': isFaltante(data) && estadoNoTerminado(),
+                            'text-red-500': tieneControlStock(data) && isFaltante(data) && estadoNoTerminado(),
                             'color-provisto': isProvistoPorTerceros(data) }" (click)="irAlProducto($event, data)"> {{
                         data.name}}</td>
                     <td [ngClass]="{ 
-                            'text-red-500': isFaltante(data) && estadoNoTerminado(),
+                            'text-red-500': tieneControlStock(data) && isFaltante(data) && estadoNoTerminado(),
                             'color-provisto': isProvistoPorTerceros(data) }"> {{ getCantidad(data) }} </td>
                     <td [ngClass]="{ 
-                            'text-red-500': isFaltante(data) && estadoNoTerminado(),
+                            'text-red-500': tieneControlStock(data) && isFaltante(data) && estadoNoTerminado(),
                             'color-provisto': isProvistoPorTerceros(data) }"> {{ getCantidadTotal(data) }} </td>
                     <td [ngClass]="{ 
-                            'text-red-500': isFaltante(data) && estadoNoTerminado(),
+                            'text-red-500': tieneControlStock(data) && isFaltante(data) && estadoNoTerminado(),
                             'color-provisto': isProvistoPorTerceros(data) }"
                         [ngxTippy]="getSupplierTooltip(data.supplier) || null"> {{
                         getOrigen(data) }} </td>
