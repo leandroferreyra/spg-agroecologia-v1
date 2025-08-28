@@ -199,7 +199,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
-          // console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -239,7 +238,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       });
       const finalUrl = this.router.serializeUrl(urlTree);
       window.open(`${baseUrl}#${finalUrl}`, '_blank');
-      return; // No sigue ejecutando lógica interna
+      return; 
     }
 
     this.subscription.add(

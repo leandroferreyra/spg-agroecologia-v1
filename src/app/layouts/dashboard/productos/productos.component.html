@@ -61,7 +61,8 @@
                             @for(data of productos ; let index = $index ;track data.uuid) {
                             <tr style="cursor: pointer;"
                                 [ngClass]="{'bg-blue-200': selectedProducto?.uuid === data.uuid}">
-                                <td (click)="showDataProducto(data)" style="font-size: 12px;">{{ data.name }}
+                                <td (click)="showProductByUuid(data.uuid, true, $event)" style="font-size: 12px;">{{
+                                    data.name }}
                                 </td>
                                 <td class="w-0 whitespace-nowrap text-right align-middle">
                                     <div hlMenu class="dropdown">

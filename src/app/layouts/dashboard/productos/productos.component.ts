@@ -212,9 +212,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
-            this.showProductByUuid(false);
+            this.showProductByUuid(this.uuidFromUrl, false);
           } else {
-            this.isLoadingProductos = false;
             if (this.productos.length === 0) {
               this.swalService.toastSuccess('center', 'No existen productos.');
               this.isTabDisabled = true;
@@ -227,9 +226,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
               this.isEdicion = false;
               const first = this.productos[0];
               this.uuidFromUrl = first.uuid;
-              this.inicializarFormEdit(first);
+              this.showProductByUuid(first.uuid, false);
               this.updateTabQueryParam('datos-generales', this.uuidFromUrl);
-
             }
           }
           this.spinner.hide();
@@ -253,9 +251,19 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
   }
 
-  showProductByUuid(updateTab: boolean = true) {
+  showProductByUuid(uuid: string, updateTab: boolean, event?: MouseEvent) {
+    if (event?.ctrlKey || event?.metaKey) {
+      const baseUrl = window.location.origin + window.location.pathname;
+      const urlTree = this.router.createUrlTree([`/dashboard/productos/${uuid}`], {
+        queryParams: updateTab ? { tab: 'datos-generales' } : {}
+      });
+      const finalUrl = this.router.serializeUrl(urlTree);
+      window.open(`${baseUrl}#${finalUrl}`, '_blank');
+      return;
+    }
+
     this.subscription.add(
-      this._productoService.showProduct(this.uuidFromUrl, this.actual_role).subscribe({
+      this._productoService.showProduct(uuid, this.actual_role).subscribe({
         next: res => {
           this.showDataProducto(res.data, updateTab);
           this.isLoadingProductos = false;
@@ -556,7 +564,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
               this.spinner.hide();
               this.obtenerProductos(true);
               this.cerrarModal();
-              this.showDataProducto(res.data);
+              // this.showDataProducto(res.data);
             },
             error: error => {
               this.spinner.hide();
