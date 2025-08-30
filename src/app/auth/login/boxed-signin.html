@@ -22,7 +22,7 @@
                             loguearte</p>
                     </div>
 
-                    <form class="space-y-4 dark:text-white" [formGroup]="loginForm" autocomplete="off">
+                    <form class="space-y-4 dark:text-white" [formGroup]="loginForm">
 
 
                         <div [ngClass]="isSubmitLogin ? loginForm.controls['usuario'].errors ? 'has-error'
@@ -37,7 +37,7 @@
                             <label>Contraseña *</label>
                             <div class="input-group">
                                 <input [type]="showPassword ? 'text' : 'password'" class="form-control"
-                                    formControlName="password">
+                                    formControlName="password" autocomplete="off">
                                 <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
                                     style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
                             </div>
