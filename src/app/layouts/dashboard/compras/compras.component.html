@@ -1235,7 +1235,7 @@
                             <label>Password</label>
                             <div class="input-group">
                                 <input [type]="showPassword ? 'text' : 'password'" class="form-control"
-                                    formControlName="password">
+                                    formControlName="password" autocomplete="off">
                                 <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
                                     style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
                             </div>
