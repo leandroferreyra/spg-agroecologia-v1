@@ -486,8 +486,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   armarDTOProduccion(produccion: ProduccionDTO, form: FormGroup) {
     produccion.actual_role = this.actual_role;
-    produccion['user->responsible_uuid'] = form.get('responsableEjecucion')?.value;
-    produccion.quantity = form.get('cantidad')?.value;
+    !form.get('responsableEjecucion')?.pristine && (produccion['user->responsible_uuid'] = form.get('responsableEjecucion')?.value);
+    !form.get('cantidad')?.pristine && (produccion.quantity = form.get('cantidad')?.value);
     if (!form.get('fechaInicio')?.pristine) {
       produccion.production_datetime = this.convertirFechaADateBackend(form.get('fechaInicio')?.value);
     }
