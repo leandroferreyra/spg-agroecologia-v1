@@ -306,8 +306,11 @@
 
                                     <div class="flex flex-wrap gap-2">
                                         @for (ctrl of numSerieArray.controls; track $index; let i = $index) {
-                                        <input class="form-control w-32 border p-2 rounded" [formControlName]="i"
-                                            placeholder="Serie {{ i + 1 }}" />
+                                        <div
+                                            [ngClass]="isSubmit ? isSubmit && ctrl.invalid ? 'has-error' : 'has-success' : ''">
+                                            <input class="form-control w-32 border p-2 rounded" [formControlName]="i"
+                                                placeholder="Serie {{ i + 1 }}" />
+                                        </div>
                                         }
                                     </div>
                                 </div>
@@ -467,7 +470,7 @@
     <ngx-custom-modal #modalCambioCantidad class="modal-top large-modal animate animate-fade-in">
         <ng-template #modalBody>
 
-            <form>
+            <div>
                 @if (isMayor) {
                 <span>Se deberá volver a seleccionar el origen de los componentes para los cuales ya se seleccionó un
                     lote</span>
@@ -476,7 +479,7 @@
                 @if (asignaNumero) {
                 <span>Si se modifica la cantidad a producir, se deben volver a ingresar los números de serie</span>
                 }
-            </form>
+            </div>
 
             <div class="row mt-3">
                 <div class="col-12 d-flex justify-content-center">

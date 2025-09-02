@@ -332,7 +332,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       asignaNumSerie: new FormControl({ value: produccion?.product?.assign_serial_number, disabled: true }, []),
       tieneNumSerie: new FormControl({ value: produccion?.product?.has_serial_number, disabled: true }, []),
       lote: new FormControl({ value: produccion?.batch?.batch_identification, disabled: true }, []),
-      // numSerie: new FormControl({ value: this.obtenerSerialNumbers(produccion), disabled: true }, []),
       numSerie: this.fb.array([])
     });
     const serials = this.obtenerSerialNumbers(produccion);
@@ -400,13 +399,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this.produccionForm.get('numSerie')?.enable();
       const nuevosControles = this.fb.array([]);
       for (let i = 0; i < this.produccionForm.get('cantidad')?.value; i++) {
-        nuevosControles.push(this.fb.control('', []));
+        nuevosControles.push(this.fb.control('', [Validators.required]));
       }
       this.produccionForm.setControl('numSerie', nuevosControles);
     }
-    // this.isMayor = false;
-    // this.asignaNumero = false;
-    // this.modificaCantidad = false;
     this.modalCambioCantidad.close();
   }
 
