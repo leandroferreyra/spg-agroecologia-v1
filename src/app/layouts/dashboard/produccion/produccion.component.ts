@@ -321,8 +321,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
-    console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
-
     this.setUsuariosConDisabled();
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
@@ -542,6 +540,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
           this._produccionService.editProduccion(this.selectedProduccion.uuid, produccion).subscribe({
             next: res => {
               this.isEdicion = false;
+              this.asignaNumero = false;
               this.modificaCantidad = false;
               this.obtenerProducciones(false);
               this.spinner.hide();

@@ -83,8 +83,7 @@
 
         @for(menu of menuItems ; track menu) {
         <li class="menu nav-item relative" style="cursor: pointer;">
-            <a class="nav-link" routerLinkActive="active" [routerLink]="menu.route"
-                [routerLinkActiveOptions]="{ exact: true }">
+            <a class="nav-link" routerLinkActive="active" [routerLink]="menu.route">
                 <div class="flex items-center">
                     <span class="px-2">{{ menu.label }}</span>
                 </div>
@@ -98,8 +97,7 @@
             <ul class="sub-menu">
                 @for(sub of menu.submenu; track sub) {
                 <li>
-                    <a [routerLink]="'config/' + sub.route" routerLinkActive="active"
-                        [routerLinkActiveOptions]="{ exact: true }" class="cursor-pointer">
+                    <a [routerLink]="'config/' + sub.route" routerLinkActive="active" class="cursor-pointer">
                         {{sub.label}}
                     </a>
                 </li>
