@@ -787,14 +787,12 @@
                             </ng-select>
                         </div>
 
-                        @if (productoAProducir.assign_serial_number === 1 && produccionForm.get('cantidad')?.value > 0)
-                        {
+                        @if (productoAProducir.assign_serial_number === 1 && produccionForm.get('cantidad')?.value > 0) {
                         <div class="col-span-1 sm:col-span-2 w-full mt-2">
                             <div class="flex items-center gap-4 mb-2">
                                 <label class="font-medium">Número de serie</label>
 
-                                @if(series.controls[0].get('value')?.value && produccionForm.get('cantidad')?.value > 1)
-                                {
+                                @if(series.controls[0].get('value')?.value && produccionForm.get('cantidad')?.value > 1) {
                                 <button type="button" class="text-blue-500 text-sm underline hover:text-blue-700"
                                     (click)="generarSecuencia()">
                                     Generar secuencia

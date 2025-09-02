@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -66,7 +66,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   store: any;
   private subscription: Subscription = new Subscription();
   actual_role: string = '';
-  // componentes: any[] = [];
   producciones: any[] = [];
   selectedProduccion: any;
   usuarioLogueado: any;
@@ -124,6 +123,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   tab1: string = 'datos-generales';
 
   @ViewChild('modalLiberacion') modalLiberacion!: NgxCustomModalComponent;
+  @ViewChild('modalCambioCantidad') modalCambioCantidad!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -134,11 +134,14 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
   hayProductosTerceros: boolean = false;
+  isMayor: boolean = false;
+  asignaNumero: boolean = false;
+  modificaCantidad: boolean = false;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
     private tokenService: TokenService, private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute,
-    private router: Router
+    private router: Router, private fb: FormBuilder
   ) {
     this.initStore();
   }
@@ -238,7 +241,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       });
       const finalUrl = this.router.serializeUrl(urlTree);
       window.open(`${baseUrl}#${finalUrl}`, '_blank');
-      return; 
+      return;
     }
 
     this.subscription.add(
@@ -318,8 +321,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   inicializarForm(produccion: any) {
     this.selectedProduccion = produccion;
+    console.log("🚀 ~ ProduccionComponent ~ inicializarForm ~ this.selectedProduccion:", this.selectedProduccion)
+
     this.setUsuariosConDisabled();
-    // this.obtenerComponentesProduccion();
     this.produccionForm = new FormGroup({
       producto: new FormControl({ value: produccion?.product?.name, disabled: true }, [Validators.required]),
       fechaInicio: new FormControl({ value: this.convertirFechaConHora(produccion?.production_datetime), disabled: !this.isEdicion }, []),
@@ -330,12 +334,82 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       asignaNumSerie: new FormControl({ value: produccion?.product?.assign_serial_number, disabled: true }, []),
       tieneNumSerie: new FormControl({ value: produccion?.product?.has_serial_number, disabled: true }, []),
       lote: new FormControl({ value: produccion?.batch?.batch_identification, disabled: true }, []),
-      numSerie: new FormControl({ value: this.obtenerSerialNumbers(produccion), disabled: true }, [])
+      // numSerie: new FormControl({ value: this.obtenerSerialNumbers(produccion), disabled: true }, []),
+      numSerie: this.fb.array([])
     });
+    const serials = this.obtenerSerialNumbers(produccion);
+    this.setNumSerie(serials);
     this.onFormEditChange();
   }
   onFormEditChange() {
 
+  }
+  get numSerieArray(): FormArray {
+    return this.produccionForm.get('numSerie') as FormArray;
+  }
+  setNumSerie(serials: string[]) {
+    this.numSerieArray.clear();
+    serials.forEach(sn => {
+      this.numSerieArray.push(new FormControl({ value: sn, disabled: true }));
+    });
+  }
+
+  onCantidadBlur() {
+    const cantidad = this.produccionForm.get('cantidad')?.value;
+    this.modificaCantidad = +cantidad !== +this.selectedProduccion.quantity;
+    if (this.modificaCantidad) {
+      this.isMayor = (cantidad && +cantidad > +this.selectedProduccion.quantity);
+      this.asignaNumero = this.selectedProduccion.product?.assign_serial_number === 1;
+      this.openModalCambioCantidad();
+    } else {
+      const serials = this.obtenerSerialNumbers(this.selectedProduccion);
+      this.setNumSerie(serials);
+    }
+  }
+
+  generarSecuencia() {
+    const cantidad = this.numSerieArray.length;
+    const base = Number(this.numSerieArray.at(0)?.value);
+
+    if (!base || isNaN(base)) {
+      this.swalService.toastError('top-right', "Los números de serie debe ser numéricos.")
+      return;
+    }
+
+    for (let i = 1; i < cantidad; i++) {
+      this.numSerieArray.at(i)?.setValue((base + i).toString());
+    }
+  }
+
+  openModalCambioCantidad() {
+    this.modalCambioCantidad.options = this.modalOptions;
+    this.modalCambioCantidad.open();
+  }
+
+  cerrarModalCambioCantidad() {
+    this.isMayor = false;
+    this.asignaNumero = false;
+    this.modificaCantidad = false;
+    const cantidad = this.showCantidad(this.selectedProduccion.quantity);
+    this.produccionForm.get('cantidad')?.setValue(cantidad);
+    const serials = this.obtenerSerialNumbers(this.selectedProduccion);
+    this.setNumSerie(serials);
+    this.modalCambioCantidad.close();
+  }
+
+  confirmarCambioCantidad() {
+    if (this.asignaNumero) {
+      this.produccionForm.get('numSerie')?.enable();
+      const nuevosControles = this.fb.array([]);
+      for (let i = 0; i < this.produccionForm.get('cantidad')?.value; i++) {
+        nuevosControles.push(this.fb.control('', []));
+      }
+      this.produccionForm.setControl('numSerie', nuevosControles);
+    }
+    // this.isMayor = false;
+    // this.asignaNumero = false;
+    // this.modificaCantidad = false;
+    this.modalCambioCantidad.close();
   }
 
   allowEditCantidad() {
@@ -443,7 +517,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
 
   cancelarEdicion() {
+    this.isSubmit = false;
     this.isEdicion = false;
+    this.modificaCantidad = false;
     this.inicializarForm(this.selectedProduccion);
   }
 
@@ -466,6 +542,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
           this._produccionService.editProduccion(this.selectedProduccion.uuid, produccion).subscribe({
             next: res => {
               this.isEdicion = false;
+              this.modificaCantidad = false;
               this.obtenerProducciones(false);
               this.spinner.hide();
             },
@@ -491,9 +568,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     if (!form.get('fechaInicio')?.pristine) {
       produccion.production_datetime = this.convertirFechaADateBackend(form.get('fechaInicio')?.value);
     }
-    // if (!this.isEdicion) {
-    //   this.cleanObject(producto);
-    // }
+    if (this.modificaCantidad && this.asignaNumero) {
+      // Se envían los nuevos números de serie.
+      produccion.serial_numbers = form.get('numSerie')?.value;
+    }
   }
 
   // Se eliminan los nulos.

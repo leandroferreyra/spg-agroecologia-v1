@@ -215,10 +215,11 @@
                                         formControlName="producto" />
                                 </div>
 
-                                <div>
+                                <div
+                                    [ngClass]="isSubmit ? produccionForm.controls['cantidad'].errors ? 'has-error' : 'has-success' : ''">
                                     <label for="cantidad">Cantidad</label>
                                     <input id="cantidad" type="text" placeholder="" class="form-control"
-                                        formControlName="cantidad" />
+                                        formControlName="cantidad" (blur)="onCantidadBlur()" />
                                 </div>
 
                                 <div>
@@ -276,7 +277,7 @@
                                     <span>Tiene número de serie</span>
                                 </div>
 
-                                @if (produccionForm.get('numSerie')?.value?.length > 0) {
+                                <!-- @if (produccionForm.get('numSerie')?.value?.length > 0) {
                                 <div class="col-span-1 sm:col-span-3 mt-2">
                                     <label class="font-medium mb-1 block">Números de serie</label>
                                     <div class="flex flex-wrap gap-2">
@@ -286,6 +287,31 @@
                                         }
                                     </div>
                                 </div>
+                                } -->
+
+                                @if (numSerieArray.length > 0) {
+                                <div class="col-span-1 sm:col-span-3 mt-2" formArrayName="numSerie">
+
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <label class="font-medium">Números de serie</label>
+                                        @if (numSerieArray.controls[0].value && produccionForm.get('cantidad')?.value >
+                                        1 && isEdicion && modificaCantidad) {
+                                        <button type="button"
+                                            class="mb-1 text-blue-500 text-sm underline hover:text-blue-700"
+                                            (click)="generarSecuencia()">
+                                            Generar secuencia
+                                        </button>
+                                        }
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2">
+                                        @for (ctrl of numSerieArray.controls; track $index; let i = $index) {
+                                        <input class="form-control w-32 border p-2 rounded" [formControlName]="i"
+                                            placeholder="Serie {{ i + 1 }}" />
+                                        }
+                                    </div>
+                                </div>
+
                                 }
 
                             </div>
@@ -437,6 +463,34 @@
     </ngx-custom-modal>
 </div>
 
+<div>
+    <ngx-custom-modal #modalCambioCantidad class="modal-top large-modal animate animate-fade-in">
+        <ng-template #modalBody>
+
+            <form>
+                @if (isMayor) {
+                <span>Se deberá volver a seleccionar el origen de los componentes para los cuales ya se seleccionó un
+                    lote</span>
+                }
+                <br> <br>
+                @if (asignaNumero) {
+                <span>Si se modifica la cantidad a producir, se deben volver a ingresar los números de serie</span>
+                }
+            </form>
+
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-center">
+                    <button class="btn btn-primary mr-3" (click)="confirmarCambioCantidad()">Confirmar</button>
+                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                        (click)="cerrarModalCambioCantidad()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+
+        </ng-template>
+    </ngx-custom-modal>
+</div>
 
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
     <p style="font-size: 20px; color: white">Cargando</p>
