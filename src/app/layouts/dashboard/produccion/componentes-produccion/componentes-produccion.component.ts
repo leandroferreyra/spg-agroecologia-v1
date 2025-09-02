@@ -138,10 +138,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           if (this.expandirTodo) {
             this.expandirTodos();
+          } else {
+            this.inicializarExpandidos();
           }
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -282,7 +283,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   toggleComponente(data: any) {
-    // console.log(data);
     const uuid = data.uuid;
     this.expandedRows[uuid] = !this.expandedRows[uuid];
     if (this.expandedRows[uuid]) {
@@ -323,6 +323,22 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       // Solo expande los que tienen control de stock.
       if (componente.product_type?.stock_controlled === 1) {
         this.expandedRows[componente.uuid] = true;
+        if (this.expandedRows[componente.uuid]) {
+          this.inicializarFormComponente(componente);
+          this.obtenerProveedoresByComponente(componente);
+          this.stocksByComponente[componente.uuid] = (componente.possible_stocks || []).map((stock: any) => ({
+            ...stock,
+            disabled: +stock.available_amount < +this.getCantidadTotal(componente)
+          }));
+        }
+      }
+    });
+  }
+
+  inicializarExpandidos() {
+    this.componentes.forEach(componente => {
+      // Solo expande los que tienen control de stock.
+      if (componente.product_type?.stock_controlled === 1) {
         if (this.expandedRows[componente.uuid]) {
           this.inicializarFormComponente(componente);
           this.obtenerProveedoresByComponente(componente);
@@ -478,8 +494,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             this.isEditing[data.uuid] = false;
             this.componenteForms[data.uuid].get('note')?.disable();
             this.componenteForms[data.uuid].get('supplier_uuid')?.disable();
+            // this.inicializarFormularioComponente(data); // Inicializa para que cambien los reservados.
             this.obtenerComponentesProduccion();
-            // this.toggleComponente(data);
             this.limpiarSerialesDeOtroLote(data);
             this.spinner.hide();
           },
