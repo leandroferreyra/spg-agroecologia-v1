@@ -171,6 +171,7 @@
                                                 <tr>
                                                     <td></td>
                                                     <td></td>
+                                                    <td><strong>Cantidad reservada</strong></td>
                                                     <td><strong>Cantidad disponible</strong></td>
                                                     <td><strong>Producción máxima</strong></td>
                                                     <td><strong>Ubicación</strong></td>
@@ -195,6 +196,8 @@
                                                         </div>
                                                     </td>
                                                     <td class="border px-2 py-1"> {{showName(stock)}} </td>
+                                                    <td class="border px-2 py-1">
+                                                        {{getCantidadReservadaStockByComponent(data, stock)}}</td>
                                                     <td class="border px-2 py-1">
                                                         {{getCantidadStockByComponent(data, stock)}} </td>
                                                     <td class="border px-2 py-1"> {{getProduccionMaxima(data, stock)}}

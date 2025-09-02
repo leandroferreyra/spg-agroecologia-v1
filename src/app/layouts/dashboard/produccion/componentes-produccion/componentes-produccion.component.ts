@@ -167,6 +167,14 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
+  getCantidadReservadaStockByComponent(data: any, stock: any) {
+    if (data.measure?.is_integer === 1) {
+      return +(+stock.reserved_amount)?.toFixed(0);
+    } else {
+      return +(+stock.reserved_amount)?.toFixed(2);
+    }
+  }
+
   getCantidadStockByComponent(data: any, stock: any) {
     if (data.measure?.is_integer === 1) {
       return +(+stock.available_amount)?.toFixed(0);
@@ -274,6 +282,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   toggleComponente(data: any) {
+    console.log(data);
     const uuid = data.uuid;
     this.expandedRows[uuid] = !this.expandedRows[uuid];
     if (this.expandedRows[uuid]) {
