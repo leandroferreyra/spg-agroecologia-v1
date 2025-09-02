@@ -134,8 +134,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
   hayProductosTerceros: boolean = false;
-  isMayor: boolean = false;
-  asignaNumero: boolean = false;
+  showMensajeIsMayor: boolean = false;
+  showMensajeAsignaNumero: boolean = false;
   modificaCantidad: boolean = false;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
@@ -234,6 +234,9 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
 
   showProduccionByUuid(uuid: string, updateTab: boolean, event?: MouseEvent) {
+    this.isSubmit = false; // Para que no quede en verde el input al editar
+    this.showMensajeAsignaNumero = false;
+    this.showMensajeIsMayor = false;
     if (event?.ctrlKey || event?.metaKey) {
       const baseUrl = window.location.origin + window.location.pathname;
       const urlTree = this.router.createUrlTree([`/dashboard/producciones/${uuid}`], {
@@ -339,7 +342,28 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.onFormEditChange();
   }
   onFormEditChange() {
+    this.produccionForm.get('cantidad')!.valueChanges.subscribe(
+      (value) => {
+        this.modificaCantidad = +value !== +this.selectedProduccion.quantity;
+        if (this.modificaCantidad) {
+          this.showMensajeIsMayor = (value && +value > +this.selectedProduccion.quantity);
+          this.showMensajeAsignaNumero = this.selectedProduccion.product?.assign_serial_number === 1;
+          if (this.selectedProduccion.product?.assign_serial_number === 1) {
+            this.produccionForm.get('numSerie')?.enable();
+            const nuevosControles = this.fb.array([]);
+            for (let i = 0; i < this.produccionForm.get('cantidad')?.value; i++) {
+              nuevosControles.push(this.fb.control('', [Validators.required]));
+            }
+            this.produccionForm.setControl('numSerie', nuevosControles);
+          }
+        } else {
+          const serials = this.obtenerSerialNumbers(this.selectedProduccion);
+          this.setNumSerie(serials);
+          this.showMensajeAsignaNumero = false;
+          this.showMensajeIsMayor = false;
+        }
 
+      });
   }
   get numSerieArray(): FormArray {
     return this.produccionForm.get('numSerie') as FormArray;
@@ -351,18 +375,20 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     });
   }
 
-  onCantidadBlur() {
-    const cantidad = this.produccionForm.get('cantidad')?.value;
-    this.modificaCantidad = +cantidad !== +this.selectedProduccion.quantity;
-    if (this.modificaCantidad) {
-      this.isMayor = (cantidad && +cantidad > +this.selectedProduccion.quantity);
-      this.asignaNumero = this.selectedProduccion.product?.assign_serial_number === 1;
-      this.openModalCambioCantidad();
-    } else {
-      const serials = this.obtenerSerialNumbers(this.selectedProduccion);
-      this.setNumSerie(serials);
-    }
-  }
+  // onCantidadBlur() {
+  //   const cantidad = this.produccionForm.get('cantidad')?.value;
+  //   this.modificaCantidad = +cantidad !== +this.selectedProduccion.quantity;
+  //   if (this.modificaCantidad) {
+  //     this.isMayor = (cantidad && +cantidad > +this.selectedProduccion.quantity);
+  //     this.asignaNumero = this.selectedProduccion.product?.assign_serial_number === 1;
+  //     if (this.isMayor || this.asignaNumero) {
+  //       this.openModalCambioCantidad();
+  //     }
+  //   } else {
+  //     const serials = this.obtenerSerialNumbers(this.selectedProduccion);
+  //     this.setNumSerie(serials);
+  //   }
+  // }
 
   generarSecuencia() {
     const cantidad = this.numSerieArray.length;
@@ -378,33 +404,34 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     }
   }
 
-  openModalCambioCantidad() {
-    this.modalCambioCantidad.options = this.modalOptions;
-    this.modalCambioCantidad.open();
-  }
+  // openModalCambioCantidad() {
+  //   this.modalCambioCantidad.options = this.modalOptions;
+  //   this.modalCambioCantidad.open();
+  // }
 
-  cerrarModalCambioCantidad() {
-    this.isMayor = false;
-    this.asignaNumero = false;
-    this.modificaCantidad = false;
-    const cantidad = this.showCantidad(this.selectedProduccion.quantity);
-    this.produccionForm.get('cantidad')?.setValue(cantidad);
-    const serials = this.obtenerSerialNumbers(this.selectedProduccion);
-    this.setNumSerie(serials);
-    this.modalCambioCantidad.close();
-  }
+  // cerrarModalCambioCantidad() {
+  //   this.isSubmit = false;
+  //   this.isMayor = false;
+  //   this.asignaNumero = false;
+  //   this.modificaCantidad = false;
+  //   const cantidad = this.showCantidad(this.selectedProduccion.quantity);
+  //   this.produccionForm.get('cantidad')?.setValue(cantidad);
+  //   const serials = this.obtenerSerialNumbers(this.selectedProduccion);
+  //   this.setNumSerie(serials);
+  //   this.modalCambioCantidad.close();
+  // }
 
-  confirmarCambioCantidad() {
-    if (this.asignaNumero) {
-      this.produccionForm.get('numSerie')?.enable();
-      const nuevosControles = this.fb.array([]);
-      for (let i = 0; i < this.produccionForm.get('cantidad')?.value; i++) {
-        nuevosControles.push(this.fb.control('', [Validators.required]));
-      }
-      this.produccionForm.setControl('numSerie', nuevosControles);
-    }
-    this.modalCambioCantidad.close();
-  }
+  // confirmarCambioCantidad() {
+  //   if (this.asignaNumero) {
+  //     this.produccionForm.get('numSerie')?.enable();
+  //     const nuevosControles = this.fb.array([]);
+  //     for (let i = 0; i < this.produccionForm.get('cantidad')?.value; i++) {
+  //       nuevosControles.push(this.fb.control('', [Validators.required]));
+  //     }
+  //     this.produccionForm.setControl('numSerie', nuevosControles);
+  //   }
+  //   this.modalCambioCantidad.close();
+  // }
 
   allowEditCantidad() {
     return !(this.isEdicion && this.selectedProduccion?.current_state?.state?.name === 'Borrador');
@@ -514,6 +541,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.isSubmit = false;
     this.isEdicion = false;
     this.modificaCantidad = false;
+    this.showMensajeAsignaNumero = false;
+    this.showMensajeIsMayor = false;
     this.inicializarForm(this.selectedProduccion);
   }
 
@@ -535,8 +564,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         this.subscription.add(
           this._produccionService.editProduccion(this.selectedProduccion.uuid, produccion).subscribe({
             next: res => {
+              this.isSubmit = false;
               this.isEdicion = false;
-              this.asignaNumero = false;
+              this.showMensajeAsignaNumero = false;
+              this.showMensajeIsMayor = false;
               this.modificaCantidad = false;
               this.obtenerProducciones(false);
               this.spinner.hide();
@@ -563,7 +594,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     if (!form.get('fechaInicio')?.pristine) {
       produccion.production_datetime = this.convertirFechaADateBackend(form.get('fechaInicio')?.value);
     }
-    if (this.modificaCantidad && this.asignaNumero) {
+    if (this.modificaCantidad && this.showMensajeAsignaNumero) {
       // Se envían los nuevos números de serie.
       produccion.serial_numbers = form.get('numSerie')?.value;
     }

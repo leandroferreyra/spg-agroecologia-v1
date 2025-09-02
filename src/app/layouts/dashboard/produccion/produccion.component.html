@@ -215,11 +215,23 @@
                                         formControlName="producto" />
                                 </div>
 
-                                <div
+                                <div (keydown.enter)="confirmarProduccion(produccionForm)"
                                     [ngClass]="isSubmit ? produccionForm.controls['cantidad'].errors ? 'has-error' : 'has-success' : ''">
                                     <label for="cantidad">Cantidad</label>
                                     <input id="cantidad" type="text" placeholder="" class="form-control"
-                                        formControlName="cantidad" (blur)="onCantidadBlur()" />
+                                        formControlName="cantidad" />
+                                    @if(showMensajeIsMayor){
+                                    <span style="color: red">Se deseleccionarán los lotes que no tengan componentes
+                                        disponibles suficientes para la nueva
+                                        cantidad a producir.</span> <br>
+                                    }
+                                    @if(showMensajeAsignaNumero){
+                                    <span style="color: red">Si se modifica la cantidad a producir, se deben volver a
+                                        ingresar los números
+                                        de serie</span>
+                                    }
+                                    <!-- <input id="cantidad" type="text" placeholder="" class="form-control"
+                                        formControlName="cantidad" (blur)="onCantidadBlur()" /> -->
                                 </div>
 
                                 <div>
@@ -466,14 +478,14 @@
     </ngx-custom-modal>
 </div>
 
-<div>
+<!-- <div>
     <ngx-custom-modal #modalCambioCantidad class="modal-top large-modal animate animate-fade-in">
         <ng-template #modalBody>
 
             <div>
                 @if (isMayor) {
-                <span>Se deberá volver a seleccionar el origen de los componentes para los cuales ya se seleccionó un
-                    lote</span>
+                <span>Se deseleccionarán los lotes que no tengan componentes disponibles suficientes para la nueva
+                    cantidad a producir</span>
                 }
                 <br> <br>
                 @if (asignaNumero) {
@@ -493,7 +505,7 @@
 
         </ng-template>
     </ngx-custom-modal>
-</div>
+</div> -->
 
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
     <p style="font-size: 20px; color: white">Cargando</p>
