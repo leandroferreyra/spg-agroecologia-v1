@@ -282,7 +282,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   toggleComponente(data: any) {
-    console.log(data);
+    // console.log(data);
     const uuid = data.uuid;
     this.expandedRows[uuid] = !this.expandedRows[uuid];
     if (this.expandedRows[uuid]) {
