@@ -176,7 +176,7 @@
                                                     <td><strong>Producción máxima</strong></td>
                                                     <td><strong>Ubicación</strong></td>
                                                 </tr>
-                                                @if(stocksByComponente[data.uuid].length > 0 || esElStockActualSeleccionado(data)) {
+                                                @if(stocksByComponente[data.uuid].length > 0) {
                                                 @for(stock of stocksByComponente[data.uuid] ; track stock.uuid) {
                                                 <tr>
                                                     <td class="border px-2 py-1">
@@ -205,11 +205,7 @@
                                                     <td class="border px-2 py-1"> {{ getLocation(stock).join(' -
                                                         ') }} </td>
                                                 </tr>
-                                                @if(
-                                                componenteForms[data.uuid].get('origin')?.value === 'Lote' &&
-                                                componenteForms[data.uuid].get('stock_uuid')?.value === data.uuid &&
-                                                data.assign_serial_number === 1
-                                                ) {
+                                                @if( debeAsignarNumerosDeSerie(data, stock) ) {
                                                 <tr>
                                                     <td></td>
                                                     <td class="border px-2 py-1"><strong>Números de serie</strong></td>

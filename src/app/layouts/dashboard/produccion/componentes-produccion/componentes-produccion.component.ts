@@ -308,10 +308,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   }
 
-  esElStockActualSeleccionado(data: any) {
-    console.log(data);
-    console.log(this.stocksByComponente[data.uuid]);
-    return true;
+  debeAsignarNumerosDeSerie(data: any, stock: any) {
+    return this.componenteForms[data.uuid].get('origin')?.value === 'Lote' &&
+      this.componenteForms[data.uuid].get('stock_uuid')?.value === stock.uuid && data.assign_serial_number === 1;
   }
 
   habilitarEdicion(data: any) {
