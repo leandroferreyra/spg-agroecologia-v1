@@ -176,7 +176,7 @@
                                                     <td><strong>Producción máxima</strong></td>
                                                     <td><strong>Ubicación</strong></td>
                                                 </tr>
-                                                @if(stocksByComponente[data.uuid].length > 0) {
+                                                @if(stocksByComponente[data.uuid].length > 0 || esElStockActualSeleccionado(data)) {
                                                 @for(stock of stocksByComponente[data.uuid] ; track stock.uuid) {
                                                 <tr>
                                                     <td class="border px-2 py-1">

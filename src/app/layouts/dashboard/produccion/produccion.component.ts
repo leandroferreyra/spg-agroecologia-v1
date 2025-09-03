@@ -570,7 +570,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
               this.showMensajeIsMayor = false;
               this.modificaCantidad = false;
               this.obtenerProducciones(false);
-              this.spinner.hide();
+              // this.spinner.hide();
             },
             error: error => {
               this.spinner.hide();

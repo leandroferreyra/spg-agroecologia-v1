@@ -294,10 +294,24 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.isEditing[data.uuid] = false;
     this.inicializarFormComponente(data);
     this.obtenerProveedoresByComponente(data);
-    this.stocksByComponente[data.uuid] = (data.possible_stocks || []).map((stock: any) => ({
+
+    const stocksOrigen = data.possible_stocks?.length
+      ? data.possible_stocks
+      : data.stock
+        ? [data.stock]
+        : [];
+
+    this.stocksByComponente[data.uuid] = stocksOrigen.map((stock: any) => ({
       ...stock,
       disabled: +stock.available_amount < +this.getCantidadTotal(data)
     }));
+
+  }
+
+  esElStockActualSeleccionado(data: any) {
+    console.log(data);
+    console.log(this.stocksByComponente[data.uuid]);
+    return true;
   }
 
   habilitarEdicion(data: any) {
@@ -342,7 +356,14 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         if (this.expandedRows[componente.uuid]) {
           this.inicializarFormComponente(componente);
           this.obtenerProveedoresByComponente(componente);
-          this.stocksByComponente[componente.uuid] = (componente.possible_stocks || []).map((stock: any) => ({
+
+          const stocksOrigen = componente.possible_stocks?.length
+            ? componente.possible_stocks
+            : componente.stock
+              ? [componente.stock]
+              : [];
+
+          this.stocksByComponente[componente.uuid] = stocksOrigen.map((stock: any) => ({
             ...stock,
             disabled: +stock.available_amount < +this.getCantidadTotal(componente)
           }));
