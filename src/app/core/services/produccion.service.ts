@@ -52,4 +52,20 @@ export class ProduccionService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProduccion + '/' + uuid, { headers, params });
   }
 
+  showTrazabilidadByProduccion(uuid: string, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .append('actual_role', rol)
+      .append('with[]', "product.measure")
+      .append('with[]', "batch.stocks.productInstances")
+      .append('with[]', "creator")
+      .append('with[]', "responsible")
+      .append('with[]', "currentState.creator")
+      .append('with[]', "frozenComponents.stock.batch")
+      .append('with[]', "frozenComponents.productInstances")
+      .append('with[]', "frozenComponents.supplier.person.human")
+      .append('with[]', "frozenComponents.supplier.person.legalEntity");
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProduccion + '/' + uuid, { headers, params });
+  }
+  
 }

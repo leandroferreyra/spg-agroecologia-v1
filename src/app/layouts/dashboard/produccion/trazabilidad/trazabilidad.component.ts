@@ -54,7 +54,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
   obtenerTrazabilidad() {
     this.spinner.show();
     this.subscription.add(
-      this._produccionService.showProduccion(this.produccion.uuid, this.rol).subscribe({
+      this._produccionService.showTrazabilidadByProduccion(this.produccion.uuid, this.rol).subscribe({
         next: res => {
           this.trazado = this.mapProduccionToTraceNode(res.data);
           this._tokenService.setToken(res.token);
@@ -151,7 +151,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       const seriales = (fc.product_instances ?? []).map((pi: any) => pi.serial_number);
       const origen =
         fc.origin === 'Sin selección' ? 'Sin control de stock'
-          : fc.origin === 'Lote' ? (fc.stock?.batch?.batch_identification ?? 'Lote no definido')
+          : fc.origin === 'Lote' ? (fc.stock?.batch?.batch_identification ?? 'Lote único')
             : fc.origin === 'Provisto por terceros' ? (
               fc.supplier?.person?.human
                 ? `Provisto por ${fc.supplier.person.human.lastname} ${fc.supplier.person.human.firstname}`

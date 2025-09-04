@@ -1,12 +1,6 @@
 <div class="panel pb-4">
 
     <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
-        <!-- Botón Agregar Cuenta Bancaria -->
-        <!-- <button type="button" ngxTippy="Agregar cuenta bancaria" (click)="openModalNuevaCuenta('NEW')">
-            <icon-plus />
-        </button> -->
-
-        <!-- Contenedor del Switch -->
         <div class="flex items-center gap-2">
             <span>Mostrar agotados</span>
             <label class="w-12 h-6 relative">
@@ -22,10 +16,15 @@
     @if (stocksProduccion.length === 0) {
     <div
         class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
-        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> El producto no posee stocks de
-                producciones</strong></span>
+        <span class="ltr:pr-2 rtl:pl-2">
+            <strong class="ltr:mr-1 rtl:ml-1">
+                El producto no posee stocks de producciones
+            </strong>
+        </span>
     </div>
     } @else {
+
+    <h1>Stock de producciones</h1>
 
     <div class="row mb-2">
         <div class="col-6">
@@ -44,24 +43,33 @@
         <table class="table-hover">
             <thead>
                 <tr>
-                    <th style="cursor: pointer;">
-                        <span style="display: inline-flex; align-items: center; gap: 10px;">
-                            Producto
-                        </span>
-                    </th>
-                    <th style="cursor: pointer;">
-                        <span style="display: inline-flex; align-items: center; gap: 10px;">
-                            Cantidad inicial
-                        </span>
-                    </th>
-
+                    <th rowspan="2">Lote</th>
+                    <th colspan="6" class="text-center">Stock</th>
+                    <th rowspan="2">Ubicación</th>
+                    <th rowspan="2">Fecha de producción</th>
+                </tr>
+                <tr>
+                    <th>Inicial</th>
+                    <th>Disponible</th>
+                    <th>Reservado</th>
+                    <th>Muestra</th>
+                    <th>Observado</th>
+                    <th>Consumido</th>
                 </tr>
             </thead>
             <tbody>
-                @for(data of stocksProduccion | slice: pageSize_produccion | slice: 0:itemsPerPage_produccion ; let index = $index; track data.uuid) {
+                @for(data of stocksProduccion | slice: pageSize_produccion | slice: 0:itemsPerPage_produccion ; let
+                index = $index; track data.uuid) {
                 <tr>
-                    <td class="whitespace-nowrap">{{ data.product.name}} </td>
-                    <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
+                    <td class="whitespace-nowrap">{{ getLote(data) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.initial_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.available_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.reserved_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.samples_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.observed_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.consumed_amount) }} </td>
+                    <td class="whitespace-nowrap"> {{ getLocation(data).join(' - ') }} </td>
+                    <td class="whitespace-nowrap"> {{ data.batch?.productions[0]?.current_state?.datetime_from }} </td>
                 </tr>
                 }
             </tbody>
@@ -70,14 +78,15 @@
         <div class="row mt-4 gy-3">
             <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
                 <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows_produccion"
-                    [pageSize]="itemsPerPage_produccion" [(page)]="currentPage_produccion" [maxSize]="2" [rotate]="true" #numPages
-                    [boundaryLinks]="true" (pageChange)="obtenerStocksProducciones()" />
+                    [pageSize]="itemsPerPage_produccion" [(page)]="currentPage_produccion" [maxSize]="2" [rotate]="true"
+                    #numPages [boundaryLinks]="true" (pageChange)="obtenerStocksProducciones()" />
             </div>
 
             <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
                 <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
-                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage_produccion" bindLabel="label" [clearable]="false"
-                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerStocksProducciones()">
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage_produccion" bindLabel="label"
+                    [clearable]="false" class="custom-select" [dropdownPosition]="'top'"
+                    (change)="obtenerStocksProducciones()">
                 </ng-select>
             </div>
         </div>

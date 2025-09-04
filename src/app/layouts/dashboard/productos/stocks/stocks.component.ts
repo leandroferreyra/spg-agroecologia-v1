@@ -85,14 +85,14 @@ export class StocksComponent implements OnInit, OnDestroy {
       this.filtros_produccion['product.uuid'].value = this.producto.uuid;
       this.filtros_compras['product.uuid'].value = this.producto.uuid;
       this.obtenerStocksProducciones();
-      this.obtenerStocksCompras();
+      // this.obtenerStocksCompras();
     }
   }
 
   obtenerStocksProducciones() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ['batch.productions.currentState', 'product.measure', 'location.location.location.location'];
+    params.with = ['batch.productions.currentState', 'product.productType', 'product.measure', 'location.location.location.location'];
     params.paging = this.itemsPerPage_produccion;
     params.page = this.currentPage_produccion;
     params.order_by = this.ordenamiento_produccion;
@@ -206,12 +206,36 @@ export class StocksComponent implements OnInit, OnDestroy {
     }
   }
 
-  mostrarCantidad(data: any) {
-    if (data.product.measure?.is_integer === 1) {
-      return (+data.available_amount)?.toFixed(0);
-    } else {
-      return (+data.available_amount)?.toFixed(2);
+  getLote(data: any) {
+    if (data.batch === null && data.product?.product_type.stock_controlled === 0) {
+      return 'Sin control de stock';
     }
+    if (data.batch === null && data.product?.product_type.stock_controlled === 1) {
+      return 'Lote único';
+    }
+    return data.batch?.batch_identification;
+  }
+
+  getStock(data: any, stock: any) {
+    if (stock === null) {
+      return '';
+    }
+    if (data.product.measure?.is_integer === 1) {
+      return (+stock)?.toFixed(0);
+    } else {
+      return (+stock)?.toFixed(2);
+    }
+  }
+
+  getLocation(data: any): string[] {
+    if (!data.location) return [];
+    const names: string[] = [];
+
+    if (data.location.location) {
+      names.push(...this.getLocation(data.location));
+    }
+    names.push(data.location.name);
+    return names;
   }
 
 }

@@ -202,8 +202,7 @@
                                                         {{getCantidadStockByComponent(data, stock)}} </td>
                                                     <td class="border px-2 py-1"> {{getProduccionMaxima(data, stock)}}
                                                     </td>
-                                                    <td class="border px-2 py-1"> {{ getLocation(stock).join(' -
-                                                        ') }} </td>
+                                                    <td class="border px-2 py-1"> {{ getLocation(stock).join(' - ') }} </td>
                                                 </tr>
                                                 @if( debeAsignarNumerosDeSerie(data, stock) ) {
                                                 <tr>
