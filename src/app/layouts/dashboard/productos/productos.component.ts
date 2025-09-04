@@ -47,6 +47,7 @@ import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { format } from 'date-fns';
 import { FlatpickrDirective } from 'angularx-flatpickr';
+import { consumerPollProducersForChange } from '@angular/core/primitives/signals';
 
 @Component({
   selector: 'app-productos',
@@ -775,7 +776,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   esProducible(producto: any) {
-    return producto?.product_type?.can_be_produced === 1;
+    return producto?.product_type?.can_be_produced === 1 && producto.current_state?.state?.name === 'Vigente';
   }
 
   confirmarProduccion() {
