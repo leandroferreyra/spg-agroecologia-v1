@@ -23,8 +23,11 @@
         </span>
     </div>
     } @else {
-
-    <h1>Stock de producciones</h1>
+    <div class="flex flex-wrap-reverse items-center justify-between mt-2 gap-2">
+        <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
+            Stock de producciones
+        </h5>
+    </div>
 
     <div class="row mb-2">
         <div class="col-6">
@@ -69,7 +72,7 @@
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.observed_amount) }} </td>
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.consumed_amount) }} </td>
                     <td class="whitespace-nowrap"> {{ getLocation(data).join(' - ') }} </td>
-                    <td class="whitespace-nowrap"> {{ data.batch?.productions[0]?.current_state?.datetime_from }} </td>
+                    <td class="whitespace-nowrap"> {{ formatFecha(data.batch?.productions[0]?.current_state?.datetime_from) }} </td>
                 </tr>
                 }
             </tbody>
@@ -87,6 +90,93 @@
                 <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage_produccion" bindLabel="label"
                     [clearable]="false" class="custom-select" [dropdownPosition]="'top'"
                     (change)="obtenerStocksProducciones()">
+                </ng-select>
+            </div>
+        </div>
+    </div>
+    }
+
+
+
+
+
+    @if (stocksCompra.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light mt-4">
+        <span class="ltr:pr-2 rtl:pl-2">
+            <strong class="ltr:mr-1 rtl:ml-1">
+                El producto no posee stocks de compras
+            </strong>
+        </span>
+    </div>
+    } @else {
+    <div class="flex flex-wrap-reverse items-center justify-between mt-2 gap-2 mt-4">
+        <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
+            Stock de compras
+        </h5>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="stocksCompra && stocksCompra.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage_compras}}/{{numPages.pageCount }}
+            </span>
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="stocksCompra && stocksCompra.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage_compras}}/{{ total_rows_compras }}
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th rowspan="2">Lote</th>
+                    <th colspan="6" class="text-center">Stock</th>
+                    <th rowspan="2">Ubicación</th>
+                    <th rowspan="2">Fecha de producción</th>
+                </tr>
+                <tr>
+                    <th>Inicial</th>
+                    <th>Disponible</th>
+                    <th>Reservado</th>
+                    <th>Muestra</th>
+                    <th>Observado</th>
+                    <th>Consumido</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of stocksCompra | slice: pageSize_compras | slice: 0:itemsPerPage_compras ; let
+                index = $index; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ getLote(data) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.initial_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.available_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.reserved_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.samples_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.observed_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.consumed_amount) }} </td>
+                    <td class="whitespace-nowrap"> {{ getLocation(data).join(' - ') }} </td>
+                    <td class="whitespace-nowrap"> {{ formatFecha(data.batch?.purchases[0]?.transaction?.transaction_datetime) }} </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows_compras"
+                    [pageSize]="itemsPerPage_compras" [(page)]="currentPage_compras" [maxSize]="2" [rotate]="true"
+                    #numPages [boundaryLinks]="true" (pageChange)="obtenerStocksCompras()" />
+            </div>
+
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage_compras" bindLabel="label"
+                    [clearable]="false" class="custom-select" [dropdownPosition]="'top'"
+                    (change)="obtenerStocksCompras()">
                 </ng-select>
             </div>
         </div>
