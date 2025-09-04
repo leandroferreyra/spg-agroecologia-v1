@@ -238,4 +238,21 @@ export class StocksComponent implements OnInit, OnDestroy {
     return names;
   }
 
+
+  formatFecha(fechaStr: string): string {
+    if (!fechaStr) return '-';
+    const d = new Date(fechaStr);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+
+    const dia = pad(d.getDate());
+    const mes = pad(d.getMonth() + 1);
+    const año = d.getFullYear();
+
+    const horas = pad(d.getHours());
+    const mins = pad(d.getMinutes());
+    const segs = pad(d.getSeconds());
+
+    return `${dia}-${mes}-${año} ${horas}:${mins}:${segs}`;
+  }
+
 }
