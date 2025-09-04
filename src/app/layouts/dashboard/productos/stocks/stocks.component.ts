@@ -28,23 +28,46 @@ export class StocksComponent implements OnInit, OnDestroy {
 
   @Input() producto: any;
   @Input() rol!: string;
-  stocks: any[] = [];
-
   private subscription: Subscription = new Subscription();
 
-  // Orden, filtro y paginación para compras de proveedor
-  MAX_ITEMS_PER_PAGE = 10;
-  currentPage = 1;
-  last_page = 1;
-  itemsPerPage = this.MAX_ITEMS_PER_PAGE;
-  itemsInPage = this.itemsPerPage;
-  pageSize: number = 0;
-  total_rows: number = 0;
+  stocksCompra: any[] = [];
+  stocksProduccion: any[] = [];
 
-  filtros: any = {
-    'product.uuid': { value: '', op: '=', contiene: false }
+
+  // Orden, filtro y paginación para stock de producción
+  MAX_ITEMS_PER_PAGE_produccion = 10;
+  currentPage_produccion = 1;
+  last_page_produccion = 1;
+  itemsPerPage_produccion = this.MAX_ITEMS_PER_PAGE_produccion;
+  itemsInPage_produccion = this.itemsPerPage_produccion;
+  pageSize_produccion: number = 0;
+  total_rows_produccion: number = 0;
+  filtros_produccion: any = {
+    'product.uuid': { value: '', op: '=', contiene: false },
+    'batch.productions.productionStates.possibleProductionState.name': { value: '', op: '=', contiene: false },
+    'batch.productions.productionStates.datetime_to': { value: '', op: '=', contiene: false },
   };
-  ordenamiento: any = {
+  ordenamiento_produccion: any = {
+  };
+
+  // Orden, filtro y paginación para stock de compras
+  MAX_ITEMS_PER_PAGE_compras = 10;
+  currentPage_compras = 1;
+  last_page_compras = 1;
+  itemsPerPage_compras = this.MAX_ITEMS_PER_PAGE_compras;
+  itemsInPage_compras = this.itemsPerPage_compras;
+  pageSize_compras: number = 0;
+  total_rows_compras: number = 0;
+  filtros_compras: any = {
+    'product.uuid': { value: '', op: '=', contiene: false },
+    'operatorOR': { value: 'OR' },
+    'operatorAND': { value: 'AND' },
+    'batch_id': { value: '', op: '=', contiene: false },
+    'batch.batch_type': { value: 'Compra', op: '=', contiene: false },
+    'batch.purchases.transaction.transactionStates.possibleTransactionState.name': { value: 'Borrador', op: '!=', contiene: false },
+    'batch.purchases.transaction.transactionStates.datetime_to': { value: 'null', op: '=', contiene: false },
+  };
+  ordenamiento_compras: any = {
   };
 
   isSubmit = false;
@@ -65,25 +88,30 @@ export class StocksComponent implements OnInit, OnDestroy {
     if (changes['producto'] && changes['producto'].currentValue) {
       this.spinner.show();
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
-      this.filtros['product.uuid'].value = this.producto.uuid;
-      this.obtenerStocks();
+      this.filtros_produccion['product.uuid'].value = this.producto.uuid;
+      this.filtros_produccion['batch.productions.productionStates.possibleProductionState.name'].value = 'Liberado';
+      this.filtros_produccion['batch.productions.productionStates.datetime_to'].value = null;
+
+      this.filtros_compras['product.uuid'].value = this.producto.uuid;
+      this.obtenerStocksProducciones();
     }
   }
 
-  obtenerStocks() {
+  obtenerStocksProducciones() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["product", "product.measure"];
-    params.paging = this.itemsPerPage;
-    params.page = this.currentPage;
-    params.order_by = this.ordenamiento;
-    params.filters = this.filtros;
+    params.with = ['batch.productions.currentState', 'product.measure', 'location.location.location.location'];
+    params.paging = this.itemsPerPage_produccion;
+    params.page = this.currentPage_produccion;
+    params.order_by = this.ordenamiento_produccion;
+    params.filters = this.filtros_produccion;
 
     this.subscription.add(
       this._indexService.getStocksWithParam(params, this.rol).subscribe({
         next: res => {
-          this.stocks = res.data;
-          this.modificarPaginacion(res);
+          this.stocksProduccion = res.data;
+          console.log("🚀 ~ StocksComponent ~ obtenerStocksProducciones ~ this.stocksProduccion:", this.stocksProduccion)
+          this.modificarPaginacionProduccion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -96,14 +124,67 @@ export class StocksComponent implements OnInit, OnDestroy {
     )
   }
 
-  modificarPaginacion(res: any) {
-    this.total_rows = res.meta.total;
-    this.last_page = res.meta.last_page;
-    if (this.stocks.length <= this.itemsPerPage) {
+  obtenerStocksCompras() {
+    // Inicializamos un objeto vacío para los parámetros
+    const params: any = {};
+    params.with = ["batch", "product.measure", "product.productType", "location.location.location.location"];
+    params.paging = this.itemsPerPage_compras;
+    params.page = this.currentPage_compras;
+    params.order_by = this.ordenamiento_compras;
+    const filters: any[] = [
+      "AND",
+      ["product.uuid", this.filtros_compras["product.uuid"].value],
+      [
+        "OR",
+        ["batch_id", "null"],
+        [
+          "AND",
+          ["batch.batch_type", "Compra"],
+          ["batch.purchases.transaction.transactionStates.possibleTransactionState.name", "!=", "Borrador"],
+          ["batch.purchases.transaction.transactionStates.datetime_to", "null"]
+        ]
+      ]
+    ];
+    params.filters = filters;
+
+    this.subscription.add(
+      this._indexService.getStocksWithParam(params, this.rol).subscribe({
+        next: res => {
+          this.stocksCompra = res.data;
+          console.log("🚀 ~ StocksComponent ~ obtenerStocksCompras ~ this.stocksCompra:", this.stocksCompra)
+          this.modificarPaginacionCompras(res);
+          this._tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  modificarPaginacionProduccion(res: any) {
+    this.total_rows_produccion = res.meta.total;
+    this.last_page_produccion = res.meta.last_page;
+    if (this.stocksProduccion.length <= this.itemsPerPage_produccion) {
       if (res.meta?.current_page === res.meta?.last_page) {
-        this.itemsInPage = this.total_rows;
+        this.itemsInPage_produccion = this.total_rows_produccion;
       } else {
-        this.itemsInPage = this.currentPage * this.itemsPerPage;
+        this.itemsInPage_produccion = this.currentPage_produccion * this.itemsPerPage_produccion;
+      }
+    }
+  }
+
+  modificarPaginacionCompras(res: any) {
+    this.total_rows_compras = res.meta.total;
+    this.last_page_compras = res.meta.last_page;
+    if (this.stocksCompra.length <= this.itemsPerPage_compras) {
+      if (res.meta?.current_page === res.meta?.last_page) {
+        this.itemsInPage_compras = this.total_rows_compras;
+      } else {
+        this.itemsInPage_compras = this.currentPage_compras * this.itemsPerPage_compras;
       }
     }
   }

@@ -295,17 +295,19 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.inicializarFormComponente(data);
     this.obtenerProveedoresByComponente(data);
 
-    const stocksOrigen = data.possible_stocks?.length
-      ? data.possible_stocks
-      : data.stock
-        ? [data.stock]
-        : [];
+    const posibles = data.possible_stocks ?? [];
+    const seleccionado = data.stock ? [data.stock] : [];
 
-    this.stocksByComponente[data.uuid] = stocksOrigen.map((stock: any) => ({
+    // Combinar ambos arrays y evitar duplicados
+    const combinados = [...posibles, ...seleccionado].filter(
+      (stock, index, self) =>
+        index === self.findIndex(s => s.uuid === stock.uuid)
+    );
+
+    this.stocksByComponente[data.uuid] = combinados.map((stock: any) => ({
       ...stock,
       disabled: +stock.available_amount < +this.getCantidadTotal(data)
     }));
-
   }
 
   debeAsignarNumerosDeSerie(data: any, stock: any) {
@@ -349,10 +351,25 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         if (this.expandedRows[componente.uuid]) {
           this.inicializarFormComponente(componente);
           this.obtenerProveedoresByComponente(componente);
-          this.stocksByComponente[componente.uuid] = (componente.possible_stocks || []).map((stock: any) => ({
+
+          const posibles = componente.possible_stocks ?? [];
+          const seleccionado = componente.stock ? [componente.stock] : [];
+
+          // Combinar ambos arrays y evitar duplicados
+          const combinados = [...posibles, ...seleccionado].filter(
+            (stock, index, self) =>
+              index === self.findIndex(s => s.uuid === stock.uuid)
+          );
+
+          this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => ({
             ...stock,
             disabled: +stock.available_amount < +this.getCantidadTotal(componente)
           }));
+
+          // this.stocksByComponente[componente.uuid] = (componente.possible_stocks || []).map((stock: any) => ({
+          //   ...stock,
+          //   disabled: +stock.available_amount < +this.getCantidadTotal(componente)
+          // }));
         }
       }
     });
@@ -366,13 +383,16 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
           this.inicializarFormComponente(componente);
           this.obtenerProveedoresByComponente(componente);
 
-          const stocksOrigen = componente.possible_stocks?.length
-            ? componente.possible_stocks
-            : componente.stock
-              ? [componente.stock]
-              : [];
+          const posibles = componente.possible_stocks ?? [];
+          const seleccionado = componente.stock ? [componente.stock] : [];
 
-          this.stocksByComponente[componente.uuid] = stocksOrigen.map((stock: any) => ({
+          // Combinar ambos arrays y evitar duplicados
+          const combinados = [...posibles, ...seleccionado].filter(
+            (stock, index, self) =>
+              index === self.findIndex(s => s.uuid === stock.uuid)
+          );
+
+          this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => ({
             ...stock,
             disabled: +stock.available_amount < +this.getCantidadTotal(componente)
           }));

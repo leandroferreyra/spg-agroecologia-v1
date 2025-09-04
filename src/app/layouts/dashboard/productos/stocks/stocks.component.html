@@ -19,22 +19,23 @@
         </div>
     </div>
 
-    @if (stocks.length === 0) {
+    @if (stocksProduccion.length === 0) {
     <div
         class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
-        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> El producto no posee stocks</strong></span>
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> El producto no posee stocks de
+                producciones</strong></span>
     </div>
     } @else {
 
     <div class="row mb-2">
         <div class="col-6">
-            <span *ngIf="stocks && stocks.length > 0" class="float-md-start color-gris">
-                Página: {{ currentPage}}/{{numPages.pageCount }}
+            <span *ngIf="stocksProduccion && stocksProduccion.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage_produccion}}/{{numPages.pageCount }}
             </span>
         </div>
         <div class="col-6" style="text-align: right;">
-            <span *ngIf="stocks && stocks.length > 0" class="float-md-end color-gris">
-                Ítems: {{itemsInPage}}/{{ total_rows }}
+            <span *ngIf="stocksProduccion && stocksProduccion.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage_produccion}}/{{ total_rows_produccion }}
             </span>
         </div>
     </div>
@@ -57,8 +58,7 @@
                 </tr>
             </thead>
             <tbody>
-                @for(data of stocks | slice: pageSize | slice: 0:itemsPerPage ; let index = $index; track
-                data.uuid) {
+                @for(data of stocksProduccion | slice: pageSize_produccion | slice: 0:itemsPerPage_produccion ; let index = $index; track data.uuid) {
                 <tr>
                     <td class="whitespace-nowrap">{{ data.product.name}} </td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
@@ -67,35 +67,21 @@
             </tbody>
         </table>
 
-        <div class="row mt-4">
-            <div class="col">
-                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                    [boundaryLinks]="true" (pageChange)="obtenerStocks()" />
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows_produccion"
+                    [pageSize]="itemsPerPage_produccion" [(page)]="currentPage_produccion" [maxSize]="2" [rotate]="true" #numPages
+                    [boundaryLinks]="true" (pageChange)="obtenerStocksProducciones()" />
             </div>
 
-            <div class="col">
-                <div class="row align-items-center float-md-end">
-                    <div class="col-auto">
-                        <label for="paginacion">Ítems por página:</label>
-                    </div>
-                    <div class="col-auto">
-                        <select id="paginacion" class="form-control" (change)="obtenerStocks()"
-                            [(ngModel)]="itemsPerPage">
-                            <option value=5>5</option>
-                            <option value=10>10</option>
-                            <option value=20>20</option>
-                            <option value=50>50</option>
-                            <option value=100>100</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage_produccion" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerStocksProducciones()">
+                </ng-select>
             </div>
-
         </div>
     </div>
-
-
     }
 
 </div>
