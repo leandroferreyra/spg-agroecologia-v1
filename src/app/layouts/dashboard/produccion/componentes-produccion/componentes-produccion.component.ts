@@ -317,6 +317,16 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.isEditing[data.uuid] = true;
     this.componenteForms[data.uuid].get('supplier_uuid')?.enable();
     this.componenteForms[data.uuid].get('note')?.enable();
+    this.deshabilitarOtrasEdiciones(data);
+  }
+
+  deshabilitarOtrasEdiciones(data: any) {
+    this.componentes.forEach(element => {
+      if (element.uuid !== data.uuid) {
+        this.inicializarFormComponente(element);
+        this.isEditing[element.uuid] = false;
+      }
+    });
   }
 
   cancelarEdicion(data: any) {
