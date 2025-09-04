@@ -57,6 +57,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       this._produccionService.showTrazabilidadByProduccion(this.produccion.uuid, this.rol).subscribe({
         next: res => {
           this.trazado = this.mapProduccionToTraceNode(res.data);
+          this.expanded.add(this.produccion.uuid);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -184,7 +185,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     });
 
     return {
-      id: `produccion-${prod.uuid}`,
+      id: `${prod.uuid}`,
       label: `📦 Producto: ${prod.product?.name ?? '(sin nombre)'}`,
       children
     };
