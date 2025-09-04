@@ -127,7 +127,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       },
       {
         id: 'usuario-liberacion',
-        label: ` Usuario liberación: ${prod.creator?.user_name ?? '-'}`,
+        label: ` Usuario liberación: ${prod.current_state?.creator?.user_name ?? '-'}`,
       },
       {
         id: 'fecha-liberacion',
