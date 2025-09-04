@@ -154,7 +154,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
           : fc.origin === 'Lote' ? (fc.stock?.batch?.batch_identification ?? 'Lote único')
             : fc.origin === 'Provisto por terceros' ? (
               fc.supplier?.person?.human
-                ? `Provisto por ${fc.supplier.person.human.lastname} ${fc.supplier.person.human.firstname}`
+                ? `Provisto por ${fc.supplier.person.human.firstname} ${fc.supplier.person.human.lastname}`
                 : fc.supplier?.person?.legal_entity
                   ? `Provisto por ${fc.supplier.person.legal_entity.company_name}`
                   : 'Provisto por tercero'
