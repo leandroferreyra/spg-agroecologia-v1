@@ -98,8 +98,8 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
 
   mapProduccionToTraceNode(prod: any): TraceNode {
     const cantidad = +prod.quantity;
-    const esEntero = prod.product?.measure?.is_integer;
-    const cantidadFmt = esEntero === 1 ? cantidad.toString() : cantidad.toFixed(2);
+    const esEntero = prod.product?.measure?.is_integer === 1;
+    const cantidadFmt = esEntero ? cantidad.toString() : cantidad.toFixed(2);
     const serialesRaiz = prod.batch?.stocks?.[0]?.product_instances?.map((pi: any) => pi.serial_number) ?? [];
 
     const frozen = (prod.frozen_components ?? []).sort((a: any, b: any) => a.order - b.order);

@@ -213,7 +213,7 @@
                                                         <ng-select [items]="stock.product_instances"
                                                             bindLabel="serial_number" clearAllText="Limpiar"
                                                             style="width: 100%" [virtualScroll]="true"
-                                                            notFoundText="No hay números de serie"
+                                                            notFoundText="No hay números de serie" [appendTo]="'body'"
                                                             class="w-1/3 min-w-[200px]"
                                                             [formControl]="getFormControl(data.uuid, 'product_instances')"
                                                             [selectOnTab]="true" multiple="true" [closeOnSelect]="false"
