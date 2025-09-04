@@ -299,7 +299,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     const seleccionado = data.stock ? [data.stock] : [];
 
     // Combinar ambos arrays y evitar duplicados
-    const combinados = [...posibles, ...seleccionado].filter(
+    const combinados = [...seleccionado, ...posibles].filter(
       (stock, index, self) =>
         index === self.findIndex(s => s.uuid === stock.uuid)
     );
@@ -356,7 +356,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
           const seleccionado = componente.stock ? [componente.stock] : [];
 
           // Combinar ambos arrays y evitar duplicados
-          const combinados = [...posibles, ...seleccionado].filter(
+          const combinados = [...seleccionado, ...posibles].filter(
             (stock, index, self) =>
               index === self.findIndex(s => s.uuid === stock.uuid)
           );
@@ -382,7 +382,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
           const seleccionado = componente.stock ? [componente.stock] : [];
 
           // Combinar ambos arrays y evitar duplicados
-          const combinados = [...posibles, ...seleccionado].filter(
+          const combinados = [...seleccionado, ...posibles].filter(
             (stock, index, self) =>
               index === self.findIndex(s => s.uuid === stock.uuid)
           );
