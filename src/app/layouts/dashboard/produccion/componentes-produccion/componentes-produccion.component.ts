@@ -104,7 +104,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
   ngOnDestroy(): void {
-
+    this.subscription.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -365,11 +365,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             ...stock,
             disabled: +stock.available_amount < +this.getCantidadTotal(componente)
           }));
-
-          // this.stocksByComponente[componente.uuid] = (componente.possible_stocks || []).map((stock: any) => ({
-          //   ...stock,
-          //   disabled: +stock.available_amount < +this.getCantidadTotal(componente)
-          // }));
         }
       }
     });

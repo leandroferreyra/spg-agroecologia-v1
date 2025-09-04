@@ -88,7 +88,7 @@ export class IndexService {
             (typeof filter.value === 'string' || Array.isArray(filter.value) ? filter.value.length > 0 : true);
 
           if (isValid) {
-            if (key === 'operator') {
+            if (key === 'operator' || key === 'operatorOR' || key === 'operatorAND') {
               params = params.append(`filters[${filterIndex}]`, `${filter.value}`);
             } else {
               params = params.append(`filters[${filterIndex}][0]`, key);

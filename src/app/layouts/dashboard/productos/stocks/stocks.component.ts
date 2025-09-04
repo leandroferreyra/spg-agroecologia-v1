@@ -44,8 +44,8 @@ export class StocksComponent implements OnInit, OnDestroy {
   total_rows_produccion: number = 0;
   filtros_produccion: any = {
     'product.uuid': { value: '', op: '=', contiene: false },
-    'batch.productions.productionStates.possibleProductionState.name': { value: '', op: '=', contiene: false },
-    'batch.productions.productionStates.datetime_to': { value: '', op: '=', contiene: false },
+    'batch.productions.productionStates.possibleProductionState.name': { value: 'Liberado', op: '=', contiene: false },
+    'batch.productions.productionStates.datetime_to': { value: 'null', op: '=', contiene: false },
   };
   ordenamiento_produccion: any = {
   };
@@ -59,13 +59,7 @@ export class StocksComponent implements OnInit, OnDestroy {
   pageSize_compras: number = 0;
   total_rows_compras: number = 0;
   filtros_compras: any = {
-    'product.uuid': { value: '', op: '=', contiene: false },
-    'operatorOR': { value: 'OR' },
-    'operatorAND': { value: 'AND' },
-    'batch_id': { value: '', op: '=', contiene: false },
-    'batch.batch_type': { value: 'Compra', op: '=', contiene: false },
-    'batch.purchases.transaction.transactionStates.possibleTransactionState.name': { value: 'Borrador', op: '!=', contiene: false },
-    'batch.purchases.transaction.transactionStates.datetime_to': { value: 'null', op: '=', contiene: false },
+    'product.uuid': { value: '', op: '=', contiene: false }
   };
   ordenamiento_compras: any = {
   };
@@ -89,11 +83,9 @@ export class StocksComponent implements OnInit, OnDestroy {
       this.spinner.show();
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros_produccion['product.uuid'].value = this.producto.uuid;
-      this.filtros_produccion['batch.productions.productionStates.possibleProductionState.name'].value = 'Liberado';
-      this.filtros_produccion['batch.productions.productionStates.datetime_to'].value = null;
-
       this.filtros_compras['product.uuid'].value = this.producto.uuid;
       this.obtenerStocksProducciones();
+      this.obtenerStocksCompras();
     }
   }
 
@@ -131,21 +123,7 @@ export class StocksComponent implements OnInit, OnDestroy {
     params.paging = this.itemsPerPage_compras;
     params.page = this.currentPage_compras;
     params.order_by = this.ordenamiento_compras;
-    const filters: any[] = [
-      "AND",
-      ["product.uuid", this.filtros_compras["product.uuid"].value],
-      [
-        "OR",
-        ["batch_id", "null"],
-        [
-          "AND",
-          ["batch.batch_type", "Compra"],
-          ["batch.purchases.transaction.transactionStates.possibleTransactionState.name", "!=", "Borrador"],
-          ["batch.purchases.transaction.transactionStates.datetime_to", "null"]
-        ]
-      ]
-    ];
-    params.filters = filters;
+    params.filters = this.armadoFiltroComprasManual();
 
     this.subscription.add(
       this._indexService.getStocksWithParam(params, this.rol).subscribe({
@@ -163,6 +141,45 @@ export class StocksComponent implements OnInit, OnDestroy {
         }
       })
     )
+  }
+
+  armadoFiltroComprasManual() {
+    const filters = {
+      // Nivel 0: raíz
+      'filters[0]': 'AND',
+
+      // Nivel 1: condición simple → ["product.uuid", valor]
+      'filters[1][0]': 'product.uuid',
+      'filters[1][1]': '=',
+      'filters[1][2]': this.filtros_compras['product.uuid'].value,
+
+      // Nivel 2: operador OR
+      'filters[2]': 'OR',
+
+      // Nivel 3: condición → ["batch_id", "null"]
+      'filters[3][0]': 'batch_id',
+      'filters[3][1]': '=',
+      'filters[3][2]': 'null',
+
+      // Nivel 4: operador AND (interno)
+      'filters[4]': 'AND',
+
+      // Nivel 5: ["batch.batch_type", "Compra"]
+      'filters[5][0]': 'batch.batch_type',
+      'filters[5][1]': '=',
+      'filters[5][2]': 'Compra',
+
+      // Nivel 6: ["...possibleTransactionState.name", "!=", "Borrador"]
+      'filters[6][0]': 'batch.purchases.transaction.transactionStates.possibleTransactionState.name',
+      'filters[6][1]': '!=',
+      'filters[6][2]': 'Borrador',
+
+      // Nivel 7: ["...datetime_to", "null"]
+      'filters[7][0]': 'batch.purchases.transaction.transactionStates.datetime_to',
+      'filters[7][1]': '=',
+      'filters[7][2]': 'null',
+    };
+    return filters;
   }
 
   modificarPaginacionProduccion(res: any) {
