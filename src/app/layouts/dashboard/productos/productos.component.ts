@@ -399,7 +399,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   mostrarCantidad(data: any, stock: string) {
-    if (data.measure?.is_integer === 1) {
+    if (data?.measure?.is_integer === 1) {
       return (+stock)?.toFixed(0);
     } else {
       return (+stock)?.toFixed(2);

@@ -5,7 +5,7 @@
             <span>Mostrar agotados</span>
             <label class="w-12 h-6 relative">
                 <input type="checkbox" class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                    id="custom_switch_checkbox2" />
+                    id="custom_switch_checkbox2" [(ngModel)]="mostrarAgotados" />
                 <span for="custom_switch_checkbox2"
                     class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                 </span>
@@ -72,7 +72,8 @@
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.observed_amount) }} </td>
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.consumed_amount) }} </td>
                     <td class="whitespace-nowrap"> {{ getLocation(data).join(' - ') }} </td>
-                    <td class="whitespace-nowrap"> {{ formatFecha(data.batch?.productions[0]?.current_state?.datetime_from) }} </td>
+                    <td class="whitespace-nowrap"> {{
+                        formatFecha(data.batch?.productions[0]?.current_state?.datetime_from) }} </td>
                 </tr>
                 }
             </tbody>
@@ -136,7 +137,7 @@
                     <th rowspan="2">Lote</th>
                     <th colspan="6" class="text-center">Stock</th>
                     <th rowspan="2">Ubicación</th>
-                    <th rowspan="2">Fecha de producción</th>
+                    <th rowspan="2">Fecha de compra</th>
                 </tr>
                 <tr>
                     <th>Inicial</th>
@@ -150,6 +151,7 @@
             <tbody>
                 @for(data of stocksCompra | slice: pageSize_compras | slice: 0:itemsPerPage_compras ; let
                 index = $index; track data.uuid) {
+                @if(mostrarAgotados || !isAgotado(data)) {
                 <tr>
                     <td class="whitespace-nowrap">{{ getLote(data) }} </td>
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.initial_amount) }} </td>
@@ -159,8 +161,9 @@
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.observed_amount) }} </td>
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.consumed_amount) }} </td>
                     <td class="whitespace-nowrap"> {{ getLocation(data).join(' - ') }} </td>
-                    <td class="whitespace-nowrap"> {{ formatFecha(data.batch?.purchases[0]?.transaction?.transaction_datetime) }} </td>
+                    <td class="whitespace-nowrap"> {{ formatFecha(data.batch?.created_at) }} </td>
                 </tr>
+                }
                 }
             </tbody>
         </table>

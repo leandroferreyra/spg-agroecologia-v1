@@ -32,6 +32,7 @@ export class StocksComponent implements OnInit, OnDestroy {
 
   stocksCompra: any[] = [];
   stocksProduccion: any[] = [];
+  mostrarAgotados: boolean = true;
 
 
   // Orden, filtro y paginación para stock de producción
@@ -67,15 +68,14 @@ export class StocksComponent implements OnInit, OnDestroy {
   isSubmit = false;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _tokenService: TokenService
-  ) {
+    private _tokenService: TokenService) {
+      
   }
 
   ngOnInit(): void {
   }
 
   ngOnDestroy(): void {
-
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -85,12 +85,11 @@ export class StocksComponent implements OnInit, OnDestroy {
       this.filtros_produccion['product.uuid'].value = this.producto.uuid;
       this.filtros_compras['product.uuid'].value = this.producto.uuid;
       this.obtenerStocksProducciones();
-      // this.obtenerStocksCompras();
+      this.obtenerStocksCompras();
     }
   }
 
   obtenerStocksProducciones() {
-    // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = ['batch.productions.currentState', 'product.productType', 'product.measure', 'location.location.location.location'];
     params.paging = this.itemsPerPage_produccion;
@@ -102,7 +101,6 @@ export class StocksComponent implements OnInit, OnDestroy {
       this._indexService.getStocksWithParam(params, this.rol).subscribe({
         next: res => {
           this.stocksProduccion = res.data;
-          console.log("🚀 ~ StocksComponent ~ obtenerStocksProducciones ~ this.stocksProduccion:", this.stocksProduccion)
           this.modificarPaginacionProduccion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -117,19 +115,17 @@ export class StocksComponent implements OnInit, OnDestroy {
   }
 
   obtenerStocksCompras() {
-    // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = ["batch", "product.measure", "product.productType", "location.location.location.location"];
     params.paging = this.itemsPerPage_compras;
     params.page = this.currentPage_compras;
     params.order_by = this.ordenamiento_compras;
-    params.filters = this.armadoFiltroComprasManual();
+    params.filters = this.filtros_compras;
 
     this.subscription.add(
-      this._indexService.getStocksWithParam(params, this.rol).subscribe({
+      this._indexService.getStocksForComprasWithParam(params, this.rol).subscribe({
         next: res => {
           this.stocksCompra = res.data;
-          console.log("🚀 ~ StocksComponent ~ obtenerStocksCompras ~ this.stocksCompra:", this.stocksCompra)
           this.modificarPaginacionCompras(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -143,43 +139,8 @@ export class StocksComponent implements OnInit, OnDestroy {
     )
   }
 
-  armadoFiltroComprasManual() {
-    const filters = {
-      // Nivel 0: raíz
-      'filters[0]': 'AND',
-
-      // Nivel 1: condición simple → ["product.uuid", valor]
-      'filters[1][0]': 'product.uuid',
-      'filters[1][1]': '=',
-      'filters[1][2]': this.filtros_compras['product.uuid'].value,
-
-      // Nivel 2: operador OR
-      'filters[2]': 'OR',
-
-      // Nivel 3: condición → ["batch_id", "null"]
-      'filters[3][0]': 'batch_id',
-      'filters[3][1]': '=',
-      'filters[3][2]': 'null',
-
-      // Nivel 4: operador AND (interno)
-      'filters[4]': 'AND',
-
-      // Nivel 5: ["batch.batch_type", "Compra"]
-      'filters[5][0]': 'batch.batch_type',
-      'filters[5][1]': '=',
-      'filters[5][2]': 'Compra',
-
-      // Nivel 6: ["...possibleTransactionState.name", "!=", "Borrador"]
-      'filters[6][0]': 'batch.purchases.transaction.transactionStates.possibleTransactionState.name',
-      'filters[6][1]': '!=',
-      'filters[6][2]': 'Borrador',
-
-      // Nivel 7: ["...datetime_to", "null"]
-      'filters[7][0]': 'batch.purchases.transaction.transactionStates.datetime_to',
-      'filters[7][1]': '=',
-      'filters[7][2]': 'null',
-    };
-    return filters;
+  isAgotado(data: any) {
+    return data.available_amount === 0 && data.reserved_amount === 0 && data.samples_amount === 0 && data.observed_amount === 0;
   }
 
   modificarPaginacionProduccion(res: any) {
@@ -237,7 +198,6 @@ export class StocksComponent implements OnInit, OnDestroy {
     names.push(data.location.name);
     return names;
   }
-
 
   formatFecha(fechaStr: string): string {
     if (!fechaStr) return '-';
