@@ -161,7 +161,7 @@
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.observed_amount) }} </td>
                     <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.consumed_amount) }} </td>
                     <td class="whitespace-nowrap"> {{ getLocation(data).join(' - ') }} </td>
-                    <td class="whitespace-nowrap"> {{ formatFecha(data.batch?.created_at) }} </td>
+                    <td class="whitespace-nowrap"> {{ formatFecha(data.batch?.purchases[0]?.transaction?.transaction_datetime) }} </td>
                 </tr>
                 }
                 }

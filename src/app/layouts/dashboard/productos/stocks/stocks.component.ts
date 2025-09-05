@@ -116,7 +116,7 @@ export class StocksComponent implements OnInit, OnDestroy {
 
   obtenerStocksCompras() {
     const params: any = {};
-    params.with = ["batch", "product.measure", "product.productType", "location.location.location.location"];
+    params.with = ["batch.purchases.transaction", "product.measure", "product.productType", "location.location.location.location"];
     params.paging = this.itemsPerPage_compras;
     params.page = this.currentPage_compras;
     params.order_by = this.ordenamiento_compras;
