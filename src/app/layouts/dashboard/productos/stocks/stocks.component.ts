@@ -69,7 +69,7 @@ export class StocksComponent implements OnInit, OnDestroy {
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService) {
-      
+
   }
 
   ngOnInit(): void {
@@ -140,7 +140,7 @@ export class StocksComponent implements OnInit, OnDestroy {
   }
 
   isAgotado(data: any) {
-    return data.available_amount === 0 && data.reserved_amount === 0 && data.samples_amount === 0 && data.observed_amount === 0;
+    return +data.available_amount === 0 && +data.reserved_amount === 0 && +data.samples_amount === 0 && +data.observed_amount === 0;
   }
 
   modificarPaginacionProduccion(res: any) {
