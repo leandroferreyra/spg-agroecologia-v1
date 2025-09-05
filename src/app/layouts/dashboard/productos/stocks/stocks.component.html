@@ -154,12 +154,12 @@
                 @if(mostrarAgotados || !isAgotado(data)) {
                 <tr>
                     <td class="whitespace-nowrap">{{ getLote(data) }} </td>
-                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.initial_amount) }} </td>
-                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.available_amount) }} </td>
-                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.reserved_amount) }} </td>
-                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.samples_amount) }} </td>
-                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.observed_amount) }} </td>
-                    <td class="whitespace-nowrap">{{ getStock(data, data.product?.stock_data?.consumed_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.initial_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.available_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.reserved_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.samples_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.observed_amount) }} </td>
+                    <td class="whitespace-nowrap">{{ getStock(data, data.consumed_amount) }} </td>
                     <td class="whitespace-nowrap"> {{ getLocation(data).join(' - ') }} </td>
                     <td class="whitespace-nowrap"> {{ formatFecha(data.batch?.purchases[0]?.transaction?.transaction_datetime) }} </td>
                 </tr>
