@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { AnyARecord } from 'dns';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
 import { IndexService } from 'src/app/core/services/index.service';
 import { ProduccionService } from 'src/app/core/services/produccion.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { IconExpandAllComponent2 } from 'src/app/shared/icon/icon-expand-all2';
 
 export interface TraceNode {
   id: string;
@@ -16,7 +19,7 @@ export interface TraceNode {
 @Component({
   selector: 'app-trazabilidad',
   standalone: true,
-  imports: [CommonModule, NgxSpinnerModule],
+  imports: [CommonModule, NgxSpinnerModule, IconExpandAllComponent2, NgxTippyModule],
   templateUrl: './trazabilidad.component.html',
   styleUrl: './trazabilidad.component.css'
 })
@@ -27,6 +30,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   trazado: any;
+  idsToExpand: string[] = [];
 
   expanded = new Set<string>();
 
@@ -57,6 +61,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       this._produccionService.showTrazabilidadByProduccion(this.produccion.uuid, this.rol).subscribe({
         next: res => {
           this.trazado = this.mapProduccionToTraceNode(res.data);
+          this.guardarIds(res.data);
           this.expanded.add(this.produccion.uuid);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -67,6 +72,14 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
           this.spinner.hide();
         }
       })
+    )
+  }
+
+  guardarIds(data: any) {
+    this.idsToExpand.push(this.produccion.uuid);
+    this.idsToExpand.push(
+      ...(data?.frozen_components ?? [])
+        .map((f: any) => f.uuid)
     )
   }
 
@@ -168,7 +181,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       const totalFmt = esEntero ? cantidadTotal.toString() : cantidadTotal.toFixed(2);
 
       const nodoComponente: TraceNode = {
-        id: `frozen-${fc.uuid ?? i}`,
+        id: `${fc.uuid ?? i}`,
         label: `🧩 Componente: ${fc.name ?? '(sin nombre)'}`,
         children: [
           { id: `origen-${i}`, label: ` Origen: ${origen}` },
@@ -189,9 +202,14 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       label: `📦 Producto: ${prod.product?.name ?? '(sin nombre)'}`,
       children
     };
+  }
 
-
-
+  expandirTodos() {
+    this.idsToExpand.forEach(element => {
+      if (!this.expanded.has(element)) {
+        this.expanded.add(element);
+      }
+    });
   }
 
 }
