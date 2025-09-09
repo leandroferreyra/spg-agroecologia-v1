@@ -76,6 +76,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
   showFilter: boolean = false;
   filtroTipoPersona: string = 'todos';
   filtroSimpleName: string = '';
+  filtroSimpleContiene: boolean = true;
 
   // Orden y filtro
   filtros: any = {
@@ -781,6 +782,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   changeTipoPersona() {
     this.filtroSimpleName = '';
+    this.filtroSimpleContiene = true;
     this.filtros.operator.value = '';
     this.filtros['person.human.firstname'].value = '';
     this.filtros['person.human.lastname'].value = '';
@@ -911,6 +913,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.filtros['person.human.document_number'].value = '';
     this.filtros['person.legalEntity.uuid'].value = '';
     this.filtros['person.legalEntity.cuit'].value = '';
+
+    this.filtros['person.human.firstname'].contiene = this.filtroSimpleContiene;
+    this.filtros['person.human.lastname'].contiene = this.filtroSimpleContiene;
+    this.filtros['person.legalEntity.company_name'].contiene = this.filtroSimpleContiene;
+
     if (this.filtroSimpleName) {
       this.filtros['person.human.firstname'].value = this.filtroSimpleName;
       this.filtros['person.human.lastname'].value = this.filtroSimpleName;
@@ -927,6 +934,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   obtenerClientesPorFiltroAvanzado() {
     this.filtroSimpleName = '';
+    this.filtroSimpleContiene = true;
     if (this.filtroTipoPersona === 'todos') {
       if (this.filtros['person.legalEntity.cuit'].value) { // Si buscó por cuit y es todos se asigna el OR
         this.filtros['person.human.cuit'].value = this.filtros['person.legalEntity.cuit'].value;

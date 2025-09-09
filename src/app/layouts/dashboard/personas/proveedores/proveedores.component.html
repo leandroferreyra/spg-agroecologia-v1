@@ -110,9 +110,9 @@
                         <div
                             class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
                             <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                                <input type="checkbox" (change)="obtenerProveedores();"
+                                <input type="checkbox" (change)="obtenerProveedoresPorFiltroSimple();"
                                     class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                                    id="contiene" [(ngModel)]="filtros['person.human.firstname'].contiene" />
+                                    id="contiene" [(ngModel)]="filtroSimpleContiene" />
                                 <span
                                     class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
                             </label>

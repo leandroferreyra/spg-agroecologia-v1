@@ -75,6 +75,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   // Orden y filtro para datos listado proveedores.
   filtroTipoPersona: string = 'todos';
   filtroSimpleName: string = '';
+  filtroSimpleContiene: boolean = true;
   // Orden y filtro
   filtros: any = {
     'operator': { value: '' },
@@ -813,6 +814,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   changeTipoPersona() {
     this.filtroSimpleName = '';
+    this.filtroSimpleContiene = true;
     if (this.inputCuitRef) {
       this.inputCuitRef.value = '';
     }
@@ -949,6 +951,10 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.filtros['person.legalEntity.uuid'].value = '';
     this.filtros['person.legalEntity.cuit'].value = '';
 
+    this.filtros['person.human.firstname'].contiene = this.filtroSimpleContiene;
+    this.filtros['person.human.lastname'].contiene = this.filtroSimpleContiene;
+    this.filtros['person.legalEntity.company_name'].contiene = this.filtroSimpleContiene;
+
     if (this.filtroSimpleName) {
       this.filtros['person.human.firstname'].value = this.filtroSimpleName;
       this.filtros['person.human.lastname'].value = this.filtroSimpleName;
@@ -965,6 +971,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   obtenerProveedoresPorFiltroAvanzado() {
     this.filtroSimpleName = '';
+    this.filtroSimpleContiene = true;
     if (this.filtroTipoPersona === 'todos') {
       if (this.filtros['person.legalEntity.cuit'].value) { // Si buscó por cuit y es todos se asigna el OR
         this.filtros['person.human.cuit'].value = this.filtros['person.legalEntity.cuit'].value;
