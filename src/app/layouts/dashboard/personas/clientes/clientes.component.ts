@@ -91,7 +91,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
     'person.legalEntity.cuit': { value: '', op: 'LIKE', contiene: true },
   };
   ordenamiento: any = {
-
+    'person.human.lastname': 'asc',
+    'person.human.firstname': 'asc',
+    'person.legalEntity.company_name': 'asc',
   };
 
   //Paginación
