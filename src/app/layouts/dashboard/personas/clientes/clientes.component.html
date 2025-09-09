@@ -749,18 +749,68 @@
                         <!-- Campos en una sola fila -->
                         <div class="d-flex flex-wrap align-items-center gap-3">
                             @if(this.filtroTipoPersona === 'fisica' || this.filtroTipoPersona === 'todos') {
-                            <div class="flex-grow-1">
+
+                            <!-- <div class="flex-grow-1">
                                 <label for="nombre">Nombre</label>
                                 <input type="text" id="nombre" class="form-control"
                                     [(ngModel)]="filtros['person.human.firstname'].value"
                                     (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()">
+                            </div> -->
+
+                            <div style="width: 100%;">
+                                <label for="nombre">Nombre</label>
+                                <div class="flex">
+                                    <input id="nombre" type="text" placeholder=""
+                                        [(ngModel)]="filtros['person.human.firstname'].value"
+                                        (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()"
+                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
+                                    <div
+                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                            <input type="checkbox"
+                                                (change)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()"
+                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                                id="custom_switch_checkbox2"
+                                                [(ngModel)]="filtros['person.human.firstname'].contiene" />
+                                            <span
+                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                                        </label>
+                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex-grow-1">
+
+                            <!-- <div class="flex-grow-1">
                                 <label for="apellido">Apellido</label>
                                 <input type="text" id="apellido" class="form-control"
                                     [(ngModel)]="filtros['person.human.lastname'].value"
                                     (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()">
+                            </div> -->
+
+                            <div style="width: 100%;">
+                                <label for="apellido">Apellido</label>
+                                <div class="flex">
+                                    <input id="apellido" type="text" placeholder=""
+                                        [(ngModel)]="filtros['person.human.lastname'].value"
+                                        (input)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()"
+                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none" />
+                                    <div
+                                        class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                                        <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                                            <input type="checkbox"
+                                                (change)="obtenerClientesPorFiltroAvanzado(); buildActiveFilters()"
+                                                class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                                                id="custom_switch_checkbox2"
+                                                [(ngModel)]="filtros['person.human.lastname'].contiene" />
+                                            <span
+                                                class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                                        </label>
+                                        <span class="text-xs text-gray-600 ml-1">Contiene</span>
+                                    </div>
+                                </div>
                             </div>
+
+
                             <div class="flex-grow-1">
                                 <label for="dni">DNI</label>
                                 <input type="text" id="dni" class="form-control"
