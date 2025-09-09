@@ -974,6 +974,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this.filtros['person.legalEntity.company_name'].value = '';
       this.filtros.operator.value = '';
     }
+    this.activeFilters = [];
     this.obtenerProveedores();
   }
 
@@ -1033,15 +1034,16 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       );
     }
 
-    pushIf('person.human.firstname', 'Nombre', this.filtros['person.human.firstname'].value);
-    pushIf('person.human.lastname', 'Apellido', this.filtros['person.human.lastname'].value);
+
+    pushIf('person.human.firstname', 'Nombre', this.filtros['person.human.firstname'].value, this.filtros['person.human.firstname'].contiene ? ' (contiene)' : '');
+    pushIf('person.human.lastname', 'Apellido', this.filtros['person.human.lastname'].value, this.filtros['person.human.lastname'].contiene ? ' (contiene)' : '');
     pushIf('person.human.document_number', 'Documento', this.filtros['person.human.document_number'].value);
     if (this.filtroTipoPersona && this.filtroTipoPersona !== 'fisica') {
       pushIf('person.legalEntity.cuit', 'Cuit', this.filtros['person.legalEntity.cuit'].value);
     } else {
       pushIf('person.human.cuit', 'Cuit', this.filtros['person.human.cuit'].value);
     }
-    pushIf('person.legalEntity.company_name', 'Razón social', this.filtros['person.legalEntity.company_name'].value);
+    pushIf('person.legalEntity.company_name', 'Razón social', this.filtros['person.legalEntity.company_name'].value, this.filtros['person.legalEntity.company_name'].contiene ? ' (contiene)' : '');
     pushIf('batch_prefix', 'Sigla', this.filtros['batch_prefix'].value);
 
     this.activeFilters = list;
