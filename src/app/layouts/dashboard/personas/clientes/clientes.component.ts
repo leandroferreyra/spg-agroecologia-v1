@@ -302,6 +302,9 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.filtros['person.legalEntity.uuid'].value = '';
     this.filtros['person.legalEntity.company_name'].value = '';
     this.filtros['person.legalEntity.cuit'].value = '';
+    this.filtros['person.human.firstname'].contiene = true;
+    this.filtros['person.human.lastname'].contiene = true;
+    this.filtros['person.legalEntity.company_name'].contiene = true;
     this.activeFilters = [];
     this.obtenerClientes();
   }

@@ -805,6 +805,11 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.filtros['person.legalEntity.cuit'].value = '';
     this.filtros['batch_prefix'].value = '';
     this.filtros.operator.value = '';
+
+    this.filtros['person.human.firstname'].contiene = true;
+    this.filtros['person.human.lastname'].contiene = true;
+    this.filtros['person.legalEntity.company_name'].contiene = true;
+
     if (this.inputCuitRef) {
       this.inputCuitRef.value = '';
     }
