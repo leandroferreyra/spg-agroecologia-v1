@@ -124,7 +124,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
       params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances",
-        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement", "possibleStocks.productInstances"];
+        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement.currentState", "possibleStocks.productInstances"];
     } else {
       params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances",
         "possibleStocks.batch", "possibleStocks.location.location.location.location", "product", "possibleStocks.productInstances"];
