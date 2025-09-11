@@ -35,8 +35,8 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ParametrosIndex } from 'src/app/core/models/request/parametrosIndex';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { Title } from '@angular/platform-browser';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 
 @Component({
   selector: 'app-proveedores',
@@ -44,8 +44,7 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, IconPencilComponent
-  ],
+    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, IconPencilComponent, IconInfoCircleComponent],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.css',
   animations: [toggleAnimation]
@@ -238,6 +237,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this._indexService.getProveedoresWithParam(this.parametrosProvedores, this.actual_role).subscribe({
         next: res => {
           this.proveedores = res.data;
+          console.log("🚀 ~ ProveedoresComponent ~ obtenerProveedores ~ this.proveedores:", this.proveedores)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -314,6 +314,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       documento: new FormControl({ value: proveedor?.person?.human?.document_number, disabled: true }, [Validators.required]),
       tipoDocumento: new FormControl({ value: proveedor?.person?.human?.document_type?.uuid, disabled: true }, [Validators.required]),
       cuit: new FormControl({ value: this.isHuman ? proveedor?.person?.human?.cuit : proveedor?.person?.legal_entity?.cuit, disabled: true }, [Validators.required]),
+      informalCuit: new FormControl({ value: proveedor?.person?.informal_cuit, disabled: true }, []),
       razon: new FormControl({ value: proveedor?.person?.legal_entity?.company_name, disabled: true }, [Validators.required]),
       sigla: new FormControl({ value: proveedor?.batch_prefix, disabled: true }, [Validators.required]),
       estado: new FormControl({ value: proveedor?.person?.current_state?.state?.uuid, disabled: true }, []),
@@ -1075,6 +1076,75 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
     this.buildActiveFilters();
     this.obtenerProveedoresPorFiltroAvanzado();
+  }
+
+  checkInvalidCuit(cuit: string, informalCuit: number): boolean {
+    if (!cuit) return true;
+
+    const prefix = cuit.substring(0, 2);
+    const invalidPrefixes = ['20', '23', '24', '27', '30', '33', '34'];
+
+    // inválido si el prefijo no está en la lista o si está marcado como informal
+    return !invalidPrefixes.includes(prefix) || informalCuit === 1;
+  }
+
+  checkInvalidNombre(nombre: string, apellido: string): boolean {
+    if (!nombre) return true;
+
+    // iguales
+    if (nombre.trim().toLowerCase() === apellido.trim().toLowerCase()) {
+      return true;
+    }
+
+    // contienen * o @
+    if (nombre.includes('*') || nombre.includes('@')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  checkInvalidApellido(nombre: string, apellido: string): boolean {
+    if (!apellido) return true;
+
+    // iguales
+    if (nombre.trim().toLowerCase() === apellido.trim().toLowerCase()) {
+      return true;
+    }
+
+    // contienen * o @
+    if (apellido.includes('*') || apellido.includes('@')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  checkInvalidRazonSocial(razon: string): boolean {
+    if (!razon) return true;
+
+    // contiene * o @
+    if (razon.includes('*') || razon.includes('@')) return true;
+
+    const palabras = razon.trim().split(/\s+/);
+    if (palabras.length > 1) {
+      const primera = palabras[0].toLowerCase();
+      const repetidas = palabras.filter(p => p.toLowerCase() === primera).length;
+      if (repetidas > 1) return true;
+    }
+
+    return false;
+  }
+
+  hasInvalidaData(data: any) {
+    if (data.person?.human) {
+      return this.checkInvalidNombre(data.person?.human?.firstname, data.person?.human?.lastname) ||
+        this.checkInvalidApellido(data.person?.human?.firstname, data.person?.human?.lastname) ||
+        this.checkInvalidCuit(data.person?.human?.cuit, data.person?.informal_cuit);
+    }
+    return this.checkInvalidCuit(data.person?.legal_entity?.cuit, data.person?.informal_cuit) ||
+      this.checkInvalidRazonSocial(data.person?.legal_entity?.company_name);
+
   }
 
 }
