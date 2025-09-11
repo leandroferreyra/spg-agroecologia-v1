@@ -916,5 +916,11 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.obtenerProduccionesPorFiltroAvanzado();
   }
 
+  busquedaComponenteNoLiberado(data: any) {
+    this.filtroSimpleName = data.name;
+    this.filtroSimpleContiene = false;
+    this.obtenerProduccionesPorFiltroSimple();
+  }
+
 
 }

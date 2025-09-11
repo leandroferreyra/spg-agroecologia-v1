@@ -405,7 +405,7 @@
 
             <div *ngIf="tab1.toLowerCase() === 'componentes'" class="w-full h-full">
                 <app-componentes-produccion [produccion]="selectedProduccion" [rol]="actual_role"
-                    class="block w-full h-full">
+                    class="block w-full h-full" (eventBusquedaComponente)="busquedaComponenteNoLiberado($event)">
                 </app-componentes-produccion>
             </div>
 

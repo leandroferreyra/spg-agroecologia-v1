@@ -22,13 +22,14 @@ import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
 import { IconExpandAllComponent2 } from 'src/app/shared/icon/icon-expand-all2';
 import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
 import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-item';
+import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 
 @Component({
   selector: 'app-componentes-produccion',
   standalone: true,
   imports: [CommonModule, NgxSpinnerModule, IconPlusComponent, NgSelectModule, FormsModule, ReactiveFormsModule, NgbPaginationModule,
     IconTrashLinesComponent, IconRefreshComponent, IconPencilComponent, NgxTippyModule, NgxCustomModalComponent, NgxTippyModule, IconCaretDownComponent,
-    IconExpandAllComponent2, IconExpandItemComponent, IconCollapseItemComponent],
+    IconExpandAllComponent2, IconExpandItemComponent, IconCollapseItemComponent, IconInfoCircleComponent],
   templateUrl: './componentes-produccion.component.html',
   styleUrl: './componentes-produccion.component.css'
 })
@@ -37,6 +38,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   @Input() produccion: any;
   @Input() rol!: string;
   private subscription: Subscription = new Subscription();
+
+  @Output() eventBusquedaComponente = new EventEmitter<any>();
 
   @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
   @ViewChild('modalReemplazo') modalReemplazo!: NgxCustomModalComponent;
@@ -123,10 +126,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances",
+      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
         "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement.currentState", "possibleStocks.productInstances"];
     } else {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances",
+      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
         "possibleStocks.batch", "possibleStocks.location.location.location.location", "product", "possibleStocks.productInstances"];
     }
     params.paging = this.itemsPerPage;
@@ -272,13 +275,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   isFaltante(data: any): boolean {
     const cantidadNecesaria = this.getCantidadTotal(data);
     const sinOrigenYSinStock = data.origin === 'Sin selección' && (!data.possible_stocks || data.possible_stocks.length === 0);
-
     const todosLosLotesInsuficientes = Array.isArray(data.possible_stocks) &&
       data.possible_stocks.length > 0 &&
       data.possible_stocks.every((lote: any) => (+lote.available_amount || 0) < cantidadNecesaria);
 
     const noEsLote = data.origin !== 'Lote';
-
     return noEsLote && (sinOrigenYSinStock || todosLosLotesInsuficientes);
   }
 
@@ -689,5 +690,19 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   toggleTodos() {
     this.ocultarSinStock = !this.ocultarSinStock;
+  }
+
+  hasNotReleasedProductions(data: any) {
+    if (data.product_type?.stock_controlled === 1) {
+      if (this.isFaltante(data)) {
+        return data.not_released_productions?.length > 0;
+      }
+      return false;
+    }
+    return false;
+  }
+
+  buscarComponenteNoliberado(data: any) {
+    this.eventBusquedaComponente.emit(data);
   }
 }

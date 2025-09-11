@@ -76,8 +76,20 @@
                         <td [ngClass]="{ 
                             'text-red-500': tieneControlStock(data) && isFaltante(data) && estadoNoTerminado(),
                             'color-provisto': isProvistoPorTerceros(data) }"
-                            [ngxTippy]="getSupplierTooltip(data.supplier) || null"> {{
-                            getOrigen(data) }} </td>
+                            [ngxTippy]="getSupplierTooltip(data.supplier) || null">
+                            <div class="flex items-center gap-1">
+                                <span>{{ getOrigen(data) }}</span>
+                                <!-- @if (hasNotReleasedProductions(data)) { -->
+                                @if(hasNotReleasedProductions(data)) {
+                                <span class="text-red-600 cursor-pointer" (click)="buscarComponenteNoliberado(data)"
+                                    ngxTippy="Existen producciones aún no liberadas. Click para consultarlas">
+                                    <icon-info-circle class="w-4 h-4" />
+                                </span>
+                                <!-- } -->
+                                }
+                            </div>
+                        </td>
+
                         <td class=" whitespace-nowrap" [ngxTippy]="getTooltipNota(data.note) || null"
                             tippyClass="note-tip" [tippyProps]="{
                                             placement: 'top',           
