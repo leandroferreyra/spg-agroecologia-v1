@@ -63,6 +63,13 @@
                                     [ngClass]="{'bg-blue-200': selectedCliente?.uuid === data.uuid}">
                                     <td (click)="showDataCliente(data)" style="font-size: 12px;">{{ getName(data) }}
                                     </td>
+                                    @if (hasInvalidaData(data)) {
+                                    <td style="color: #dc3545" ngxTippy="Existen datos inválidos">
+                                        <icon-info-circle class="w-5 h-5" />
+                                    </td>
+                                    }@else {
+                                    <td></td>
+                                    }
                                     <td class="w-0 whitespace-nowrap text-right align-middle">
                                         <div hlMenu class="dropdown">
                                             <button type="button" hlMenuButton>
@@ -228,12 +235,14 @@
                                     <div>
                                         <label for="nombre">Nombre</label>
                                         <input id="nombre" type="text" placeholder="" class="form-control"
-                                            formControlName="nombre" />
+                                            formControlName="nombre"
+                                            [ngClass]="{'is-invalid': checkInvalidNombre(clienteForm.controls['nombre'].value, clienteForm.controls['apellido'].value)}" />
                                     </div>
                                     <div>
                                         <label for="apellido">Apellido</label>
                                         <input id="apellido" type="text" placeholder="" class="form-control"
-                                            formControlName="apellido" />
+                                            formControlName="apellido"
+                                            [ngClass]="{'is-invalid': checkInvalidApellido(clienteForm.controls['nombre'].value, clienteForm.controls['apellido'].value)}" />
                                     </div>
                                     <div>
                                         <label for="tipoDocumento">Tipo documento</label>
@@ -258,13 +267,15 @@
                                     <div>
                                         <label for="razon">Razón social</label>
                                         <input id="razon" type="text" placeholder="" class="form-control"
-                                            formControlName="razon" />
+                                            formControlName="razon"
+                                            [ngClass]="{'is-invalid': checkInvalidRazonSocial(clienteForm.controls['razon'].value)}" />
                                     </div>
                                     }
                                     <div>
                                         <label for="cuit">Cuit</label>
                                         <input id="cuit" type="text" placeholder="" class="form-control"
-                                            formControlName="cuit" />
+                                            formControlName="cuit"
+                                            [ngClass]="{'is-invalid': checkInvalidCuit(clienteForm.controls['cuit'].value, clienteForm.controls['informalCuit'].value)}" />
                                     </div>
                                     <div>
                                         <label for="estado">Estado</label>

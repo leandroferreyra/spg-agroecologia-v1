@@ -38,6 +38,7 @@ import { Location } from '@angular/common';
 import { timeStamp } from 'console';
 import { Title } from '@angular/platform-browser';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
+import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 
 @Component({
   selector: 'app-clientes',
@@ -46,7 +47,7 @@ import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent, ContactosPersonaComponent,
     IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent, FontAwesomeModule, NgbPaginationModule, IconPencilComponent,
-    ProductosEnPosesionComponent
+    ProductosEnPosesionComponent, IconInfoCircleComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.css',
@@ -327,6 +328,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
       documento: new FormControl({ value: cliente?.person?.human?.document_number, disabled: true }, [Validators.required]),
       tipoDocumento: new FormControl({ value: cliente?.person?.human?.document_type?.uuid, disabled: true }, [Validators.required]),
       cuit: new FormControl({ value: this.isHuman ? cliente?.person?.human?.cuit : cliente?.person?.legal_entity?.cuit, disabled: true }, [Validators.required]),
+      informalCuit: new FormControl({ value: cliente?.person?.informal_cuit, disabled: true }, []),
       razon: new FormControl({ value: cliente?.person?.legal_entity?.company_name, disabled: true }, [Validators.required]),
       estado: new FormControl({ value: cliente?.person?.current_state?.state?.uuid, disabled: true }, []),
       estadoComentario: new FormControl({ value: cliente?.person?.current_state?.comments, disabled: true }, []),
@@ -1030,6 +1032,74 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
     this.buildActiveFilters();
     this.obtenerClientesPorFiltroAvanzado();
+  }
+
+  checkInvalidCuit(cuit: string, informalCuit: number): boolean {
+    if (!cuit) return true;
+
+    const prefix = cuit.substring(0, 2);
+    const invalidPrefixes = ['20', '23', '24', '27', '30', '33', '34'];
+
+    // inválido si el prefijo no está en la lista o si está marcado como informal
+    return !invalidPrefixes.includes(prefix) || informalCuit === 1;
+  }
+
+  checkInvalidNombre(nombre: string, apellido: string): boolean {
+    if (!nombre) return true;
+
+    // iguales
+    if (nombre.trim().toLowerCase() === apellido.trim().toLowerCase()) {
+      return true;
+    }
+
+    // contienen * o @
+    if (nombre.includes('*') || nombre.includes('@')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  checkInvalidApellido(nombre: string, apellido: string): boolean {
+    if (!apellido) return true;
+
+    // iguales
+    if (nombre.trim().toLowerCase() === apellido.trim().toLowerCase()) {
+      return true;
+    }
+
+    // contienen * o @
+    if (apellido.includes('*') || apellido.includes('@')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  checkInvalidRazonSocial(razon: string): boolean {
+    if (!razon) return true;
+
+    // contiene * o @
+    if (razon.includes('*') || razon.includes('@')) return true;
+
+    const palabras = razon.trim().split(/\s+/);
+    if (palabras.length > 1) {
+      const primera = palabras[0].toLowerCase();
+      const repetidas = palabras.filter(p => p.toLowerCase() === primera).length;
+      if (repetidas > 1) return true;
+    }
+
+    return false;
+  }
+
+  hasInvalidaData(data: any) {
+    if (data.person?.human) {
+      return this.checkInvalidNombre(data.person?.human?.firstname, data.person?.human?.lastname) ||
+        this.checkInvalidApellido(data.person?.human?.firstname, data.person?.human?.lastname) ||
+        this.checkInvalidCuit(data.person?.human?.cuit, data.person?.informal_cuit);
+    }
+    return this.checkInvalidCuit(data.person?.legal_entity?.cuit, data.person?.informal_cuit) ||
+      this.checkInvalidRazonSocial(data.person?.legal_entity?.company_name);
   }
 
 }

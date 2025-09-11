@@ -237,7 +237,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
       this._indexService.getProveedoresWithParam(this.parametrosProvedores, this.actual_role).subscribe({
         next: res => {
           this.proveedores = res.data;
-          console.log("🚀 ~ ProveedoresComponent ~ obtenerProveedores ~ this.proveedores:", this.proveedores)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -1144,7 +1143,6 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     }
     return this.checkInvalidCuit(data.person?.legal_entity?.cuit, data.person?.informal_cuit) ||
       this.checkInvalidRazonSocial(data.person?.legal_entity?.company_name);
-
   }
 
 }
