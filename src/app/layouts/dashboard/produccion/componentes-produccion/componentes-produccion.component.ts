@@ -217,6 +217,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this.produccion.current_state?.state?.name !== 'Liberada');
   }
 
+  estadoBorrador() {
+    return (this.produccion.current_state?.state?.name === 'Borrador');
+  }
+
   tieneControlStock(data: any) {
     return data.product_type?.stock_controlled === 1;
   }
@@ -625,12 +629,12 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     });
   }
 
-  hasReplacement(data: any) {
-    let reemplazos = (data.product?.replacements || []).filter(
-      (replacement: any) => replacement?.replacement?.current_state?.state?.name === 'Vigente'
-    );
-    return (reemplazos.length > 0 && this.produccion.current_state?.state?.name === 'Borrador');
-  }
+  // hasReplacement(data: any) {
+  //   let reemplazos = (data.product?.replacements || []).filter(
+  //     (replacement: any) => replacement?.replacement?.current_state?.state?.name === 'Vigente'
+  //   );
+  //   return (reemplazos.length > 0 && this.produccion.current_state?.state?.name === 'Borrador');
+  // }
 
   openModalReemplazos(data: any) {
     this.selectedComponent = data;
@@ -649,8 +653,23 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   inicializarFormReemplazo() {
     this.reemplazoForm = new FormGroup({
-      uuid: new FormControl({ value: null, disabled: false }, [Validators.required])
+      uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      excepcional: new FormControl({ value: false, disabled: false }, []),
+      justificacion: new FormControl({ value: null, disabled: false }, [])
     })
+    this.onFormChange();
+  }
+  onFormChange() {
+    this.reemplazoForm.get('excepcional')!.valueChanges.subscribe(
+      (value) => {
+        if (value) {
+          this.reemplazoForm.get('justificacion')?.setValidators([Validators.required]);
+          this.reemplazoForm.get('justificacion')?.updateValueAndValidity({ emitEvent: false });
+        } else {
+          this.reemplazoForm.get('justificacion')?.setValidators([]);
+          this.reemplazoForm.get('justificacion')?.updateValueAndValidity({ emitEvent: false });
+        }
+      });
   }
 
   confirmarReemplazo() {

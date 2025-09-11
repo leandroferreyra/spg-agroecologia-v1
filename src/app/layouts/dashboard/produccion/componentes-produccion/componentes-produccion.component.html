@@ -117,7 +117,7 @@
                                     }
                                 </div>
                                 }
-                                @if (hasReplacement(data)) {
+                                @if (estadoBorrador()) {
                                 <div>
                                     <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Reemplazar"
                                         (click)="openModalReemplazos(data)">
@@ -345,6 +345,18 @@
                 <div class="flex flex-col sm:flex-row">
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-1">
 
+                        <div class="flex items-center gap-2">
+                            <label class="w-12 h-6 relative">
+                                <input type="checkbox" formControlName="excepcional"
+                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                    id="custom_switch_checkbox2" />
+                                <span for="custom_switch_checkbox2"
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                                </span>
+                            </label>
+                            <span>Reemplazo excepcional</span>
+                        </div>
+
                         <div>
                             <label>Reemplazos</label>
                             <ng-select [items]="reemplazos" bindLabel="replacement.name" bindValue="replacement.uuid"
@@ -353,6 +365,15 @@
                                 [selectOnTab]="true"
                                 [ngClass]="isSubmit ? reemplazoForm.controls['uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
+
+                        @if(reemplazoForm.controls['excepcional'].value) {
+                        <div class="mb-3"
+                            [ngClass]="isSubmit ? reemplazoForm.controls['justificacion'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="justificacion">Justificación del reemplazo excepcional</label>
+                            <textarea class="form-control" id="justificacion" formControlName="justificacion"
+                                rows="2"></textarea>
+                        </div>
+                        }
 
                     </div>
                 </div>
