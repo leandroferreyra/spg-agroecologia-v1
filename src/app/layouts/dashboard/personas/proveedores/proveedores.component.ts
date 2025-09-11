@@ -411,7 +411,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   getName(proveedor: any) {
     if (proveedor.person?.human) {
-      return proveedor.person.human.firstname + ' ' + proveedor.person.human.lastname
+      return proveedor.person.human.lastname + ' ' + proveedor.person.human.firstname
     } else if (proveedor.person?.legal_entity) {
       return proveedor.person.legal_entity.company_name
     } else {

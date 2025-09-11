@@ -423,7 +423,7 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   getName(cliente: any) {
     if (cliente.person?.human) {
-      return cliente.person?.human.firstname + ' ' + cliente.person?.human.lastname
+      return cliente.person?.human.lastname + ' ' + cliente.person?.human.firstname
     } else if (cliente.person?.legal_entity) {
       return cliente.person?.legal_entity?.company_name
     } else {
