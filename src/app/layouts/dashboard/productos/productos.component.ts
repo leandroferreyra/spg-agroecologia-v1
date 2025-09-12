@@ -411,7 +411,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       nombre: new FormControl({ value: null, disabled: false }, [Validators.required]),
       codigo: new FormControl({ value: null, disabled: false }, []),
       tipoProducto: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      categoria: new FormControl({ value: null, disabled: false }, []),
+      categoria: new FormControl({ value: null, disabled: false }, [Validators.required]),
       estado: new FormControl({ value: null, disabled: false }, [Validators.required]),
       estadoComentario: new FormControl({ value: null, disabled: false }, []),
       nomenclatura: new FormControl({ value: null, disabled: false }, []),
@@ -565,7 +565,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
               this.spinner.hide();
               this.obtenerProductos(true);
               this.cerrarModal();
-              // this.showDataProducto(res.data);
+              this.showDataProducto(res.data);
             },
             error: error => {
               this.spinner.hide();
