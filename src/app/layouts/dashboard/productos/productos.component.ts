@@ -452,10 +452,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       });
   }
 
-  get tieneNumSerieNewCtrl() {
-    return this.newProductoForm.get('tieneNumSerie') as FormControl;
-  }
-
   showDataProducto(producto: any, updateTab: boolean = true) {
     this.productoAnterior = [];
     this.isEdicion = false;
