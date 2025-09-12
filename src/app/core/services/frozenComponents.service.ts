@@ -3,9 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
-import { ComponenteDTO } from '../models/request/componenteDTO';
 import { FrozenComponentDTO } from '../models/request/frozenComponentDTO';
-import { RolDTO } from '../models/request/rolDTO';
+import { ReplaceFrozenComponentDTO } from '../models/request/replaceFrozenComponentDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -16,19 +15,14 @@ export class FrozenComponentService {
 
   constructor(private http: HttpClient) { }
 
-  // saveComponente(componente: ComponenteDTO): Observable<AuthResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiComponentes, JSON.stringify(componente), { headers });
-  // }
-
   editComponente(uuid: string, componente: FrozenComponentDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.put<AuthResponse>(environment.baseUrl + this.apiComponentes + '/' + uuid, JSON.stringify(componente), { headers });
   }
 
-  replaceComponente(uuidFrozen: string, uuidReplacement: string, rolDTO: RolDTO): Observable<AuthResponse> {
+  replaceComponente(uuidFrozen: string, uuidReplacement: string, replaceFrozenComponentDTO: ReplaceFrozenComponentDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put<AuthResponse>(environment.baseUrl + this.apiComponentes + '/' + uuidFrozen + '/replace/' + uuidReplacement, JSON.stringify(rolDTO), { headers });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiComponentes + '/' + uuidFrozen + '/replace/' + uuidReplacement, JSON.stringify(replaceFrozenComponentDTO), { headers });
   }
 
   deleteComponent(uuid: string, rolActual: string): Observable<AuthResponse> {

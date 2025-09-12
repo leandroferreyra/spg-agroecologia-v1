@@ -23,6 +23,7 @@ import { IconExpandAllComponent2 } from 'src/app/shared/icon/icon-expand-all2';
 import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
 import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-item';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
+import { ReplaceFrozenComponentDTO } from 'src/app/core/models/request/replaceFrozenComponentDTO';
 
 @Component({
   selector: 'app-componentes-produccion',
@@ -99,6 +100,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   expandirTodo = false;
 
+  productoInput$ = new Subject<string>();
+  productos$!: Observable<any[]>;
+  loadingProductos = false;
+  productosGuardados: any[] = [];
+
   constructor(private spinner: NgxSpinnerService, private _indexService: IndexService, private _tokenService: TokenService,
     private _swalService: SwalService, private _frozenComponentService: FrozenComponentService, private router: Router) {
 
@@ -141,6 +147,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           if (this.expandirTodo) {
             this.expandirTodos();
@@ -638,9 +645,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   openModalReemplazos(data: any) {
     this.selectedComponent = data;
-    this.reemplazos = (data.product?.replacements || []).filter(
-      (replacement: any) => replacement?.replacement?.current_state?.state?.name === 'Vigente'
-    );
+    this.obtenerReemplazos(data);
     this.inicializarFormReemplazo();
     this.tituloModal = 'Seleccionar reemplazo';
     this.modalReemplazo.options = this.modalOptions;
@@ -657,12 +662,18 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       excepcional: new FormControl({ value: false, disabled: false }, []),
       justificacion: new FormControl({ value: null, disabled: false }, [])
     })
+    if (this.reemplazos.length === 0) {
+      this.reemplazoForm.get('excepcional')?.setValue(true);
+      this.reemplazoForm.get('justificacion')?.setValidators([Validators.required]);
+      this.reemplazoForm.get('justificacion')?.updateValueAndValidity({ emitEvent: false });
+    }
     this.onFormChange();
   }
   onFormChange() {
     this.reemplazoForm.get('excepcional')!.valueChanges.subscribe(
       (value) => {
         if (value) {
+          this.obtenerProductos(this.selectedComponent.uuid);
           this.reemplazoForm.get('justificacion')?.setValidators([Validators.required]);
           this.reemplazoForm.get('justificacion')?.updateValueAndValidity({ emitEvent: false });
         } else {
@@ -672,14 +683,29 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       });
   }
 
+  obtenerReemplazos(data: any) {
+    const replacements = (data.product?.replacements || [])
+      .filter((r: any) => r?.replacement?.current_state?.state?.name === 'Vigente')
+      .map((r: any) => r.replacement);
+    if (replacements.length > 0) {
+      this.reemplazos = replacements;
+      this.productos$ = of(replacements);
+    } else {
+      this.obtenerProductos(data.uuid);
+    }
+  }
+
   confirmarReemplazo() {
     this.isSubmit = true;
     if (this.reemplazoForm.valid) {
       this.spinner.show();
-      let rolDTO = new RolDTO();
-      rolDTO.actual_role = this.rol;
+      let replaceFrozenComponentDTO = new ReplaceFrozenComponentDTO();
+      replaceFrozenComponentDTO.actual_role = this.rol;
+      if (this.reemplazoForm.get('excepcional')?.value) {
+        replaceFrozenComponentDTO.note = this.reemplazoForm.get('justificacion')?.value;
+      }
       this.subscription.add(
-        this._frozenComponentService.replaceComponente(this.selectedComponent.uuid, this.reemplazoForm.get('uuid')?.value, rolDTO).subscribe({
+        this._frozenComponentService.replaceComponente(this.selectedComponent.uuid, this.reemplazoForm.get('uuid')?.value, replaceFrozenComponentDTO).subscribe({
           next: res => {
             this.obtenerComponentesProduccion();
             this._tokenService.setToken(res.token);
@@ -724,4 +750,39 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   buscarComponenteNoliberado(data: any) {
     this.eventBusquedaComponente.emit(data);
   }
+
+  obtenerProductos(uuid: string) {
+    const params: any = {};
+    params.with = ["productType", "productCategory", "currentState", "productStates", "measure", "country", "stocks"];
+    params.paging = 20;
+    params.page = null;
+    params.order_by = {};
+    params.filters = {
+      'uuid': { value: uuid, op: '!=', contiene: false },
+      'productStates.possibleProductState.name': { value: 'Vigente', op: '=', contiene: false },
+      'productStates.datetime_to': { value: 'null', op: '=', contiene: false },
+    };
+
+    this.productos$ = this.productoInput$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => this.loadingProductos = true),
+      switchMap((term: string) => {
+        if (!term || term.trim().length < 2) {
+          this.loadingProductos = false;
+          this.reemplazos = [];
+          return of([]);
+        }
+        params.filters['name'] = { value: term, op: 'LIKE', contiene: true };
+
+        return this._indexService.getProductosWithParamAsync(params, this.rol).pipe(
+          map((res: any) => {
+            this.reemplazos = res.data;
+            return res.data;
+          }), finalize(() => this.loadingProductos = false)
+        );
+      })
+    );
+  }
+
 }

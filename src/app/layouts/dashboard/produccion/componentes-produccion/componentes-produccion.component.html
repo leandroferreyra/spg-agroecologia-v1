@@ -357,14 +357,34 @@
                             <span>Reemplazo excepcional</span>
                         </div>
 
-                        <div>
+                        <!-- <div>
                             <label>Reemplazos</label>
-                            <ng-select [items]="reemplazos" bindLabel="replacement.name" bindValue="replacement.uuid"
-                                clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
-                                notFoundText="No hay reemplazos" class="w-1/3 min-w-[200px]" formControlName="uuid"
-                                [selectOnTab]="true"
+                            <ng-select [items]="reemplazos" bindLabel="name" bindValue="uuid" clearAllText="Limpiar"
+                                style="width: 100%" [virtualScroll]="true" notFoundText="No hay reemplazos"
+                                class="w-1/3 min-w-[200px]" formControlName="uuid" [selectOnTab]="true"
                                 [ngClass]="isSubmit ? reemplazoForm.controls['uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                        </div> -->
+
+                        <!-- <div>
+                            <label>Reemplazos</label>
+                            <ng-select [items]="productos$ | async" bindLabel="name" bindValue="uuid"
+                                [typeahead]="productoInput$" clearAllText="Limpiar" style="width: 100%"
+                                [virtualScroll]="true" notFoundText="No hay reemplazos" class="w-1/3 min-w-[200px]"
+                                formControlName="uuid" [selectOnTab]="true" [loading]="loadingProductos"
+                                [ngClass]="isSubmit ? reemplazoForm.controls['uuid'].errors ? 'has-error' : 'has-success' : ''">
+                            </ng-select>
+                        </div> -->
+
+                        <div class="flex-grow-1">
+                            <label>Reemplazos</label>
+                            <ng-select [items]="productos$ | async" bindLabel="name" bindValue="uuid"
+                                [typeahead]="productoInput$" [loading]="loadingProductos" [virtualScroll]="true"
+                                typeToSearchText='Escriba un nombre' loadingText="Cargando..." [appendTo]="'body'"
+                                placeholder="Buscar reemplazo..." formControlName="uuid"
+                                [ngClass]="isSubmit ? reemplazoForm.controls['uuid'].errors ? 'has-error' : 'has-success' : ''">
+                            </ng-select>
                         </div>
+
 
                         @if(reemplazoForm.controls['excepcional'].value) {
                         <div class="mb-3"
