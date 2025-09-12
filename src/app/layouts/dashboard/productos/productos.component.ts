@@ -291,6 +291,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       next: res => {
         this.paises = res.paises.data;
         this.categorias = res.categorias.data;
+        this.categorias = this.categorias.sort((a: any, b: any) => a.name.localeCompare(b.name));
         this.estados = res.estados.data;
         this.tipoProductos = res.tipoProductos.data;
         this.measures = res.measures.data;
