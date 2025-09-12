@@ -677,6 +677,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
           this.reemplazoForm.get('justificacion')?.setValidators([Validators.required]);
           this.reemplazoForm.get('justificacion')?.updateValueAndValidity({ emitEvent: false });
         } else {
+          this.obtenerReemplazos(this.selectedComponent);
           this.reemplazoForm.get('justificacion')?.setValidators([]);
           this.reemplazoForm.get('justificacion')?.updateValueAndValidity({ emitEvent: false });
         }
