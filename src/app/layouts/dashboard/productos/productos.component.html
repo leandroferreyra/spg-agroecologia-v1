@@ -672,9 +672,9 @@
 
                         <div class="flex items-center gap-2 mt-2">
                             <label class="w-12 h-6 relative">
-                                <input type="checkbox"
+                                <input type="checkbox" [disabled]="tieneNumSerieNewCtrl.disabled"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" formControlName="asignaNumSerie" />
+                                    id="custom_switch_checkbox2" formControlName="tieneNumSerie" />
                                 <span for="custom_switch_checkbox2"
                                     class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                 </span>
@@ -787,12 +787,14 @@
                             </ng-select>
                         </div>
 
-                        @if (productoAProducir.assign_serial_number === 1 && produccionForm.get('cantidad')?.value > 0) {
+                        @if (productoAProducir.assign_serial_number === 1 && produccionForm.get('cantidad')?.value > 0)
+                        {
                         <div class="col-span-1 sm:col-span-2 w-full mt-2">
                             <div class="flex items-center gap-4 mb-2">
                                 <label class="font-medium">Número de serie</label>
 
-                                @if(series.controls[0].get('value')?.value && produccionForm.get('cantidad')?.value > 1) {
+                                @if(series.controls[0].get('value')?.value && produccionForm.get('cantidad')?.value > 1)
+                                {
                                 <button type="button" class="text-blue-500 text-sm underline hover:text-blue-700"
                                     (click)="generarSecuencia()">
                                     Generar secuencia
