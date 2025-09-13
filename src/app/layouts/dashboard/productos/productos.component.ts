@@ -604,7 +604,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     producto.country_uuid = form.get('pais')?.value;
     producto.mercosur_nomenclature = form.get('nomenclatura')?.value;
     producto.assign_serial_number = form.get('asignaNumSerie')?.value;
-    producto.has_serial_number = form.get('tieneNumSerie')?.value;
+    // producto.has_serial_number = form.get('tieneNumSerie')?.value;
     producto.traceable = form.get('trazable')?.value;
     producto.salable = form.get('vendible')?.value;
     producto.sales_name = form.get('nombreVenta')?.value;
