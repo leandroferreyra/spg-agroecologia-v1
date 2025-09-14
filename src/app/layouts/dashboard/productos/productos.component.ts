@@ -332,7 +332,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       unidad: new FormControl({ value: producto?.measure, disabled: !this.isEdicion }, [Validators.required]),
       iva: new FormControl({ value: producto?.vat_percent, disabled: !this.isEdicion }, [Validators.required]),
       pais: new FormControl({ value: producto?.country?.uuid, disabled: !this.isEdicion }, [Validators.required]),
-      asignaNumSerie: new FormControl({ value: producto?.assign_serial_number, disabled: !this.isEdicion }, [Validators.required]),
+      asignaNumSerie: new FormControl({ value: producto?.assign_serial_number, disabled: (!this.isEdicion || producto?.has_serial_number === 1) }, [Validators.required]),
       tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: true }, []),
       trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
       vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
@@ -349,14 +349,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
       stock_quantity_sold: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.quantity_sold), disabled: true }, []),
     });
     // Habilitar todos los controles si es edición
-    if (this.isEdicion) {
-      Object.keys(this.productoForm.controls).forEach(key => {
-        if (key !== 'stock_available' && key !== 'stock_initial' && key !== 'stock_minimum' && key !== 'stock_observed' &&
-          key !== 'stock_optimum' && key !== 'stock_quantity_sold' && key !== 'stock_reserved' && key !== 'stock_samples' && key !== 'tieneNumSerie') {
-          this.productoForm.controls[key].enable();
-        }
-      });
-    }
+    // if (this.isEdicion) {
+    //   Object.keys(this.productoForm.controls).forEach(key => {
+    //     if (key !== 'stock_available' && key !== 'stock_initial' && key !== 'stock_minimum' && key !== 'stock_observed' &&
+    //       key !== 'stock_optimum' && key !== 'stock_quantity_sold' && key !== 'stock_reserved' && key !== 'stock_samples' && key !== 'tieneNumSerie') {
+    //       this.productoForm.controls[key].enable();
+    //     }
+    //   });
+    // }
     this.onFormEditChange();
   }
   onFormEditChange() {
