@@ -327,9 +327,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   habilitarEdicion(data: any) {
+    console.log(data);
     this.isEditing[data.uuid] = true;
     this.componenteForms[data.uuid].get('supplier_uuid')?.enable();
     this.componenteForms[data.uuid].get('note')?.enable();
+    this.componenteForms[data.uuid].get('product_instances')?.enable();
     this.deshabilitarOtrasEdiciones(data);
   }
 
