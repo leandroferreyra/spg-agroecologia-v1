@@ -424,7 +424,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       stock_uuid: new FormControl({ value: data ? data.stock?.uuid : null, disabled: !this.isEditing[data.uuid] }, []),
       supplier_uuid: new FormControl({ value: data ? data.supplier : null, disabled: !this.isEditing[data.uuid] }, []),
       note: new FormControl({ value: data ? data.note : null, disabled: !this.isEditing[data.uuid] }, []),
-      product_instances: new FormControl({ value: data ? data.product_instances : null, disabled: data.assign_serial_number === 0 }, []),
+      product_instances: new FormControl({ value: data ? data.product_instances : null, disabled: !this.isEditing[data.uuid] || data.assign_serial_number === 0 }, []),
     });
     if (data && data.origin === 'Lote' && data.assign_serial_number === 1) {
       this.componenteForm.get('product_instances')?.setValidators(Validators.required);
