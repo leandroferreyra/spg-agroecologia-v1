@@ -305,25 +305,55 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.isEditing[data.uuid] = false;
     this.inicializarFormComponente(data);
     this.obtenerProveedoresByComponente(data);
+    this.obtenerPosiblesSeriales(data);
+    // const posibles = data.possible_stocks ?? [];
+    // const seleccionado = data.stock ? [data.stock] : [];
 
-    const posibles = data.possible_stocks ?? [];
-    const seleccionado = data.stock ? [data.stock] : [];
+    // // Combinar ambos arrays y evitar duplicados
 
-    // Combinar ambos arrays y evitar duplicados
-    // const combinados = [...seleccionado, ...posibles].filter(
+    // const combinados = [...posibles, ...seleccionado].filter(
     //   (stock, index, self) =>
     //     index === self.findIndex(s => s.uuid === stock.uuid)
     // );
+
+    // this.stocksByComponente[data.uuid] = combinados.map((stock: any) => {
+    //   const todasLasInstancias = [
+    //     ...(stock.product_instances ?? []),   // todas las posibles
+    //   ];
+
+    //   return {
+    //     ...stock,
+    //     product_instances: todasLasInstancias,  // siempre todas
+    //     disabled: +stock.available_amount < +this.getCantidadTotal(data)
+    //   };
+    // });
+
+
+  }
+
+  debeAsignarNumerosDeSerie(data: any, stock: any) {
+    return this.componenteForms[data.uuid].get('origin')?.value === 'Lote' &&
+      this.componenteForms[data.uuid].get('stock_uuid')?.value === stock.uuid && data.assign_serial_number === 1;
+  }
+
+  habilitarEdicion(data: any) {
+    this.isEditing[data.uuid] = true;
+    this.componenteForms[data.uuid].get('supplier_uuid')?.enable();
+    this.componenteForms[data.uuid].get('note')?.enable();
+    this.componenteForms[data.uuid].get('product_instances')?.enable();
+    this.deshabilitarOtrasEdiciones(data);
+    //  Esto es cuando previamente confirmo el lote y no hizo un toggle. 
+    this.obtenerPosiblesSeriales(data);
+  }
+
+  obtenerPosiblesSeriales(data: any) {
+    const posibles = data.possible_stocks ?? [];
+    const seleccionado = data.stock ? [data.stock] : [];
 
     const combinados = [...posibles, ...seleccionado].filter(
       (stock, index, self) =>
         index === self.findIndex(s => s.uuid === stock.uuid)
     );
-
-    // this.stocksByComponente[data.uuid] = combinados.map((stock: any) => ({
-    //   ...stock,
-    //   disabled: +stock.available_amount < +this.getCantidadTotal(data)
-    // }));
 
     this.stocksByComponente[data.uuid] = combinados.map((stock: any) => {
       const todasLasInstancias = [
@@ -336,22 +366,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         disabled: +stock.available_amount < +this.getCantidadTotal(data)
       };
     });
-
-
-  }
-
-  debeAsignarNumerosDeSerie(data: any, stock: any) {
-    return this.componenteForms[data.uuid].get('origin')?.value === 'Lote' &&
-      this.componenteForms[data.uuid].get('stock_uuid')?.value === stock.uuid && data.assign_serial_number === 1;
-  }
-
-  habilitarEdicion(data: any) {
-    console.log(data);
-    this.isEditing[data.uuid] = true;
-    this.componenteForms[data.uuid].get('supplier_uuid')?.enable();
-    this.componenteForms[data.uuid].get('note')?.enable();
-    this.componenteForms[data.uuid].get('product_instances')?.enable();
-    this.deshabilitarOtrasEdiciones(data);
   }
 
   deshabilitarOtrasEdiciones(data: any) {
@@ -383,25 +397,19 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         if (this.expandedRows[componente.uuid]) {
           this.inicializarFormComponente(componente);
           this.obtenerProveedoresByComponente(componente);
+          this.obtenerPosiblesSeriales(componente);
+          // const posibles = componente.possible_stocks ?? [];
+          // const seleccionado = componente.stock ? [componente.stock] : [];
 
-          const posibles = componente.possible_stocks ?? [];
-          const seleccionado = componente.stock ? [componente.stock] : [];
-
-          // Combinar ambos arrays y evitar duplicados
-          // const combinados = [...seleccionado, ...posibles].filter(
+          // const combinados = [...posibles, ...seleccionado].filter(
           //   (stock, index, self) =>
           //     index === self.findIndex(s => s.uuid === stock.uuid)
           // );
 
-          const combinados = [...posibles, ...seleccionado].filter(
-            (stock, index, self) =>
-              index === self.findIndex(s => s.uuid === stock.uuid)
-          );
-
-          this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => ({
-            ...stock,
-            disabled: +stock.available_amount < +this.getCantidadTotal(componente)
-          }));
+          // this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => ({
+          //   ...stock,
+          //   disabled: +stock.available_amount < +this.getCantidadTotal(componente)
+          // }));
         }
       }
     });
