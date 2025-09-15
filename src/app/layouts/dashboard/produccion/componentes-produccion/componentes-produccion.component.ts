@@ -589,7 +589,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             this.isEditing[data.uuid] = false;
             this.componenteForms[data.uuid].get('note')?.disable();
             this.componenteForms[data.uuid].get('supplier_uuid')?.disable();
-            // this.inicializarFormularioComponente(data); // Inicializa para que cambien los reservados.
             this.obtenerComponentesProduccion();
             this.limpiarSerialesDeOtroLote(data);
             this.spinner.hide();
