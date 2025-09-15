@@ -310,15 +310,34 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     const seleccionado = data.stock ? [data.stock] : [];
 
     // Combinar ambos arrays y evitar duplicados
-    const combinados = [...seleccionado, ...posibles].filter(
+    // const combinados = [...seleccionado, ...posibles].filter(
+    //   (stock, index, self) =>
+    //     index === self.findIndex(s => s.uuid === stock.uuid)
+    // );
+
+    const combinados = [...posibles, ...seleccionado].filter(
       (stock, index, self) =>
         index === self.findIndex(s => s.uuid === stock.uuid)
     );
 
-    this.stocksByComponente[data.uuid] = combinados.map((stock: any) => ({
-      ...stock,
-      disabled: +stock.available_amount < +this.getCantidadTotal(data)
-    }));
+    // this.stocksByComponente[data.uuid] = combinados.map((stock: any) => ({
+    //   ...stock,
+    //   disabled: +stock.available_amount < +this.getCantidadTotal(data)
+    // }));
+
+    this.stocksByComponente[data.uuid] = combinados.map((stock: any) => {
+      const todasLasInstancias = [
+        ...(stock.product_instances ?? []),   // todas las posibles
+      ];
+
+      return {
+        ...stock,
+        product_instances: todasLasInstancias,  // siempre todas
+        disabled: +stock.available_amount < +this.getCantidadTotal(data)
+      };
+    });
+
+
   }
 
   debeAsignarNumerosDeSerie(data: any, stock: any) {
@@ -369,7 +388,12 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
           const seleccionado = componente.stock ? [componente.stock] : [];
 
           // Combinar ambos arrays y evitar duplicados
-          const combinados = [...seleccionado, ...posibles].filter(
+          // const combinados = [...seleccionado, ...posibles].filter(
+          //   (stock, index, self) =>
+          //     index === self.findIndex(s => s.uuid === stock.uuid)
+          // );
+
+          const combinados = [...posibles, ...seleccionado].filter(
             (stock, index, self) =>
               index === self.findIndex(s => s.uuid === stock.uuid)
           );
@@ -400,10 +424,23 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
               index === self.findIndex(s => s.uuid === stock.uuid)
           );
 
-          this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => ({
-            ...stock,
-            disabled: +stock.available_amount < +this.getCantidadTotal(componente)
-          }));
+          // this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => ({
+          //   ...stock,
+          //   disabled: +stock.available_amount < +this.getCantidadTotal(componente)
+          // }));
+          this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => {
+            const todasLasInstancias = [
+              ...(stock.product_instances ?? []),   // todas las posibles
+            ];
+
+            return {
+              ...stock,
+              product_instances: todasLasInstancias,  // siempre todas
+              disabled: +stock.available_amount < +this.getCantidadTotal(componente)
+            };
+          });
+
+
         }
       }
     });
