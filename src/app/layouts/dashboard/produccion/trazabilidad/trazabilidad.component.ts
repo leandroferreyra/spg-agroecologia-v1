@@ -164,7 +164,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
 
     if (allSeriales.length > 0) {
       // Inserto después de los 7 atributos iniciales
-      const posicion = 7;
+      const posicion = 2;
       children.splice(posicion, 0, {
         id: 'seriales-todos',
         label: ` Números de serie: ${allSeriales.join(' - ')}`
