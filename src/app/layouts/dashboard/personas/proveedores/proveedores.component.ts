@@ -97,7 +97,7 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   parametrosProvedores!: ParametrosIndex;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 10;
+  MAX_ITEMS_PER_PAGE = 20;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;

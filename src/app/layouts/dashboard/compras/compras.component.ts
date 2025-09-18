@@ -34,7 +34,6 @@ import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTran
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { TransactionProductoService } from 'src/app/core/services/transactionProducto.service';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
-import { IconAutoPaymentComponent } from 'src/app/shared/icon/icon-auto-payment';
 import { FacturaService } from 'src/app/core/services/factura.service';
 import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -86,7 +85,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 10;
+  MAX_ITEMS_PER_PAGE = 20;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;

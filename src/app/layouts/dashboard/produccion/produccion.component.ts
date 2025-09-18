@@ -78,7 +78,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   isTabDisabled = false;
 
   //Paginación
-  MAX_ITEMS_PER_PAGE = 10;
+  MAX_ITEMS_PER_PAGE = 20;
   currentPage = 1;
   last_page = 1;
   itemsPerPage = this.MAX_ITEMS_PER_PAGE;
