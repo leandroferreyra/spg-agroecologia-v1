@@ -59,7 +59,6 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._produccionService.showTrazabilidadByProduccion(this.produccion.uuid, this.rol).subscribe({
         next: res => {
-          console.log(res);
           this.trazado = this.mapProduccionToTraceNode(res.data);
           this.guardarIds(res.data);
           this.expanded.add(this.produccion.uuid);
