@@ -636,8 +636,15 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   getDropdownClass(index: number) {
-    let mitad = this.productos.length / 2;
-    return index < mitad ? 'ltr:right-0 rtl:left-0' : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
+    const total = this.productos.length;
+
+    if (total <= 5) {
+      return 'ltr:right-0 rtl:left-0';
+    }
+    const mitad = total / 2;
+    return index < mitad
+      ? 'ltr:right-0 rtl:left-0'
+      : 'bottom-full !mt-0 mb-1 whitespace-nowrap ltr:right-0 rtl:left-0';
   }
 
   obtenerProductosPorFiltroSimple() {
