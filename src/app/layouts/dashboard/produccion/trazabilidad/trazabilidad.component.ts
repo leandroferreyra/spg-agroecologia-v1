@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { AnyARecord } from 'dns';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
@@ -76,11 +75,25 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
   }
 
   guardarIds(data: any) {
+    this.idsToExpand = []; // limpio antes de cargar
     this.idsToExpand.push(this.produccion.uuid);
-    this.idsToExpand.push(
-      ...(data?.frozen_components ?? [])
-        .map((f: any) => f.uuid)
-    )
+
+    (data?.traceability ?? []).forEach((fc: any) => {
+      this.collectTraceabilityIds(fc);
+    });
+  }
+  private collectTraceabilityIds(fc: any) {
+    if (fc?.uuid) {
+      this.idsToExpand.push(fc.uuid);
+    }
+
+    if (fc.origin === 'Lote' && fc.stock?.batch?.productions?.length) {
+      fc.stock.batch.productions.forEach((prod: any) => {
+        (prod.traceability ?? []).forEach((subFc: any) => {
+          this.collectTraceabilityIds(subFc);
+        });
+      });
+    }
   }
 
   toggle(id: string) {
@@ -109,107 +122,85 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     return `${dia}-${mes}-${año} ${horas}:${mins}:${segs}`;
   }
 
-
-  mapProduccionToTraceNode(prod: any): TraceNode {
-    const cantidad = +prod.quantity;
-    const esEntero = prod.product?.measure?.is_integer === 1;
-    const cantidadFmt = esEntero ? cantidad.toString() : cantidad.toFixed(2);
-    const serialesRaiz = prod.batch?.stocks?.[0]?.product_instances?.map((pi: any) => pi.serial_number) ?? [];
-
-    const frozen = (prod.frozen_components ?? []).sort((a: any, b: any) => a.order - b.order);
-
-    const children: TraceNode[] = [
-      {
-        id: 'cantidad',
-        label: ` Cantidad: ${cantidadFmt}`
-      },
-      {
-        id: 'lote',
-        label: ` Lote: ${prod.batch?.batch_identification ?? '(sin lote)'}`
-      },
-      {
-        id: 'fecha-inicio',
-        label: ` Fecha de inicio: ${this.formatFecha(prod.production_datetime) ?? '-'}`,
-      },
-      {
-        id: 'creador',
-        label: ` Usuario alta: ${prod.creator?.user_name ?? '-'}`,
-      },
-      {
-        id: 'responsable',
-        label: ` Usuario responsable: ${prod.responsible?.user_name ?? '-'}`,
-      },
-      {
-        id: 'usuario-liberacion',
-        label: ` Usuario liberación: ${prod.current_state?.creator?.user_name ?? '-'}`,
-      },
-      {
-        id: 'fecha-liberacion',
-        label: ` Fecha de liberación: ${this.formatFecha(prod.current_state?.datetime_from) ?? '-'}`,
-      }
-    ];
-
-    if (serialesRaiz.length > 0) {
-      children.push({
-        id: 'seriales-raiz',
-        label: ` Números de serie:`,
-        children: serialesRaiz.map((s: string, i: number) => ({
-          id: `serial-root-${i}`,
-          label: s
-        }))
-      });
-    }
-
-    // Componentes congelados
-    frozen.forEach((fc: any, i: any) => {
-      const seriales = (fc.product_instances ?? []).map((pi: any) => pi.serial_number);
-      const origen =
-        fc.origin === 'Sin selección' ? 'Sin control de stock'
-          : fc.origin === 'Lote' ? (fc.stock?.batch?.batch_identification ?? 'Lote único')
-            : fc.origin === 'Provisto por terceros' ? (
-              fc.supplier?.person?.human
-                ? `Provisto por ${fc.supplier.person.human.firstname} ${fc.supplier.person.human.lastname}`
-                : fc.supplier?.person?.legal_entity
-                  ? `Provisto por ${fc.supplier.person.legal_entity.company_name}`
-                  : 'Provisto por tercero'
-            )
-              : fc.origin;
-
-      const cantidadCompo = +fc.quantity;
-      const cantidadTotal = cantidad * cantidadCompo;
-      const cantidadFmt = esEntero ? cantidadCompo.toString() : cantidadCompo.toFixed(2);
-      const totalFmt = esEntero ? cantidadTotal.toString() : cantidadTotal.toFixed(2);
-
-      const nodoComponente: TraceNode = {
-        id: `${fc.uuid ?? i}`,
-        label: `🧩 Componente: ${fc.name ?? '(sin nombre)'}`,
-        children: [
-          { id: `origen-${i}`, label: ` Origen: ${origen}` },
-          ...(seriales.length > 0 ? [{
-            id: `seriales-${i}`,
-            label: ` Números de serie: ${seriales.join(' - ')}`,
-          }] : []),
-          { id: `cantidad-unitaria-${i}`, label: ` Cantidad por producto: ${cantidadFmt}` },
-          { id: `cantidad-total-${i}`, label: ` Cantidad total: ${totalFmt}` }
-        ]
-      };
-
-      children.push(nodoComponente);
-    });
-
-    return {
-      id: `${prod.uuid}`,
-      label: `📦 Producto: ${prod.product?.name ?? '(sin nombre)'}`,
-      children
-    };
-  }
-
   expandirTodos() {
     this.idsToExpand.forEach(element => {
       if (!this.expanded.has(element)) {
         this.expanded.add(element);
       }
     });
+  }
+
+  mapProduccionToTraceNode(prod: any): TraceNode {
+    const cantidad = +prod.quantity;
+    const esEntero = prod.product?.measure?.is_integer === 1;
+    const cantidadFmt = esEntero ? cantidad.toString() : cantidad.toFixed(2);
+
+    const children: TraceNode[] = [
+      { id: 'cantidad', label: ` Cantidad: ${cantidadFmt}` },
+      { id: 'lote', label: ` Lote: ${prod.batch?.batch_identification ?? '(sin lote)'}` },
+      { id: 'fecha-inicio', label: ` Fecha de inicio: ${this.formatFecha(prod.production_datetime) ?? '-'}` },
+      { id: 'creador', label: ` Usuario alta: ${prod.creator?.user_name ?? '-'}` },
+      { id: 'responsable', label: ` Usuario responsable: ${prod.responsible?.user_name ?? '-'}` },
+      { id: 'usuario-liberacion', label: ` Usuario liberación: ${prod.current_state?.creator?.user_name ?? '-'}` },
+      { id: 'fecha-liberacion', label: ` Fecha de liberación: ${this.formatFecha(prod.current_state?.datetime_from) ?? '-'}` }
+    ];
+
+    const frozen = (prod.traceability ?? []).sort((a: any, b: any) => a.order - b.order);
+    frozen.forEach((fc: any, i: any) => {
+      children.push(this.mapTraceabilityRecursive(fc, i, cantidad, esEntero));
+    });
+
+    return {
+      id: prod.uuid,
+      label: `📦 Producto: ${prod.product?.name ?? '(sin nombre)'}`,
+      children
+    };
+  }
+
+  private mapTraceabilityRecursive(fc: any, index: number, cantidadPadre: number, esEntero: boolean): TraceNode {
+    const seriales = (fc.product_instances ?? []).map((pi: any) => pi.serial_number);
+
+    const origen =
+      fc.origin === 'Sin selección' ? 'Sin control de stock'
+        : fc.origin === 'Lote' ? (fc.stock?.batch?.batch_identification ?? 'Lote único')
+          : fc.origin === 'Provisto por terceros' ? (
+            fc.supplier?.person?.human
+              ? `Provisto por ${fc.supplier.person.human.firstname} ${fc.supplier.person.human.lastname}`
+              : fc.supplier?.person?.legal_entity
+                ? `Provisto por ${fc.supplier.person.legal_entity.company_name}`
+                : 'Provisto por tercero'
+          )
+            : fc.origin;
+
+    const cantidadCompo = +fc.quantity;
+    const cantidadTotal = cantidadPadre * cantidadCompo;
+    const cantidadFmt = esEntero ? cantidadCompo.toString() : cantidadCompo.toFixed(2);
+    const totalFmt = esEntero ? cantidadTotal.toString() : cantidadTotal.toFixed(2);
+
+    const children: TraceNode[] = [
+      { id: `origen-${index}`, label: ` Origen: ${origen}` },
+      ...(seriales.length > 0 ? [{
+        id: `seriales-${index}`,
+        label: ` Números de serie: ${seriales.join(' - ')}`,
+      }] : []),
+      { id: `cantidad-unitaria-${index}`, label: ` Cantidad por producto: ${cantidadFmt}` },
+      { id: `cantidad-total-${index}`, label: ` Cantidad total: ${totalFmt}` }
+    ];
+
+    if (fc.origin === 'Lote' && fc.stock?.batch?.productions?.length) {
+      fc.stock.batch.productions.forEach((prod: any, j: number) => {
+        const subTrace = (prod.traceability ?? []).sort((a: any, b: any) => a.order - b.order);
+        subTrace.forEach((subFc: any, k: number) => {
+          children.push(this.mapTraceabilityRecursive(subFc, k, +prod.quantity, esEntero));
+        });
+      });
+    }
+
+    return {
+      id: fc.uuid ?? `fc-${index}`,
+      label: `🧩 Componente: ${fc.name ?? '(sin nombre)'}`,
+      children
+    };
   }
 
 }

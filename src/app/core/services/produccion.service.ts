@@ -61,10 +61,7 @@ export class ProduccionService {
       .append('with[]', "creator")
       .append('with[]', "responsible")
       .append('with[]', "currentState.creator")
-      .append('with[]', "frozenComponents.stock.batch")
-      .append('with[]', "frozenComponents.productInstances")
-      .append('with[]', "frozenComponents.supplier.person.human")
-      .append('with[]', "frozenComponents.supplier.person.legalEntity");
+      .append('with[]', "traceability");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProduccion + '/' + uuid, { headers, params });
   }
   
