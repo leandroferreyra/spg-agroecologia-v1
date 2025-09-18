@@ -136,7 +136,9 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     const cantidad = +prod.quantity;
     const esEntero = prod.product?.measure?.is_integer === 1;
     const cantidadFmt = esEntero ? cantidad.toString() : cantidad.toFixed(2);
-    const serialesRaiz = prod.batch?.stocks?.[0]?.product_instances?.map((pi: any) => pi.serial_number) ?? [];
+
+    const serialesRaiz =
+      prod.batch?.stocks?.[0]?.product_instances?.map((pi: any) => pi.serial_number) ?? [];
 
     const children: TraceNode[] = [
       { id: 'cantidad', label: ` Cantidad: ${cantidadFmt}` },
@@ -148,18 +150,26 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       { id: 'fecha-liberacion', label: ` Fecha de liberación: ${this.formatFecha(prod.current_state?.datetime_from) ?? '-'}` }
     ];
 
-    if (serialesRaiz.length > 0) {
-      children.push({
-        id: 'seriales-raiz',
-        label: ` Números de serie: ${serialesRaiz.join(' - ')}`
+    const frozen = (prod.traceability ?? []).sort((a: any, b: any) => a.order - b.order);
+
+    let serialesDeHijos: string[] = [];
+    frozen.forEach((fc: any, i: number) => {
+      const { node, seriales } = this.mapTraceabilityRecursive(fc, i, cantidad, esEntero);
+      children.push(node);
+      serialesDeHijos.push(...seriales);
+    });
+
+    // Eliminar duplicados
+    const allSeriales = Array.from(new Set([...serialesRaiz, ...serialesDeHijos]));
+
+    if (allSeriales.length > 0) {
+      // Inserto después de los 7 atributos iniciales
+      const posicion = 7;
+      children.splice(posicion, 0, {
+        id: 'seriales-todos',
+        label: ` Números de serie: ${allSeriales.join(' - ')}`
       });
     }
-
-    // Procesar la raíz de traceability de forma recursiva
-    const frozen = (prod.traceability ?? []).sort((a: any, b: any) => a.order - b.order);
-    frozen.forEach((fc: any, i: any) => {
-      children.push(this.mapTraceabilityRecursive(fc, i, cantidad, esEntero));
-    });
 
     return {
       id: prod.uuid,
@@ -168,11 +178,13 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     };
   }
 
-  /**
-   * Construye un nodo de trazabilidad de forma recursiva
-   */
-  private mapTraceabilityRecursive(fc: any, index: number, cantidadPadre: number, esEntero: boolean): TraceNode {
-    const seriales = (fc.product_instances ?? []).map((pi: any) => pi.serial_number);
+  private mapTraceabilityRecursive(
+    fc: any,
+    index: number,
+    cantidadPadre: number,
+    esEntero: boolean
+  ): { node: TraceNode; seriales: string[] } {
+    const serialesPropios = (fc.product_instances ?? []).map((pi: any) => pi.serial_number);
 
     const origen =
       fc.origin === 'Sin selección' ? 'Sin control de stock'
@@ -193,28 +205,49 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
 
     const children: TraceNode[] = [
       { id: `origen-${index}`, label: ` Origen: ${origen}` },
-      ...(seriales.length > 0 ? [{
-        id: `seriales-${index}`,
-        label: ` Números de serie: ${seriales.join(' - ')}`,
-      }] : []),
       { id: `cantidad-unitaria-${index}`, label: ` Cantidad por producto: ${cantidadFmt}` },
       { id: `cantidad-total-${index}`, label: ` Cantidad total: ${totalFmt}` }
     ];
 
-    // 🔁 Parte recursiva: si es un Lote y tiene producciones, procesarlas
+    let serialesAcumulados: string[] = [];
+
+    // si este nodo asigna seriales → se agregan
+    if (fc.assign_serial_number === 1 && serialesPropios.length > 0) {
+      serialesAcumulados.push(...serialesPropios);
+    }
+
+    // procesar hijos recursivamente
     if (fc.origin === 'Lote' && fc.stock?.batch?.productions?.length) {
-      fc.stock.batch.productions.forEach((prod: any, j: number) => {
+      fc.stock.batch.productions.forEach((prod: any) => {
         const subTrace = (prod.traceability ?? []).sort((a: any, b: any) => a.order - b.order);
         subTrace.forEach((subFc: any, k: number) => {
-          children.push(this.mapTraceabilityRecursive(subFc, k, +prod.quantity, esEntero));
+          const { node: childNode, seriales: serialesHijos } =
+            this.mapTraceabilityRecursive(subFc, k, +prod.quantity, esEntero);
+
+          children.push(childNode);
+          serialesAcumulados.push(...serialesHijos);
         });
       });
     }
 
+    // 🔑 Eliminar duplicados
+    const allSeriales = Array.from(new Set([...serialesPropios, ...serialesAcumulados]));
+
+    // mostrar seriales al inicio si hay
+    if (allSeriales.length > 0) {
+      children.unshift({
+        id: `seriales-${index}`,
+        label: ` Números de serie: ${allSeriales.join(' - ')}`
+      });
+    }
+
     return {
-      id: fc.uuid ?? `fc-${index}`,
-      label: `🧩 Componente: ${fc.name ?? '(sin nombre)'}`,
-      children
+      node: {
+        id: fc.uuid ?? `fc-${index}`,
+        label: `🧩 Componente: ${fc.name ?? '(sin nombre)'}`,
+        children
+      },
+      seriales: allSeriales
     };
   }
 
