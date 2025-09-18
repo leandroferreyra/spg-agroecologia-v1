@@ -59,6 +59,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._produccionService.showTrazabilidadByProduccion(this.produccion.uuid, this.rol).subscribe({
         next: res => {
+          console.log(res);
           this.trazado = this.mapProduccionToTraceNode(res.data);
           this.guardarIds(res.data);
           this.expanded.add(this.produccion.uuid);
@@ -78,6 +79,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     this.idsToExpand = []; // limpio antes de cargar
     this.idsToExpand.push(this.produccion.uuid);
 
+    // recorrer recursivamente el traceability completo
     (data?.traceability ?? []).forEach((fc: any) => {
       this.collectTraceabilityIds(fc);
     });
@@ -87,6 +89,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       this.idsToExpand.push(fc.uuid);
     }
 
+    // si tiene producciones, entrar en ellas
     if (fc.origin === 'Lote' && fc.stock?.batch?.productions?.length) {
       fc.stock.batch.productions.forEach((prod: any) => {
         (prod.traceability ?? []).forEach((subFc: any) => {
@@ -134,6 +137,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     const cantidad = +prod.quantity;
     const esEntero = prod.product?.measure?.is_integer === 1;
     const cantidadFmt = esEntero ? cantidad.toString() : cantidad.toFixed(2);
+    const serialesRaiz = prod.batch?.stocks?.[0]?.product_instances?.map((pi: any) => pi.serial_number) ?? [];
 
     const children: TraceNode[] = [
       { id: 'cantidad', label: ` Cantidad: ${cantidadFmt}` },
@@ -145,6 +149,14 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       { id: 'fecha-liberacion', label: ` Fecha de liberación: ${this.formatFecha(prod.current_state?.datetime_from) ?? '-'}` }
     ];
 
+    if (serialesRaiz.length > 0) {
+      children.push({
+        id: 'seriales-raiz',
+        label: ` Números de serie: ${serialesRaiz.join(' - ')}`
+      });
+    }
+
+    // Procesar la raíz de traceability de forma recursiva
     const frozen = (prod.traceability ?? []).sort((a: any, b: any) => a.order - b.order);
     frozen.forEach((fc: any, i: any) => {
       children.push(this.mapTraceabilityRecursive(fc, i, cantidad, esEntero));
@@ -157,6 +169,9 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
     };
   }
 
+  /**
+   * Construye un nodo de trazabilidad de forma recursiva
+   */
   private mapTraceabilityRecursive(fc: any, index: number, cantidadPadre: number, esEntero: boolean): TraceNode {
     const seriales = (fc.product_instances ?? []).map((pi: any) => pi.serial_number);
 
@@ -187,6 +202,7 @@ export class TrazabilidadComponent implements OnInit, OnDestroy {
       { id: `cantidad-total-${index}`, label: ` Cantidad total: ${totalFmt}` }
     ];
 
+    // 🔁 Parte recursiva: si es un Lote y tiene producciones, procesarlas
     if (fc.origin === 'Lote' && fc.stock?.batch?.productions?.length) {
       fc.stock.batch.productions.forEach((prod: any, j: number) => {
         const subTrace = (prod.traceability ?? []).sort((a: any, b: any) => a.order - b.order);
