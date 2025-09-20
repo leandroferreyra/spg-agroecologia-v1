@@ -132,11 +132,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
-        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product.replacements.replacement.currentState", "possibleStocks.productInstances"];
+      params.with = ["productType", "measure", "stock.batch", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
+        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location", "product.replacements.replacement.currentState", "possibleStocks.productInstances"];
     } else {
-      params.with = ["productType", "measure", "stock.batch", "supplier", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
-        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product", "possibleStocks.productInstances"];
+      params.with = ["productType", "measure", "stock.batch", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
+        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location", "product", "possibleStocks.productInstances"];
     }
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
