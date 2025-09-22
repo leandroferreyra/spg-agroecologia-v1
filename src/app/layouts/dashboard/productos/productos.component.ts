@@ -210,7 +210,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.productos = res.data;
-          console.log("🚀 ~ ProductosComponent ~ obtenerProductos ~ this.productos:", this.productos)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {

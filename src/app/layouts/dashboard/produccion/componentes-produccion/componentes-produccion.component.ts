@@ -133,11 +133,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
       params.with = ["productType", "measure", "stock.batch", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
-        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location",
+        "possibleStocks.location.location.location.location",
         "product.replacements.replacement.currentState", "possibleStocks.productInstances"];
     } else {
       params.with = ["productType", "measure", "stock.batch", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
-        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location", "product",
+        "possibleStocks.location.location.location.location", "product",
         "possibleStocks.productInstances"];
     }
     params.paging = this.itemsPerPage;
@@ -149,7 +149,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
-          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           if (this.expandirTodo) {
             this.expandirTodos();
@@ -344,24 +343,9 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     );
 
     this.stocksByComponente[data.uuid] = combinados.map((stock: any) => {
-
-      let todasLasInstancias: any[] = [];
-
-      // 🔹 Caso 1: asigna número de serie
-      if (data.assign_serial_number === 1) {
-        todasLasInstancias = stock.product_instances ?? [];
-      }
-
-      // 🔹 Caso 2: tiene número de serie
-      else if (data.has_serial_number === 1) {
-        todasLasInstancias =
-          stock.batch?.productions?.[0]?.frozen_component_with_serial_number?.[0]
-            ?.product_instances ?? [];
-      }
-
-      // const todasLasInstancias = [
-      //   ...(stock.product_instances ?? []),   // todas las posibles
-      // ];
+      const todasLasInstancias = [
+        ...(stock.product_instances ?? []),   // todas las posibles
+      ];
 
       return {
         ...stock,
@@ -369,7 +353,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         disabled: +stock.available_amount < +this.getCantidadTotal(data)
       };
     });
-
   }
 
   deshabilitarOtrasEdiciones(data: any) {
