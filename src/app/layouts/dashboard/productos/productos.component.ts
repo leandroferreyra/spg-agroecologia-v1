@@ -47,7 +47,7 @@ import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { format } from 'date-fns';
 import { FlatpickrDirective } from 'angularx-flatpickr';
-import { consumerPollProducersForChange } from '@angular/core/primitives/signals';
+import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle copy';
 
 @Component({
   selector: 'app-productos',
@@ -57,7 +57,7 @@ import { consumerPollProducersForChange } from '@angular/core/primitives/signals
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
     ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent, IconSettingsComponent,
-    FlatpickrDirective, IconSearchComponent
+    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -210,6 +210,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._indexService.getProductosWithParam(params, this.actual_role).subscribe({
         next: res => {
           this.productos = res.data;
+          console.log("🚀 ~ ProductosComponent ~ obtenerProductos ~ this.productos:", this.productos)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -774,6 +775,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   esProducible(producto: any) {
     return producto?.product_type?.can_be_produced === 1 && producto.current_state?.state?.name === 'Vigente';
+  }
+
+  isNotVigente() {
+    return this.selectedProducto.current_state?.state?.name !== 'Vigente';
   }
 
   confirmarProduccion() {

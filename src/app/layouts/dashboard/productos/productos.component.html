@@ -285,7 +285,14 @@
                                         class="w-1/3 min-w-[200px]" formControlName="categoria"></ng-select>
                                 </div>
                                 <div>
-                                    <label for="estado">Estado</label>
+                                    <label for="estado" class="flex items-center space-x-1">
+                                        <span>Estado</span>
+                                        @if (isNotVigente()) {
+                                        <span ngxTippy="Producto no vigente" class="cursor-pointer">
+                                            <icon-info-circle class="w-5 h-5 text-red-600"></icon-info-circle>
+                                        </span>
+                                        }
+                                    </label>
                                     <ng-select [items]="estados" bindLabel="name" bindValue="uuid" [selectOnTab]="true"
                                         clearAllText="Limpiar" style="width: 100%" [virtualScroll]="true"
                                         notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
@@ -672,7 +679,7 @@
 
                         <div class="flex items-center gap-2 mt-2">
                             <label class="w-12 h-6 relative">
-                                <input type="checkbox" 
+                                <input type="checkbox"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
                                     id="custom_switch_checkbox2" formControlName="tieneNumSerie" />
                                 <span for="custom_switch_checkbox2"

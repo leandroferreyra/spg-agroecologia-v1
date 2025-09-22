@@ -133,10 +133,12 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
       params.with = ["productType", "measure", "stock.batch", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
-        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location", "product.replacements.replacement.currentState", "possibleStocks.productInstances"];
+        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location",
+        "product.replacements.replacement.currentState", "possibleStocks.productInstances"];
     } else {
       params.with = ["productType", "measure", "stock.batch", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
-        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location", "product", "possibleStocks.productInstances"];
+        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location", "product",
+        "possibleStocks.productInstances"];
     }
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
@@ -147,6 +149,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           if (this.expandirTodo) {
             this.expandirTodos();
@@ -306,35 +309,20 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.inicializarFormComponente(data);
     this.obtenerProveedoresByComponente(data);
     this.obtenerPosiblesSeriales(data);
-    // const posibles = data.possible_stocks ?? [];
-    // const seleccionado = data.stock ? [data.stock] : [];
-
-    // // Combinar ambos arrays y evitar duplicados
-
-    // const combinados = [...posibles, ...seleccionado].filter(
-    //   (stock, index, self) =>
-    //     index === self.findIndex(s => s.uuid === stock.uuid)
-    // );
-
-    // this.stocksByComponente[data.uuid] = combinados.map((stock: any) => {
-    //   const todasLasInstancias = [
-    //     ...(stock.product_instances ?? []),   // todas las posibles
-    //   ];
-
-    //   return {
-    //     ...stock,
-    //     product_instances: todasLasInstancias,  // siempre todas
-    //     disabled: +stock.available_amount < +this.getCantidadTotal(data)
-    //   };
-    // });
-
-
   }
 
   debeAsignarNumerosDeSerie(data: any, stock: any) {
-    return this.componenteForms[data.uuid].get('origin')?.value === 'Lote' &&
-      this.componenteForms[data.uuid].get('stock_uuid')?.value === stock.uuid && data.assign_serial_number === 1;
+    return (this.componenteForms[data.uuid].get('origin')?.value === 'Lote' &&
+      this.componenteForms[data.uuid].get('stock_uuid')?.value === stock.uuid) &&
+      (data.assign_serial_number === 1 || data.has_serial_number === 1);
   }
+
+  // debeAsignarNumerosDeSerie(data: any, stock: any) {
+  //   if (this.componenteForms[data.uuid].get('origin')?.value === 'Lote' && this.componenteForms[data.uuid].get('stock_uuid')?.value === stock.uuid) {
+  //     return data.assign_serial_number === 1;
+  //   }
+  //   return false;
+  // }
 
   habilitarEdicion(data: any) {
     this.isEditing[data.uuid] = true;
@@ -356,9 +344,24 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     );
 
     this.stocksByComponente[data.uuid] = combinados.map((stock: any) => {
-      const todasLasInstancias = [
-        ...(stock.product_instances ?? []),   // todas las posibles
-      ];
+
+      let todasLasInstancias: any[] = [];
+
+      // 🔹 Caso 1: asigna número de serie
+      if (data.assign_serial_number === 1) {
+        todasLasInstancias = stock.product_instances ?? [];
+      }
+
+      // 🔹 Caso 2: tiene número de serie
+      else if (data.has_serial_number === 1) {
+        todasLasInstancias =
+          stock.batch?.productions?.[0]?.frozen_component_with_serial_number?.[0]
+            ?.product_instances ?? [];
+      }
+
+      // const todasLasInstancias = [
+      //   ...(stock.product_instances ?? []),   // todas las posibles
+      // ];
 
       return {
         ...stock,
@@ -366,6 +369,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         disabled: +stock.available_amount < +this.getCantidadTotal(data)
       };
     });
+
   }
 
   deshabilitarOtrasEdiciones(data: any) {
@@ -398,18 +402,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
           this.inicializarFormComponente(componente);
           this.obtenerProveedoresByComponente(componente);
           this.obtenerPosiblesSeriales(componente);
-          // const posibles = componente.possible_stocks ?? [];
-          // const seleccionado = componente.stock ? [componente.stock] : [];
-
-          // const combinados = [...posibles, ...seleccionado].filter(
-          //   (stock, index, self) =>
-          //     index === self.findIndex(s => s.uuid === stock.uuid)
-          // );
-
-          // this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => ({
-          //   ...stock,
-          //   disabled: +stock.available_amount < +this.getCantidadTotal(componente)
-          // }));
         }
       }
     });
@@ -422,31 +414,27 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
         if (this.expandedRows[componente.uuid]) {
           this.inicializarFormComponente(componente);
           this.obtenerProveedoresByComponente(componente);
+          this.obtenerPosiblesSeriales(componente);
 
-          const posibles = componente.possible_stocks ?? [];
-          const seleccionado = componente.stock ? [componente.stock] : [];
+          // const posibles = componente.possible_stocks ?? [];
+          // const seleccionado = componente.stock ? [componente.stock] : [];
 
-          // Combinar ambos arrays y evitar duplicados
-          const combinados = [...seleccionado, ...posibles].filter(
-            (stock, index, self) =>
-              index === self.findIndex(s => s.uuid === stock.uuid)
-          );
+          // // Combinar ambos arrays y evitar duplicados
+          // const combinados = [...seleccionado, ...posibles].filter(
+          //   (stock, index, self) =>
+          //     index === self.findIndex(s => s.uuid === stock.uuid)
+          // );
+          // this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => {
+          //   const todasLasInstancias = [
+          //     ...(stock.product_instances ?? []),   // todas las posibles
+          //   ];
 
-          // this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => ({
-          //   ...stock,
-          //   disabled: +stock.available_amount < +this.getCantidadTotal(componente)
-          // }));
-          this.stocksByComponente[componente.uuid] = combinados.map((stock: any) => {
-            const todasLasInstancias = [
-              ...(stock.product_instances ?? []),   // todas las posibles
-            ];
-
-            return {
-              ...stock,
-              product_instances: todasLasInstancias,  // siempre todas
-              disabled: +stock.available_amount < +this.getCantidadTotal(componente)
-            };
-          });
+          //   return {
+          //     ...stock,
+          //     product_instances: todasLasInstancias,  // siempre todas
+          //     disabled: +stock.available_amount < +this.getCantidadTotal(componente)
+          //   };
+          // });
 
 
         }
@@ -458,11 +446,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     this.expandirTodo = false;
     this.expandedRows = {};
   }
-
-  // cerrarModal(data: any) {
-  // this.isSubmit = false;
-  // this.modalComponente.close();
-  // }
 
   inicializarFormComponente(data: any) {
     this.componenteForm = new FormGroup({
@@ -620,7 +603,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     const productInstances = this.componenteForms[data.uuid].get('product_instances')?.value ?? [];
     const uuids = productInstances.map((pi: any) => pi.uuid);
     componente.product_instances = uuids;
-    if (componente.origin !== 'Lote' || data.assign_serial_number === 0) {
+    if (componente.origin !== 'Lote' || (data.assign_serial_number === 0 && data.has_serial_number === 0)) {
       delete componente.product_instances;
     }
   }
@@ -680,13 +663,6 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this.componenteForms[data.uuid].get(field)?.updateValueAndValidity({ emitEvent: false });
     });
   }
-
-  // hasReplacement(data: any) {
-  //   let reemplazos = (data.product?.replacements || []).filter(
-  //     (replacement: any) => replacement?.replacement?.current_state?.state?.name === 'Vigente'
-  //   );
-  //   return (reemplazos.length > 0 && this.produccion.current_state?.state?.name === 'Borrador');
-  // }
 
   openModalReemplazos(data: any) {
     this.selectedComponent = data;
