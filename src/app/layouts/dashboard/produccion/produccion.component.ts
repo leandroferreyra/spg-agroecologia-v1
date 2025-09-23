@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormBuilder, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -202,6 +202,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(this.params, this.actual_role).subscribe({
         next: res => {
           this.producciones = res.data;
+          console.log("🚀 ~ ProduccionComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
           if (this.uuidFromUrl) {
@@ -375,21 +376,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     });
   }
 
-  // onCantidadBlur() {
-  //   const cantidad = this.produccionForm.get('cantidad')?.value;
-  //   this.modificaCantidad = +cantidad !== +this.selectedProduccion.quantity;
-  //   if (this.modificaCantidad) {
-  //     this.isMayor = (cantidad && +cantidad > +this.selectedProduccion.quantity);
-  //     this.asignaNumero = this.selectedProduccion.product?.assign_serial_number === 1;
-  //     if (this.isMayor || this.asignaNumero) {
-  //       this.openModalCambioCantidad();
-  //     }
-  //   } else {
-  //     const serials = this.obtenerSerialNumbers(this.selectedProduccion);
-  //     this.setNumSerie(serials);
-  //   }
-  // }
-
   generarSecuencia() {
     const cantidad = this.numSerieArray.length;
     const base = Number(this.numSerieArray.at(0)?.value);
@@ -403,35 +389,6 @@ export class ProduccionComponent implements OnInit, OnDestroy {
       this.numSerieArray.at(i)?.setValue((base + i).toString());
     }
   }
-
-  // openModalCambioCantidad() {
-  //   this.modalCambioCantidad.options = this.modalOptions;
-  //   this.modalCambioCantidad.open();
-  // }
-
-  // cerrarModalCambioCantidad() {
-  //   this.isSubmit = false;
-  //   this.isMayor = false;
-  //   this.asignaNumero = false;
-  //   this.modificaCantidad = false;
-  //   const cantidad = this.showCantidad(this.selectedProduccion.quantity);
-  //   this.produccionForm.get('cantidad')?.setValue(cantidad);
-  //   const serials = this.obtenerSerialNumbers(this.selectedProduccion);
-  //   this.setNumSerie(serials);
-  //   this.modalCambioCantidad.close();
-  // }
-
-  // confirmarCambioCantidad() {
-  //   if (this.asignaNumero) {
-  //     this.produccionForm.get('numSerie')?.enable();
-  //     const nuevosControles = this.fb.array([]);
-  //     for (let i = 0; i < this.produccionForm.get('cantidad')?.value; i++) {
-  //       nuevosControles.push(this.fb.control('', [Validators.required]));
-  //     }
-  //     this.produccionForm.setControl('numSerie', nuevosControles);
-  //   }
-  //   this.modalCambioCantidad.close();
-  // }
 
   allowEditCantidad() {
     return !(this.isEdicion && this.selectedProduccion?.current_state?.state?.name === 'Borrador');
@@ -928,6 +885,10 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.filtroSimpleName = data.name;
     this.filtroSimpleContiene = false;
     this.obtenerProduccionesPorFiltroSimple();
+  }
+
+  actualizarNumerosDeSerie() {
+    this.showProduccionByUuid(this.uuidFromUrl, false);
   }
 
 

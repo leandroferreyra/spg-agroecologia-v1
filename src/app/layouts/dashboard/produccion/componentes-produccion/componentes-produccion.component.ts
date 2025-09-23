@@ -41,7 +41,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   @Output() eventBusquedaComponente = new EventEmitter<any>();
-
+  @Output() eventCambioNumeroSerie = new EventEmitter<any>();
+  
   @ViewChild('modalComponente') modalComponente!: NgxCustomModalComponent;
   @ViewChild('modalReemplazo') modalReemplazo!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
@@ -565,6 +566,10 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
             this.componenteForms[data.uuid].get('supplier_uuid')?.disable();
             this.obtenerComponentesProduccion();
             this.limpiarSerialesDeOtroLote(data);
+            // Si cambió números de serie, avisa a producciones
+            if (componente.product_instances && componente.product_instances?.length > 0) {
+              this.eventCambioNumeroSerie.emit();
+            }
             this.spinner.hide();
           },
           error: error => {
