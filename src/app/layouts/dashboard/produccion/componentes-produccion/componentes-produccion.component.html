@@ -46,6 +46,7 @@
                 <thead class="sticky top-0 bg-white dark:bg-gray-800 z-10">
                     <tr>
                         <th>Orden</th>
+                        <th>NS</th>
                         <th>Nombre</th>
                         <th>Cantidad por producto</th>
                         <th>Total</th>
@@ -63,6 +64,12 @@
                     @if(!(ocultarSinStock && data.product_type?.stock_controlled === 0)) {
                     <tr>
                         <td> {{ data.order }} </td>
+                        <td>
+                            <span *ngIf="getSerialNumberIndicator(data) !== ''" 
+                                  class="bg-yellow-300 px-2 py-1 rounded text-sm font-medium">
+                                {{getSerialNumberIndicator(data)}}
+                            </span>
+                        </td>
                         <td class="hover:text-blue-600 hover:underline hover:cursor-pointer" [ngClass]="{ 
                             'text-red-500': tieneControlStock(data) && isFaltante(data) && estadoNoTerminado(),
                             'color-provisto': isProvistoPorTerceros(data) }" (click)="irAlProducto($event, data)"> {{

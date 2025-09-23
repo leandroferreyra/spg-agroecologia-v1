@@ -317,6 +317,15 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       (data.assign_serial_number === 1 || data.has_serial_number === 1);
   }
 
+  getSerialNumberIndicator(data: any): string {
+    if (data.has_serial_number === 1) {
+      return 'T'; // Tiene número de serie
+    } else if (data.assign_serial_number === 1) {
+      return 'A'; // Asigna número de serie
+    }
+    return ''; // No asigna ni tiene
+  }
+
   // debeAsignarNumerosDeSerie(data: any, stock: any) {
   //   if (this.componenteForms[data.uuid].get('origin')?.value === 'Lote' && this.componenteForms[data.uuid].get('stock_uuid')?.value === stock.uuid) {
   //     return data.assign_serial_number === 1;
