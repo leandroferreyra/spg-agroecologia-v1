@@ -134,11 +134,11 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     const params: any = {};
     if (this.produccion.current_state?.state?.name === 'Borrador') {
       params.with = ["productType", "measure", "stock.batch", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
-        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location",
+        "possibleStocks.batch", "possibleStocks.location.location.location.location",
         "product.replacements.replacement.currentState", "possibleStocks.productInstances"];
     } else {
       params.with = ["productType", "measure", "stock.batch", "supplier.person.human", "supplier.person.legalEntity", "productInstances", "notReleasedProductions",
-        "possibleStocks.batch.productions.frozenComponentWithSerialNumber.productInstances", "possibleStocks.location.location.location.location", "product",
+        "possibleStocks.batch", "possibleStocks.location.location.location.location", "product",
         "possibleStocks.productInstances"];
     }
     params.paging = this.itemsPerPage;
