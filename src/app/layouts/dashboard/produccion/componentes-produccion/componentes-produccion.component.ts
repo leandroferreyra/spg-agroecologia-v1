@@ -17,7 +17,6 @@ import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import { Router } from '@angular/router';
-import { RolDTO } from 'src/app/core/models/request/rolDTO';
 import { IconCaretDownComponent } from 'src/app/shared/icon/icon-caret-down';
 import { IconExpandAllComponent2 } from 'src/app/shared/icon/icon-expand-all2';
 import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
@@ -238,6 +237,8 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
     if (data.product_type?.stock_controlled === 0) {
       return 'Sin control de stock';
     }
+
+    // Lo de abajo se podría unificar. Lo dejé así para ver cuando era lote único.
     if (data.product_type?.stock_controlled === 1 && data.traceable === 0) {
       // Lote único
       if (this.isFaltante(data) && data.origin != 'Lote' && (this.estadoNoTerminado())) {

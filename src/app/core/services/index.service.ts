@@ -49,6 +49,7 @@ export class IndexService {
   apiMetodosPago = '/payment_methods';
   apiProducciones = '/productions';
   apiFrozenComponents = '/frozen_components';
+  apiMissingFrozenComponentes = '/missing_frozen_components';
 
 
   constructor(private http: HttpClient) { }
@@ -395,5 +396,11 @@ export class IndexService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiFrozenComponents, { headers, params: this.getNewParams(paramsObj, rol) });
   }
+
+  getFaltantesWithParam(paramsObj: any, uuid: string, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiMissingFrozenComponentes + '/' + uuid, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
 
 }
