@@ -48,7 +48,8 @@
             <tbody>
                 @for(data of faltantes | slice: pageSize | slice: 0:itemsPerPage ; let index = $index; track data.uuid){
                 <tr>
-                    <td class="whitespace-nowrap"> {{index+1}} </td>
+                    <td class="whitespace-nowrap"> {{ (currentPage - 1) * itemsPerPage + index + 1 }}
+                    </td>
                     <td class="whitespace-nowrap">
                         <div class="flex items-center gap-1">
                             <span>{{data.name}}</span>

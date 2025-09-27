@@ -31,7 +31,7 @@ export class FaltantesComponent implements OnInit, OnDestroy {
   filtros: any = {
   };
   ordenamiento: any = {
-    'order': 'asc'
+    'name': 'asc'
   };
 
   // Orden, filtro y paginación para compras de proveedor
@@ -68,6 +68,8 @@ export class FaltantesComponent implements OnInit, OnDestroy {
   }
 
   obtenerFaltantes() {
+    this.spinner.show();
+
     const params: any = {};
     params.with = ["product", "measure", "notReleasedProductions"];
     params.paging = this.itemsPerPage;
@@ -79,7 +81,6 @@ export class FaltantesComponent implements OnInit, OnDestroy {
       this._indexService.getFaltantesWithParam(params, this.produccion.uuid, this.rol).subscribe({
         next: res => {
           this.faltantes = res.data;
-          // console.log("🚀 ~ FaltantesComponent ~ obtenerFaltantes ~ this.faltantes:", this.faltantes)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -94,8 +95,8 @@ export class FaltantesComponent implements OnInit, OnDestroy {
   }
 
   modificarPaginacion(res: any) {
-    this.total_rows = res.meta.total;
-    this.last_page = res.meta.last_page;
+    this.total_rows = res.meta?.total;
+    this.last_page = res.meta?.last_page;
     if (this.faltantes.length <= this.itemsPerPage) {
       if (res.meta?.current_page === res.meta?.last_page) {
         this.itemsInPage = this.total_rows;
