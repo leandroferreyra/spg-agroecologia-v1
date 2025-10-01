@@ -31,7 +31,7 @@ export class FaltantesComponent implements OnInit, OnDestroy {
   filtros: any = {
   };
   ordenamiento: any = {
-    'name': 'asc'
+    'order': 'asc'
   };
 
   // Orden, filtro y paginación para compras de proveedor
