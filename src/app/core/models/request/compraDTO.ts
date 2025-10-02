@@ -21,6 +21,8 @@ export class Transaction {
     perceptionIB!: string;
     perceptionRG3337!: string;
     possible_transaction_state_uuid!: string;
+    currency_uuid!: string;
+    exchange_rate!: string;
 
     constructor() {
 

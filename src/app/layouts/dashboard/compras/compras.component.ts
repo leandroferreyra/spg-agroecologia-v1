@@ -580,12 +580,23 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inicializarFormNew() {
     this.newCompraForm = new FormGroup({
       transaction_datetime: new FormControl({ value: new Date(), disabled: false }, []),
-      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required])
+      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      currency_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      exchange_rate: new FormControl({ value: null, disabled: false }, [Validators.required])
     });
     this.onNewForm();
   }
   onNewForm() {
-
+    this.newCompraForm.get('currency_uuid')!.valueChanges.subscribe(
+      (value: any) => {
+        if (value.name === 'Pesos') {
+          this.newCompraForm.get('exchange_rate')?.setValue(1);
+          this.newCompraForm.get('exchange_rate')?.disable();
+        } else {
+          this.newCompraForm.get('exchange_rate')?.setValue(null);
+          this.newCompraForm.get('exchange_rate')?.enable();
+        }
+      });
   }
 
   showName(dato: any) {
@@ -1016,6 +1027,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
       let compra = new CompraDTO();
       this.armarDTOCompra(compra, form);
       if (!this.isEdicion) {
+        compra.transaction.currency_uuid = form.get('currency_uuid')?.value?.uuid;
+        compra.transaction.exchange_rate = form.get('exchange_rate')?.value;
         this.subscription.add(
           this._comprasService.saveCompra(compra).subscribe({
             next: res => {

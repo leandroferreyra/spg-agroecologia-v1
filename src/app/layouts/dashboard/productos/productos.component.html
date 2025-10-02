@@ -610,53 +610,52 @@
                                 <div class="text-sm font-medium text-gray-600 mb-2">Costo de Producción</div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <!-- <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Costo de producción</label>
-                                        <input type="number" class="form-input w-full py-1.5 text-sm" />
-                                    </div> -->
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Valor original</label>
-                                        <input type="number" class="form-input w-full py-1.5 text-sm" />
+                                        <input type="number" class="form-input w-full py-1.5 text-sm"
+                                            formControlName="valorOriginalProduccion" />
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Valor actualizado (USD)</label>
-                                        <input type="number" class="form-input w-full py-1.5 text-sm" />
+                                        <label class="block text-xs text-gray-500 mb-1">Valor actualizado según
+                                            dólar</label>
+                                        <input type="number" class="form-input w-full py-1.5 text-sm"
+                                            formControlName="valorActualizadoProduccion" />
                                     </div>
                                 </div>
                             </div>
 
                             <div *ngIf="productoForm.get('comprable')?.value" class="mt-4">
                                 <div class="text-sm font-medium text-gray-600 mb-2">Costo de Compra</div>
-
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <!-- <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Costo de compra</label>
-                                        <input type="number" class="form-input w-full py-1.5 text-sm" />
-                                    </div> -->
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Valor original</label>
-                                        <input type="number" class="form-input w-full py-1.5 text-sm" />
+                                        <input type="number" class="form-input w-full py-1.5 text-sm"
+                                            formControlName="valorOriginalCompra" />
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Valor actualizado</label>
-                                        <input type="number" class="form-input w-full py-1.5 text-sm" />
+                                        <label class="block text-xs text-gray-500 mb-1">Valor actualizado según
+                                            dólar</label>
+                                        <input type="number" class="form-input w-full py-1.5 text-sm"
+                                            formControlName="valorActualizadoCompra" />
                                     </div>
                                 </div>
 
-                                <!-- Parámetros de cálculo -->
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                                <div class="text-sm font-medium text-gray-600 mb-2 mt-2">Parámetros de cálculo</div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Cantidad de compras</label>
-                                        <input type="number" class="form-input w-full py-1.5 text-sm" />
+                                        <input type="number" class="form-input w-full py-1.5 text-sm"
+                                            formControlName="cantidadCompras" />
                                     </div>
                                     <div>
-                                        <!-- <label class="block text-xs text-gray-500 mb-1">Función de cálculo</label>
+                                        <label class="block text-xs text-gray-500 mb-1">Función de cálculo</label>
                                         <ng-select [items]="['Mínimo','Máximo','Promedio']"
                                             formControlName="funcionCalculo" [clearable]="false"
                                             placeholder="Seleccione" class="w-full">
-                                        </ng-select> -->
+                                        </ng-select>
                                     </div>
                                 </div>
+
                             </div>
                             }
 

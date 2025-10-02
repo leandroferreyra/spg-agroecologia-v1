@@ -361,6 +361,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
       puedeSerProvisto: new FormControl({ value: producto?.product_type?.can_be_provided, disabled: true }, []),
       comprable: new FormControl({ value: producto?.product_type?.can_be_purchased, disabled: true }, []),
       producible: new FormControl({ value: producto?.product_type?.can_be_produced, disabled: true }, []),
+      valorOriginalProduccion: new FormControl({ value: 0, disabled: true }, []),
+      valorActualizadoProduccion: new FormControl({ value: 0, disabled: true }, []),
+      valorOriginalCompra: new FormControl({ value: 0, disabled: true }, []),
+      valorActualizadoCompra: new FormControl({ value: 0, disabled: true }, []),
+      cantidadCompras: new FormControl({ value: 0, disabled: true }, []),
+      funcionCalculo: new FormControl({ value: "Promedio", disabled: true }, []),
     });
     // Habilitar todos los controles si es edición
     // if (this.isEdicion) {

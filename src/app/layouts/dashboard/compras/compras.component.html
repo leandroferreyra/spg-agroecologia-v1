@@ -654,6 +654,21 @@
                             </ng-select>
                         </div>
 
+                        <div>
+                            <label>Moneda</label>
+                            <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar" style="width: 100%"
+                                [virtualScroll]="true" notFoundText="No hay monedas" class="w-1/3 min-w-[200px]"
+                                formControlName="currency_uuid" [selectOnTab]="true"
+                                [ngClass]="isSubmit ? newCompraForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                        </div>
+
+                        <div
+                            [ngClass]="isSubmitPago ? newCompraForm.controls['exchange_rate'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="exchange_rate">Tipo de cambio</label>
+                            <input id="exchange_rate" type="text" class="form-control"
+                                formControlName="exchange_rate" />
+                        </div>
+
                     </div>
                 </div>
 
