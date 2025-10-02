@@ -350,7 +350,8 @@
                                 </div>
 
                                 <fieldset class="border border-gray-300 rounded p-4 md:col-span-3">
-                                    <legend class="text-lg font-semibold flex items-center justify-between">
+                                    <legend
+                                        class="text-lg font-semibold flex items-center justify-between flex-wrap gap-2">
                                         <span>Características</span>
                                         <button type="button" (click)="toggleSwitches()"
                                             class="text-sm hover:underline flex items-center gap-1"
@@ -361,150 +362,121 @@
                                     </legend>
 
                                     @if (mostrarSwitches) {
-                                    <div class="flex justify-between items-center gap-4 mt-2 w-full">
-                                        <div class="flex items-center gap-2 flex-1">
+                                    <!-- 🟩 Switches del producto -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-2 w-full">
+                                        <div class="flex items-center gap-2">
                                             <label class="w-12 h-6 relative">
                                                 <input type="checkbox"
                                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_asigna" formControlName="asignaNumSerie" />
-                                                <span for="switch_asigna" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                                    formControlName="asignaNumSerie" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Asigna número de serie</span>
                                         </div>
 
-                                        <div class="flex items-center gap-2 flex-1">
+                                        <div class="flex items-center gap-2">
                                             <label class="w-12 h-6 relative">
                                                 <input type="checkbox"
                                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_tiene" formControlName="tieneNumSerie" />
-                                                <span for="switch_tiene" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                                    formControlName="tieneNumSerie" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Tiene número de serie</span>
                                         </div>
 
-                                        <div class="flex items-center gap-2 flex-1">
+                                        <div class="flex items-center gap-2">
                                             <label class="w-12 h-6 relative">
                                                 <input type="checkbox"
                                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_trazable" formControlName="trazable" />
-                                                <span for="switch_trazable" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                                    formControlName="trazable" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Trazable</span>
                                         </div>
 
-                                        <div class="flex items-center gap-2 flex-1">
+                                        <div class="flex items-center gap-2">
                                             <label class="w-12 h-6 relative">
                                                 <input type="checkbox"
                                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_vendible" formControlName="vendible" />
-                                                <span for="switch_vendible" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                                    formControlName="vendible" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Vendible</span>
                                         </div>
                                     </div>
 
-                                    <!-- 🧭 Separador visual -->
                                     <div class="border-t border-gray-300 my-4"></div>
-                                    <!-- <div class="text-sm font-medium text-gray-500 mb-2">Características del tipo de
-                                        producto</div> -->
 
-                                    <legend class="text-lg font-semibold flex items-center justify-between">
-                                        <span>Características del tipo de producto</span>
+                                    <legend class="text-base font-semibold mb-2">Características del tipo de producto
                                     </legend>
 
-                                    <!-- 🟦 Switches informativos del tipo de producto -->
-                                    <div class="grid grid-cols-5 gap-4">
-                                        <div class="flex items-center gap-2 flex-1">
-                                            <label class="w-12 h-6 relative">
-                                                <input type="checkbox"
-                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_asigna" formControlName="esCompuesto" />
-                                                <span for="switch_asigna" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                        <div class="flex items-center gap-2">
+                                            <label class="w-12 h-6 relative opacity-50">
+                                                <input type="checkbox" formControlName="esCompuesto"
+                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-not-allowed peer" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Es compuesto</span>
                                         </div>
 
-                                        <div class="flex items-center gap-2 flex-1">
-                                            <label class="w-12 h-6 relative">
-                                                <input type="checkbox"
-                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_asigna" formControlName="stockControlled" />
-                                                <span for="switch_asigna" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                        <div class="flex items-center gap-2">
+                                            <label class="w-12 h-6 relative opacity-50">
+                                                <input type="checkbox" formControlName="stockControlled"
+                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-not-allowed peer" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Con control de stock</span>
                                         </div>
 
-
-                                        <div class="flex items-center gap-2 flex-1">
-                                            <label class="w-12 h-6 relative">
-                                                <input type="checkbox"
-                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_asigna" formControlName="puedeSerProvisto" />
-                                                <span for="switch_asigna" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                        <div class="flex items-center gap-2">
+                                            <label class="w-12 h-6 relative opacity-50">
+                                                <input type="checkbox" formControlName="puedeSerProvisto"
+                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-not-allowed peer" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Puede ser provisto</span>
                                         </div>
 
-                                        <div class="flex items-center gap-2 flex-1">
-                                            <label class="w-12 h-6 relative">
-                                                <input type="checkbox"
-                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_asigna" formControlName="comprable" />
-                                                <span for="switch_asigna" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                        <div class="flex items-center gap-2">
+                                            <label class="w-12 h-6 relative opacity-50">
+                                                <input type="checkbox" formControlName="comprable"
+                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-not-allowed peer" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Comprable</span>
                                         </div>
 
-                                        <div class="flex items-center gap-2 flex-1">
-                                            <label class="w-12 h-6 relative">
-                                                <input type="checkbox"
-                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                                    id="switch_asigna" formControlName="producible" />
-                                                <span for="switch_asigna" class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full
-                     before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark
-                     before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
-                     peer-checked:border-primary peer-checked:before:bg-primary
-                     before:transition-all before:duration-300"></span>
+                                        <div class="flex items-center gap-2">
+                                            <label class="w-12 h-6 relative opacity-50">
+                                                <input type="checkbox" formControlName="producible"
+                                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-not-allowed peer" />
+                                                <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                                             </label>
                                             <span>Producible</span>
                                         </div>
                                     </div>
-
                                     }
-
                                 </fieldset>
+
 
                             </div>
                         </div>

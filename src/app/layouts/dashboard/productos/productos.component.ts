@@ -467,7 +467,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any, updateTab: boolean = true) {
-    console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
     this.productoAnterior = [];
     this.isEdicion = false;
     this.uuidFromUrl = producto.uuid;
