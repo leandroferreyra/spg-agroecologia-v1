@@ -251,18 +251,19 @@
 
                     <td>
                         <div class="flex items-center">
+                            @if(!isProcesoIPLadie(data)){
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                    (click)="openModalNuevoTipo('EDIT', data)" [disabled]="isProcesoIPLadie(data)">
+                                    (click)="openModalNuevoTipo('EDIT', data)">
                                     <icon-pencil />
                                 </button>
                             </div>
                             <div>
-                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)"
-                                    [disabled]="isProcesoIPLadie(data)">
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                     <icon-trash-lines />
                                 </button>
                             </div>
+                            }
                         </div>
                     </td>
                 </tr>
