@@ -48,6 +48,7 @@ import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { format } from 'date-fns';
 import { FlatpickrDirective } from 'angularx-flatpickr';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle copy';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-productos',
@@ -145,6 +146,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
+
+  // Iconos
+  iconEye = faEye;
+  iconEyeSlash = faEyeSlash;
+
+  mostrarSwitches = true;
+  mostrarStocks = true;
+  mostrarCostos = true;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -347,6 +356,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
       stock_minimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.minimum), disabled: this.isFieldDisabled(producto) }, []),
       stock_optimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.optimum), disabled: this.isFieldDisabled(producto) }, []),
       stock_quantity_sold: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.quantity_sold), disabled: true }, []),
+      esCompuesto: new FormControl({ value: producto?.product_type?.product_compound, disabled: true }, []),
+      stockControlled: new FormControl({ value: producto?.product_type?.stock_controlled, disabled: true }, []),
+      puedeSerProvisto: new FormControl({ value: producto?.product_type?.can_be_provided, disabled: true }, []),
+      comprable: new FormControl({ value: producto?.product_type?.can_be_purchased, disabled: true }, []),
+      producible: new FormControl({ value: producto?.product_type?.can_be_produced, disabled: true }, []),
     });
     // Habilitar todos los controles si es edición
     // if (this.isEdicion) {
@@ -453,6 +467,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any, updateTab: boolean = true) {
+    console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
     this.productoAnterior = [];
     this.isEdicion = false;
     this.uuidFromUrl = producto.uuid;
@@ -945,6 +960,26 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
     this.buildActiveFilters();
     this.obtenerProductosPorFiltroAvanzado();
+  }
+
+  getMostrarOcultarTooltipSwitches() {
+    return this.mostrarSwitches ? 'Ocultar' : 'Mostrar';
+  }
+  getMostrarOcultarTooltipStocks() {
+    return this.mostrarStocks ? 'Ocultar' : 'Mostrar';
+  }
+  getMostrarOcultarTooltipCostos() {
+    return this.mostrarCostos ? 'Ocultar' : 'Mostrar';
+  }
+
+  toggleSwitches() {
+    this.mostrarSwitches = !this.mostrarSwitches;
+  }
+  toggleStocks() {
+    this.mostrarStocks = !this.mostrarStocks;
+  }
+  toggleCostos() {
+    this.mostrarCostos = !this.mostrarCostos;
   }
 
 }
