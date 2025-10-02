@@ -31,7 +31,6 @@ export class ComprasProveedorService {
       .append('with[]', "transaction.currentState")
       .append('with[]', "transaction.transactionStates")
       .append('with[]', "batch")
-      .append('with[]', "qualificationOption")
       ;
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiCompras + '/' + uuid, { headers, params });
   }

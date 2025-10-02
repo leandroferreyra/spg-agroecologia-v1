@@ -239,6 +239,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       "transaction.person.city.district.country",
       "transaction.person.legalEntity",
       "transaction.transactionDocuments.accountDocumentType",
+      "transaction.transactionDocuments.currency",
       'transaction.transactionProducts.product.productType',
       'batch.stocks.productInstances',
       'transaction.currentState'
