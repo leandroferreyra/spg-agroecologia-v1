@@ -194,6 +194,12 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
         if (value && field === 'can_be_produced') {
           this.tiposProductosForm.get('product_compound')?.setValue(true, { emitEvent: false });
         }
+        if (!value && field === 'stock_controlled') {
+          this.tiposProductosForm.get('product_must_be_traceable')?.setValue(false, { emitEvent: false });
+        }
+        if (!value && field === 'product_compound') {
+          this.tiposProductosForm.get('can_be_produced')?.setValue(false, { emitEvent: false });
+        }
       });
     });
 
