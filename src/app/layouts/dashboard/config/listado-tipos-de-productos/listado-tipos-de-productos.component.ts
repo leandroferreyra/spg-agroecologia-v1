@@ -170,6 +170,40 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
       can_be_purchased: new FormControl(tipoProducto ? tipoProducto.can_be_purchased : false, [Validators.required]),
       can_be_produced: new FormControl(tipoProducto ? tipoProducto.can_be_produced : false, [Validators.required]),
     });
+    this.onFormChange();
+  }
+
+  onFormChange() {
+    const fieldsToWatch = [
+      'product_compound',
+      'product_must_be_traceable',
+      'stock_controlled',
+      'can_be_provided',
+      'can_be_purchased',
+      'can_be_produced'
+    ];
+
+    fieldsToWatch.forEach(field => {
+      this.tiposProductosForm.get(field)!.valueChanges.subscribe(value => {
+        if (value) {
+          this.tiposProductosForm.get('is_process')?.setValue(false, { emitEvent: false });
+        }
+        if (value && field === 'product_must_be_traceable') {
+          this.tiposProductosForm.get('stock_controlled')?.setValue(true, { emitEvent: false });
+        }
+        if (value && field === 'can_be_produced') {
+          this.tiposProductosForm.get('product_compound')?.setValue(true, { emitEvent: false });
+        }
+      });
+    });
+
+    this.tiposProductosForm.get('is_process')!.valueChanges.subscribe(value => {
+      if (value) {
+        fieldsToWatch.forEach(field => {
+          this.tiposProductosForm.get(field)?.setValue(false, { emitEvent: false });
+        });
+      }
+    });
   }
 
   confirmarTipoProducto() {
@@ -314,6 +348,10 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
   onColorChange(event: any) {
     this.color = event.color.hex;
     this.showPicker = false;
+  }
+
+  isProcesoIPLadie(data: any) {
+    return data.name === 'Procesos IP LADIE';
   }
 
 }

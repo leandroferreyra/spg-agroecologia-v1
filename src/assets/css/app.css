@@ -92,3 +92,9 @@ ng-select.has-error .ng-select-container {
 .disable-hover:hover {
     background-color: inherit !important;
 }
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
