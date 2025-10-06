@@ -169,6 +169,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inEdicionFactura: boolean = false;
   inEdicionProducto: boolean = false;
   inEdicionPago: boolean = false;
+  inAltaPago: boolean = false;
   inAltaFactura: boolean = false;
   poseeFactura: boolean = false;
 
@@ -455,6 +456,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     } else if (this.inEdicionFactura || this.inAltaFactura) {
       fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaFacturacion')?.value);
       uuidMoneda = this.compraForm.get('moneda')?.value?.uuid;
+    } else if (this.inEdicionPago || this.inAltaPago) {
+      let conversionFecha = this.convertirFechaNew(this.pagoForm.get('payment_datetime')?.value);
+      fecha = this.convertirFechaADateBackend(conversionFecha);
+      uuidMoneda = this.pagoForm.get('currency_uuid')?.value?.uuid;
     } else {
       // console.log(this.newCompraForm.get('transaction_datetime')?.value);
       let conversionFecha = this.convertirFechaNew(this.newCompraForm.get('transaction_datetime')?.value);
@@ -899,6 +904,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       if (this.isEdicion) {
         this.isEdicion = false;
       }
+      this.inAltaPago = true;
       this.tituloModal = 'Nuevo pago';
       this.inicializarFormPago();
       this.modalPago.options = this.modalOptions;
@@ -925,23 +931,35 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inicializarFormPago(data?: any) {
     this.pagoForm = new FormGroup({
       pago_uuid: new FormControl({ value: data ? data.uuid : null, disabled: false }, []),
-      payment_datetime: new FormControl({ value: data ? this.getFecha(data.payment_datetime) : null, disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
+      payment_datetime: new FormControl({ value: data ? this.getFecha(data.payment_datetime) : new Date(), disabled: false }, this.inEdicionPago ? [] : [Validators.required]),
       payment_method: new FormControl({ value: data ? data.payment_method?.uuid : null, disabled: false }, this.inEdicionPago ? [] : []),
       amount: new FormControl({ value: data ? data.amount : null, disabled: false }, this.inEdicionPago ? [] : []),
       detail: new FormControl({ value: data ? data.detail : null, disabled: false }, []),
-      currency_uuid: new FormControl({ value: data ? data.currency.name : null, disabled: false }, this.inEdicionPago ? [] : []),
+      currency_uuid: new FormControl({ value: data ? data.currency : null, disabled: false }, this.inEdicionPago ? [] : []),
       exchange_rate: new FormControl({ value: data ? data.exchange_rate : null, disabled: false }, this.inEdicionPago ? [] : []),
     });
     this.onChangePagoForm();
   }
   onChangePagoForm() {
+    this.pagoForm.get('payment_datetime')!.valueChanges.subscribe(
+      async (value: any) => {
+        const moneda = this.pagoForm.get('currency_uuid')?.value?.name;
+        // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
+        // let valor = this.convertirFechaADateBackend(value);
+        if (moneda && moneda !== 'Pesos') {
+          const rate = await this.getTipoCambioPorFechaPromise();
+          this.pagoForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
+        }
+      });
+
     this.pagoForm.get('currency_uuid')!.valueChanges.subscribe(
-      (value: any) => {
+      async (value: any) => {
         if (value.name === 'Pesos') {
           this.pagoForm.get('exchange_rate')?.setValue(1);
           this.pagoForm.get('exchange_rate')?.disable();
         } else {
-          this.pagoForm.get('exchange_rate')?.setValue(null);
+          const rate = await this.getTipoCambioPorFechaPromise();
+          this.pagoForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
           this.pagoForm.get('exchange_rate')?.enable();
         }
       });
@@ -1999,7 +2017,12 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.spinner.show();
       let pago = new PagoDTO();
       pago.actual_role = this.actual_role;
-      pago.payment_datetime = this.convertirFechaADateBackend(this.pagoForm.get('payment_datetime')?.value);
+      const fechaFormateada = this.pagoForm.get('payment_datetime')?.value instanceof Date
+        ? format(this.pagoForm.get('payment_datetime')?.value, 'dd-MM-yyyy')
+        : this.pagoForm.get('payment_datetime')?.value;
+      pago.payment_datetime = this.convertirFechaADateBackend(fechaFormateada);
+
+      // pago.payment_datetime = this.convertirFechaADateBackend(this.pagoForm.get('payment_datetime')?.value);
       pago.amount = this.pagoForm.get('amount')?.value;
       pago.currency_uuid = this.pagoForm.get('currency_uuid')?.value?.uuid;
       pago.detail = this.pagoForm.get('detail')?.value;
@@ -2089,6 +2112,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   cerrarModalPago() {
     this.isSubmitPago = false;
     this.inEdicionPago = false;
+    this.inAltaPago = false;
     this.modalPago.close();
   }
 
