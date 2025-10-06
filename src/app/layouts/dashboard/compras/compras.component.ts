@@ -11,7 +11,7 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Observable, Subject, Subscription, debounceTime, distinctUntilChanged, finalize, forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { Observable, Subject, Subscription, catchError, debounceTime, distinctUntilChanged, finalize, firstValueFrom, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -364,11 +364,14 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
   onFormEditChange() {
     this.compraForm.get('fechaCompra')!.valueChanges.subscribe(
-      (value: any) => {
-        let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
-        let valor = this.convertirFechaADateBackend(value);
-        if (valorActual !== valor) {
-          this.getTipoCambioPorFecha();
+      async (value: any) => {
+        const moneda = this.compraForm.get('moneda')?.value?.name;
+        // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
+        // let valor = this.convertirFechaADateBackend(value);
+        // if (valorActual !== valor && moneda !== 'Pesos') {
+        if (moneda && moneda !== 'Pesos') {
+          const rate = await this.getTipoCambioPorFechaPromise();
+          this.compraForm.get('tipoCambioCompra')?.setValue(rate, { emitEvent: false });
         }
       });
 
@@ -399,7 +402,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     });
 
     this.compraForm.get('monedaCompra')!.valueChanges.subscribe(
-      (value: any) => {
+      async (value: any) => {
 
         const tipoCambioCtrl = this.compraForm.get('tipoCambioCompra');
         if (!value) return;
@@ -419,7 +422,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
           if (monedaCambioReal) {
             // Se llama al endpoint para setear el valor del tipo de cambio según la fecha. 
-            this.getTipoCambioPorFecha();
+            const rate = await this.getTipoCambioPorFechaPromise();
+            tipoCambioCtrl?.setValue(rate, { emitEvent: false });
           }
         }
 
@@ -428,25 +432,67 @@ export class ComprasComponent implements OnInit, OnDestroy {
       });
   }
 
-  getTipoCambioPorFecha() {
-    const fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
-    const uuidMoneda = this.compraForm.get('monedaCompra')?.value?.uuid;
-    this.subscription.add(
-      this._tiposCambioService.getTipoCambioPorFecha(uuidMoneda, fecha, this.actual_role).subscribe({
-        next: res => {
-          let exchangeRate = res.data;
+  async getTipoCambioPorFechaPromise() {
+    let fecha;
+    let uuidMoneda;
+    if (this.inEdicionFechaCompra) {
+      fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
+      uuidMoneda = this.compraForm.get('monedaCompra')?.value?.uuid;
+    } else {
+      // console.log(this.newCompraForm.get('transaction_datetime')?.value);
+      let conversionFecha = this.convertirFechaNew(this.newCompraForm.get('transaction_datetime')?.value);
+      fecha = this.convertirFechaADateBackend(conversionFecha);
+      uuidMoneda = this.newCompraForm.get('currency_uuid')?.value?.uuid;
+    }
+    const observable$ = this._tiposCambioService
+      .getTipoCambioPorFecha(uuidMoneda, fecha, this.actual_role)
+      .pipe(
+        map(res => {
+          const exchangeRate = res.data;
           if (exchangeRate.length > 0) {
-            this.compraForm.get('tipoCambioCompra')?.setValue(exchangeRate[0].rate, { emitEvent: false });
+            return exchangeRate[0].rate as number;
           } else {
-            this.compraForm.get('tipoCambioCompra')?.setValue(null, { emitEvent: false });
+            return null;
           }
-        },
-        error: error => {
+        }),
+        catchError(error => {
           this.swalService.toastError('top-right', error.error.message);
-          console.error(error);
-        }
-      })
-    )
+          console.error('Error obteniendo tipo de cambio:', error);
+          return of(null);
+        })
+      );
+
+    return firstValueFrom(observable$);
+
+    // const fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
+    // const uuidMoneda = this.compraForm.get('monedaCompra')?.value?.uuid;
+    // this.subscription.add(
+    //   this._tiposCambioService.getTipoCambioPorFecha(uuidMoneda, fecha, this.actual_role).subscribe({
+    //     next: res => {
+    //       let exchangeRate = res.data;
+    //       if (exchangeRate.length > 0) {
+    //         this.compraForm.get('tipoCambioCompra')?.setValue(exchangeRate[0].rate, { emitEvent: false });
+    //       } else {
+    //         this.compraForm.get('tipoCambioCompra')?.setValue(null, { emitEvent: false });
+    //       }
+    //     },
+    //     error: error => {
+    //       this.swalService.toastError('top-right', error.error.message);
+    //       console.error(error);
+    //     }
+    //   })
+    // )
+  }
+
+  convertirFechaNew(fecha: string) {
+    const fechaOriginal = new Date(fecha);
+
+    const dia = String(fechaOriginal.getDate()).padStart(2, '0');
+    const mes = String(fechaOriginal.getMonth() + 1).padStart(2, '0');
+    const anio = fechaOriginal.getFullYear();
+
+    const fechaFormateada = `${dia}-${mes}-${anio}`;
+    return fechaFormateada;
   }
 
   getFecha(fecha: string) {
@@ -655,13 +701,25 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.onNewForm();
   }
   onNewForm() {
+    this.newCompraForm.get('transaction_datetime')!.valueChanges.subscribe(
+      async (value: any) => {
+        const moneda = this.newCompraForm.get('currency_uuid')?.value?.name;
+        // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
+        // let valor = this.convertirFechaADateBackend(value);
+        if (moneda && moneda !== 'Pesos') {
+          const rate = await this.getTipoCambioPorFechaPromise();
+          this.newCompraForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
+        }
+      });
+
     this.newCompraForm.get('currency_uuid')!.valueChanges.subscribe(
-      (value: any) => {
+      async (value: any) => {
         if (value.name === 'Pesos') {
           this.newCompraForm.get('exchange_rate')?.setValue(1);
           this.newCompraForm.get('exchange_rate')?.disable();
         } else {
-          this.newCompraForm.get('exchange_rate')?.setValue(null);
+          const rate = await this.getTipoCambioPorFechaPromise();
+          this.newCompraForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
           this.newCompraForm.get('exchange_rate')?.enable();
         }
       });
