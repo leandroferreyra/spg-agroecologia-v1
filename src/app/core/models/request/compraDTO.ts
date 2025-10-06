@@ -22,7 +22,7 @@ export class Transaction {
     perceptionRG3337!: string;
     possible_transaction_state_uuid!: string;
     currency_uuid!: string;
-    exchange_rate!: string;
+    exchange_rate!: number;
 
     constructor() {
 

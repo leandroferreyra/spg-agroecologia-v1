@@ -47,6 +47,7 @@ import { Title } from '@angular/platform-browser';
 import { BatchUpdateControlDTO } from 'src/app/core/models/request/batchUpdateControlDTO';
 import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePriceRangeDTO';
 import { IconDollarSignComponent } from 'src/app/shared/icon/icon-dollar-sign';
+import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
 
 @Component({
   selector: 'app-compras',
@@ -187,13 +188,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
   private ultimaMonedaSeleccionada: any = null;
+  private ultimaMonedaCompraSeleccionada: any = null;
+  private ultimaFechaCompraSeleccionada: any = null;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService, private titleService: Title,
     private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
     private _ubicacionService: UbicacionesService, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
-    private router: Router) {
+    private router: Router, private _tiposCambioService: TiposCambioService) {
     this.initStore();
   }
 
@@ -242,7 +245,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
       "transaction.transactionDocuments.currency",
       'transaction.transactionProducts.product.productType',
       'batch.stocks.productInstances',
-      'transaction.currentState'
+      'transaction.currentState',
+      'transaction.currency'
     ];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
@@ -316,6 +320,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   inicializarFormEdit() {
     this.poseeFactura = false;
     this.compraForm = new FormGroup({
+      monedaCompra: new FormControl({ value: this.selectedCompra?.transaction?.currency, disabled: true }, []),
+      tipoCambioCompra: new FormControl({ value: this.selectedCompra?.transaction?.exchange_rate, disabled: true }, []),
       // Proveedor
       nombre: new FormControl({ value: this.selectedCompra?.transaction?.person?.human?.firstname, disabled: true }, []),
       apellido: new FormControl({ value: this.selectedCompra?.transaction?.person?.human?.lastname, disabled: true }, []),
@@ -348,6 +354,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
       calificacionComentarios: new FormControl({ value: this.selectedCompra?.qualification_comments, disabled: true }, []),
     });
     this.ultimaMonedaSeleccionada = this.compraForm.get('moneda')?.value;
+    this.ultimaMonedaCompraSeleccionada = this.compraForm.get('monedaCompra')?.value;
+    this.ultimaFechaCompraSeleccionada = this.compraForm.get('fechaCompra')?.value;
 
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
       this.poseeFactura = true;
@@ -355,6 +363,15 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.onFormEditChange();
   }
   onFormEditChange() {
+    this.compraForm.get('fechaCompra')!.valueChanges.subscribe(
+      (value: any) => {
+        let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
+        let valor = this.convertirFechaADateBackend(value);
+        if (valorActual !== valor) {
+          this.getTipoCambioPorFecha();
+        }
+      });
+
     this.compraForm.get('moneda')!.valueChanges.subscribe((value: any) => {
       const tipoCambioCtrl = this.compraForm.get('tipoCambio');
       if (!value) return;
@@ -380,6 +397,56 @@ export class ComprasComponent implements OnInit, OnDestroy {
       // Actualizamos el valor anterior
       this.ultimaMonedaSeleccionada = value;
     });
+
+    this.compraForm.get('monedaCompra')!.valueChanges.subscribe(
+      (value: any) => {
+
+        const tipoCambioCtrl = this.compraForm.get('tipoCambioCompra');
+        if (!value) return;
+
+        const nuevaMoneda = value?.name;
+        const monedaAnterior = this.ultimaMonedaCompraSeleccionada?.name;
+
+        // CASO 1: Si es Pesos
+        if (nuevaMoneda === 'Pesos') {
+          tipoCambioCtrl?.setValue(1);
+          tipoCambioCtrl?.disable();
+        } else {
+          tipoCambioCtrl?.enable();
+
+          // CASO 2: Cambio real entre monedas (Pesos <-> otra o USD <-> EUR, etc.)
+          const monedaCambioReal = monedaAnterior && monedaAnterior !== nuevaMoneda;
+
+          if (monedaCambioReal) {
+            // Se llama al endpoint para setear el valor del tipo de cambio según la fecha. 
+            this.getTipoCambioPorFecha();
+          }
+        }
+
+        // Actualizamos el valor anterior
+        this.ultimaMonedaCompraSeleccionada = value;
+      });
+  }
+
+  getTipoCambioPorFecha() {
+    const fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
+    const uuidMoneda = this.compraForm.get('monedaCompra')?.value?.uuid;
+    this.subscription.add(
+      this._tiposCambioService.getTipoCambioPorFecha(uuidMoneda, fecha, this.actual_role).subscribe({
+        next: res => {
+          let exchangeRate = res.data;
+          if (exchangeRate.length > 0) {
+            this.compraForm.get('tipoCambioCompra')?.setValue(exchangeRate[0].rate, { emitEvent: false });
+          } else {
+            this.compraForm.get('tipoCambioCompra')?.setValue(null, { emitEvent: false });
+          }
+        },
+        error: error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error(error);
+        }
+      })
+    )
   }
 
   getFecha(fecha: string) {
@@ -1550,12 +1617,43 @@ export class ComprasComponent implements OnInit, OnDestroy {
       }
       this.compraForm.get('fechaCompra')?.enable();
       this.compraForm.get('estadoCompra')?.enable();
+      if (this.selectedCompra?.transaction?.current_state?.state?.name === 'Borrador') {
+        this.compraForm.get('monedaCompra')?.enable();
+        if (this.compraForm.get('monedaCompra')?.value?.name !== 'Pesos') {
+          this.compraForm.get('tipoCambioCompra')?.enable();
+        }
+      }
     } else {
       this.compraForm.get('fechaCompra')?.disable();
       this.compraForm.get('estadoCompra')?.disable();
+      this.compraForm.get('monedaCompra')?.disable();
+      this.compraForm.get('tipoCambioCompra')?.disable();
       this.inicializarFormEdit();
     }
 
+  }
+
+  openSwalConfirmarEdicionDatosCompra(compraDTO: CompraDTO) {
+    Swal.fire({
+      title: '',
+      text: `Al confirmar se eliminarán los productos cargados en la compra`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.edicionConfirmadaDatosCompra(compraDTO);
+      } else if (result.isDenied) {
+
+      }
+    })
   }
 
   confirmarEdicionFechaCompra() {
@@ -1563,7 +1661,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.swalService.toastError('top-right', 'Debe seleccionar un estado');
       return;
     }
-    this.spinner.show();
+    if (this.compraForm.get('tipoCambioCompra')?.value === null) {
+      this.swalService.toastError('top-right', 'Debe seleccionar un tipo de cambio');
+      return;
+    }
     let compraDTO = new CompraDTO();
     let transaction = new Transaction();
     transaction.transaction_datetime = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
@@ -1581,6 +1682,23 @@ export class ComprasComponent implements OnInit, OnDestroy {
       "transaction.currentState",
       "batch",
       "qualificationOption"];
+    const modificaMonedaCompra = this.compraForm.get('monedaCompra')?.value?.name !== this.selectedCompra?.transaction?.currency?.name;
+    const modificaTipoCambioCompra = this.compraForm.get('tipoCambioCompra')?.value !== +this.selectedCompra?.transaction?.exchange_rate;
+    if (modificaMonedaCompra) {
+      compraDTO.transaction.currency_uuid = this.compraForm.get('monedaCompra')?.value?.uuid;
+    }
+    if (modificaTipoCambioCompra) {
+      compraDTO.transaction.exchange_rate = +this.compraForm.get('tipoCambioCompra')?.value;
+    }
+    if (modificaMonedaCompra && this.selectedCompra?.transaction?.transaction_products?.length > 0) {
+      this.openSwalConfirmarEdicionDatosCompra(compraDTO);
+    } else {
+      this.edicionConfirmadaDatosCompra(compraDTO);
+    }
+  }
+
+  edicionConfirmadaDatosCompra(compraDTO: CompraDTO) {
+    this.spinner.show();
     this.subscription.add(
       this._comprasService.editCompra(this.selectedCompra.uuid, compraDTO).subscribe({
         next: res => {
@@ -1598,6 +1716,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       })
     )
   }
+
 
   openCloseEditarDescuentosCompra() {
     this.inEdicionDescuentos = !this.inEdicionDescuentos;

@@ -31,4 +31,11 @@ export class TiposCambioService {
     return this.http.delete<AuthResponse>(environment.baseUrl + this.apiTiposCambio + '/' + uuid, { headers, params });
   }
 
+  getTipoCambioPorFecha(uuid: string, fecha: string, rolActual: string) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .set('actual_role', rolActual);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiTiposCambio + '/' + uuid + '/' + fecha, { headers, params });
+  }
+
 }
