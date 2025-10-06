@@ -1889,11 +1889,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.compraForm.get('moneda')?.enable();
       this.compraForm.get('tipoCambio')?.enable();
     } else {
-      this.compraForm.get('fechaFacturacion')?.disable();
+      this.compraForm.get('fechaFacturacion')?.disable({ emitEvent: false });
       this.compraForm.get('tipoComprobante')?.disable();
       this.compraForm.get('prefijoComprobante')?.disable();
       this.compraForm.get('documentoComprobante')?.disable();
-      this.compraForm.get('moneda')?.disable();
+      this.compraForm.get('moneda')?.disable({ emitEvent: false });
       this.compraForm.get('tipoCambio')?.disable();
       this.inicializarFormEdit();
     }
