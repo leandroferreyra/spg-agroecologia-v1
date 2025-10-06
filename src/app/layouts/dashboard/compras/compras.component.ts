@@ -187,7 +187,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
-  private ultimaMonedaSeleccionada: any = null;
+  private ultimaMonedaFacturacionSeleccionada: any = null;
   private ultimaMonedaCompraSeleccionada: any = null;
   private ultimaFechaCompraSeleccionada: any = null;
 
@@ -353,7 +353,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       calificacion: new FormControl({ value: this.selectedCompra?.qualification_option?.uuid, disabled: true }, []),
       calificacionComentarios: new FormControl({ value: this.selectedCompra?.qualification_comments, disabled: true }, []),
     });
-    this.ultimaMonedaSeleccionada = this.compraForm.get('moneda')?.value;
+    this.ultimaMonedaFacturacionSeleccionada = this.compraForm.get('moneda')?.value;
     this.ultimaMonedaCompraSeleccionada = this.compraForm.get('monedaCompra')?.value;
     this.ultimaFechaCompraSeleccionada = this.compraForm.get('fechaCompra')?.value;
 
@@ -365,7 +365,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   onFormEditChange() {
     this.compraForm.get('fechaCompra')!.valueChanges.subscribe(
       async (value: any) => {
-        const moneda = this.compraForm.get('moneda')?.value?.name;
+        const moneda = this.compraForm.get('monedaCompra')?.value?.name;
         // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
         // let valor = this.convertirFechaADateBackend(value);
         // if (valorActual !== valor && moneda !== 'Pesos') {
@@ -375,12 +375,24 @@ export class ComprasComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.compraForm.get('moneda')!.valueChanges.subscribe((value: any) => {
+    this.compraForm.get('fechaFacturacion')!.valueChanges.subscribe(
+      async (value: any) => {
+        const moneda = this.compraForm.get('moneda')?.value?.name;
+        // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
+        // let valor = this.convertirFechaADateBackend(value);
+        // if (valorActual !== valor && moneda !== 'Pesos') {
+        if (moneda && moneda !== 'Pesos') {
+          const rate = await this.getTipoCambioPorFechaPromise();
+          this.compraForm.get('tipoCambio')?.setValue(rate, { emitEvent: false });
+        }
+      });
+
+    this.compraForm.get('moneda')!.valueChanges.subscribe(async (value: any) => {
       const tipoCambioCtrl = this.compraForm.get('tipoCambio');
       if (!value) return;
 
       const nuevaMoneda = value?.name;
-      const monedaAnterior = this.ultimaMonedaSeleccionada?.name;
+      const monedaAnterior = this.ultimaMonedaFacturacionSeleccionada?.name;
 
       // CASO 1: Si es Pesos
       if (nuevaMoneda === 'Pesos') {
@@ -390,15 +402,17 @@ export class ComprasComponent implements OnInit, OnDestroy {
         tipoCambioCtrl?.enable();
 
         // CASO 2: Cambio real entre monedas (Pesos <-> otra o USD <-> EUR, etc.)
+        const primeraFactura = this.ultimaMonedaFacturacionSeleccionada === '';
         const monedaCambioReal = monedaAnterior && monedaAnterior !== nuevaMoneda;
 
-        if (monedaCambioReal) {
-          tipoCambioCtrl?.setValue(null);
+        if (primeraFactura || monedaCambioReal) {
+          const rate = await this.getTipoCambioPorFechaPromise();
+          tipoCambioCtrl?.setValue(rate, { emitEvent: false });
         }
       }
 
       // Actualizamos el valor anterior
-      this.ultimaMonedaSeleccionada = value;
+      this.ultimaMonedaFacturacionSeleccionada = value;
     });
 
     this.compraForm.get('monedaCompra')!.valueChanges.subscribe(
@@ -438,6 +452,9 @@ export class ComprasComponent implements OnInit, OnDestroy {
     if (this.inEdicionFechaCompra) {
       fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
       uuidMoneda = this.compraForm.get('monedaCompra')?.value?.uuid;
+    } else if (this.inEdicionFactura || this.inAltaFactura) {
+      fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaFacturacion')?.value);
+      uuidMoneda = this.compraForm.get('moneda')?.value?.uuid;
     } else {
       // console.log(this.newCompraForm.get('transaction_datetime')?.value);
       let conversionFecha = this.convertirFechaNew(this.newCompraForm.get('transaction_datetime')?.value);
