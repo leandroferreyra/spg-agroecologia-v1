@@ -364,8 +364,10 @@
                                     <th class="px-2 py-1">Código</th>
                                     <th class="px-2 py-1">Nombre</th>
                                     <th class="px-2 py-1">Cantidad adquirida</th>
-                                    <th class="px-2 py-1">Precio unitario</th>
-                                    <th class="px-2 py-1">Precio total</th>
+                                    <th class="px-2 py-1">Precio unitario
+                                        ({{selectedCompra?.transaction?.currency?.symbol}}) </th>
+                                    <th class="px-2 py-1">Precio total
+                                        ({{selectedCompra?.transaction?.currency?.symbol}})</th>
                                     <th class="px-2 py-1">IVA (%)</th>
                                     <th class="px-2 py-1">Descripción del control</th>
                                     <th class="px-2 py-1">Control realizado</th>
@@ -485,39 +487,47 @@
                 @if (mostrarDetalles) {
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block font-medium">Subtotal sin descuentos</label>
+                        <label class="block font-medium">Subtotal sin descuentos
+                            ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="subtotalSinDescuento" />
                     </div>
                     <div>
-                        <label class="block font-medium">Descuento 1</label>
+                        <label class="block font-medium">Descuento 1
+                            ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="descuento1" />
                     </div>
                     <div>
-                        <label class="block font-medium">Descuento 2</label>
+                        <label class="block font-medium">Descuento 2
+                            ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="descuento2" />
                     </div>
                     <div>
-                        <label class="block font-medium">Subtotal con descuentos</label>
+                        <label class="block font-medium">Subtotal con descuentos
+                            ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="subtotalConDescuento" />
                     </div>
                     <div>
-                        <label class="block font-medium">Otros cargos</label>
+                        <label class="block font-medium">Otros cargos
+                            ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="otrosCargos" />
                     </div>
                     <div>
-                        <label class="block font-medium">IVA</label>
+                        <label class="block font-medium">IVA ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="iva" />
                     </div>
                     <div>
-                        <label class="block font-medium">Percepción IIBB</label>
+                        <label class="block font-medium">Percepción IIBB
+                            ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="percepcionIIBB" />
                     </div>
                     <div>
-                        <label class="block font-medium">Percepción RG. 3337</label>
+                        <label class="block font-medium">Percepción RG. 3337
+                            ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="percepcionRG3337" />
                     </div>
                     <div>
-                        <label class="block font-medium">Total compra</label>
+                        <label class="block font-medium">Total compra
+                            ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                         <input type="text" class="form-control w-full" formControlName="total" />
                     </div>
                     <div>
@@ -737,7 +747,8 @@
 
                         <div (keydown.enter)="validatePriceRange()"
                             [ngClass]="isSubmit ? productoForm.controls['unit_price'].errors ? 'has-error' : 'has-success' : ''">
-                            <label for="unit_price">Precio unitario</label>
+                            <label for="unit_price">Precio unitario
+                                ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                             <input id="unit_price" type="text" placeholder="" class="form-control"
                                 formControlName="unit_price" />
                         </div>
