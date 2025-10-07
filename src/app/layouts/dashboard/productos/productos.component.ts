@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, RequiredValidator, FormArray, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormArray, FormBuilder } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -40,14 +40,14 @@ import { StocksComponent } from './stocks/stocks.component';
 import { ComprasProductoComponent } from './compras-producto/compras-producto.component';
 import { VinculosComponent } from './vinculos/vinculos.component';
 import { Location } from '@angular/common';
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { ProduccionService } from 'src/app/core/services/produccion.service';
 import { ProduccionDTO } from 'src/app/core/models/request/produccionDTO';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { format } from 'date-fns';
 import { FlatpickrDirective } from 'angularx-flatpickr';
-import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle copy';
+import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -365,7 +365,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       valorActualizadoProduccion: new FormControl({ value: 0, disabled: true }, []),
       valorOriginalCompra: new FormControl({ value: 0, disabled: true }, []),
       valorActualizadoCompra: new FormControl({ value: 0, disabled: true }, []),
-      cantidadCompras: new FormControl({ value: 0, disabled: true }, []),
+      cantidadCompras: new FormControl({ value: null, disabled: true }, []),
       funcionCalculo: new FormControl({ value: "Promedio", disabled: true }, []),
     });
     // Habilitar todos los controles si es edición
@@ -473,6 +473,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any, updateTab: boolean = true) {
+    console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
     this.productoAnterior = [];
     this.isEdicion = false;
     this.uuidFromUrl = producto.uuid;

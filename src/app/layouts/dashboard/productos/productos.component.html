@@ -596,7 +596,13 @@
 
                         <fieldset class="border border-gray-300 rounded p-4 md:col-span-3 mt-2">
                             <legend class="text-lg font-semibold flex items-center justify-between">
-                                <span>Costos</span>
+                                <span>
+                                    Costos
+                                    <button type="button" class="ltr:ml-3 rtl:mr-1 hover:text-primary"
+                                        ngxTippy="Editar">
+                                        <icon-pencil />
+                                    </button>
+                                </span>
                                 <button type="button" (click)="toggleCostos()"
                                     class="text-sm hover:underline flex items-center gap-1" style="color:#000000a3"
                                     [ngxTippy]="getMostrarOcultarTooltipCostos()">
@@ -604,6 +610,14 @@
                                         style="cursor: pointer;"></fa-icon>
                                 </button>
                             </legend>
+
+                            <!-- <span>
+                                Detalles
+                                <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
+                                    (click)="openCloseEditarDescuentosCompra()">
+                                    <icon-pencil />
+                                </button>
+                            </span> -->
 
                             @if (mostrarCostos) {
                             <div *ngIf="productoForm.get('producible')?.value" class="mt-2">

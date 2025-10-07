@@ -118,7 +118,7 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
     this.spinner.show();
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = [];
+    params.with = ["costParam"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -380,8 +380,8 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
   inicializarFormGastos(data: any) {
     this.gastosForm = new FormGroup({
       uuidTipoProducto: new FormControl(data.uuid, [Validators.required]),
-      cantidadCompras: new FormControl(null, [Validators.required, Validators.min(1)]),
-      funcionCalculo: new FormControl('Promedio', [Validators.required]),
+      cantidadCompras: new FormControl(data.cost_param ? data.cost_param.purchases_quantity : null, [Validators.required, Validators.min(1)]),
+      funcionCalculo: new FormControl(data.cost_param ? data.cost_param.calculation_function : 'Promedio', [Validators.required]),
     });
     this.onChangeGastosForm();
   }
@@ -407,6 +407,7 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
           next: res => {
             this.spinner.hide();
             this.cerrarModalCostos();
+            this.obtenerTiposProductos();
           },
           error: error => {
             console.error(error);

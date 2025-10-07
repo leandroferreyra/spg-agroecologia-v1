@@ -36,6 +36,7 @@ export class ProductoService {
     const params = new HttpParams()
       .append('actual_role', rol)
       .append('with[]', "productType")
+      .append('with[]', "productType.costParam")
       .append('with[]', "productCategory")
       .append('with[]', "currentState")
       .append('with[]', "productStates")
