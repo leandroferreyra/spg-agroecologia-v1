@@ -15,6 +15,7 @@ import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TipoProductoService } from 'src/app/core/services/tipoProducto.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { IconAdjustmentsComponent } from 'src/app/shared/icon/icon-adjustments';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
@@ -29,7 +30,7 @@ import { GastosDTO } from 'src/app/core/models/request/gastosDTO';
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule, ColorSketchModule,
-    NgSelectModule],
+    NgSelectModule, IconAdjustmentsComponent],
   templateUrl: './listado-tipos-de-productos.component.html',
   styleUrl: './listado-tipos-de-productos.component.css'
 })
