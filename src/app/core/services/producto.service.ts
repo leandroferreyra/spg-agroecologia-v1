@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { ProductoDTO } from '../models/request/productoDTO';
+import { GastosDTO } from '../models/request/gastosDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -24,11 +25,23 @@ export class ProductoService {
     return this.http.put<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, JSON.stringify(producto), { headers });
   }
 
+  editarParametrosCalculo(uuid: string, gastos: GastosDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, JSON.stringify(gastos), { headers });
+  }
+
   deleteProducto(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .set('actual_role', rolActual);
     return this.http.delete<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, { headers, params });
+  }
+
+  deleteParametrosCalculo(uuid: string, rolActual: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .set('actual_role', rolActual);
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, JSON.stringify({ "cost_param_uuid": null }), { headers, params });
   }
 
   showProduct(uuid: string, rol: string): Observable<AuthResponse> {
@@ -37,6 +50,7 @@ export class ProductoService {
       .append('actual_role', rol)
       .append('with[]', "productType")
       .append('with[]', "productType.costParam")
+      .append('with[]', "costParam")
       .append('with[]', "productCategory")
       .append('with[]', "currentState")
       .append('with[]', "productStates")

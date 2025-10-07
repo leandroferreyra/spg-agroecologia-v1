@@ -49,6 +49,7 @@ import { format } from 'date-fns';
 import { FlatpickrDirective } from 'angularx-flatpickr';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { GastosDTO } from 'src/app/core/models/request/gastosDTO';
 
 @Component({
   selector: 'app-productos',
@@ -79,6 +80,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   produccionForm!: FormGroup;
 
   isEdicion: boolean = false;
+  isEdicionCostos: boolean = false;
   isShowMailMenu = false;
   isTabDisabled = false;
 
@@ -365,8 +367,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
       valorActualizadoProduccion: new FormControl({ value: 0, disabled: true }, []),
       valorOriginalCompra: new FormControl({ value: 0, disabled: true }, []),
       valorActualizadoCompra: new FormControl({ value: 0, disabled: true }, []),
-      cantidadCompras: new FormControl({ value: null, disabled: true }, []),
-      funcionCalculo: new FormControl({ value: "Promedio", disabled: true }, []),
+      cantidadCompras: new FormControl({ value: producto?.cost_param ? producto?.cost_param.purchases_quantity : null, disabled: true }, []),
+      funcionCalculo: new FormControl({ value: producto?.cost_param ? producto?.cost_param.calculation_function : null, disabled: true }, []),
     });
     // Habilitar todos los controles si es edición
     // if (this.isEdicion) {
@@ -473,7 +475,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any, updateTab: boolean = true) {
-    console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
+    // console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
     this.productoAnterior = [];
     this.isEdicion = false;
     this.uuidFromUrl = producto.uuid;
@@ -554,6 +556,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.tab1 = 'datos-generales';
       this.isEdicion = true;
       this.tituloModal = 'Edición producto';
+      this.isEdicionCostos = false;
       this.inicializarFormEdit(producto);
     }
   }
@@ -986,6 +989,99 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
   toggleCostos() {
     this.mostrarCostos = !this.mostrarCostos;
+  }
+
+  openCloseEditarCostos() {
+    this.isEdicion = false;
+    this.inicializarFormEdit(this.selectedProducto);
+    this.isEdicionCostos = !this.isEdicionCostos;
+    if (this.isEdicionCostos) {
+      this.mostrarCostos = true;
+      this.productoForm.get('cantidadCompras')?.setValidators(Validators.required);
+      this.productoForm.get('cantidadCompras')?.updateValueAndValidity();
+      this.productoForm.get('cantidadCompras')?.enable();
+      this.productoForm.get('funcionCalculo')?.setValidators(Validators.required);
+      this.productoForm.get('funcionCalculo')?.updateValueAndValidity();
+      this.productoForm.get('funcionCalculo')?.enable();
+    } else {
+      this.productoForm.get('cantidadCompras')?.clearValidators();
+      this.productoForm.get('cantidadCompras')?.updateValueAndValidity();
+      this.productoForm.get('cantidadCompras')?.disable();
+      this.productoForm.get('funcionCalculo')?.clearValidators();
+      this.productoForm.get('funcionCalculo')?.updateValueAndValidity();
+      this.productoForm.get('funcionCalculo')?.disable();
+    }
+  }
+
+  confirmarCostos() {
+    this.isSubmit = true;
+    if (this.productoForm.get('cantidadCompras')?.valid && this.productoForm.get('funcionCalculo')?.valid) {
+      this.spinner.show();
+      let gastos = new GastosDTO();
+      gastos.actual_role = this.actual_role;
+      gastos.purchases_quantity = this.productoForm.get('cantidadCompras')?.value;
+      gastos.calculation_function = this.productoForm.get('funcionCalculo')?.value;
+      this.subscription.add(
+        this._productoService.editarParametrosCalculo(this.selectedProducto.uuid, gastos).subscribe({
+          next: res => {
+            this.spinner.hide();
+            this.cancelarEdicionCostos();
+            this.obtenerProductos(true);
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+            this.swalService.toastError('top-right', error.error.message);
+          }
+        })
+      );
+    }
+  }
+
+  cancelarEdicionCostos() {
+    this.isSubmit = false;
+    this.isEdicionCostos = false;
+    this.inicializarFormEdit(this.selectedProducto);
+  }
+
+  openSwalEliminarCostos() {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar los parámetros de cálculo actuales?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarCostos();
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+  eliminarCostos() {
+    this.spinner.show();
+    this.subscription.add(
+      this._productoService.deleteParametrosCalculo(this.selectedProducto.uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+          this.obtenerProductos(true);
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
   }
 
 }

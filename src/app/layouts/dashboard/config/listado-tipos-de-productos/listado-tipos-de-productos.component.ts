@@ -381,7 +381,7 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
     this.gastosForm = new FormGroup({
       uuidTipoProducto: new FormControl(data.uuid, [Validators.required]),
       cantidadCompras: new FormControl(data.cost_param ? data.cost_param.purchases_quantity : null, [Validators.required, Validators.min(1)]),
-      funcionCalculo: new FormControl(data.cost_param ? data.cost_param.calculation_function : 'Promedio', [Validators.required]),
+      funcionCalculo: new FormControl(data.cost_param ? data.cost_param.calculation_function : null, [Validators.required]),
     });
     this.onChangeGastosForm();
   }

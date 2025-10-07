@@ -598,9 +598,14 @@
                             <legend class="text-lg font-semibold flex items-center justify-between">
                                 <span>
                                     Costos
-                                    <button type="button" class="ltr:ml-3 rtl:mr-1 hover:text-primary"
-                                        ngxTippy="Editar">
+                                    <button type="button" class="ltr:ml-3 rtl:mr-1 hover:text-primary" ngxTippy="Editar"
+                                        (click)="openCloseEditarCostos();">
                                         <icon-pencil />
+                                    </button>
+
+                                    <button type="button" ngxTippy="Eliminar" class="ml-2"
+                                        (click)="openSwalEliminarCostos()" [disabled]="!selectedProducto?.cost_param">
+                                        <icon-trash-lines />
                                     </button>
                                 </span>
                                 <button type="button" (click)="toggleCostos()"
@@ -610,14 +615,6 @@
                                         style="cursor: pointer;"></fa-icon>
                                 </button>
                             </legend>
-
-                            <!-- <span>
-                                Detalles
-                                <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
-                                    (click)="openCloseEditarDescuentosCompra()">
-                                    <icon-pencil />
-                                </button>
-                            </span> -->
 
                             @if (mostrarCostos) {
                             <div *ngIf="productoForm.get('producible')?.value" class="mt-2">
@@ -654,21 +651,33 @@
                                     </div>
                                 </div>
 
-                                <div class="text-sm font-medium text-gray-600 mb-2 mt-2">Parámetros de cálculo</div>
+                                <div class="text-sm font-medium text-gray-600 mb-2 mt-3">Parámetros de cálculo</div>
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Cantidad de compras</label>
+                                    <div [ngClass]="isSubmit ? productoForm.controls['cantidadCompras'].errors ? 'has-error'
+                                        : 'has-success' : ''">
+                                        <label class=" block text-xs text-gray-500 mb-1">Cantidad de compras</label>
                                         <input type="number" class="form-input w-full py-1.5 text-sm"
                                             formControlName="cantidadCompras" />
                                     </div>
                                     <div>
                                         <label class="block text-xs text-gray-500 mb-1">Función de cálculo</label>
-                                        <ng-select [items]="['Mínimo','Máximo','Promedio']"
-                                            formControlName="funcionCalculo" [clearable]="false"
-                                            placeholder="Seleccione" class="w-full">
+                                        <ng-select [items]="['Mínimo','Máximo','Promedio']" [ngClass]="isSubmit ? productoForm.controls['funcionCalculo'].errors ? 'has-error'
+                                        : 'has-success' : ''" formControlName="funcionCalculo" [clearable]="false"
+                                            class="w-full">
                                         </ng-select>
                                     </div>
                                 </div>
+
+                                @if (isEdicionCostos) {
+                                <div class="row mt-3">
+                                    <div class="col-12 d-flex justify-content-center">
+                                        <button type="button" class="btn btn-wd btn-primary mr-4"
+                                            (click)="confirmarCostos()">Confirmar</button>
+                                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                            (click)="cancelarEdicionCostos()">Cancelar</button>
+                                    </div>
+                                </div>
+                                }
 
                             </div>
                             }
