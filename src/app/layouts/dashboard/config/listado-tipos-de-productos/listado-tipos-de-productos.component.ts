@@ -129,7 +129,7 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
         next: res => {
           this.spinner.hide();
           this.tiposProductos = res.data;
-          console.log("🚀 ~ ListadoTiposDeProductosComponent ~ obtenerTiposProductos ~ this.tiposProductos:", this.tiposProductos)
+          // console.log("🚀 ~ ListadoTiposDeProductosComponent ~ obtenerTiposProductos ~ this.tiposProductos:", this.tiposProductos)
           this.modificarPaginacion(res);
         },
         error: error => {
@@ -380,9 +380,13 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
   inicializarFormGastos(data: any) {
     this.gastosForm = new FormGroup({
       uuidTipoProducto: new FormControl(data.uuid, [Validators.required]),
-      cantidadCompras: new FormControl(null, [Validators.required]),
+      cantidadCompras: new FormControl(null, [Validators.required, Validators.min(1)]),
       funcionCalculo: new FormControl('Promedio', [Validators.required]),
-    })
+    });
+    this.onChangeGastosForm();
+  }
+  onChangeGastosForm() {
+
   }
 
   cerrarModalCostos() {
@@ -401,7 +405,6 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._tipoProductoService.editarParametrosCalculo(this.gastosForm.get('uuidTipoProducto')?.value, gastos).subscribe({
           next: res => {
-            console.log(res);
             this.spinner.hide();
             this.cerrarModalCostos();
           },
