@@ -86,66 +86,52 @@
                     <td></td>
 
                     <td>
-                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.is_process.value"
-                            (change)="obtenerTiposProductos()">
-                            <option [ngValue]="''"></option>
-                            <option [ngValue]="1">Sí</option>
-                            <option [ngValue]="0">No</option>
-                        </select>
+                        <ng-select [items]="opcionesSiNo" bindLabel="label" bindValue="value"
+                            [(ngModel)]="filtros.is_process.value" [clearable]="false" class="w-full"
+                            (change)="obtenerTiposProductos()" [appendTo]="'body'">
+                        </ng-select>
                     </td>
 
                     <td>
-                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.product_compound.value"
-                            (change)="obtenerTiposProductos()">
-                            <option [ngValue]="''"></option>
-                            <option [ngValue]="1">Sí</option>
-                            <option [ngValue]="0">No</option>
-                        </select>
+                        <ng-select [items]="opcionesSiNo" bindLabel="label" bindValue="value"
+                            [(ngModel)]="filtros.product_compound.value" [clearable]="false" class="w-full"
+                            (change)="obtenerTiposProductos()" [appendTo]="'body'">
+                        </ng-select>
                     </td>
 
                     <td>
-                        <select class="form-control campo-busqueda"
-                            [(ngModel)]="filtros.product_must_be_traceable.value" (change)="obtenerTiposProductos()">
-                            <option [ngValue]="''"></option>
-                            <option [ngValue]="1">Sí</option>
-                            <option [ngValue]="0">No</option>
-                        </select>
+                        <ng-select [items]="opcionesSiNo" bindLabel="label" bindValue="value"
+                            [(ngModel)]="filtros.product_must_be_traceable.value" [clearable]="false" class="w-full"
+                            (change)="obtenerTiposProductos()" [appendTo]="'body'">
+                        </ng-select>
                     </td>
 
                     <td>
-                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.stock_controlled.value"
-                            (change)="obtenerTiposProductos()">
-                            <option [ngValue]="''"></option>
-                            <option [ngValue]="1">Sí</option>
-                            <option [ngValue]="0">No</option>
-                        </select>
+                        <ng-select [items]="opcionesSiNo" bindLabel="label" bindValue="value"
+                            [(ngModel)]="filtros.stock_controlled.value" [clearable]="false" class="w-full"
+                            (change)="obtenerTiposProductos()" [appendTo]="'body'">
+                        </ng-select>
                     </td>
 
                     <td>
-                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_provided.value"
-                            (change)="obtenerTiposProductos()">
-                            <option [ngValue]="''"></option>
-                            <option [ngValue]="1">Sí</option>
-                            <option [ngValue]="0">No</option>
-                        </select>
+                        <ng-select [items]="opcionesSiNo" bindLabel="label" bindValue="value"
+                            [(ngModel)]="filtros.can_be_provided.value" [clearable]="false" class="w-full"
+                            (change)="obtenerTiposProductos()" [appendTo]="'body'">
+                        </ng-select>
                     </td>
 
                     <td>
-                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_purchased.value"
-                            (change)="obtenerTiposProductos()">
-                            <option [ngValue]="''"></option>
-                            <option [ngValue]="1">Sí</option>
-                            <option [ngValue]="0">No</option>
-                        </select>
+                        <ng-select [items]="opcionesSiNo" bindLabel="label" bindValue="value"
+                            [(ngModel)]="filtros.can_be_purchased.value" [clearable]="false" class="w-full"
+                            (change)="obtenerTiposProductos()" [appendTo]="'body'">
+                        </ng-select>
                     </td>
 
                     <td>
-                        <select class="form-control campo-busqueda" [(ngModel)]="filtros.can_be_produced.value"
-                            (change)="obtenerTiposProductos()">
-                            <option [ngValue]="''"></option>
-                            <option [ngValue]="1">Sí</option>
-                            <option [ngValue]="0">No</option>
-                        </select>
+                        <ng-select [items]="opcionesSiNo" bindLabel="label" bindValue="value"
+                            [(ngModel)]="filtros.can_be_produced.value" [clearable]="false" class="w-full"
+                            (change)="obtenerTiposProductos()" [appendTo]="'body'">
+                        </ng-select>
                     </td>
 
                 </tr>
@@ -225,16 +211,22 @@
 
                     <td class="whitespace-nowrap">
                         <div class="flex items-center gap-2 mt-2">
-                            <label class="w-12 h-6 relative">
+                            <label class="w-12 h-6 relative flex-shrink-0">
                                 <input type="checkbox"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    id="custom_switch_checkbox2" [checked]=data.can_be_purchased disabled />
+                                    id="custom_switch_checkbox2" [checked]="data.can_be_purchased" disabled />
                                 <span for="custom_switch_checkbox2"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
+                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
                             </label>
+                            @if (data.can_be_purchased) {
+                            <button type="button" class="flex items-center justify-center ltr:ml-1 rtl:mr-1"
+                                ngxTippy="Editar parámetros de cálculo de costos" (click)="openModalCostos(data)">
+                                <icon-pencil />
+                            </button>
+                            }
                         </div>
                     </td>
+
 
                     <td class="whitespace-nowrap">
                         <div class="flex items-center gap-2 mt-2">
@@ -405,7 +397,7 @@
                                                 class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                             </span>
                                         </label>
-                                        <span>Puede ser comprado</span>
+                                        <span>Puede ser comprado </span>
                                     </div>
 
                                     <div class="flex items-center gap-2 mt-2">
@@ -440,6 +432,51 @@
     </ngx-custom-modal>
 </div>
 
+
+<div>
+    <ngx-custom-modal #modalCostos class="modal-top animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="gastosForm" (keydown.enter)="confirmarCostos()">
+
+                            <div
+                                [ngClass]="isSubmit ? gastosForm.controls['cantidadCompras'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Cantidad de compras</label>
+                                <input type="number" class="form-input w-full py-1.5 text-sm"
+                                    formControlName="cantidadCompras" />
+                            </div>
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? gastosForm.controls['funcionCalculo'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Función de cálculo</label>
+                                <ng-select [items]="['Mínimo','Máximo','Promedio']" formControlName="funcionCalculo"
+                                    [clearable]="false" placeholder="Seleccione" class="w-full">
+                                </ng-select>
+                            </div>
+
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarCostos()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModalCostos()">Cancelar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
 
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
     <p style="font-size: 20px; color: white">Cargando</p>

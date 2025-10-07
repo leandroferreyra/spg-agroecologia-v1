@@ -22,6 +22,7 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 import { ColorSketchModule } from 'ngx-color/sketch';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { GastosDTO } from 'src/app/core/models/request/gastosDTO';
 
 @Component({
   selector: 'app-listado-tipos-de-productos',
@@ -42,6 +43,7 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
   showPicker: boolean = false; tiposProductos: any[] = [];
 
   tiposProductosForm!: FormGroup;
+  gastosForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
@@ -73,11 +75,18 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
     'code': 'asc'
   };
 
+  opcionesSiNo = [
+    { label: '', value: '' },
+    { label: 'Sí', value: "1" },
+    { label: 'No', value: "0" },
+  ];
+
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
   // Referencia al modal para crear y editar países.
   @ViewChild('modalTipoProductos') modalTipoProductos!: NgxCustomModalComponent;
+  @ViewChild('modalCostos') modalCostos!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -120,6 +129,7 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
         next: res => {
           this.spinner.hide();
           this.tiposProductos = res.data;
+          console.log("🚀 ~ ListadoTiposDeProductosComponent ~ obtenerTiposProductos ~ this.tiposProductos:", this.tiposProductos)
           this.modificarPaginacion(res);
         },
         error: error => {
@@ -358,6 +368,51 @@ export class ListadoTiposDeProductosComponent implements OnInit, OnDestroy {
 
   isProcesoIPLadie(data: any) {
     return data.name === 'Procesos IP LADIE';
+  }
+
+  openModalCostos(data: any) {
+    this.modalCostos.options = this.modalOptions;
+    this.modalCostos.open();
+    this.tituloModal = 'Edición de parámetros de costos'
+    this.inicializarFormGastos(data);
+  }
+
+  inicializarFormGastos(data: any) {
+    this.gastosForm = new FormGroup({
+      uuidTipoProducto: new FormControl(data.uuid, [Validators.required]),
+      cantidadCompras: new FormControl(null, [Validators.required]),
+      funcionCalculo: new FormControl('Promedio', [Validators.required]),
+    })
+  }
+
+  cerrarModalCostos() {
+    this.isSubmit = false;
+    this.modalCostos.close();
+  }
+
+  confirmarCostos() {
+    this.isSubmit = true;
+    if (this.gastosForm.valid) {
+      this.spinner.show();
+      let gastos = new GastosDTO();
+      gastos.actual_role = this.actual_role;
+      gastos.purchases_quantity = this.gastosForm.get('cantidadCompras')?.value;
+      gastos.calculation_function = this.gastosForm.get('funcionCalculo')?.value;
+      this.subscription.add(
+        this._tipoProductoService.editarParametrosCalculo(this.gastosForm.get('uuidTipoProducto')?.value, gastos).subscribe({
+          next: res => {
+            console.log(res);
+            this.spinner.hide();
+            this.cerrarModalCostos();
+          },
+          error: error => {
+            console.error(error);
+            this.spinner.hide();
+            this.swalService.toastError('top-right', error.error.message);
+          }
+        })
+      );
+    }
   }
 
 }
