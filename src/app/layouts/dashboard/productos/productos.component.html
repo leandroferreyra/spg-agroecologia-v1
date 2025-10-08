@@ -598,6 +598,7 @@
                             <legend class="text-lg font-semibold flex items-center justify-between">
                                 <span>
                                     Costos
+                                    @if (productoForm.get('comprable')?.value) {
                                     <button type="button" class="ltr:ml-3 rtl:mr-1 hover:text-primary" ngxTippy="Editar"
                                         (click)="openCloseEditarCostos();">
                                         <icon-pencil />
@@ -607,6 +608,7 @@
                                         (click)="openSwalEliminarCostos()" [disabled]="!selectedProducto?.cost_param">
                                         <icon-trash-lines />
                                     </button>
+                                    }
                                 </span>
                                 <button type="button" (click)="toggleCostos()"
                                     class="text-sm hover:underline flex items-center gap-1" style="color:#000000a3"
