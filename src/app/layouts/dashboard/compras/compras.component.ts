@@ -457,13 +457,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
       fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaFacturacion')?.value);
       uuidMoneda = this.compraForm.get('moneda')?.value?.uuid;
     } else if (this.inEdicionPago || this.inAltaPago) {
-      let conversionFecha = this.convertirFechaNew(this.pagoForm.get('payment_datetime')?.value);
-      fecha = this.convertirFechaADateBackend(conversionFecha);
+      const fechaFormateada = this.pagoForm.get('payment_datetime')?.value instanceof Date
+        ? format(this.pagoForm.get('payment_datetime')?.value, 'dd-MM-yyyy')
+        : this.pagoForm.get('payment_datetime')?.value;
+      fecha = this.convertirFechaADateBackend(fechaFormateada);
       uuidMoneda = this.pagoForm.get('currency_uuid')?.value?.uuid;
     } else {
-      // console.log(this.newCompraForm.get('transaction_datetime')?.value);
-      let conversionFecha = this.convertirFechaNew(this.newCompraForm.get('transaction_datetime')?.value);
-      fecha = this.convertirFechaADateBackend(conversionFecha);
+      const fechaFormateada = this.newCompraForm.get('transaction_datetime')?.value instanceof Date
+        ? format(this.newCompraForm.get('transaction_datetime')?.value, 'dd-MM-yyyy')
+        : this.newCompraForm.get('transaction_datetime')?.value;
+      fecha = this.convertirFechaADateBackend(fechaFormateada);
       uuidMoneda = this.newCompraForm.get('currency_uuid')?.value?.uuid;
     }
     const observable$ = this._tiposCambioService
@@ -506,16 +509,16 @@ export class ComprasComponent implements OnInit, OnDestroy {
     // )
   }
 
-  convertirFechaNew(fecha: string) {
-    const fechaOriginal = new Date(fecha);
+  // convertirFechaNew(fecha: string) {
+  //   const fechaOriginal = new Date(fecha);
 
-    const dia = String(fechaOriginal.getDate()).padStart(2, '0');
-    const mes = String(fechaOriginal.getMonth() + 1).padStart(2, '0');
-    const anio = fechaOriginal.getFullYear();
+  //   const dia = String(fechaOriginal.getDate()).padStart(2, '0');
+  //   const mes = String(fechaOriginal.getMonth() + 1).padStart(2, '0');
+  //   const anio = fechaOriginal.getFullYear();
 
-    const fechaFormateada = `${dia}-${mes}-${anio}`;
-    return fechaFormateada;
-  }
+  //   const fechaFormateada = `${dia}-${mes}-${anio}`;
+  //   return fechaFormateada;
+  // }
 
   getFecha(fecha: string) {
     const date = new Date(fecha.replace(' ', 'T'));
