@@ -317,11 +317,12 @@
                                         notFoundText="No hay unidades" placeholder="" class="w-1/3 min-w-[200px]"
                                         formControlName="unidad"></ng-select>
                                 </div>
-                                <!-- <div (keydown.enter)="confirmarProducto(productoForm)">
+
+                                <div (keydown.enter)="confirmarProducto(productoForm)">
                                     <label for="iva">IVA (%)</label>
                                     <input id="iva" type="text" placeholder="" class="form-control"
                                         formControlName="iva" />
-                                </div> -->
+                                </div>
 
                                 <div>
                                     <label for="pais">País</label>
@@ -823,11 +824,11 @@
                                 [ngClass]="isSubmit ? newProductoForm.controls['unidad'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
                         </div>
 
-                        <!-- <div (keydown.enter)="confirmarProducto(newProductoForm)"
+                        <div (keydown.enter)="confirmarProducto(newProductoForm)"
                             [ngClass]="isSubmit ? newProductoForm.controls['iva'].errors ? 'has-error' : 'has-success' : ''">
                             <label for="iva">IVA (%)</label>
                             <input id="iva" type="text" placeholder="" class="form-control" formControlName="iva" />
-                        </div> -->
+                        </div>
 
                         <div>
                             <label for="pais">País</label>
@@ -857,6 +858,8 @@
                             <textarea class="form-control" id="descripcionControl" formControlName="descripcionControl"
                                 rows="1"></textarea>
                         </div>
+
+                        <div></div>
 
                         <div class="flex items-center gap-2 mt-2"
                             [ngClass]="isSubmit ? newProductoForm.controls['asignaNumSerie'].errors ? 'has-error' : 'has-success' : ''">
