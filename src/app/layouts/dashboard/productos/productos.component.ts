@@ -156,6 +156,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   mostrarSwitches = true;
   mostrarStocks = true;
   mostrarCostos = true;
+  mostrarParametrosCalculo = false;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -420,7 +421,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       nomenclatura: new FormControl({ value: null, disabled: false }, []),
       pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
       unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      iva: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      iva: new FormControl({ value: 1, disabled: false }, []),
       comentarios: new FormControl({ value: null, disabled: false }, []),
       nombreVenta: new FormControl({ value: null, disabled: false }, []),
       descripcionControl: new FormControl({ value: null, disabled: false }, []),
@@ -429,7 +430,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
       trazable: new FormControl({ value: false, disabled: false }, [Validators.required]),
       vendible: new FormControl({ value: false, disabled: false }, [Validators.required]),
       stock_minimum: new FormControl({ value: null, disabled: true }, []),
-      stock_optimum: new FormControl({ value: null, disabled: true }, [])
+      stock_optimum: new FormControl({ value: null, disabled: true }, []),
+      cantidadCompras: new FormControl({ value: null, disabled: false }, [Validators.min(1)]),
+      funcionCalculo: new FormControl({ value: null, disabled: false }, [])
     });
     this.onNewForm();
   }
@@ -453,6 +456,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
         ['stock_minimum', 'stock_optimum'].forEach((field) => {
           this.newProductoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
         });
+        if (value && value.can_be_purchased === 1) {
+          this.mostrarParametrosCalculo = true;
+        } else {
+          this.mostrarParametrosCalculo = false;
+        }
       });
 
     this.newProductoForm.get('unidad')!.valueChanges.subscribe(
@@ -634,6 +642,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
       }
     }
     if (!this.isEdicion) {
+      producto.purchases_quantity = form.get('cantidadCompras')?.value;
+      producto.calculation_function = form.get('funcionCalculo')?.value;
       this.cleanObject(producto);
     }
   }

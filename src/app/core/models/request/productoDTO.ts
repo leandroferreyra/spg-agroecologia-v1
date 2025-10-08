@@ -19,6 +19,8 @@ export class ProductoDTO {
     product_state!: ProductState;
     minimum!: number;
     optimum!: number;
+    purchases_quantity!: number;
+    calculation_function!: string;
     with: string[] = [];
     actual_role!: string;
 
