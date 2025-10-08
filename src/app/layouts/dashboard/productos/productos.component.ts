@@ -363,22 +363,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
       puedeSerProvisto: new FormControl({ value: producto?.product_type?.can_be_provided, disabled: true }, []),
       comprable: new FormControl({ value: producto?.product_type?.can_be_purchased, disabled: true }, []),
       producible: new FormControl({ value: producto?.product_type?.can_be_produced, disabled: true }, []),
-      valorOriginalProduccion: new FormControl({ value: 0, disabled: true }, []),
-      valorActualizadoProduccion: new FormControl({ value: 0, disabled: true }, []),
-      valorOriginalCompra: new FormControl({ value: 0, disabled: true }, []),
-      valorActualizadoCompra: new FormControl({ value: 0, disabled: true }, []),
+      valorOriginalProduccion: new FormControl({ value: producto?.costs?.original_production_cost, disabled: true }, []),
+      valorActualizadoProduccion: new FormControl({ value: producto?.costs?.adjusted_production_cost, disabled: true }, []),
+      valorOriginalCompra: new FormControl({ value: producto?.costs?.original_purchase_cost, disabled: true }, []),
+      valorActualizadoCompra: new FormControl({ value: producto?.costs?.adjusted_purchase_cost, disabled: true }, []),
       cantidadCompras: new FormControl({ value: producto?.cost_param ? producto?.cost_param.purchases_quantity : null, disabled: true }, []),
       funcionCalculo: new FormControl({ value: producto?.cost_param ? producto?.cost_param.calculation_function : null, disabled: true }, []),
     });
-    // Habilitar todos los controles si es edición
-    // if (this.isEdicion) {
-    //   Object.keys(this.productoForm.controls).forEach(key => {
-    //     if (key !== 'stock_available' && key !== 'stock_initial' && key !== 'stock_minimum' && key !== 'stock_observed' &&
-    //       key !== 'stock_optimum' && key !== 'stock_quantity_sold' && key !== 'stock_reserved' && key !== 'stock_samples' && key !== 'tieneNumSerie') {
-    //       this.productoForm.controls[key].enable();
-    //     }
-    //   });
-    // }
     this.onFormEditChange();
   }
   onFormEditChange() {

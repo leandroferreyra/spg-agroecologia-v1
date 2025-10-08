@@ -48,6 +48,7 @@ export class ProductoService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
       .append('actual_role', rol)
+      .append('include[]', 'costs')
       .append('with[]', "productType")
       .append('with[]', "productType.costParam")
       .append('with[]', "costParam")
