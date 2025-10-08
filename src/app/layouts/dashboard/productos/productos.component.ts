@@ -537,9 +537,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   cerrarModal() {
     this.isSubmit = false;
+    this.mostrarParametrosCalculo = false;
     this.modalProducto.close();
   }
-
 
   openModalProducto(type: string, producto?: any) {
     if (type === 'NEW') {
