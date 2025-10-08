@@ -260,7 +260,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.compras = res.data;
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
-          if (this.uuidFromUrl) {
+          if (this.uuidFromUrl && this.compras.length !== 0) {
             this.obtenerCompraPorId(this.uuidFromUrl);
           } else {
             if (this.compras.length === 0) {

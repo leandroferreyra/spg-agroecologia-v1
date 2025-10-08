@@ -2,8 +2,11 @@
     <div class="overlay absolute z-[5] hidden h-full w-full rounded-md bg-black/60"
         [ngClass]="{ '!block xl:!hidden': isShowMailMenu }" (click)="isShowMailMenu = !isShowMailMenu"></div>
 
-    <div class="panel dark:gray-50 absolute z-10 hidden h-full w-[520px] max-w-full flex-none space-y-3 overflow-hidden p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
+    <div class="panel absolute z-10 hidden h-screen w-[520px] max-w-full flex-none space-y-3 
+         overflow-y-auto hide-scrollbar p-4 ltr:rounded-r-none rtl:rounded-l-none 
+         xl:relative xl:block xl:h-auto xl:overflow-y-visible ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
         [ngClass]="{ '!block': isShowMailMenu }">
+
 
         <!-- PANEL IZQUIERDO -->
         <div class="flex justify-end xl:hidden mb-2">
@@ -23,8 +26,9 @@
                     Agregar compra
                 </button>
 
-                <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas" [disabled]="isEdicion"
-                    data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" [ngClass]="{
+                <button type="button" class="hover:text-primary" data-bs-toggle="offcanvas"
+                    [disabled]="isEdicion || compras.length === 0" data-bs-target="#offcanvasRight"
+                    aria-controls="offcanvasRight" [ngClass]="{
                         'text-gray-400 cursor-not-allowed': isEdicion
                       }">
                     <icon-search class="mx-auto mb-1" />
@@ -94,7 +98,7 @@
                 </div>
                 <div class="flex w-full">
                     <div class="relative flex-grow">
-                        <input id="switchRight1" type="text" placeholder="Buscar compra..."
+                        <input id="switchRight1" type="text" placeholder="Buscar compra..." [disabled]="compras.length === 0"
                             [(ngModel)]="filtroSimpleName" (input)="obtenerComprasPorFiltroSimple()"
                             class="form-input w-full ltr:rounded-r-none rtl:rounded-l-none" />
                         <div class="absolute top-1/2 -translate-y-1/2 ltr:right-[11px] rtl:left-[11px]">
@@ -104,7 +108,7 @@
                     <div
                         class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
                         <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                            <input type="checkbox" (change)="obtenerComprasPorFiltroSimple();"
+                            <input type="checkbox" (change)="obtenerComprasPorFiltroSimple();" [disabled]="compras.length === 0"
                                 class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                 id="custom_switch_checkbox2" [(ngModel)]="filtroSimpleContiene" />
                             <span
@@ -120,6 +124,7 @@
     </div>
 
     <!-- PANEL DERECHO -->
+    @if(compras.length > 0 && selectedCompra) {
     <div class="panel h-full flex-1 overflow-x-hidden p-2">
 
         <!-- MENU ICONO OCULTO RESPONSIVE -->
@@ -127,18 +132,17 @@
             <h5 class="text-lg font-semibold dark:text-white-light min-w-0 flex items-center gap-2">
                 Compra
             </h5>
-
             <div class="flex items-center gap-2 ml-auto">
-                @if(compras.length > 0 && selectedCompra) {
                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(selectedCompra)">
                     <icon-trash-lines />
                 </button>
-                }
+
                 <button type="button" class="block hover:text-primary xl:hidden"
                     (click)="isShowMailMenu = !isShowMailMenu">
                     <icon-menu />
                 </button>
             </div>
+
         </div>
 
         @if (selectedCompra) {
@@ -638,10 +642,17 @@
 
         </div>
         }
+
     </div>
+    } @else {
+    <div class="flex justify-end w-full">
+        <button type="button" class="block hover:text-primary xl:hidden" (click)="isShowMailMenu = !isShowMailMenu">
+            <icon-menu />
+        </button>
+    </div>
+    }
 
 </div>
-
 
 <div>
     <ngx-custom-modal #modalCompra class=" modal-top extra-large-modal animate animate-fade-in">
