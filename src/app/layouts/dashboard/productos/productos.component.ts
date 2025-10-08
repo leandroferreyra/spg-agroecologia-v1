@@ -421,7 +421,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
       nomenclatura: new FormControl({ value: null, disabled: false }, []),
       pais: new FormControl({ value: null, disabled: false }, [Validators.required]),
       unidad: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      iva: new FormControl({ value: 1, disabled: false }, []),
+      iva: new FormControl({ value: null, disabled: false }, []),
       comentarios: new FormControl({ value: null, disabled: false }, []),
       nombreVenta: new FormControl({ value: null, disabled: false }, []),
       descripcionControl: new FormControl({ value: null, disabled: false }, []),
@@ -623,7 +623,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     producto.product_state = estadoProducto;
     producto.comments = form.get('comentarios')?.value;
     producto.measure_uuid = form.get('unidad')?.value.uuid;
-    producto.vat_percent = form.get('iva')?.value;
+    // producto.vat_percent = form.get('iva')?.value;
     producto.country_uuid = form.get('pais')?.value;
     producto.mercosur_nomenclature = form.get('nomenclatura')?.value;
     producto.assign_serial_number = form.get('asignaNumSerie')?.value;
