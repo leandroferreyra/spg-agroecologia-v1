@@ -455,7 +455,7 @@
                             <div class="mt-2"
                                 [ngClass]="isSubmit ? gastosForm.controls['funcionCalculo'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Función de cálculo</label>
-                                <ng-select [items]="['Mínimo','Máximo','Promedio']" formControlName="funcionCalculo"
+                                <ng-select [items]="['Máximo','Promedio', 'Mínimo']" formControlName="funcionCalculo"
                                     [clearable]="false" placeholder="Seleccione" class="w-full">
                                 </ng-select>
                             </div>
