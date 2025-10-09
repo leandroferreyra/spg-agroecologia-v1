@@ -316,7 +316,6 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiComprasClientes, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
-
   getVentasWithParam(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiVentas, { headers, params: this.getNewParams(paramsObj, rol) });

@@ -251,6 +251,14 @@
                         }" (click)="!isTabDisabled && cambiarTab('vinculos')">
                     Vínculos
                 </a>
+                <a href="javascript:;" class="flex items-center border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary 
+                    hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
+                            '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
+                            tab1.toLowerCase() === 'producciones',
+                            'cursor-not-allowed tab-disabled': isTabDisabled
+                        }" (click)="!isTabDisabled && cambiarTab('producciones')">
+                    Producciones
+                </a>
             </div>
 
             <div class="flex-1 text-sm">
@@ -736,13 +744,18 @@
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'compras'">
-                    <app-compras-producto>
+                    <app-compras-producto [producto]="selectedProducto" [rol]="actual_role">
                     </app-compras-producto>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'vinculos'">
                     <app-vinculos>
                     </app-vinculos>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'producciones'">
+                    <app-producciones>
+                    </app-producciones>
                 </div>
 
             </div>

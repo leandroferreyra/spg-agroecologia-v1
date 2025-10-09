@@ -50,6 +50,7 @@ import { FlatpickrDirective } from 'angularx-flatpickr';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { GastosDTO } from 'src/app/core/models/request/gastosDTO';
+import { ProduccionesComponent } from './producciones/producciones.component';
 
 @Component({
   selector: 'app-productos',
@@ -59,7 +60,7 @@ import { GastosDTO } from 'src/app/core/models/request/gastosDTO';
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
     ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent, IconSettingsComponent,
-    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent
+    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent, ProduccionesComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',

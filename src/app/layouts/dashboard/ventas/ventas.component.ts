@@ -225,7 +225,8 @@ export class VentasComponent implements OnInit, OnDestroy {
       "transaction.transactionProducts.product",
       "transaction.transactionProducts.product.productType",
       "transaction.transactionProducts.saleProduct.productInstances",
-      "transaction.transactionProducts.saleProduct.stock.batch"
+      "transaction.transactionProducts.saleProduct.stock.batch",
+      "transaction.currency"
     ];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
@@ -238,7 +239,7 @@ export class VentasComponent implements OnInit, OnDestroy {
           this.ventas = res.data;
           this.modificarPaginacion(res);
           this.tokenService.setToken(res.token);
-          if (this.uuidFromUrl) {
+          if (this.uuidFromUrl && this.ventas.length !== 0) {
             this.obtenerVentaPorId(this.uuidFromUrl);
           } else {
             this.isLoadingVentas = false;
@@ -1470,6 +1471,12 @@ export class VentasComponent implements OnInit, OnDestroy {
       }
       this.ventaForm.get('fechaVenta')?.enable();
       this.ventaForm.get('estadoVenta')?.enable();
+      if (this.selectedVenta?.transaction?.current_state?.state?.name === 'Borrador') {
+        this.ventaForm.get('monedaVenta')?.enable();
+        if (this.ventaForm.get('monedaVenta')?.value?.name !== 'Pesos') {
+          this.ventaForm.get('tipoCambioVenta')?.enable();
+        }
+      }
     } else {
       this.ventaForm.get('fechaVenta')?.disable();
       this.ventaForm.get('estadoVenta')?.disable();
@@ -1504,13 +1511,13 @@ export class VentasComponent implements OnInit, OnDestroy {
       ventaDTO.transaction.exchange_rate = +this.ventaForm.get('tipoCambioVenta')?.value;
     }
     if (modificaMonedaVenta && this.selectedVenta?.transaction?.transaction_products?.length > 0) {
-      this.openSwalConfirmarEdicionDatosCompra(ventaDTO);
+      this.openSwalConfirmarEdicionDatosVenta(ventaDTO);
     } else {
       this.edicionConfirmadaDatosVenta(ventaDTO);
     }
   }
 
-  openSwalConfirmarEdicionDatosCompra(ventaDTO: VentaDTO) {
+  openSwalConfirmarEdicionDatosVenta(ventaDTO: VentaDTO) {
     Swal.fire({
       title: '',
       text: `Al confirmar se eliminarán los productos cargados en la venta`,
