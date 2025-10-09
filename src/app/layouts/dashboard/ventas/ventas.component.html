@@ -149,7 +149,7 @@
 
             <fieldset class="border border-gray-300 rounded p-4 md:col-span-2">
                 <legend class="text-lg font-semibold flex items-center">
-                    <span>Fecha y estado</span>
+                    <span>Datos de la venta</span>
                     <button type="button" class="ltr:ml-3 rtl:mr-2 hover:text-primary" ngxTippy="Editar"
                         (click)="openCloseEditarVenta()">
                         <icon-pencil />
@@ -173,6 +173,21 @@
                             notFoundText="No hay estados" placeholder="" class="w-1/3 min-w-[200px]"
                             formControlName="estadoVenta" [selectOnTab]="true">
                         </ng-select>
+                    </div>
+
+                    <div>
+                        <label>Moneda</label>
+                        <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar" style="width: 100%"
+                            [virtualScroll]="true" notFoundText="No hay monedas" class="w-1/3 min-w-[200px]"
+                            formControlName="monedaVenta" [selectOnTab]="true"
+                            [ngClass]="isSubmit ? ventaForm.controls['monedaVenta'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                    </div>
+
+                    <div
+                        [ngClass]="isSubmitPago ? ventaForm.controls['tipoCambioVenta'].errors ? 'has-error' : 'has-success' : ''">
+                        <label for="tipoCambioVenta">Tipo de cambio</label>
+                        <input id="tipoCambioVenta" type="text" class="form-control"
+                            formControlName="tipoCambioVenta" />
                     </div>
 
                 </div>
@@ -783,6 +798,21 @@
                                 notFoundText="No hay clientes"
                                 [ngClass]="isSubmit ? newVentaForm.controls['person_uuid'].errors ? 'has-error' : 'has-success' : ''">
                             </ng-select>
+                        </div>
+
+                        <div>
+                            <label>Moneda</label>
+                            <ng-select [items]="monedas" bindLabel="name" clearAllText="Limpiar" style="width: 100%"
+                                [virtualScroll]="true" notFoundText="No hay monedas" class="w-1/3 min-w-[200px]"
+                                formControlName="currency_uuid" [selectOnTab]="true"
+                                [ngClass]="isSubmit ? newVentaForm.controls['currency_uuid'].errors ? 'has-error' : 'has-success' : ''"></ng-select>
+                        </div>
+
+                        <div
+                            [ngClass]="isSubmitPago ? newVentaForm.controls['exchange_rate'].errors ? 'has-error' : 'has-success' : ''">
+                            <label for="exchange_rate">Tipo de cambio</label>
+                            <input id="exchange_rate" type="text" class="form-control"
+                                formControlName="exchange_rate" />
                         </div>
 
                     </div>

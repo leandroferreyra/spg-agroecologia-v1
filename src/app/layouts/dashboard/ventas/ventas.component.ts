@@ -12,7 +12,7 @@ import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { debounceTime, distinctUntilChanged, finalize, forkJoin, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, finalize, firstValueFrom, forkJoin, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FacturaService } from 'src/app/core/services/factura.service';
@@ -43,6 +43,7 @@ import { VentaDTO } from 'src/app/core/models/request/ventaDTO';
 import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTransaccionDTO';
 import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
+import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
 
 @Component({
   selector: 'app-ventas',
@@ -172,12 +173,14 @@ export class VentasComponent implements OnInit, OnDestroy {
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
+  private ultimaMonedaVentaSeleccionada: any = null;
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
-    private _transactionProductService: TransactionProductoService, private _facturaService: FacturaService,
+    private _transactionProductService: TransactionProductoService,
     private _transactionDocumentsService: FacturaService, private _pagoService: PagosService, private location: Location, private route: ActivatedRoute,
-    private router: Router, private datePipe: DatePipe) {
+    private router: Router, private datePipe: DatePipe, private _tiposCambioService: TiposCambioService) {
     this.initStore();
   }
   async initStore() {
@@ -366,6 +369,8 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   inicializarFormEdit() {
     this.ventaForm = new FormGroup({
+      monedaVenta: new FormControl({ value: this.selectedVenta?.transaction?.currency, disabled: true }, []),
+      tipoCambioVenta: new FormControl({ value: this.selectedVenta?.transaction?.exchange_rate, disabled: true }, []),
       // Venta
       nombre: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.firstname, disabled: true }, []),
       apellido: new FormControl({ value: this.selectedVenta?.transaction?.person?.human?.lastname, disabled: true }, []),
@@ -394,7 +399,48 @@ export class VentasComponent implements OnInit, OnDestroy {
       fechaRetira: new FormControl({ value: this.selectedVenta?.delivery_date, disabled: true }, []),
       remito: new FormControl({ value: this.selectedVenta?.delivery_note, disabled: true }, []),
     })
+    this.ultimaMonedaVentaSeleccionada = this.ventaForm.get('monedaVenta')?.value;
+    this.onChangeFormEdit();
+  }
+  onChangeFormEdit() {
+    this.ventaForm.get('fechaVenta')!.valueChanges.subscribe(
+      async (value: any) => {
+        const moneda = this.ventaForm.get('monedaVenta')?.value?.name;
+        if (moneda && moneda !== 'Pesos') {
+          const rate = await this.getTipoCambioPorFechaPromise(value, this.ventaForm.get('monedaVenta')?.value);
+          this.ventaForm.get('tipoCambioVenta')?.setValue(rate, { emitEvent: false });
+        }
+      });
 
+    this.ventaForm.get('monedaVenta')!.valueChanges.subscribe(
+      async (value: any) => {
+
+        const tipoCambioCtrl = this.ventaForm.get('tipoCambioVenta');
+        if (!value) return;
+
+        const nuevaMoneda = value?.name;
+        const monedaAnterior = this.ultimaMonedaVentaSeleccionada?.name;
+
+        // CASO 1: Si es Pesos
+        if (nuevaMoneda === 'Pesos') {
+          tipoCambioCtrl?.setValue(1);
+          tipoCambioCtrl?.disable();
+        } else {
+          tipoCambioCtrl?.enable();
+
+          // CASO 2: Cambio real entre monedas (Pesos <-> otra o USD <-> EUR, etc.)
+          const monedaCambioReal = monedaAnterior && monedaAnterior !== nuevaMoneda;
+
+          if (monedaCambioReal) {
+            // Se llama al endpoint para setear el valor del tipo de cambio según la fecha. 
+            const rate = await this.getTipoCambioPorFechaPromise(this.ventaForm.get('fechaVenta')?.value, value);
+            tipoCambioCtrl?.setValue(rate, { emitEvent: false });
+          }
+        }
+
+        // Actualizamos el valor anterior
+        this.ultimaMonedaVentaSeleccionada = value;
+      });
   }
 
   getCuit() {
@@ -651,12 +697,59 @@ export class VentasComponent implements OnInit, OnDestroy {
   inicializarFormNew() {
     this.newVentaForm = new FormGroup({
       transaction_datetime: new FormControl({ value: new Date(), disabled: false }, []),
-      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required])
+      person_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      currency_uuid: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      exchange_rate: new FormControl({ value: null, disabled: false }, [Validators.required])
     });
     this.onNewForm();
   }
   onNewForm() {
+    this.newVentaForm.get('transaction_datetime')!.valueChanges.subscribe(
+      async (value: any) => {
+        const moneda = this.newVentaForm.get('currency_uuid')?.value?.name;
+        if (moneda && moneda !== 'Pesos') {
+          const rate = await this.getTipoCambioPorFechaPromise(value, this.newVentaForm.get('currency_uuid')?.value);
+          this.newVentaForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
+        }
+      });
 
+    this.newVentaForm.get('currency_uuid')!.valueChanges.subscribe(
+      async (value: any) => {
+        if (value.name === 'Pesos') {
+          this.newVentaForm.get('exchange_rate')?.setValue(1);
+          this.newVentaForm.get('exchange_rate')?.disable();
+        } else {
+          const rate = await this.getTipoCambioPorFechaPromise(this.newVentaForm.get('transaction_datetime')?.value, value);
+          this.newVentaForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
+          this.newVentaForm.get('exchange_rate')?.enable();
+        }
+      });
+  }
+
+  async getTipoCambioPorFechaPromise(fecha: any, moneda: any) {
+    const fechaFormateada = fecha instanceof Date
+      ? format(fecha, 'dd-MM-yyyy')
+      : fecha;
+    const fechaFinal = this.convertirFechaADateBackend(fechaFormateada);
+    const observable$ = this._tiposCambioService
+      .getTipoCambioPorFecha(moneda.uuid, fechaFinal, this.actual_role)
+      .pipe(
+        map(res => {
+          const exchangeRate = res.data;
+          if (exchangeRate.length > 0) {
+            return exchangeRate[0].rate as number;
+          } else {
+            return null;
+          }
+        }),
+        catchError(error => {
+          this.swalService.toastError('top-right', error.error.message);
+          console.error('Error obteniendo tipo de cambio:', error);
+          return of(null);
+        })
+      );
+
+    return firstValueFrom(observable$);
   }
 
   obtenerVentasPorFiltroSimple() {
@@ -1298,6 +1391,8 @@ export class VentasComponent implements OnInit, OnDestroy {
       let venta = new VentaDTO();
       this.armarDTOVenta(venta, form);
       if (!this.isEdicion) {
+        venta.transaction.currency_uuid = form.get('currency_uuid')?.value?.uuid;
+        venta.transaction.exchange_rate = form.get('exchange_rate')?.value;
         this.subscription.add(
           this._ventaService.saveVenta(venta).subscribe({
             next: res => {
@@ -1400,6 +1495,45 @@ export class VentasComponent implements OnInit, OnDestroy {
       "transaction.transactionDocuments.accountDocumentType",
       "transaction.transactionDocuments.currency",
       "transaction.transactionProducts.product.measure"];
+    const modificaMonedaVenta = this.ventaForm.get('monedaVenta')?.value?.name !== this.selectedVenta?.transaction?.currency?.name;
+    const modificaTipoCambioVenta = this.ventaForm.get('tipoCambioVenta')?.value !== +this.selectedVenta?.transaction?.exchange_rate;
+    if (modificaMonedaVenta) {
+      ventaDTO.transaction.currency_uuid = this.ventaForm.get('monedaVenta')?.value?.uuid;
+    }
+    if (modificaTipoCambioVenta) {
+      ventaDTO.transaction.exchange_rate = +this.ventaForm.get('tipoCambioVenta')?.value;
+    }
+    if (modificaMonedaVenta && this.selectedVenta?.transaction?.transaction_products?.length > 0) {
+      this.openSwalConfirmarEdicionDatosCompra(ventaDTO);
+    } else {
+      this.edicionConfirmadaDatosVenta(ventaDTO);
+    }
+  }
+
+  openSwalConfirmarEdicionDatosCompra(ventaDTO: VentaDTO) {
+    Swal.fire({
+      title: '',
+      text: `Al confirmar se eliminarán los productos cargados en la venta`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.edicionConfirmadaDatosVenta(ventaDTO);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  edicionConfirmadaDatosVenta(ventaDTO: VentaDTO) {
     this.subscription.add(
       this._ventaService.editVenta(this.selectedVenta.uuid, ventaDTO).subscribe({
         next: res => {
@@ -1417,7 +1551,6 @@ export class VentasComponent implements OnInit, OnDestroy {
       })
     )
   }
-
 
   openSwalEliminarComprobante(comprobante: any) {
     Swal.fire({

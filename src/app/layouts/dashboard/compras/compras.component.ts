@@ -190,7 +190,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   private ultimaMonedaFacturacionSeleccionada: any = null;
   private ultimaMonedaCompraSeleccionada: any = null;
-  private ultimaFechaCompraSeleccionada: any = null;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -356,7 +355,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
     });
     this.ultimaMonedaFacturacionSeleccionada = this.compraForm.get('moneda')?.value;
     this.ultimaMonedaCompraSeleccionada = this.compraForm.get('monedaCompra')?.value;
-    this.ultimaFechaCompraSeleccionada = this.compraForm.get('fechaCompra')?.value;
 
     if (this.selectedCompra?.transaction?.transaction_documents.length > 0) {
       this.poseeFactura = true;
@@ -367,11 +365,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.compraForm.get('fechaCompra')!.valueChanges.subscribe(
       async (value: any) => {
         const moneda = this.compraForm.get('monedaCompra')?.value?.name;
-        // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
-        // let valor = this.convertirFechaADateBackend(value);
-        // if (valorActual !== valor && moneda !== 'Pesos') {
         if (moneda && moneda !== 'Pesos') {
-          const rate = await this.getTipoCambioPorFechaPromise();
+          const rate = await this.getTipoCambioPorFechaPromise(value, this.compraForm.get('monedaCompra')?.value);
           this.compraForm.get('tipoCambioCompra')?.setValue(rate, { emitEvent: false });
         }
       });
@@ -379,11 +374,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.compraForm.get('fechaFacturacion')!.valueChanges.subscribe(
       async (value: any) => {
         const moneda = this.compraForm.get('moneda')?.value?.name;
-        // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
-        // let valor = this.convertirFechaADateBackend(value);
-        // if (valorActual !== valor && moneda !== 'Pesos') {
         if (moneda && moneda !== 'Pesos') {
-          const rate = await this.getTipoCambioPorFechaPromise();
+          const rate = await this.getTipoCambioPorFechaPromise(value, this.compraForm.get('moneda')?.value);
           this.compraForm.get('tipoCambio')?.setValue(rate, { emitEvent: false });
         }
       });
@@ -407,7 +399,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         const monedaCambioReal = monedaAnterior && monedaAnterior !== nuevaMoneda;
 
         if (primeraFactura || monedaCambioReal) {
-          const rate = await this.getTipoCambioPorFechaPromise();
+          const rate = await this.getTipoCambioPorFechaPromise(this.compraForm.get('fechaFacturacion')?.value, value);
           tipoCambioCtrl?.setValue(rate, { emitEvent: false });
         }
       }
@@ -437,7 +429,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
           if (monedaCambioReal) {
             // Se llama al endpoint para setear el valor del tipo de cambio según la fecha. 
-            const rate = await this.getTipoCambioPorFechaPromise();
+            const rate = await this.getTipoCambioPorFechaPromise(this.compraForm.get('fechaCompra')?.value, value);
             tipoCambioCtrl?.setValue(rate, { emitEvent: false });
           }
         }
@@ -447,30 +439,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
       });
   }
 
-  async getTipoCambioPorFechaPromise() {
-    let fecha;
-    let uuidMoneda;
-    if (this.inEdicionFechaCompra) {
-      fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
-      uuidMoneda = this.compraForm.get('monedaCompra')?.value?.uuid;
-    } else if (this.inEdicionFactura || this.inAltaFactura) {
-      fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaFacturacion')?.value);
-      uuidMoneda = this.compraForm.get('moneda')?.value?.uuid;
-    } else if (this.inEdicionPago || this.inAltaPago) {
-      const fechaFormateada = this.pagoForm.get('payment_datetime')?.value instanceof Date
-        ? format(this.pagoForm.get('payment_datetime')?.value, 'dd-MM-yyyy')
-        : this.pagoForm.get('payment_datetime')?.value;
-      fecha = this.convertirFechaADateBackend(fechaFormateada);
-      uuidMoneda = this.pagoForm.get('currency_uuid')?.value?.uuid;
-    } else {
-      const fechaFormateada = this.newCompraForm.get('transaction_datetime')?.value instanceof Date
-        ? format(this.newCompraForm.get('transaction_datetime')?.value, 'dd-MM-yyyy')
-        : this.newCompraForm.get('transaction_datetime')?.value;
-      fecha = this.convertirFechaADateBackend(fechaFormateada);
-      uuidMoneda = this.newCompraForm.get('currency_uuid')?.value?.uuid;
-    }
+  async getTipoCambioPorFechaPromise(fecha: any, moneda: any) {
+    const fechaFormateada = fecha instanceof Date
+      ? format(fecha, 'dd-MM-yyyy')
+      : fecha;
+    const fechaFinal = this.convertirFechaADateBackend(fechaFormateada);
     const observable$ = this._tiposCambioService
-      .getTipoCambioPorFecha(uuidMoneda, fecha, this.actual_role)
+      .getTipoCambioPorFecha(moneda.uuid, fechaFinal, this.actual_role)
       .pipe(
         map(res => {
           const exchangeRate = res.data;
@@ -488,37 +463,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       );
 
     return firstValueFrom(observable$);
-
-    // const fecha = this.convertirFechaADateBackend(this.compraForm.get('fechaCompra')?.value);
-    // const uuidMoneda = this.compraForm.get('monedaCompra')?.value?.uuid;
-    // this.subscription.add(
-    //   this._tiposCambioService.getTipoCambioPorFecha(uuidMoneda, fecha, this.actual_role).subscribe({
-    //     next: res => {
-    //       let exchangeRate = res.data;
-    //       if (exchangeRate.length > 0) {
-    //         this.compraForm.get('tipoCambioCompra')?.setValue(exchangeRate[0].rate, { emitEvent: false });
-    //       } else {
-    //         this.compraForm.get('tipoCambioCompra')?.setValue(null, { emitEvent: false });
-    //       }
-    //     },
-    //     error: error => {
-    //       this.swalService.toastError('top-right', error.error.message);
-    //       console.error(error);
-    //     }
-    //   })
-    // )
   }
-
-  // convertirFechaNew(fecha: string) {
-  //   const fechaOriginal = new Date(fecha);
-
-  //   const dia = String(fechaOriginal.getDate()).padStart(2, '0');
-  //   const mes = String(fechaOriginal.getMonth() + 1).padStart(2, '0');
-  //   const anio = fechaOriginal.getFullYear();
-
-  //   const fechaFormateada = `${dia}-${mes}-${anio}`;
-  //   return fechaFormateada;
-  // }
 
   getFecha(fecha: string) {
     const date = new Date(fecha.replace(' ', 'T'));
@@ -729,10 +674,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.newCompraForm.get('transaction_datetime')!.valueChanges.subscribe(
       async (value: any) => {
         const moneda = this.newCompraForm.get('currency_uuid')?.value?.name;
-        // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
-        // let valor = this.convertirFechaADateBackend(value);
         if (moneda && moneda !== 'Pesos') {
-          const rate = await this.getTipoCambioPorFechaPromise();
+          const rate = await this.getTipoCambioPorFechaPromise(value, this.newCompraForm.get('currency_uuid')?.value);
           this.newCompraForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
         }
       });
@@ -743,7 +686,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.newCompraForm.get('exchange_rate')?.setValue(1);
           this.newCompraForm.get('exchange_rate')?.disable();
         } else {
-          const rate = await this.getTipoCambioPorFechaPromise();
+          const rate = await this.getTipoCambioPorFechaPromise(this.newCompraForm.get('transaction_datetime')?.value, value);
           this.newCompraForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
           this.newCompraForm.get('exchange_rate')?.enable();
         }
@@ -947,10 +890,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.pagoForm.get('payment_datetime')!.valueChanges.subscribe(
       async (value: any) => {
         const moneda = this.pagoForm.get('currency_uuid')?.value?.name;
-        // let valorActual = this.convertirFechaADateBackend(this.ultimaFechaCompraSeleccionada);
-        // let valor = this.convertirFechaADateBackend(value);
         if (moneda && moneda !== 'Pesos') {
-          const rate = await this.getTipoCambioPorFechaPromise();
+          const rate = await this.getTipoCambioPorFechaPromise(value, this.pagoForm.get('currency_uuid')?.value);
           this.pagoForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
         }
       });
@@ -961,7 +902,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.pagoForm.get('exchange_rate')?.setValue(1);
           this.pagoForm.get('exchange_rate')?.disable();
         } else {
-          const rate = await this.getTipoCambioPorFechaPromise();
+          const rate = await this.getTipoCambioPorFechaPromise(this.pagoForm.get('payment_datetime')?.value, value);
           this.pagoForm.get('exchange_rate')?.setValue(rate, { emitEvent: false });
           this.pagoForm.get('exchange_rate')?.enable();
         }
