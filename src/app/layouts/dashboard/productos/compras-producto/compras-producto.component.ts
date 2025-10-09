@@ -46,24 +46,8 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
     'transaction.transaction_datetime': 'desc'
   };
 
-  reemplazoForm!: FormGroup;
-  tituloModal: string = '';
-  isSubmit = false;
-  isEdicion = false;
-
-  // Catalogos
-  proveedores: any[] = [];
-  productos: any[] = [];
-  procesos: any[] = [];
-
-  placeholderCantidad: string = '';
-
-  procesoActivo: any;
-  isEdicionProceso: boolean = false;
-
-  productoInput$ = new Subject<string>();
-  productos$!: Observable<any[]>;
-  loadingProductos = false;
+  preciosActualizados: Record<string, number | null> = {};
+  monedaDolar: any;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private router: Router, private _tiposCambioService: TiposCambioService) {
@@ -82,6 +66,19 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['transaction.transactionProducts.Product.uuid'].value = this.producto.uuid;
       this.obtenerCompras();
+      this.obtenerMonedas();
+    }
+  }
+
+  async obtenerMonedas(): Promise<any> {
+    try {
+      const res = await firstValueFrom(this._indexService.getMonedas(this.rol));
+      const monedaDolar = res.data.find((m: any) => m.name === 'Dólares');
+      this.monedaDolar = monedaDolar;
+      return monedaDolar;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   }
 
@@ -93,7 +90,8 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
       "transaction.currentState",
       "transaction.person.human",
       "transaction.person.legalEntity",
-      "transaction.transactionProducts.product"
+      "transaction.transactionProducts.product",
+      "transaction.person.supplier"
     ];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
@@ -102,11 +100,13 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this._indexService.getComprasProveedorWithParam(params, this.rol).subscribe({
-        next: res => {
+        next: async res => {
           this.compras = res.data;
-          console.log("🚀 ~ ComprasProductoComponent ~ obtenerCompras ~ this.compras:", this.compras)
+          await this.obtenerMonedas();
+          // console.log("🚀 ~ ComprasProductoComponent ~ obtenerCompras ~ this.compras:", this.compras)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
+          this.obtenerPreciosActualizados();
           this.spinner.hide();
         },
         error: error => {
@@ -130,23 +130,60 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
     }
   }
 
+  async obtenerPreciosActualizados() {
+    const promises = this.compras.map(async (data: any) => {
+      const id = data.uuid;
+      const currency = data.transaction.currency;
+
+      // Si no hay moneda definida, no calculamos
+      if (!currency || !currency.uuid) {
+        this.preciosActualizados[id] = null;
+        return;
+      }
+
+      // Si no es pesos usar precio original
+      if (currency.name && currency.name !== 'Pesos') {
+        this.preciosActualizados[id] = data.transaction.transaction_products[0].unit_price;
+        return;
+      }
+
+      const valorActualMoneda = await this.getTipoCambioPorFechaPromise(new Date(), this.monedaDolar);
+      const valorDolarTransaction = await this.getTipoCambioPorFechaPromise(new Date(data.transaction.transaction_datetime), this.monedaDolar);
+
+      if (valorActualMoneda !== null && valorDolarTransaction !== null) {
+        this.preciosActualizados[id] = (+valorActualMoneda * +data.transaction.transaction_products[0].unit_price) / +valorDolarTransaction;
+      } else {
+        this.preciosActualizados[id] = null;
+      }
+    });
+
+    await Promise.all(promises);
+  }
+
+
   getNombreProveedor(data: any): { value: string; id: string } {
     if (!data) return { value: '', id: '' };
 
     let value = '';
-    let id = '';
+    let id = data.supplier.uuid ?? '';
 
     if (data.human) {
       const nombre = data.human?.firstname ?? '';
       const apellido = data.human?.lastname ?? '';
       value = `${nombre} ${apellido}`.trim();
-      id = data.human?.uuid;
     } else if (data.legal_entity) {
       value = data.legal_entity?.company_name ?? '';
-      id = data.legal_entity?.uuid;
     }
 
     return { value, id };
+  }
+
+  getPrecioTotalActualizado(data: any) {
+    const precio = this.preciosActualizados[data.uuid];
+    if (precio === null || precio === undefined) {
+      return '';
+    }
+    return data.transaction.transaction_products[0].quantity * this.preciosActualizados[data.uuid]!;
   }
 
   irAlProveedor(event: MouseEvent, uuid: any) {
@@ -176,18 +213,6 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
     const [fecha, hora] = fechaStr.split(' ');
     const [anio, mes, dia] = fecha.split('-');
     return `${dia}-${mes}-${anio} ${hora}`;
-  }
-
-  async getPrecioUnitarioActualizado(data: any) {
-    // if (data.transaction.currency.name !== 'Pesos') {
-    //   return data.transaction.transaction_products[0].unit_price;
-    // }
-    // let valorActualMoneda = await this.getTipoCambioPorFechaPromise(new Date(), data.transaction.currency.uuid);
-    // let valorDolarTransaction = await this.getTipoCambioPorFechaPromise(data.transaction.transaction_datetime, data.transaction.currency.uuid);
-    // if (valorActualMoneda !== null && valorDolarTransaction !== null) {
-    //   return valorActualMoneda * data.transaction.transaction_products[0].unit_price / valorDolarTransaction;
-    // }
-    // return '';
   }
 
   async getTipoCambioPorFechaPromise(fecha: any, moneda: any) {

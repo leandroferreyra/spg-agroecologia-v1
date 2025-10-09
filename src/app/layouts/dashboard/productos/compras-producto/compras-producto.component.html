@@ -49,12 +49,10 @@
                     <td class="whitespace-nowrap"> {{ data.transaction.transaction_products[0].quantity }} </td>
                     <td class="whitespace-nowrap"> {{ data.transaction.currency.symbol }} </td>
                     <td class="whitespace-nowrap"> {{ data.transaction.transaction_products[0].unit_price }} </td>
-                    <td class="whitespace-nowrap"> {{
-                        getPrecioUnitarioActualizado(data) }} </td>
+                    <td class="whitespace-nowrap"> {{ preciosActualizados[data.uuid] ?? '-' }} </td>
                     <td class="whitespace-nowrap"> {{ data.transaction.transaction_products[0].quantity *
                         data.transaction.transaction_products[0].unit_price }} </td>
-                    <td class="whitespace-nowrap"> {{ data.transaction.transaction_products[0].quantity *
-                        data.transaction.transaction_products[0].unit_price }} </td>
+                    <td class="whitespace-nowrap"> {{ getPrecioTotalActualizado(data) }} </td>
                     <td class="whitespace-nowrap"> {{ data.transaction.current_state.state.name }} </td>
                     <td>
                         <div class="flex items-center">
