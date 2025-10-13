@@ -65,8 +65,8 @@
                     <tr>
                         <td> {{ data.order }} </td>
                         <td>
-                            <span *ngIf="getSerialNumberIndicator(data) !== ''" 
-                                  class="bg-yellow-300 px-2 py-1 rounded text-sm font-medium">
+                            <span *ngIf="getSerialNumberIndicator(data) !== ''"
+                                class="bg-yellow-300 px-2 py-1 rounded text-sm font-medium">
                                 {{getSerialNumberIndicator(data)}}
                             </span>
                         </td>
@@ -241,7 +241,8 @@
                                                     </tr>
                                                     }
 
-                                                    @if(data?.product_type?.can_be_provided === 1) {
+                                                    @if(data?.product_type?.can_be_provided === 1 &&
+                                                    data?.assign_serial_number === 0 && data?.has_serial_number ===0) {
                                                     <tr>
                                                         <td></td>
                                                         <td></td>

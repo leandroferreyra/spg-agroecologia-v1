@@ -149,6 +149,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
       this._indexService.getFrozenComponentsWithParam(params, this.rol).subscribe({
         next: res => {
           this.componentes = res.data;
+          // console.log("🚀 ~ ComponentesProduccionComponent ~ obtenerComponentesProduccion ~ this.componentes:", this.componentes)
           this.modificarPaginacion(res);
           if (this.expandirTodo) {
             this.expandirTodos();
@@ -298,6 +299,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
   }
 
   toggleComponente(data: any) {
+    // console.log("🚀 ~ ComponentesProduccionComponent ~ toggleComponente ~ data:", data)
     const uuid = data.uuid;
     this.expandedRows[uuid] = !this.expandedRows[uuid];
     if (this.expandedRows[uuid]) {
