@@ -337,55 +337,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   inicializarFormEdit(producto: any) {
     this.selectedProducto = producto;
-    this.productoForm = new FormGroup({
-      nombre: new FormControl({ value: producto?.name, disabled: !this.isEdicion }, [Validators.required]),
-      codigo: new FormControl({ value: producto?.code, disabled: !this.isEdicion }, []),
-      tipoProducto: new FormControl({ value: producto?.product_type, disabled: !this.isEdicion }, [Validators.required]),
-      categoria: new FormControl({ value: producto?.product_category?.uuid, disabled: !this.isEdicion }, []),
-      estado: new FormControl({ value: producto?.current_state?.state?.uuid, disabled: !this.isEdicion }, [Validators.required]),
-      estadoComentario: new FormControl({ value: producto?.current_state?.comments, disabled: !this.isEdicion }, []),
-      nomenclatura: new FormControl({ value: producto?.mercosur_nomenclature, disabled: !this.isEdicion }, []),
-      unidad: new FormControl({ value: producto?.measure, disabled: !this.isEdicion }, [Validators.required]),
-      iva: new FormControl({ value: producto?.vat_percent, disabled: !this.isEdicion }, [Validators.required]),
-      pais: new FormControl({ value: producto?.country?.uuid, disabled: !this.isEdicion }, [Validators.required]),
-      asignaNumSerie: new FormControl({ value: producto?.assign_serial_number, disabled: (!this.isEdicion || producto?.has_serial_number === 1) }, [Validators.required]),
-      tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: true }, []),
-      trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
-      vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
-      descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }, []),
-      comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }, []),
-      nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }, []),
-      stock_initial: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.initial_amount), disabled: true }, []),
-      stock_available: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.available_amount), disabled: true }, []),
-      stock_reserved: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.reserved_amount), disabled: true }, []),
-      stock_samples: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.samples_amount), disabled: true }, []),
-      stock_observed: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.observed_amount), disabled: true }, []),
-      stock_minimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.minimum), disabled: this.isFieldDisabled(producto) }, []),
-      stock_optimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.optimum), disabled: this.isFieldDisabled(producto) }, []),
-      stock_quantity_sold: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.quantity_sold), disabled: true }, []),
-      esCompuesto: new FormControl({ value: producto?.product_type?.product_compound, disabled: true }, []),
-      stockControlled: new FormControl({ value: producto?.product_type?.stock_controlled, disabled: true }, []),
-      puedeSerProvisto: new FormControl({ value: producto?.product_type?.can_be_provided, disabled: true }, []),
-      comprable: new FormControl({ value: producto?.product_type?.can_be_purchased, disabled: true }, []),
-      producible: new FormControl({ value: producto?.product_type?.can_be_produced, disabled: true }, []),
-      valorOriginalProduccion: new FormControl({ value: producto?.costs?.original_production_cost, disabled: true }, []),
-      valorActualizadoProduccion: new FormControl({ value: producto?.costs?.adjusted_production_cost, disabled: true }, []),
-      valorOriginalCompra: new FormControl({ value: producto?.costs?.original_purchase_cost, disabled: true }, []),
-      valorActualizadoCompra: new FormControl({ value: producto?.costs?.adjusted_purchase_cost, disabled: true }, []),
-      cantidadCompras: new FormControl({ value: producto?.cost_param ? producto?.cost_param.purchases_quantity : null, disabled: true }, []),
-      funcionCalculo: new FormControl({ value: producto?.cost_param ? producto?.cost_param.calculation_function : null, disabled: true }, []),
-    });
-    if (!this.productoForm.get('trazable')?.value) {
-      // Deshabilitar asignaNumSerie si trazable es OFF
-      this.productoForm.get('asignaNumSerie')?.disable();
-    }
-    if (!this.productoForm.get('stockControlled')?.value) {
-      this.productoForm.get('trazable')?.setValue(false);
-      this.productoForm.get('trazable')?.disable();
-      this.tooltipTrazable = 'El producto no puede ser trazable ya que el tipo de producto no tiene control de stock';
-    } else {
-      this.tooltipTrazable = null;
-    }
+    this.productoForm = this.buildProductoForm(producto);
+    this.configureTrazabilidadYStockInicial();
     this.onFormEditChange();
   }
   onFormEditChange() {
@@ -413,51 +366,17 @@ export class ProductosComponent implements OnInit, OnDestroy {
         next: res => {
           console.log(res);
           let tipoProducto = res.data;
-          form.get('esCompuesto')?.setValue(tipoProducto.product_compound);
-          form.get('stockControlled')?.setValue(tipoProducto.stock_controlled);
-          form.get('puedeSerProvisto')?.setValue(tipoProducto.can_be_provided);
-          form.get('comprable')?.setValue(tipoProducto.can_be_purchased);
-          form.get('producible')?.setValue(tipoProducto.can_be_produced);
-          if (tipoProducto.product_must_be_traceable === 1) {
-            form.get('trazable')?.setValue(true);
-            form.get('trazable')?.disable();
-            this.tooltipTrazable = 'El producto debe ser trazable ya que el tipo de producto lo exige.';
-          } else {
-            this.tooltipTrazable = null;
-          }
-          if (tipoProducto.can_be_provided === 1) {
-            form.get('asignaNumSerie')?.setValue(false);
-          }
-          if (value.stock_controlled === 1) {
-            form.get('stock_minimum')?.enable();
-            form.get('stock_optimum')?.enable();
-            form.get('stock_minimum')?.setValidators(Validators.required)
-            form.get('stock_optimum')?.setValidators(Validators.required)
-            if (tipoProducto.product_must_be_traceable === 0) {
-              // Lo habilita solo en este caso, ya que si fuera must be traceable en 1, se pisaría con el disabled de arriba.
-              form.get('trazable')?.enable();
-            }
-          } else {
-            this.placeholderStocks = '';
-            form.get('stock_minimum')?.setValue(null);
-            form.get('stock_optimum')?.setValue(null);
-            form.get('stock_minimum')?.disable();
-            form.get('stock_optimum')?.disable();
-            form.get('stock_minimum')?.clearValidators();
-            form.get('stock_optimum')?.clearValidators();
-            form.get('trazable')?.setValue(false);
-            form.get('trazable')?.disable();
-            this.tooltipTrazable = 'El producto no puede ser trazable ya que el tipo de producto no tiene control de stock';
-          }
-          ['stock_minimum', 'stock_optimum'].forEach((field) => {
-            form.get(field)?.updateValueAndValidity({ emitEvent: false });
+          form.patchValue({
+            esCompuesto: tipoProducto.product_compound,
+            stockControlled: tipoProducto.stock_controlled,
+            puedeSerProvisto: tipoProducto.can_be_provided,
+            comprable: tipoProducto.can_be_purchased,
+            producible: tipoProducto.can_be_produced,
           });
-          if (!this.isEdicion) { // Viene del newFormChange
-            if (tipoProducto.can_be_purchased === 1) {
-              this.mostrarParametrosCalculo = true;
-            } else {
-              this.mostrarParametrosCalculo = false;
-            }
+          this.configureTrazabilidadPorTipo(tipoProducto);
+          this.configureStockPorTipo(tipoProducto);
+          if (!this.isEdicion) {
+            this.mostrarParametrosCalculo = tipoProducto.can_be_purchased === 1;
           }
         },
         error: error => {
@@ -466,6 +385,139 @@ export class ProductosComponent implements OnInit, OnDestroy {
       })
     )
   }
+
+  private buildProductoForm(producto: any): FormGroup {
+    return new FormGroup({
+      nombre: new FormControl({ value: producto?.name, disabled: !this.isEdicion }, [Validators.required]),
+      codigo: new FormControl({ value: producto?.code, disabled: !this.isEdicion }),
+      tipoProducto: new FormControl({ value: producto?.product_type, disabled: !this.isEdicion }, [Validators.required]),
+      categoria: new FormControl({ value: producto?.product_category?.uuid, disabled: !this.isEdicion }),
+      estado: new FormControl({ value: producto?.current_state?.state?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+      estadoComentario: new FormControl({ value: producto?.current_state?.comments, disabled: !this.isEdicion }),
+      nomenclatura: new FormControl({ value: producto?.mercosur_nomenclature, disabled: !this.isEdicion }),
+      unidad: new FormControl({ value: producto?.measure, disabled: !this.isEdicion }, [Validators.required]),
+      iva: new FormControl({ value: producto?.vat_percent, disabled: !this.isEdicion }, [Validators.required]),
+      pais: new FormControl({ value: producto?.country?.uuid, disabled: !this.isEdicion }, [Validators.required]),
+
+      asignaNumSerie: new FormControl({
+        value: producto?.assign_serial_number,
+        disabled: (!this.isEdicion || producto?.has_serial_number === 1)
+      }, [Validators.required]),
+
+      tieneNumSerie: new FormControl({ value: producto?.has_serial_number, disabled: true }),
+      trazable: new FormControl({ value: producto?.traceable, disabled: !this.isEdicion }, [Validators.required]),
+      vendible: new FormControl({ value: producto?.salable, disabled: !this.isEdicion }, [Validators.required]),
+      descripcionControl: new FormControl({ value: producto?.control_description, disabled: !this.isEdicion }),
+      comentarios: new FormControl({ value: producto?.comments, disabled: !this.isEdicion }),
+      nombreVenta: new FormControl({ value: producto?.sales_name, disabled: !this.isEdicion }),
+
+      // Stock
+      stock_initial: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.initial_amount), disabled: true }),
+      stock_available: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.available_amount), disabled: true }),
+      stock_reserved: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.reserved_amount), disabled: true }),
+      stock_samples: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.samples_amount), disabled: true }),
+      stock_observed: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.observed_amount), disabled: true }),
+      stock_minimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.minimum), disabled: this.isFieldDisabled(producto) }),
+      stock_optimum: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.optimum), disabled: this.isFieldDisabled(producto) }),
+      stock_quantity_sold: new FormControl({ value: this.mostrarCantidad(producto, producto?.stock_data?.quantity_sold), disabled: true }),
+
+      // Tipo producto
+      esCompuesto: new FormControl({ value: producto?.product_type?.product_compound, disabled: true }),
+      stockControlled: new FormControl({ value: producto?.product_type?.stock_controlled, disabled: true }),
+      puedeSerProvisto: new FormControl({ value: producto?.product_type?.can_be_provided, disabled: true }),
+      comprable: new FormControl({ value: producto?.product_type?.can_be_purchased, disabled: true }),
+      producible: new FormControl({ value: producto?.product_type?.can_be_produced, disabled: true }),
+
+      // Costos
+      valorOriginalProduccion: new FormControl({ value: producto?.costs?.original_production_cost, disabled: true }),
+      valorActualizadoProduccion: new FormControl({ value: producto?.costs?.adjusted_production_cost, disabled: true }),
+      valorOriginalCompra: new FormControl({ value: producto?.costs?.original_purchase_cost, disabled: true }),
+      valorActualizadoCompra: new FormControl({ value: producto?.costs?.adjusted_purchase_cost, disabled: true }),
+      cantidadCompras: new FormControl({ value: producto?.cost_param?.purchases_quantity ?? null, disabled: true }),
+      funcionCalculo: new FormControl({ value: producto?.cost_param?.calculation_function ?? null, disabled: true }),
+    });
+  }
+
+  private configureTrazabilidadYStockInicial(): void {
+    const trazableCtrl = this.productoForm.get('trazable');
+    const asignaNumSerieCtrl = this.productoForm.get('asignaNumSerie');
+    const stockControlled = this.productoForm.get('stockControlled')?.value;
+
+    if (!trazableCtrl?.value) asignaNumSerieCtrl?.disable();
+
+    if (!stockControlled) {
+      trazableCtrl?.setValue(false);
+      trazableCtrl?.disable();
+      this.tooltipTrazable = 'El producto no puede ser trazable ya que el tipo de producto no tiene control de stock';
+    } else {
+      this.tooltipTrazable = null;
+    }
+  }
+
+  private configureTrazabilidadPorTipo(tipoProducto: any): void {
+    const trazableCtrl = this.productoForm.get('trazable');
+
+    if (tipoProducto.product_must_be_traceable === 1) {
+      // Caso: debe ser trazable
+      trazableCtrl?.setValue(true);
+      trazableCtrl?.disable();
+      this.tooltipTrazable = 'El producto debe ser trazable ya que el tipo de producto lo exige.';
+    } else if (tipoProducto.stock_controlled === 0) {
+      // Caso: sin stock control
+      trazableCtrl?.setValue(false);
+      trazableCtrl?.disable();
+      this.tooltipTrazable = 'El producto no puede ser trazable ya que el tipo de producto no tiene control de stock';
+    } else {
+      // Caso intermedio: trazable editable
+      trazableCtrl?.enable();
+      this.tooltipTrazable = null;
+    }
+
+    if (tipoProducto.can_be_provided === 1) {
+      this.productoForm.get('asignaNumSerie')?.setValue(false);
+    }
+  }
+
+  private configureStockPorTipo(tipoProducto: any): void {
+    const stockMin = this.productoForm.get('stock_minimum');
+    const stockOpt = this.productoForm.get('stock_optimum');
+
+    if (tipoProducto.stock_controlled === 1) {
+      [stockMin, stockOpt].forEach(ctrl => {
+        ctrl?.enable();
+        ctrl?.setValidators(Validators.required);
+        ctrl?.updateValueAndValidity({ emitEvent: false });
+      });
+
+    } else {
+      [stockMin, stockOpt].forEach(ctrl => {
+        ctrl?.setValue(null);
+        ctrl?.disable();
+        ctrl?.clearValidators();
+        ctrl?.updateValueAndValidity({ emitEvent: false });
+      });
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   isFieldDisabled(producto: any) {
     // Solo se habilita si es edicion y es stock controlled
