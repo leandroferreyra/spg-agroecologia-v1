@@ -364,7 +364,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._tipoProductoService.showTipoProducto(value.uuid, this.actual_role).subscribe({
         next: res => {
-          console.log(res);
           let tipoProducto = res.data;
           form.patchValue({
             esCompuesto: tipoProducto.product_compound,
@@ -594,7 +593,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any, updateTab: boolean = true) {
-    console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
+    // console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
     this.productoAnterior = [];
     this.isEdicion = false;
     this.uuidFromUrl = producto.uuid;
