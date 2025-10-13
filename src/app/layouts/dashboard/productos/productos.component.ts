@@ -51,6 +51,7 @@ import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { GastosDTO } from 'src/app/core/models/request/gastosDTO';
 import { ProduccionesComponent } from './producciones/producciones.component';
+import { TipoProductoService } from 'src/app/core/services/tipoProducto.service';
 
 @Component({
   selector: 'app-productos',
@@ -162,7 +163,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router,
-    private _produccionService: ProduccionService, private _userLogged: UserLoggedService, private formBuilder: FormBuilder
+    private _produccionService: ProduccionService, private _userLogged: UserLoggedService, private formBuilder: FormBuilder,
+    private _tipoProductoService: TipoProductoService
   ) {
     this.initStore();
   }
@@ -372,30 +374,82 @@ export class ProductosComponent implements OnInit, OnDestroy {
       cantidadCompras: new FormControl({ value: producto?.cost_param ? producto?.cost_param.purchases_quantity : null, disabled: true }, []),
       funcionCalculo: new FormControl({ value: producto?.cost_param ? producto?.cost_param.calculation_function : null, disabled: true }, []),
     });
+    if (!this.productoForm.get('trazable')?.value) {
+      // Deshabilitar asignaNumSerie si trazable es OFF
+      this.productoForm.get('asignaNumSerie')?.disable();
+      this.productoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
+    }
     this.onFormEditChange();
   }
   onFormEditChange() {
+    this.productoForm.get('trazable')!.valueChanges.subscribe(
+      (value) => {
+        if (value) {
+          this.productoForm.get('asignaNumSerie')?.enable();
+          this.productoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
+        } else {
+          this.productoForm.get('asignaNumSerie')?.setValue(false);
+          this.productoForm.get('asignaNumSerie')?.disable();
+          this.productoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
+        }
+      });
 
     this.productoForm.get('tipoProducto')!.valueChanges.subscribe(
       (value) => {
-        if (value && value.stock_controlled === 1) {
-          this.productoForm.get('stock_minimum')?.enable();
-          this.productoForm.get('stock_optimum')?.enable();
-          this.productoForm.get('stock_minimum')?.setValidators(Validators.required)
-          this.productoForm.get('stock_optimum')?.setValidators(Validators.required)
-        } else {
-          this.placeholderStocks = '';
-          this.productoForm.get('stock_minimum')?.setValue(null);
-          this.productoForm.get('stock_optimum')?.setValue(null);
-          this.productoForm.get('stock_minimum')?.disable();
-          this.productoForm.get('stock_optimum')?.disable();
-          this.productoForm.get('stock_minimum')?.clearValidators();
-          this.productoForm.get('stock_optimum')?.clearValidators();
+        if (value) {
+          this.obtenerDatosDelTipoDeProducto(this.productoForm, value);
         }
-        ['stock_minimum', 'stock_optimum'].forEach((field) => {
-          this.productoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
-        });
       });
+  }
+
+  obtenerDatosDelTipoDeProducto(form: FormGroup, value: any) {
+    this.subscription.add(
+      this._tipoProductoService.showTipoProducto(value.uuid, this.actual_role).subscribe({
+        next: res => {
+          console.log(res);
+          let tipoProducto = res.data;
+          form.get('esCompuesto')?.setValue(tipoProducto.product_compound);
+          form.get('stockControlled')?.setValue(tipoProducto.stock_controlled);
+          form.get('puedeSerProvisto')?.setValue(tipoProducto.can_be_provided);
+          form.get('comprable')?.setValue(tipoProducto.can_be_purchased);
+          form.get('producible')?.setValue(tipoProducto.can_be_produced);
+          if (tipoProducto.product_must_be_traceable === 1) {
+            form.get('trazable')?.setValue(true);
+          }
+          if (tipoProducto.can_be_provided === 1) {
+            form.get('asignaNumSerie')?.setValue(false);
+          }
+          if (value.stock_controlled === 1) {
+            form.get('stock_minimum')?.enable();
+            form.get('stock_optimum')?.enable();
+            form.get('stock_minimum')?.setValidators(Validators.required)
+            form.get('stock_optimum')?.setValidators(Validators.required)
+          } else {
+            this.placeholderStocks = '';
+            form.get('stock_minimum')?.setValue(null);
+            form.get('stock_optimum')?.setValue(null);
+            form.get('stock_minimum')?.disable();
+            form.get('stock_optimum')?.disable();
+            form.get('stock_minimum')?.clearValidators();
+            form.get('stock_optimum')?.clearValidators();
+            form.get('trazable')?.setValue(false);
+          }
+          ['stock_minimum', 'stock_optimum'].forEach((field) => {
+            form.get(field)?.updateValueAndValidity({ emitEvent: false });
+          });
+          if (!this.isEdicion) { // Viene del newFormChange
+            if (tipoProducto.can_be_purchased === 1) {
+              this.mostrarParametrosCalculo = true;
+            } else {
+              this.mostrarParametrosCalculo = false;
+            }
+          }
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    )
   }
 
   isFieldDisabled(producto: any) {
@@ -435,32 +489,30 @@ export class ProductosComponent implements OnInit, OnDestroy {
       cantidadCompras: new FormControl({ value: null, disabled: false }, [Validators.min(1)]),
       funcionCalculo: new FormControl({ value: null, disabled: false }, [])
     });
+    if (!this.newProductoForm.get('trazable')?.value) {
+      // Deshabilitar asignaNumSerie si trazable es OFF
+      this.newProductoForm.get('asignaNumSerie')?.disable();
+      this.newProductoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
+    }
     this.onNewForm();
   }
   onNewForm() {
+    this.newProductoForm.get('trazable')!.valueChanges.subscribe(
+      (value) => {
+        if (value) {
+          this.newProductoForm.get('asignaNumSerie')?.enable();
+          this.newProductoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
+        } else {
+          this.newProductoForm.get('asignaNumSerie')?.setValue(false);
+          this.newProductoForm.get('asignaNumSerie')?.disable();
+          this.newProductoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
+        }
+      });
+
     this.newProductoForm.get('tipoProducto')!.valueChanges.subscribe(
       (value) => {
-        if (value && value.stock_controlled === 1) {
-          this.newProductoForm.get('stock_minimum')?.enable();
-          this.newProductoForm.get('stock_optimum')?.enable();
-          this.newProductoForm.get('stock_minimum')?.setValidators(Validators.required)
-          this.newProductoForm.get('stock_optimum')?.setValidators(Validators.required)
-        } else {
-          this.placeholderStocks = '';
-          this.newProductoForm.get('stock_minimum')?.setValue(null);
-          this.newProductoForm.get('stock_optimum')?.setValue(null);
-          this.newProductoForm.get('stock_minimum')?.disable();
-          this.newProductoForm.get('stock_optimum')?.disable();
-          this.newProductoForm.get('stock_minimum')?.clearValidators();
-          this.newProductoForm.get('stock_optimum')?.clearValidators();
-        }
-        ['stock_minimum', 'stock_optimum'].forEach((field) => {
-          this.newProductoForm.get(field)?.updateValueAndValidity({ emitEvent: false });
-        });
-        if (value && value.can_be_purchased === 1) {
-          this.mostrarParametrosCalculo = true;
-        } else {
-          this.mostrarParametrosCalculo = false;
+        if (value) {
+          this.obtenerDatosDelTipoDeProducto(this.newProductoForm, value);
         }
       });
 
@@ -475,7 +527,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any, updateTab: boolean = true) {
-    // console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
+    console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
     this.productoAnterior = [];
     this.isEdicion = false;
     this.uuidFromUrl = producto.uuid;
