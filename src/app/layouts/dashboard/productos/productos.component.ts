@@ -159,6 +159,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   mostrarStocks = true;
   mostrarCostos = true;
   mostrarParametrosCalculo = false;
+  tooltipTrazable: string | null = null;
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -377,7 +378,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
     if (!this.productoForm.get('trazable')?.value) {
       // Deshabilitar asignaNumSerie si trazable es OFF
       this.productoForm.get('asignaNumSerie')?.disable();
-      this.productoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
+    }
+    if (!this.productoForm.get('stockControlled')?.value) {
+      this.productoForm.get('trazable')?.setValue(false);
+      this.productoForm.get('trazable')?.disable();
+      this.tooltipTrazable = 'El producto no puede ser trazable ya que el tipo de producto no tiene control de stock';
+    } else {
+      this.tooltipTrazable = null;
     }
     this.onFormEditChange();
   }
@@ -386,11 +393,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
       (value) => {
         if (value) {
           this.productoForm.get('asignaNumSerie')?.enable();
-          this.productoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
         } else {
           this.productoForm.get('asignaNumSerie')?.setValue(false);
           this.productoForm.get('asignaNumSerie')?.disable();
-          this.productoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
         }
       });
 
@@ -415,6 +420,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
           form.get('producible')?.setValue(tipoProducto.can_be_produced);
           if (tipoProducto.product_must_be_traceable === 1) {
             form.get('trazable')?.setValue(true);
+            form.get('trazable')?.disable();
+            this.tooltipTrazable = 'El producto debe ser trazable ya que el tipo de producto lo exige.';
+          } else {
+            this.tooltipTrazable = null;
           }
           if (tipoProducto.can_be_provided === 1) {
             form.get('asignaNumSerie')?.setValue(false);
@@ -424,6 +433,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
             form.get('stock_optimum')?.enable();
             form.get('stock_minimum')?.setValidators(Validators.required)
             form.get('stock_optimum')?.setValidators(Validators.required)
+            if (tipoProducto.product_must_be_traceable === 0) {
+              // Lo habilita solo en este caso, ya que si fuera must be traceable en 1, se pisaría con el disabled de arriba.
+              form.get('trazable')?.enable();
+            }
           } else {
             this.placeholderStocks = '';
             form.get('stock_minimum')?.setValue(null);
@@ -433,6 +446,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
             form.get('stock_minimum')?.clearValidators();
             form.get('stock_optimum')?.clearValidators();
             form.get('trazable')?.setValue(false);
+            form.get('trazable')?.disable();
+            this.tooltipTrazable = 'El producto no puede ser trazable ya que el tipo de producto no tiene control de stock';
           }
           ['stock_minimum', 'stock_optimum'].forEach((field) => {
             form.get(field)?.updateValueAndValidity({ emitEvent: false });
@@ -527,7 +542,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any, updateTab: boolean = true) {
-    // console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
+    console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
     this.productoAnterior = [];
     this.isEdicion = false;
     this.uuidFromUrl = producto.uuid;
@@ -1137,4 +1152,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
     )
   }
 
+  // tooltipTrazable() {
+  //   if (this.selectedProducto?.product_type?.stock_controlled === 0) {
+  //     return 'El producto no puede ser trazable ya que el tipo de producto no tiene control de stock';
+  //   }
+  //   return '';
+  // }
 }

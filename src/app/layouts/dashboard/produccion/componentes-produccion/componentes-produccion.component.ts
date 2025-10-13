@@ -472,7 +472,7 @@ export class ComponentesProduccionComponent implements OnInit, OnDestroy {
 
   getTooltipNota(nota: string) {
     const v = (nota ?? '').toString();
-    return v.replace(/(\S{20})/g, '$1\u200B'); // zero-width space cada 20 chars
+    return v.replace(/(\S{20})/g, '$1\u200B');
   }
 
   getSupplierTooltip(supplier: any) {
