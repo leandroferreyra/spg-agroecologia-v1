@@ -372,8 +372,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
             comprable: tipoProducto.can_be_purchased,
             producible: tipoProducto.can_be_produced,
           });
-          this.configureTrazabilidadPorTipo(tipoProducto);
-          this.configureStockPorTipo(tipoProducto);
+          this.configureTrazabilidadPorTipo(form, tipoProducto);
+          this.configureStockPorTipo(form, tipoProducto);
           if (!this.isEdicion) {
             this.mostrarParametrosCalculo = tipoProducto.can_be_purchased === 1;
           }
@@ -453,8 +453,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
   }
 
-  private configureTrazabilidadPorTipo(tipoProducto: any): void {
-    const trazableCtrl = this.productoForm.get('trazable');
+  private configureTrazabilidadPorTipo(form: FormGroup, tipoProducto: any): void {
+    const trazableCtrl = form.get('trazable');
 
     if (tipoProducto.product_must_be_traceable === 1) {
       // Caso: debe ser trazable
@@ -473,13 +473,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
 
     if (tipoProducto.can_be_provided === 1) {
-      this.productoForm.get('asignaNumSerie')?.setValue(false);
+      form.get('asignaNumSerie')?.setValue(false);
     }
   }
 
-  private configureStockPorTipo(tipoProducto: any): void {
-    const stockMin = this.productoForm.get('stock_minimum');
-    const stockOpt = this.productoForm.get('stock_optimum');
+  private configureStockPorTipo(form: FormGroup, tipoProducto: any): void {
+    const stockMin = form.get('stock_minimum');
+    const stockOpt = form.get('stock_optimum');
 
     if (tipoProducto.stock_controlled === 1) {
       [stockMin, stockOpt].forEach(ctrl => {
@@ -555,11 +555,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
       cantidadCompras: new FormControl({ value: null, disabled: false }, [Validators.min(1)]),
       funcionCalculo: new FormControl({ value: null, disabled: false }, [])
     });
-    if (!this.newProductoForm.get('trazable')?.value) {
-      // Deshabilitar asignaNumSerie si trazable es OFF
-      this.newProductoForm.get('asignaNumSerie')?.disable();
-      this.newProductoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
-    }
+    // if (!this.newProductoForm.get('trazable')?.value) {
+    //   // Deshabilitar asignaNumSerie si trazable es OFF
+    //   this.newProductoForm.get('asignaNumSerie')?.disable();
+    //   this.newProductoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
+    // }
     this.onNewForm();
   }
   onNewForm() {
