@@ -48,6 +48,7 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
 
   preciosActualizados: Record<string, number | null> = {};
   monedaDolar: any;
+  tipoCambioHoy: any;
 
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private router: Router, private _tiposCambioService: TiposCambioService) {
@@ -131,6 +132,10 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
   }
 
   async obtenerPreciosActualizados() {
+    if (this.monedaDolar) {
+      this.tipoCambioHoy = await this.getTipoCambioPorFechaPromise(new Date(), this.monedaDolar);
+    }
+
     const promises = this.compras.map(async (data: any) => {
       const id = data.uuid;
       const currency = data.transaction.currency;
@@ -151,7 +156,7 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const valorActualMoneda = await this.getTipoCambioPorFechaPromise(new Date(), this.monedaDolar);
+      const valorActualMoneda = this.tipoCambioHoy;
       const valorDolarTransaction = await this.getTipoCambioPorFechaPromise(new Date(data.transaction.transaction_datetime), this.monedaDolar);
 
       if (valorActualMoneda !== null && valorDolarTransaction !== null) {
