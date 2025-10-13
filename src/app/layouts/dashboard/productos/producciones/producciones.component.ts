@@ -67,7 +67,7 @@ export class ProduccionesComponent implements OnInit, OnDestroy {
   obtenerProducciones() {
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
-    params.with = ["batch", "responsible", "currentState"];
+    params.with = ["batch", "responsible", "currentState", "product.measure"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -77,6 +77,7 @@ export class ProduccionesComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(params, this.rol).subscribe({
         next: res => {
           this.producciones = res.data;
+          console.log("🚀 ~ ProduccionesComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
@@ -117,7 +118,15 @@ export class ProduccionesComponent implements OnInit, OnDestroy {
     if (!fechaStr) return '';
     const [fecha, hora] = fechaStr.split(' ');
     const [anio, mes, dia] = fecha.split('-');
-    return `${dia}-${mes}-${anio} ${hora}`;
+    return `${dia}-${mes}-${anio}`;
+  }
+
+  mostrarCantidad(data: any) {
+    if (data.product?.measure?.is_integer === 1) {
+      return (+data.quantity)?.toFixed(0);
+    } else {
+      return (+data.quantity)?.toFixed(2);
+    }
   }
 
 }

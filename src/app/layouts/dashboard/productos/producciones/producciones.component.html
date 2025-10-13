@@ -40,7 +40,7 @@
                 {
                 <tr>
                     <td class="whitespace-nowrap"> {{ convertirFechaConHora(data.production_datetime) }} </td>
-                    <td class="whitespace-nowrap"> {{data.quantity}} </td>
+                    <td class="whitespace-nowrap"> {{mostrarCantidad(data)}} </td>
                     <td class="whitespace-nowrap"> {{ data.batch?.batch_identification }} </td>
                     <td class="whitespace-nowrap"> {{ data.responsible?.user_name }} </td>
                     <td class="whitespace-nowrap">

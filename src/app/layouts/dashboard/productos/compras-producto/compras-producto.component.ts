@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -66,7 +66,7 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
       // Si el producto cambia, actualizamos los filtros y obtenemos los componentes
       this.filtros['transaction.transactionProducts.Product.uuid'].value = this.producto.uuid;
       this.obtenerCompras();
-      this.obtenerMonedas();
+      // this.obtenerMonedas();
     }
   }
 
@@ -90,7 +90,7 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
       "transaction.currentState",
       "transaction.person.human",
       "transaction.person.legalEntity",
-      "transaction.transactionProducts.product",
+      "transaction.transactionProducts.product.measure",
       "transaction.person.supplier"
     ];
     params.paging = this.itemsPerPage;
@@ -134,6 +134,9 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
     const promises = this.compras.map(async (data: any) => {
       const id = data.uuid;
       const currency = data.transaction.currency;
+      const itemInTransactionProducts = data.transaction.transaction_products.find(
+        (item: any) => item.product.uuid === this.producto.uuid
+      );
 
       // Si no hay moneda definida, no calculamos
       if (!currency || !currency.uuid) {
@@ -143,7 +146,8 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
 
       // Si no es pesos usar precio original
       if (currency.name && currency.name !== 'Pesos') {
-        this.preciosActualizados[id] = data.transaction.transaction_products[0].unit_price;
+
+        this.preciosActualizados[id] = itemInTransactionProducts.unit_price;
         return;
       }
 
@@ -151,7 +155,7 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
       const valorDolarTransaction = await this.getTipoCambioPorFechaPromise(new Date(data.transaction.transaction_datetime), this.monedaDolar);
 
       if (valorActualMoneda !== null && valorDolarTransaction !== null) {
-        this.preciosActualizados[id] = (+valorActualMoneda * +data.transaction.transaction_products[0].unit_price) / +valorDolarTransaction;
+        this.preciosActualizados[id] = (+valorActualMoneda * +(itemInTransactionProducts.unit_price)) / +valorDolarTransaction;
       } else {
         this.preciosActualizados[id] = null;
       }
@@ -179,11 +183,14 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
   }
 
   getPrecioTotalActualizado(data: any) {
+    const itemInTransactionProducts = data.transaction.transaction_products.find(
+      (item: any) => item.product.uuid === this.producto.uuid
+    );
     const precio = this.preciosActualizados[data.uuid];
     if (precio === null || precio === undefined) {
       return '';
     }
-    return data.transaction.transaction_products[0].quantity * this.preciosActualizados[data.uuid]!;
+    return +(itemInTransactionProducts.quantity * this.preciosActualizados[data.uuid]!).toFixed(2);
   }
 
   irAlProveedor(event: MouseEvent, uuid: any) {
@@ -212,7 +219,7 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
     if (!fechaStr) return '';
     const [fecha, hora] = fechaStr.split(' ');
     const [anio, mes, dia] = fecha.split('-');
-    return `${dia}-${mes}-${anio} ${hora}`;
+    return `${dia}-${mes}-${anio}`;
   }
 
   async getTipoCambioPorFechaPromise(fecha: any, moneda: any) {
@@ -245,6 +252,24 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
     const fechaNormalizada = fechaStr.replace(/[\/()]/g, '-');
     const [dia, mes, anio] = fechaNormalizada.split('-');
     return `${anio}-${mes}-${dia}`;
+  }
+
+  mostrarCantidad(data: any) {
+    const itemInTransactionProducts = data.transaction.transaction_products.find(
+      (item: any) => item.product.uuid === this.producto.uuid
+    );
+    if (itemInTransactionProducts.product?.measure?.is_integer === 1) {
+      return (+itemInTransactionProducts.quantity)?.toFixed(0);
+    } else {
+      return (+itemInTransactionProducts.quantity)?.toFixed(2);
+    }
+  }
+
+  mostrarPrecio(data: number | null) {
+    if (data) {
+      return (+data).toFixed(2);
+    }
+    return data;
   }
 
 }

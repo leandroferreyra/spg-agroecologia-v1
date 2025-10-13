@@ -46,12 +46,13 @@
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
                         (click)="irAlProveedor($event, getNombreProveedor(data.transaction.person)!.id)">
                         {{getNombreProveedor(data.transaction.person)!.value }}</td>
-                    <td class="whitespace-nowrap"> {{ data.transaction.transaction_products[0].quantity }} </td>
+                    <td class="whitespace-nowrap"> {{ mostrarCantidad(data) }}</td>
                     <td class="whitespace-nowrap"> {{ data.transaction.currency.symbol }} </td>
-                    <td class="whitespace-nowrap"> {{ data.transaction.transaction_products[0].unit_price }} </td>
-                    <td class="whitespace-nowrap"> {{ preciosActualizados[data.uuid] ?? '-' }} </td>
-                    <td class="whitespace-nowrap"> {{ data.transaction.transaction_products[0].quantity *
-                        data.transaction.transaction_products[0].unit_price }} </td>
+                    <td class="whitespace-nowrap"> {{ mostrarPrecio(data.transaction.transaction_products[0].unit_price)
+                        }} </td>
+                    <td class="whitespace-nowrap"> {{ mostrarPrecio(preciosActualizados[data.uuid]) ?? '-' }} </td>
+                    <td class="whitespace-nowrap"> {{ mostrarPrecio(data.transaction.transaction_products[0].quantity *
+                        data.transaction.transaction_products[0].unit_price) }} </td>
                     <td class="whitespace-nowrap"> {{ getPrecioTotalActualizado(data) }} </td>
                     <td class="whitespace-nowrap"> {{ data.transaction.current_state.state.name }} </td>
                     <td>
