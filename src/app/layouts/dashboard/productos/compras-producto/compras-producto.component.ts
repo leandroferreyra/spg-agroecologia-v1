@@ -103,8 +103,8 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(params, this.rol).subscribe({
         next: async res => {
           this.compras = res.data;
+          console.log("🚀 ~ ComprasProductoComponent ~ obtenerCompras ~ this.compras:", this.compras)
           await this.obtenerMonedas();
-          // console.log("🚀 ~ ComprasProductoComponent ~ obtenerCompras ~ this.compras:", this.compras)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.obtenerPreciosActualizados();
@@ -270,11 +270,28 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
     }
   }
 
-  mostrarPrecio(data: number | null) {
+  mostrarPrecioHoy(data: number | null) {
     if (data) {
       return (+data).toFixed(2);
     }
     return data;
+  }
+
+  mostrarPrecio(data: any | null) {
+    if (data) {
+      const itemInTransactionProducts = data.transaction.transaction_products.find(
+        (item: any) => item.product.uuid === this.producto.uuid
+      );
+      return (+itemInTransactionProducts.unit_price)?.toFixed(2);
+    }
+    return data;
+  }
+
+  mostrarPrecioTotal(data: any) {
+    const itemInTransactionProducts = data.transaction.transaction_products.find(
+      (item: any) => item.product.uuid === this.producto.uuid
+    );
+    return (+itemInTransactionProducts.unit_price * +itemInTransactionProducts.quantity)?.toFixed(2);
   }
 
 }
