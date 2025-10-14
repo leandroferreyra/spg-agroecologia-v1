@@ -103,7 +103,7 @@ export class ComprasProductoComponent implements OnInit, OnDestroy {
       this._indexService.getComprasProveedorWithParam(params, this.rol).subscribe({
         next: async res => {
           this.compras = res.data;
-          console.log("🚀 ~ ComprasProductoComponent ~ obtenerCompras ~ this.compras:", this.compras)
+          // console.log("🚀 ~ ComprasProductoComponent ~ obtenerCompras ~ this.compras:", this.compras)
           await this.obtenerMonedas();
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
