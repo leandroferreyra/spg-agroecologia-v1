@@ -551,19 +551,19 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   mostrarCostoUnitario(data: any) {
-    // Si existe data.child_product.costs.defined_by y su valor es "Compra", devolver data.child_product.costs.adjusted_purchase_cost
-    // Si existe data.child_product.costs.defined_by y su valor es "Producción", devolver data.child_product.costs.adjusted_production_cost
-    // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.adjusted_purchase_cost, devolver data.child_product.costs.adjusted_purchase_cost
-    // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.adjusted_production_cost, devolver data.child_product.costs.adjusted_production_cost
-    // Si no existe data.child_product.costs.defined_by, y no existe data.child_product.costs.adjusted_purchase_cost, y no existe data.child_product.costs.adjusted_production_cost, devolver null
+    // Si existe data.child_product.costs.defined_by y su valor es "Compra", devolver data.child_product.costs.purchase_cost_pesos
+    // Si existe data.child_product.costs.defined_by y su valor es "Producción", devolver data.child_product.costs.production_cost_pesos
+    // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.purchase_cost_pesos, devolver data.child_product.costs.purchase_cost_pesos
+    // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.production_cost_pesos, devolver data.child_product.costs.production_cost_pesos
+    // Si no existe data.child_product.costs.defined_by, y no existe data.child_product.costs.purchase_cost_pesos, y no existe data.child_product.costs.production_cost_pesos, devolver null
     if (data.child_product.costs.defined_by === "Compra") {
-      return data.child_product.costs.adjusted_purchase_cost;
+      return data.child_product.costs.purchase_cost_pesos;
     } else if (data.child_product.costs.defined_by === "Producción") {
-      return data.child_product.costs.adjusted_production_cost;
-    } else if (data.child_product.costs.adjusted_purchase_cost) {
-      return data.child_product.costs.adjusted_purchase_cost;
-    } else if (data.child_product.costs.adjusted_production_cost) {
-      return data.child_product.costs.adjusted_production_cost;
+      return data.child_product.costs.production_cost_pesos;
+    } else if (data.child_product.costs.purchase_cost_pesos) {
+      return data.child_product.costs.purchase_cost_pesos;
+    } else if (data.child_product.costs.production_cost_pesos) {
+      return data.child_product.costs.production_cost_pesos;
     } else {
       return null;
     }

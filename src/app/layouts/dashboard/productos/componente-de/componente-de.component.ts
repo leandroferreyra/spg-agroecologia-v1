@@ -126,6 +126,30 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
     }
   }
 
+  mostrarCostoUnitario(data: any) {
+    // Si existe data.parent_product.costs.defined_by y su valor es "Compra", devolver data.parent_product.costs.purchase_cost_pesos
+    // Si existe data.parent_product.costs.defined_by y su valor es "Producción", devolver data.parent_product.costs.production_cost_pesos
+    // Si no existe data.parent_product.costs.defined_by, y existe data.parent_product.costs.purchase_cost_pesos, devolver data.parent_product.costs.purchase_cost_pesos
+    // Si no existe data.parent_product.costs.defined_by, y existe data.parent_product.costs.production_cost_pesos, devolver data.parent_product.costs.production_cost_pesos
+    // Si no existe data.parent_product.costs.defined_by, y no existe data.parent_product.costs.purchase_cost_pesos, y no existe data.parent_product.costs.production_cost_pesos, devolver null
+    if (data.parent_product.costs.defined_by === "Compra") {
+      return data.parent_product.costs.purchase_cost_pesos;
+    } else if (data.parent_product.costs.defined_by === "Producción") {
+      return data.parent_product.costs.production_cost_pesos;
+    } else if (data.parent_product.costs.purchase_cost_pesos) {
+      return data.parent_product.costs.purchase_cost_pesos;
+    } else if (data.parent_product.costs.production_cost_pesos) {
+      return data.parent_product.costs.production_cost_pesos;
+    } else {
+      return null;
+    }
+  }
+
+  mostrarCostoTotal(data: any) {
+    const costoUnitario = this.mostrarCostoUnitario(data);
+    return costoUnitario ? costoUnitario * data.quantity : null;
+  }
+
   goToProduct(event: MouseEvent, data: any) {
     this.eventProducto.emit({ data, event });
   }
