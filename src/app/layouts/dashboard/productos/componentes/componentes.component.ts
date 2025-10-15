@@ -550,6 +550,30 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     }
   }
 
+  mostrarCostoUnitario(data: any) {
+    // Si existe data.child_product.costs.defined_by y su valor es "Compra", devolver data.child_product.costs.adjusted_purchase_cost
+    // Si existe data.child_product.costs.defined_by y su valor es "Producción", devolver data.child_product.costs.adjusted_production_cost
+    // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.adjusted_purchase_cost, devolver data.child_product.costs.adjusted_purchase_cost
+    // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.adjusted_production_cost, devolver data.child_product.costs.adjusted_production_cost
+    // Si no existe data.child_product.costs.defined_by, y no existe data.child_product.costs.adjusted_purchase_cost, y no existe data.child_product.costs.adjusted_production_cost, devolver null
+    if (data.child_product.costs.defined_by === "Compra") {
+      return data.child_product.costs.adjusted_purchase_cost;
+    } else if (data.child_product.costs.defined_by === "Producción") {
+      return data.child_product.costs.adjusted_production_cost;
+    } else if (data.child_product.costs.adjusted_purchase_cost) {
+      return data.child_product.costs.adjusted_purchase_cost;
+    } else if (data.child_product.costs.adjusted_production_cost) {
+      return data.child_product.costs.adjusted_production_cost;
+    } else {
+      return null;
+    }
+  }
+
+  mostrarCostoTotal(data: any) {
+    const costoUnitario = this.mostrarCostoUnitario(data);
+    return costoUnitario ? costoUnitario * data.quantity : null;
+  }
+
   openModalProceso(type: string, dato?: any) {
     if (type === 'NEW') {
       this.tituloModalProceso = 'Nuevo proceso';
