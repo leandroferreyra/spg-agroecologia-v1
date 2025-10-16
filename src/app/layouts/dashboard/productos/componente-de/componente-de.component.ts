@@ -155,17 +155,31 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
   }
 
   getTippyInUSD(data: any) {
-    if (data.parent_product?.costs?.purchase_cost_dollars) {
+    if (data.parent_product?.costs?.defined_by === "Compra") {
       return 'USD ' + (+data.parent_product?.costs?.purchase_cost_dollars).toFixed(2);
+    } else if (data.parent_product?.costs?.defined_by === "Producción") {
+      return 'USD ' + (+data.parent_product?.costs?.production_cost_dollars).toFixed(2);
+    } else if (data.parent_product?.costs?.purchase_cost_dollars) {
+      return 'USD ' + (+data.parent_product.costs.purchase_cost_dollars).toFixed(2);
+    } else if (data.parent_product?.costs?.production_cost_dollars) {
+      return 'USD ' + (+data.parent_product.costs.production_cost_dollars).toFixed(2);
+    } else {
+      return null;
     }
-    return null;
   }
 
   getTippyTotalInUSD(data: any) {
-    if (data.parent_product?.costs?.purchase_cost_dollars) {
+    if (data.parent_product?.costs?.defined_by === "Compra") {
       return 'USD ' + (+data.parent_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
+    } else if (data.parent_product?.costs?.defined_by === "Producción") {
+      return 'USD ' + (+data.parent_product?.costs?.production_cost_dollars * data.quantity).toFixed(2);
+    } else if (data.parent_product?.costs?.purchase_cost_dollars) {
+      return 'USD ' + (+data.parent_product.costs.purchase_cost_dollars * data.quantity).toFixed(2);
+    } else if (data.parent_product?.costs?.production_cost_dollars) {
+      return 'USD ' + (+data.parent_product.costs.production_cost_dollars * data.quantity).toFixed(2);
+    } else {
+      return null;
     }
-    return null;
   }
 
 }

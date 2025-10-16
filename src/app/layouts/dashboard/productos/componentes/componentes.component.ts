@@ -696,17 +696,31 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   getTippyInUSD(data: any) {
-    if (data.child_product?.costs?.purchase_cost_dollars) {
+    if (data.child_product?.costs?.defined_by === "Compra") {
       return 'USD ' + (+data.child_product?.costs?.purchase_cost_dollars).toFixed(2);
+    } else if (data.child_product?.costs?.defined_by === "Producción") {
+      return 'USD ' + (+data.child_product?.costs?.production_cost_dollars).toFixed(2);
+    } else if (data.child_product?.costs?.purchase_cost_dollars) {
+      return 'USD ' + (+data.child_product.costs.purchase_cost_dollars).toFixed(2);
+    } else if (data.child_product?.costs?.production_cost_dollars) {
+      return 'USD ' + (+data.child_product.costs.production_cost_dollars).toFixed(2);
+    } else {
+      return null;
     }
-    return null;
   }
 
   getTippyTotalInUSD(data: any) {
-    if (data.child_product?.costs?.purchase_cost_dollars) {
+    if (data.child_product?.costs?.defined_by === "Compra") {
       return 'USD ' + (+data.child_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
+    } else if (data.child_product?.costs?.defined_by === "Producción") {
+      return 'USD ' + (+data.child_product?.costs?.production_cost_dollars * data.quantity).toFixed(2);
+    } else if (data.child_product?.costs?.purchase_cost_dollars) {
+      return 'USD ' + (+data.child_product.costs.purchase_cost_dollars * data.quantity).toFixed(2);
+    } else if (data.child_product?.costs?.production_cost_dollars) {
+      return 'USD ' + (+data.child_product.costs.production_cost_dollars * data.quantity).toFixed(2);
+    } else {
+      return null;
     }
-    return null;
   }
 
   isProductoCompuesto() {
