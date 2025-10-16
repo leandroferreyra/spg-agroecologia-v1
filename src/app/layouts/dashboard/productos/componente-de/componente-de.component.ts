@@ -155,11 +155,17 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
   }
 
   getTippyInUSD(data: any) {
-    return 'USD ' + (+data.parent_product?.costs?.production_cost_dollars).toFixed(2);
+    if (data.parent_product?.costs?.purchase_cost_dollars) {
+      return 'USD ' + (+data.parent_product?.costs?.purchase_cost_dollars).toFixed(2);
+    }
+    return null;
   }
 
   getTippyTotalInUSD(data: any) {
-    return 'USD ' + (+data.parent_product?.costs?.production_cost_dollars * data.quantity).toFixed(2);
+    if (data.parent_product?.costs?.purchase_cost_dollars) {
+      return 'USD ' + (+data.parent_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
+    }
+    return null;
   }
 
 }
