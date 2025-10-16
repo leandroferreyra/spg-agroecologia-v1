@@ -696,11 +696,11 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   }
 
   getTippyInUSD(data: any) {
-    return 'USD ' + (data.child_product?.costs?.purchase_cost_dollars).toFixed(2);
+    return 'USD ' + (+data.child_product?.costs?.purchase_cost_dollars).toFixed(2);
   }
 
   getTippyTotalInUSD(data: any) {
-    return 'USD ' + (data.child_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
+    return 'USD ' + (+data.child_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
   }
 
   isProductoCompuesto() {

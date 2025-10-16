@@ -54,9 +54,6 @@
                             Proveedor
                         </span>
                     </th>
-                    <!-- <th>
-                            Acciones
-                        </th> -->
                 </tr>
             </thead>
             <tbody>
@@ -67,8 +64,10 @@
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
                         (click)="goToProduct($event, data.parent_product)"> {{ data.parent_product.name}}</td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
-                    <td class="whitespace-nowrap"> $ {{mostrarCostoUnitario(data)}} </td>
-                    <td class="whitespace-nowrap"> $ {{mostrarCostoTotal(data)}} </td>
+                    <td class="whitespace-nowrap" [ngxTippy]="getTippyInUSD(data)"> $ {{mostrarCostoUnitario(data)}}
+                    </td>
+                    <td class="whitespace-nowrap" [ngxTippy]="getTippyTotalInUSD(data)"> $ {{mostrarCostoTotal(data)}}
+                    </td>
                     <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
                 </tr>
                 }
