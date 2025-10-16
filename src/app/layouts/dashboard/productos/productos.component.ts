@@ -428,13 +428,20 @@ export class ProductosComponent implements OnInit, OnDestroy {
       producible: new FormControl({ value: producto?.product_type?.can_be_produced, disabled: true }),
 
       // Costos
-      valorOriginalProduccion: new FormControl({ value: producto?.costs?.production_cost_dollars, disabled: true }),
-      valorActualizadoProduccion: new FormControl({ value: producto?.costs?.production_cost_pesos, disabled: true }),
-      valorOriginalCompra: new FormControl({ value: producto?.costs?.purchase_cost_dollars, disabled: true }),
-      valorActualizadoCompra: new FormControl({ value: producto?.costs?.purchase_cost_pesos, disabled: true }),
+      valorOriginalProduccion: new FormControl({ value: this.showCosts(producto?.costs?.production_cost_dollars), disabled: true }),
+      valorActualizadoProduccion: new FormControl({ value: this.showCosts(producto?.costs?.production_cost_pesos), disabled: true }),
+      valorOriginalCompra: new FormControl({ value: this.showCosts(producto?.costs?.purchase_cost_dollars), disabled: true }),
+      valorActualizadoCompra: new FormControl({ value: this.showCosts(producto?.costs?.purchase_cost_pesos), disabled: true }),
       cantidadCompras: new FormControl({ value: producto?.cost_param?.purchases_quantity ?? null, disabled: true }),
       funcionCalculo: new FormControl({ value: producto?.cost_param?.calculation_function ?? null, disabled: true }),
     });
+  }
+
+  showCosts(cost: any) {
+    if (cost) {
+      return (+cost).toFixed(2);
+    }
+    return '';
   }
 
   private configureTrazabilidadYStockInicial(): void {
