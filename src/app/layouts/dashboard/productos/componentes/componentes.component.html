@@ -25,16 +25,6 @@
                     </th>
                     <th style="cursor: pointer;">
                         <span style="display: inline-flex; align-items: center; gap: 10px;">
-                            Precio unitario actual
-                        </span>
-                    </th>
-                    <th style="cursor: pointer;">
-                        <span style="display: inline-flex; align-items: center; gap: 10px;">
-                            Proveedor por defecto
-                        </span>
-                    </th>
-                    <th style="cursor: pointer;">
-                        <span style="display: inline-flex; align-items: center; gap: 10px;">
                             Acciones
                         </span>
                     </th>
@@ -46,8 +36,6 @@
                 <tr>
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
                         (click)="goToProduct($event, data.child_product)"> {{ data.child_product.name}}</td>
-                    <td class="whitespace-nowrap"> $ {{data.unit_price}} </td>
-                    <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
                     <td>
                         <div class="flex items-center">
                             <div>
@@ -175,8 +163,9 @@
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
                         (click)="goToProduct($event, data.child_product)"> {{ data.child_product.name}}</td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
-                    <td class="whitespace-nowrap"> $ {{mostrarCostoUnitario(data)}} </td>
-                    <td class="whitespace-nowrap"> $ {{mostrarCostoTotal(data)}} </td>
+                    <td class="whitespace-nowrap" [ngxTippy]="getTippyInUSD(data)"> $ {{mostrarCostoUnitario(data)}}
+                    </td>
+                    <td class="whitespace-nowrap" [ngxTippy]="getTippyTotalInUSD(data)"> $ {{mostrarCostoTotal(data)}} </td>
                     <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
                     <td class="whitespace-nowrap" [ngxTippy]="getTippyComments(data)"> {{ getComments(data)}}
                     </td>

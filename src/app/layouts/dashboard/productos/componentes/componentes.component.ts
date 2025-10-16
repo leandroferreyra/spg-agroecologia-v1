@@ -557,13 +557,13 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.production_cost_pesos, devolver data.child_product.costs.production_cost_pesos
     // Si no existe data.child_product.costs.defined_by, y no existe data.child_product.costs.purchase_cost_pesos, y no existe data.child_product.costs.production_cost_pesos, devolver null
     if (data.child_product.costs.defined_by === "Compra") {
-      return data.child_product.costs.purchase_cost_pesos;
+      return (data.child_product?.costs?.purchase_cost_pesos).toFixed(2);
     } else if (data.child_product.costs.defined_by === "Producción") {
-      return data.child_product.costs.production_cost_pesos;
+      return (data.child_product?.costs?.production_cost_pesos).toFixed(2);
     } else if (data.child_product.costs.purchase_cost_pesos) {
-      return data.child_product.costs.purchase_cost_pesos;
+      return (data.child_product.costs.purchase_cost_pesos).toFixed(2);
     } else if (data.child_product.costs.production_cost_pesos) {
-      return data.child_product.costs.production_cost_pesos;
+      return (data.child_product.costs.production_cost_pesos).toFixed(2);
     } else {
       return null;
     }
@@ -571,7 +571,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
   mostrarCostoTotal(data: any) {
     const costoUnitario = this.mostrarCostoUnitario(data);
-    return costoUnitario ? costoUnitario * data.quantity : null;
+    return costoUnitario ? (costoUnitario * data.quantity).toFixed(2) : null;
   }
 
   openModalProceso(type: string, dato?: any) {
@@ -695,6 +695,13 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     return data.child_product?.comments;
   }
 
+  getTippyInUSD(data: any) {
+    return 'USD ' + (data.child_product?.costs?.purchase_cost_dollars).toFixed(2);
+  }
+
+  getTippyTotalInUSD(data: any) {
+    return 'USD ' + (data.child_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
+  }
 
   isProductoCompuesto() {
     return this.producto?.product_type?.product_compound === 1;
