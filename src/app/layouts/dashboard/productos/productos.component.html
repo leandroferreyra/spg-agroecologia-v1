@@ -255,6 +255,15 @@
                 <a href="javascript:;" class="flex items-center border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary 
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
+                            tab1.toLowerCase() === 'archivos',
+                            'cursor-not-allowed tab-disabled': isTabDisabled
+                        }" (click)="!isTabDisabled && cambiarTab('archivos')">
+                    Archivos
+                </a>
+
+                <a href="javascript:;" class="flex items-center border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary 
+                    hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
+                            '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'vinculos',
                             'cursor-not-allowed tab-disabled': isTabDisabled
                         }" (click)="!isTabDisabled && cambiarTab('vinculos')">
@@ -636,12 +645,14 @@
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Valor original en dólares</label>
+                                        <label class="block text-xs text-gray-500 mb-1">Valor original en
+                                            dólares</label>
                                         <input type="number" class="form-input w-full py-1.5 text-sm"
                                             formControlName="valorOriginalProduccion" />
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Valor actualizado en pesos</label>
+                                        <label class="block text-xs text-gray-500 mb-1">Valor actualizado en
+                                            pesos</label>
                                         <input type="number" class="form-input w-full py-1.5 text-sm"
                                             formControlName="valorActualizadoProduccion" />
                                     </div>
@@ -652,12 +663,14 @@
                                 <div class="text-sm font-medium text-gray-600 mb-2">Costo de Compra</div>
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Valor original en dólares</label>
+                                        <label class="block text-xs text-gray-500 mb-1">Valor original en
+                                            dólares</label>
                                         <input type="number" class="form-input w-full py-1.5 text-sm"
                                             formControlName="valorOriginalCompra" />
                                     </div>
                                     <div>
-                                        <label class="block text-xs text-gray-500 mb-1">Valor actualizado en pesos</label>
+                                        <label class="block text-xs text-gray-500 mb-1">Valor actualizado en
+                                            pesos</label>
                                         <input type="number" class="form-input w-full py-1.5 text-sm"
                                             formControlName="valorActualizadoCompra" />
                                     </div>
@@ -751,6 +764,11 @@
                 <div *ngIf="tab1.toLowerCase() === 'producciones'">
                     <app-producciones [producto]="selectedProducto" [rol]="actual_role">
                     </app-producciones>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'archivos'">
+                    <app-archivos [producto]="selectedProducto" [rol]="actual_role">
+                    </app-archivos>
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'vinculos'">

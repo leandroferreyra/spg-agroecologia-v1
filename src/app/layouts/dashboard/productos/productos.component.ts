@@ -52,6 +52,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { GastosDTO } from 'src/app/core/models/request/gastosDTO';
 import { ProduccionesComponent } from './producciones/producciones.component';
 import { TipoProductoService } from 'src/app/core/services/tipoProducto.service';
+import { ArchivosComponent } from './archivos/archivos.component';
 
 @Component({
   selector: 'app-productos',
@@ -61,7 +62,7 @@ import { TipoProductoService } from 'src/app/core/services/tipoProducto.service'
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
     ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent, IconSettingsComponent,
-    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent, ProduccionesComponent
+    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent, ProduccionesComponent, ArchivosComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -204,13 +205,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
       }
     });
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
-
-    this.spinner.show();
     this.obtenerProductos();
     this.obtenerCatalogos();
   }
 
   obtenerProductos(alta: boolean = false) {
+    this.spinner.show();
+
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
 

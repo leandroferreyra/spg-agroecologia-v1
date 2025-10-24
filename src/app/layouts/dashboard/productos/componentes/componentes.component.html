@@ -67,6 +67,17 @@
             (click)="openModalComponente('NEW')" class="disabled:opacity-50 disabled:cursor-not-allowed">
             <icon-plus />
         </button>
+
+        <div class="flex items-center gap-2">
+            <span>Mostrar costos en dólares</span>
+            <label class="w-12 h-6 relative">
+                <input type="checkbox" class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                    id="custom_switch_checkbox2" [(ngModel)]="costoEnDolares" />
+                <span for="custom_switch_checkbox2"
+                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
+                </span>
+            </label>
+        </div>
     </div>
 
     @if (componentes.length === 0) {
@@ -163,9 +174,12 @@
                     <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
                         (click)="goToProduct($event, data.child_product)"> {{ data.child_product.name}}</td>
                     <td class="whitespace-nowrap">{{ mostrarCantidad(data) }} </td>
-                    <td class="whitespace-nowrap" [ngxTippy]="getTippyInUSD(data)"> $ {{mostrarCostoUnitario(data)}}
+                    <td class="whitespace-nowrap" [ngxTippy]="getTippyBasedOnCurrency(data)">
+                        {{ getCurrencySymbol() }} {{ mostrarCostoUnitario(data) }}
                     </td>
-                    <td class="whitespace-nowrap" [ngxTippy]="getTippyTotalInUSD(data)"> $ {{mostrarCostoTotal(data)}} </td>
+                    <td class="whitespace-nowrap" [ngxTippy]="getTippyTotalBasedOnCurrency(data)"> {{
+                        getCurrencySymbol() }} {{mostrarCostoTotal(data)}}
+                    </td>
                     <td class="whitespace-nowrap"> {{getNombreCompletoProveedor(data)}} </td>
                     <td class="whitespace-nowrap" [ngxTippy]="getTippyComments(data)"> {{ getComments(data)}}
                     </td>

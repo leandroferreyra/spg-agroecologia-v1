@@ -49,6 +49,8 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
   ordenamiento: any = {
   };
 
+  costoEnDolares: boolean = false;
+
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService) {
   }
@@ -132,54 +134,97 @@ export class ComponenteDeComponent implements OnInit, OnDestroy {
     // Si no existe data.parent_product.costs.defined_by, y existe data.parent_product.costs.purchase_cost_pesos, devolver data.parent_product.costs.purchase_cost_pesos
     // Si no existe data.parent_product.costs.defined_by, y existe data.parent_product.costs.production_cost_pesos, devolver data.parent_product.costs.production_cost_pesos
     // Si no existe data.parent_product.costs.defined_by, y no existe data.parent_product.costs.purchase_cost_pesos, y no existe data.parent_product.costs.production_cost_pesos, devolver null
-    if (data.parent_product?.costs?.defined_by === "Compra") {
-      return (data.parent_product?.costs?.purchase_cost_pesos).toFixed(2);
-    } else if (data.parent_product?.costs?.defined_by === "Producción") {
-      return (data.parent_product?.costs?.production_cost_pesos).toFixed(2);
-    } else if (data.parent_product?.costs?.purchase_cost_pesos) {
-      return (data.parent_product?.costs?.purchase_cost_pesos).toFixed(2);
-    } else if (data.parent_product?.costs?.production_cost_pesos) {
-      return (data.parent_product.costs.production_cost_pesos).toFixed(2);
-    } else {
-      return null;
+    const costs = data.parent_product?.costs;
+    if (!costs) return null;
+
+    const isUSD = this.costoEnDolares;
+
+    const purchaseCost = isUSD ? costs?.purchase_cost_dollars : costs?.purchase_cost_pesos;
+    const productionCost = isUSD ? costs?.production_cost_dollars : costs?.production_cost_pesos;
+
+    if (costs.defined_by === 'Compra' && purchaseCost != null) {
+      return (+purchaseCost).toFixed(2);
     }
+    if (costs.defined_by === 'Producción' && productionCost != null) {
+      return (+productionCost).toFixed(2);
+    }
+    if (purchaseCost != null) {
+      return (+purchaseCost).toFixed(2);
+    }
+    if (productionCost != null) {
+      return (+productionCost).toFixed(2);
+    }
+    return null;
   }
 
   mostrarCostoTotal(data: any) {
     const costoUnitario = this.mostrarCostoUnitario(data);
-    return costoUnitario ? (costoUnitario * data.quantity).toFixed(2) : null;
+    return costoUnitario ? (+costoUnitario * data.quantity).toFixed(2) : null;
   }
 
   goToProduct(event: MouseEvent, data: any) {
     this.eventProducto.emit({ data, event });
   }
 
-  getTippyInUSD(data: any) {
-    if (data.parent_product?.costs?.defined_by === "Compra") {
-      return 'USD ' + (+data.parent_product?.costs?.purchase_cost_dollars).toFixed(2);
-    } else if (data.parent_product?.costs?.defined_by === "Producción") {
-      return 'USD ' + (+data.parent_product?.costs?.production_cost_dollars).toFixed(2);
-    } else if (data.parent_product?.costs?.purchase_cost_dollars) {
-      return 'USD ' + (+data.parent_product.costs.purchase_cost_dollars).toFixed(2);
-    } else if (data.parent_product?.costs?.production_cost_dollars) {
-      return 'USD ' + (+data.parent_product.costs.production_cost_dollars).toFixed(2);
-    } else {
-      return null;
+  getTippyBasedOnCurrency(data: any) {
+    const costs = data.parent_product?.costs;
+    if (!costs) return null;
+    const isUSD = this.costoEnDolares;
+    const purchaseCost = isUSD ? costs?.purchase_cost_pesos : costs?.purchase_cost_dollars;
+    const productionCost = isUSD ? costs?.production_cost_pesos : costs?.production_cost_dollars;
+    const currencySymbol = isUSD ? '$ ' : 'USD ';
+    if (costs.defined_by === 'Compra' && purchaseCost != null) {
+      return currencySymbol + (+purchaseCost).toFixed(2);
     }
+    if (costs.defined_by === 'Producción' && productionCost != null) {
+      return currencySymbol + (+productionCost).toFixed(2);
+    }
+    if (purchaseCost != null) {
+      return currencySymbol + (+purchaseCost).toFixed(2);
+    }
+    if (productionCost != null) {
+      return currencySymbol + (+productionCost).toFixed(2);
+    }
+    return null;
+
   }
 
-  getTippyTotalInUSD(data: any) {
-    if (data.parent_product?.costs?.defined_by === "Compra") {
-      return 'USD ' + (+data.parent_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
-    } else if (data.parent_product?.costs?.defined_by === "Producción") {
-      return 'USD ' + (+data.parent_product?.costs?.production_cost_dollars * data.quantity).toFixed(2);
-    } else if (data.parent_product?.costs?.purchase_cost_dollars) {
-      return 'USD ' + (+data.parent_product.costs.purchase_cost_dollars * data.quantity).toFixed(2);
-    } else if (data.parent_product?.costs?.production_cost_dollars) {
-      return 'USD ' + (+data.parent_product.costs.production_cost_dollars * data.quantity).toFixed(2);
-    } else {
-      return null;
+  getTippyTotalBasedOnCurrency(data: any) {
+    // if (data.parent_product?.costs?.defined_by === "Compra") {
+    //   return 'USD ' + (+data.parent_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
+    // } else if (data.parent_product?.costs?.defined_by === "Producción") {
+    //   return 'USD ' + (+data.parent_product?.costs?.production_cost_dollars * data.quantity).toFixed(2);
+    // } else if (data.parent_product?.costs?.purchase_cost_dollars) {
+    //   return 'USD ' + (+data.parent_product.costs.purchase_cost_dollars * data.quantity).toFixed(2);
+    // } else if (data.parent_product?.costs?.production_cost_dollars) {
+    //   return 'USD ' + (+data.parent_product.costs.production_cost_dollars * data.quantity).toFixed(2);
+    // } else {
+    //   return null;
+    // }
+
+    const costs = data.parent_product?.costs;
+    if (!costs) return null;
+    const isUSD = this.costoEnDolares;
+    const purchaseCost = isUSD ? costs?.purchase_cost_pesos : costs?.purchase_cost_dollars;
+    const productionCost = isUSD ? costs?.production_cost_pesos : costs?.production_cost_dollars;
+    const currencySymbol = isUSD ? '$ ' : 'USD ';
+    if (costs.defined_by === 'Compra' && purchaseCost != null) {
+      return currencySymbol + (+purchaseCost * data.quantity).toFixed(2);
     }
+    if (costs.defined_by === 'Producción' && productionCost != null) {
+      return currencySymbol + (+productionCost * data.quantity).toFixed(2);
+    }
+    if (purchaseCost != null) {
+      return currencySymbol + (+purchaseCost * data.quantity).toFixed(2);
+    }
+    if (productionCost != null) {
+      return currencySymbol + (+productionCost * data.quantity).toFixed(2);
+    }
+    return null;
+  }
+
+  getCurrencySymbol(): string {
+    return this.costoEnDolares ? 'USD' : '$';
   }
 
 }

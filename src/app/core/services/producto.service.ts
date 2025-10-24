@@ -57,7 +57,8 @@ export class ProductoService {
       .append('with[]', "productStates")
       .append('with[]', "measure")
       .append('with[]', "country")
-      .append('with[]', "stocks");
+      .append('with[]', "stocks")
+      .append('with[]', "files");
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, { headers, params });
   }
 

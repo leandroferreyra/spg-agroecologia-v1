@@ -94,6 +94,8 @@ export class ComponentesComponent implements OnInit, OnDestroy {
   showWarningOrden: boolean = false;
   showWarningComponent: string = '';
 
+  costoEnDolares: boolean = false;
+
   constructor(private _indexService: IndexService, private _swalService: SwalService, private spinner: NgxSpinnerService,
     private _tokenService: TokenService, private _componenteService: ComponentesService) {
   }
@@ -556,22 +558,81 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.purchase_cost_pesos, devolver data.child_product.costs.purchase_cost_pesos
     // Si no existe data.child_product.costs.defined_by, y existe data.child_product.costs.production_cost_pesos, devolver data.child_product.costs.production_cost_pesos
     // Si no existe data.child_product.costs.defined_by, y no existe data.child_product.costs.purchase_cost_pesos, y no existe data.child_product.costs.production_cost_pesos, devolver null
-    if (data.child_product.costs.defined_by === "Compra") {
-      return (data.child_product?.costs?.purchase_cost_pesos).toFixed(2);
-    } else if (data.child_product.costs.defined_by === "Producción") {
-      return (data.child_product?.costs?.production_cost_pesos).toFixed(2);
-    } else if (data.child_product.costs.purchase_cost_pesos) {
-      return (data.child_product.costs.purchase_cost_pesos).toFixed(2);
-    } else if (data.child_product.costs.production_cost_pesos) {
-      return (data.child_product.costs.production_cost_pesos).toFixed(2);
-    } else {
-      return null;
+    const costs = data.child_product?.costs;
+    if (!costs) return null;
+
+    const isUSD = this.costoEnDolares;
+
+    const purchaseCost = isUSD ? costs?.purchase_cost_dollars : costs?.purchase_cost_pesos;
+    const productionCost = isUSD ? costs?.production_cost_dollars : costs?.production_cost_pesos;
+
+    if (costs.defined_by === 'Compra' && purchaseCost != null) {
+      return (+purchaseCost).toFixed(2);
     }
+    if (costs.defined_by === 'Producción' && productionCost != null) {
+      return (+productionCost).toFixed(2);
+    }
+    if (purchaseCost != null) {
+      return (+purchaseCost).toFixed(2);
+    }
+    if (productionCost != null) {
+      return (+productionCost).toFixed(2);
+    }
+    return null;
+
   }
 
   mostrarCostoTotal(data: any) {
     const costoUnitario = this.mostrarCostoUnitario(data);
-    return costoUnitario ? (costoUnitario * data.quantity).toFixed(2) : null;
+    return costoUnitario ? (+costoUnitario * data.quantity).toFixed(2) : null;
+  }
+
+  getCurrencySymbol(): string {
+    return this.costoEnDolares ? 'USD' : '$';
+  }
+
+  getTippyBasedOnCurrency(data: any) {
+    const costs = data.child_product?.costs;
+    if (!costs) return null;
+    const isUSD = this.costoEnDolares;
+    const purchaseCost = isUSD ? costs?.purchase_cost_pesos : costs?.purchase_cost_dollars;
+    const productionCost = isUSD ? costs?.production_cost_pesos : costs?.production_cost_dollars;
+    const currencySymbol = isUSD ? '$ ' : 'USD ';
+    if (costs.defined_by === 'Compra' && purchaseCost != null) {
+      return currencySymbol + (+purchaseCost).toFixed(2);
+    }
+    if (costs.defined_by === 'Producción' && productionCost != null) {
+      return currencySymbol + (+productionCost).toFixed(2);
+    }
+    if (purchaseCost != null) {
+      return currencySymbol + (+purchaseCost).toFixed(2);
+    }
+    if (productionCost != null) {
+      return currencySymbol + (+productionCost).toFixed(2);
+    }
+    return null;
+  }
+
+  getTippyTotalBasedOnCurrency(data: any) {
+    const costs = data.child_product?.costs;
+    if (!costs) return null;
+    const isUSD = this.costoEnDolares;
+    const purchaseCost = isUSD ? costs?.purchase_cost_pesos : costs?.purchase_cost_dollars;
+    const productionCost = isUSD ? costs?.production_cost_pesos : costs?.production_cost_dollars;
+    const currencySymbol = isUSD ? '$ ' : 'USD ';
+    if (costs.defined_by === 'Compra' && purchaseCost != null) {
+      return currencySymbol + (+purchaseCost * data.quantity).toFixed(2);
+    }
+    if (costs.defined_by === 'Producción' && productionCost != null) {
+      return currencySymbol + (+productionCost * data.quantity).toFixed(2);
+    }
+    if (purchaseCost != null) {
+      return currencySymbol + (+purchaseCost * data.quantity).toFixed(2);
+    }
+    if (productionCost != null) {
+      return currencySymbol + (+productionCost * data.quantity).toFixed(2);
+    }
+    return null;
   }
 
   openModalProceso(type: string, dato?: any) {
@@ -695,33 +756,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     return data.child_product?.comments;
   }
 
-  getTippyInUSD(data: any) {
-    if (data.child_product?.costs?.defined_by === "Compra") {
-      return 'USD ' + (+data.child_product?.costs?.purchase_cost_dollars).toFixed(2);
-    } else if (data.child_product?.costs?.defined_by === "Producción") {
-      return 'USD ' + (+data.child_product?.costs?.production_cost_dollars).toFixed(2);
-    } else if (data.child_product?.costs?.purchase_cost_dollars) {
-      return 'USD ' + (+data.child_product.costs.purchase_cost_dollars).toFixed(2);
-    } else if (data.child_product?.costs?.production_cost_dollars) {
-      return 'USD ' + (+data.child_product.costs.production_cost_dollars).toFixed(2);
-    } else {
-      return null;
-    }
-  }
 
-  getTippyTotalInUSD(data: any) {
-    if (data.child_product?.costs?.defined_by === "Compra") {
-      return 'USD ' + (+data.child_product?.costs?.purchase_cost_dollars * data.quantity).toFixed(2);
-    } else if (data.child_product?.costs?.defined_by === "Producción") {
-      return 'USD ' + (+data.child_product?.costs?.production_cost_dollars * data.quantity).toFixed(2);
-    } else if (data.child_product?.costs?.purchase_cost_dollars) {
-      return 'USD ' + (+data.child_product.costs.purchase_cost_dollars * data.quantity).toFixed(2);
-    } else if (data.child_product?.costs?.production_cost_dollars) {
-      return 'USD ' + (+data.child_product.costs.production_cost_dollars * data.quantity).toFixed(2);
-    } else {
-      return null;
-    }
-  }
 
   isProductoCompuesto() {
     return this.producto?.product_type?.product_compound === 1;
