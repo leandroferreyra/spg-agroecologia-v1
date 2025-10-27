@@ -79,4 +79,16 @@ export class ProductoService {
       .set('actual_role', rolActual);
     return this.http.delete<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuidProducto + "/files/" + uuidFile, { headers, params });
   }
+
+  moveUpFile(uuidProducto: string, uuidFile: string, rolActual: string) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuidProducto + "/files/" + uuidFile + "/move_up",
+      JSON.stringify({ "actual_role": rolActual }), { headers });
+  }
+
+  moveDownFile(uuidProducto: string, uuidFile: string, rolActual: string) {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuidProducto + "/files/" + uuidFile + "/move_down",
+      JSON.stringify({ "actual_role": rolActual }), { headers });
+  }
 }

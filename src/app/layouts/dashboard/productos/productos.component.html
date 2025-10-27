@@ -174,6 +174,41 @@
         </div>
 
 
+        <!-- IMAGENES-->
+        <div class="swiper mt-4" id="slider5">
+            <div class="swiper-wrapper">
+                <div *ngFor="let item of archivos; index as i" class="swiper-slide">
+                    <div class="swiper-zoom-container">
+                        @if (item.is_image) {
+                        <img [src]="item.thumbnail_url" alt="{{ item.description }}" (click)="abrirArchivo(item.url)"
+                            [ngxTippy]="item.description" />
+                        }@else {
+                        <fa-icon [icon]="getIconByType(item.mime_type)" class="text-2xl text-gray-600"
+                            [ngxTippy]="item.description" (click)="abrirArchivo(item.url)"></fa-icon>
+                        }
+                    </div>
+                </div>
+            </div>
+            <a href="javascript:;"
+                class="swiper-button-prev-ex5 absolute top-[44%] z-[999] grid -translate-y-1/2 place-content-center rounded-full border border-primary p-1 text-primary transition hover:border-primary hover:bg-primary hover:text-white ltr:left-2 rtl:right-2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 rtl:rotate-180">
+                    <path d="M15 5L9 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </a>
+            <a href="javascript:;"
+                class="swiper-button-next-ex5 absolute top-[44%] z-[999] grid -translate-y-1/2 place-content-center rounded-full border border-primary p-1 text-primary transition hover:border-primary hover:bg-primary hover:text-white ltr:right-2 rtl:left-2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 ltr:rotate-180">
+                    <path d="M15 5L9 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </a>
+            <div class="swiper-pagination"></div>
+        </div>
+
+
         <!-- TABS -->
         <div class="">
 
@@ -767,7 +802,8 @@
                 </div>
 
                 <div *ngIf="tab1.toLowerCase() === 'archivos'">
-                    <app-archivos [producto]="selectedProducto" [rol]="actual_role">
+                    <app-archivos [producto]="selectedProducto" [rol]="actual_role"
+                        (eventArchivo)="actualizarProducto()">
                     </app-archivos>
                 </div>
 

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators, FormArray, FormBuilder } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faArrowUp, faArrowDown, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faArrowDown, faArrowLeft, faFilePdf, faFileWord, faFileZipper, faFileImage, faFile } from '@fortawesome/free-solid-svg-icons';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
@@ -53,6 +53,8 @@ import { GastosDTO } from 'src/app/core/models/request/gastosDTO';
 import { ProduccionesComponent } from './producciones/producciones.component';
 import { TipoProductoService } from 'src/app/core/services/tipoProducto.service';
 import { ArchivosComponent } from './archivos/archivos.component';
+import Swiper from 'swiper';
+import { Navigation, Pagination } from 'swiper/modules';
 
 @Component({
   selector: 'app-productos',
@@ -162,6 +164,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
   mostrarParametrosCalculo = false;
   tooltipTrazable: string | null = null;
 
+  swiper5: any;
+  archivos: any[] = [];
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router,
@@ -185,7 +190,23 @@ export class ProductosComponent implements OnInit, OnDestroy {
         // Aquí puedes ejecutar cualquier acción adicional al cierre
       });
     }
+
+    this.swiper5 = new Swiper('#slider5', {
+      modules: [Navigation, Pagination],
+      navigation: { nextEl: '.swiper-button-next-ex5', prevEl: '.swiper-button-prev-ex5' },
+      breakpoints: {
+        1024: { slidesPerView: 3, spaceBetween: 30 },
+        768: { slidesPerView: 2, spaceBetween: 40 },
+        320: { slidesPerView: 1, spaceBetween: 20 },
+      },
+      pagination: {
+        el: '#slider5 .swiper-pagination',
+        type: 'bullets',
+        clickable: true
+      }
+    });
   }
+
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
@@ -197,7 +218,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     });
     this.route.queryParamMap.subscribe(params => {
       const tab = params.get('tab')?.toLowerCase();
-      const validTabs = ['datos-generales', 'componentes', 'componente-de', 'reemplazos', 'proveedores', 'stocks', 'compras', 'vinculos'];
+      const validTabs = ['datos-generales', 'componentes', 'componente-de', 'reemplazos', 'proveedores', 'stocks', 'compras', 'vinculos', 'archivos'];
       if (tab && validTabs.includes(tab)) {
         this.tab1 = tab;
       } else {
@@ -284,8 +305,25 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._productoService.showProduct(uuid, this.actual_role).subscribe({
         next: res => {
           this.showDataProducto(res.data, updateTab);
+          this.archivos = res.data?.files;
+          console.log(res);
           this.isLoadingProductos = false;
           this.tokenService.setToken(res.token);
+          // Reinicializar el swiper por si cambió desde tab archivos.
+          this.swiper5 = new Swiper('#slider5', {
+            modules: [Navigation, Pagination],
+            navigation: { nextEl: '.swiper-button-next-ex5', prevEl: '.swiper-button-prev-ex5' },
+            breakpoints: {
+              1024: { slidesPerView: 3, spaceBetween: 30 },
+              768: { slidesPerView: 2, spaceBetween: 40 },
+              320: { slidesPerView: 1, spaceBetween: 20 },
+            },
+            pagination: {
+              el: '#slider5 .swiper-pagination',
+              type: 'bullets',
+              clickable: true
+            }
+          });
         },
         error: error => {
           // this.isLoadingProductos = false;
@@ -855,6 +893,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
   }
 
+  actualizarProducto() {
+    // Viene del evento de actualización de archivos
+    this.showProductByUuid(this.uuidFromUrl, false);
+  }
+
   volverAlProductoAnterior() {
     let p = this.productoAnterior.pop();
     this.location.replaceState(`/dashboard/productos/${p.uuid}`);
@@ -1211,10 +1254,19 @@ export class ProductosComponent implements OnInit, OnDestroy {
     )
   }
 
-  // tooltipTrazable() {
-  //   if (this.selectedProducto?.product_type?.stock_controlled === 0) {
-  //     return 'El producto no puede ser trazable ya que el tipo de producto no tiene control de stock';
-  //   }
-  //   return '';
-  // }
+  abrirArchivo(url: string) {
+    if (!url) return;
+    window.open(url, '_blank');
+  }
+
+  getIconByType(tipo: string) {
+    switch (tipo) {
+      case 'application/pdf': return faFilePdf;
+      case 'application/word': return faFileWord;
+      case 'application/zip': return faFileZipper;
+      case 'application/image': return faFileImage;
+      default: return faFile;
+    }
+  }
+
 }

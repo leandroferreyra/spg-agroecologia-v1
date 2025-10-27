@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
@@ -14,8 +14,6 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import { faFilePdf, faFileWord, faFileZipper, faFileImage, faFile, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
-import Swiper from 'swiper';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { ArchivoDTO } from 'src/app/core/models/request/archivoDTO';
 import Swal from 'sweetalert2';
@@ -34,6 +32,9 @@ export class ArchivosComponent implements OnInit, OnDestroy {
 
   @Input() producto: any;
   @Input() rol!: string;
+
+  @Output() eventArchivo = new EventEmitter<any>();
+
   private subscription: Subscription = new Subscription();
 
   // Orden, filtro y paginación para compras de proveedor
@@ -50,12 +51,10 @@ export class ArchivosComponent implements OnInit, OnDestroy {
 
   archivos: any[] = [];
 
-  imagenes: any[] = [];
+  // imagenes: any[] = [];
 
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
-
-  swiper5: any;
 
   archivoForm!: FormGroup;
   archivoSeleccionado?: File;
@@ -74,7 +73,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   };
 
   constructor(private _productoService: ProductoService, private _swalService: SwalService, private spinner: NgxSpinnerService,
-    private _tokenService: TokenService, private router: Router) {
+    private _tokenService: TokenService) {
   }
 
   ngOnInit(): void {
@@ -91,29 +90,12 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngAfterViewInit() {
-    this.swiper5 = new Swiper('#slider5', {
-      modules: [Navigation, Pagination],
-      navigation: { nextEl: '.swiper-button-next-ex5', prevEl: '.swiper-button-prev-ex5' },
-      breakpoints: {
-        1024: { slidesPerView: 3, spaceBetween: 30 },
-        768: { slidesPerView: 2, spaceBetween: 40 },
-        320: { slidesPerView: 1, spaceBetween: 20 },
-      },
-      pagination: {
-        el: '#slider5 .swiper-pagination',
-        type: 'bullets',
-        clickable: true
-      },
-    });
-  }
-
   obtenerArchivos() {
     this.subscription.add(
       this._productoService.showProduct(this.producto.uuid, this.rol).subscribe({
         next: res => {
-          this.archivos = res.data?.files?.filter((x: any) => !x.is_image);
-          this.imagenes = res.data?.files?.filter((x: any) => x.is_image);
+          this.archivos = res.data?.files;
+          // this.imagenes = res.data?.files?.filter((x: any) => x.is_image);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -174,6 +156,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
             this.cerrarModal();
             this._tokenService.setToken(res.token);
             this.spinner.hide();
+            this.eventArchivo.emit();
           },
           error: error => {
             this._swalService.toastError('top-right', error.error.message);
@@ -258,8 +241,54 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._productoService.deleteFile(this.producto.uuid, archivo.uuid, this.rol.toUpperCase()).subscribe({
         next: res => {
+          this.eventArchivo.emit();
           this.obtenerArchivos();
           this._tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this._swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  mover(movement: string = 'up | down', data: any) {
+    this.spinner.show();
+    if (movement === 'up') {
+      this.moverArriba(data);
+    } else {
+      this.moverAbajo(data);
+    }
+  }
+
+  moverArriba(data: any) {
+    this.subscription.add(
+      this._productoService.moveUpFile(this.producto.uuid, data.uuid, this.rol.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerArchivos();
+          this._tokenService.setToken(res.token);
+          this.eventArchivo.emit();
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this._swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  moverAbajo(data: any) {
+    this.subscription.add(
+      this._productoService.moveDownFile(this.producto.uuid, data.uuid, this.rol.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerArchivos();
+          this._tokenService.setToken(res.token);
+          this.eventArchivo.emit();
           this.spinner.hide();
         },
         error: error => {
