@@ -548,26 +548,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   isFieldDisabled(producto: any) {
     // Solo se habilita si es edicion y es stock controlled
     return !this.isEdicion || producto.product_type?.stock_controlled !== 1;
