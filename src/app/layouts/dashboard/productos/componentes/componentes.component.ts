@@ -114,7 +114,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this.filtros['product->parent_product_uuid'].value = this.producto.uuid;
       this.obtenerComponentes();
       this.obtenerProcesoActivo();
-      this.obtenerPosiblesProcesos();
+      // this.obtenerPosiblesProcesos();
     }
   }
 
@@ -133,7 +133,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
           this.componentes = res.data;
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
-          this.obtenerCatalogos();
+          // this.obtenerCatalogos();
           this.spinner.hide();
         },
         error: error => {
@@ -340,6 +340,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
 
 
   openModalComponente(type: string, dato?: any) {
+    this.obtenerCatalogos();
     if (type === 'NEW') {
       this.isEdicion = false;
       this.tituloModal = 'Nuevo componente';
@@ -641,6 +642,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
     } else {
       this.tituloModalProceso = 'Edición proceso';
     }
+    this.obtenerPosiblesProcesos();
     this.procesoActivo = this.componenteProceso.length > 0 ? this.componenteProceso[0].child_product?.uuid : null;
     this.modalProceso.options = this.modalOptions;
     this.modalProceso.open();
