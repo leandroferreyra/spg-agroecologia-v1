@@ -1,1 +1,179 @@
-<p>archivos works!</p>
+<div class="panel pb-4">
+
+    <div class="mb-3 flex flex-col md:flex-row md:items-center justify-between">
+        <button type="button" ngxTippy="Agregar archivo" (click)="openModalArchivo()">
+            <icon-plus />
+        </button>
+    </div>
+
+
+    @if (archivos.length === 0) {
+    <div
+        class="flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee archivos</strong></span>
+    </div>
+    } @else {
+
+    <div class="swiper" id="slider5">
+        <div class="swiper-wrapper">
+            <div *ngFor="let item of imagenes; index as i" class="swiper-slide">
+                <div class="swiper-zoom-container">
+                    <img [src]="item.thumbnail_url" alt="{{ item.description }}" (click)="abrirArchivo(item.url)"
+                        [ngxTippy]="item.description" />
+                </div>
+            </div>
+        </div>
+        <a href="javascript:;"
+            class="swiper-button-prev-ex5 absolute top-[44%] z-[999] grid -translate-y-1/2 place-content-center rounded-full border border-primary p-1 text-primary transition hover:border-primary hover:bg-primary hover:text-white ltr:left-2 rtl:right-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 rtl:rotate-180">
+                <path d="M15 5L9 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </a>
+        <a href="javascript:;"
+            class="swiper-button-next-ex5 absolute top-[44%] z-[999] grid -translate-y-1/2 place-content-center rounded-full border border-primary p-1 text-primary transition hover:border-primary hover:bg-primary hover:text-white ltr:right-2 rtl:left-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 ltr:rotate-180">
+                <path d="M15 5L9 12L15 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </a>
+        <div class="swiper-pagination"></div>
+    </div>
+
+
+
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center w-auto whitespace-nowrap">Orden</th>
+                    <th class="w-auto text-center"></th>
+                    <!-- <th class="w-auto text-center"></th> -->
+                    <th class="text-center w-auto whitespace-nowrap">Descripción</th>
+                    <th class="text-center w-auto whitespace-nowrap">Thumbnail</th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of archivos | slice: pageSize | slice: 0:itemsPerPage ; let index = $index; track data.uuid)
+                {
+                <tr>
+                    <td class="text-center whitespace-nowrap">
+                        {{ data.order_column }}
+                    </td>
+                    <td class="text-center px-0 w-auto">
+                        <button class="text-gray-500 hover:text-blue-600 mr-4" type="button" ngxTippy="Mover abajo">
+                            <fa-icon [icon]="iconArrowDown"></fa-icon>
+                        </button>
+                    <!-- </td>
+
+                    <td class="text-center px-0 w-auto"> -->
+                        <button class="text-gray-500 hover:text-blue-600" type="button" ngxTippy="Mover arriba">
+                            <fa-icon [icon]="iconArrowUp"></fa-icon>
+                        </button>
+                    </td>
+
+                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                        (click)="abrirArchivo(data.url)">
+                        {{data.description}} </td>
+
+                    <td class="text-center align-middle">
+                        <fa-icon [icon]="getIconByType(data.mime_type)" class="text-2xl text-gray-600"
+                            (click)="abrirArchivo(data.url)"></fa-icon>
+                    </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+    }
+
+
+</div>
+
+
+
+<!-- MODAL ARCHIVO -->
+<div>
+    <ngx-custom-modal #modalArchivo class="modal-top animate extra-large-modal animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">Nuevo archivo</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="archivoForm" (keydown.enter)="confirmarArchivo()">
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? archivoForm.controls['descripcion'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Descripción</label>
+                                <input type="text" class="form-control" formControlName="descripcion">
+                            </div>
+
+                            <div class="mb-4 mt-2">
+                                <label class="block mb-1 text-sm font-medium">
+                                    Archivo
+                                    @if (archivoSeleccionado) {
+                                    <button type="button" class="text-red-500 hover:text-red-700"
+                                        (click)="borrarArchivo()" ngxTippy="Eliminar archivo">
+                                        ✕
+                                    </button>
+                                    }
+                                </label>
+
+                                <div class="dropzone" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                                    (drop)="onFileDrop($event)" [class.dragging]="isDragging">
+                                    @if (!archivoSeleccionado) {
+                                    <p>
+                                        Arrastrá y soltá tu archivo aquí<br>
+                                        <span class="text-sm text-gray-500">o hacé click para seleccionarlo</span>
+                                    </p>
+                                    } @else {
+                                    <p class="text-sm text-gray-700">
+                                        📎 {{ archivoSeleccionado.name }}
+                                    </p>
+                                    }
+                                    <input type="file" (change)="onArchivoSeleccionado($event)" class="file-input"
+                                        formControlName="archivo" accept="image/*,.pdf,.doc,.docx,.zip,.rar" />
+                                </div>
+
+                                <img *ngIf="archivoSeleccionado && archivoSeleccionado.type.startsWith('image/')"
+                                    [src]="imagenPreview" class="w-20 h-20 object-cover mt-2 rounded" />
+                            </div>
+
+
+                            <div class="row mt-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarArchivo()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>

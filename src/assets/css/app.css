@@ -1,6 +1,6 @@
 @import 'tippy.js/dist/tippy.css';
 @import 'flatpickr/dist/flatpickr.min.css';
-
+@import 'swiper/swiper-bundle.css';
 @import 'tailwind.css';
 
 /* html {

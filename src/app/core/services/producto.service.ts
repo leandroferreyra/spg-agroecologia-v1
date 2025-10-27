@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { ProductoDTO } from '../models/request/productoDTO';
 import { GastosDTO } from '../models/request/gastosDTO';
+import { ArchivoDTO } from '../models/request/archivoDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -62,4 +63,20 @@ export class ProductoService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuid, { headers, params });
   }
 
+  saveFile(uuidProducto: string, archivo: ArchivoDTO): Observable<AuthResponse> {
+    const formData = new FormData();
+    formData.append('description', archivo.description);
+    if (archivo.file) {
+      formData.append('file', archivo.file);
+    }
+    formData.append('actual_role', archivo.actual_role);
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiProductos + "/" + uuidProducto + "/files", formData);
+  }
+
+  deleteFile(uuidProducto: string, uuidFile: string, rolActual: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .set('actual_role', rolActual);
+    return this.http.delete<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuidProducto + "/files/" + uuidFile, { headers, params });
+  }
 }
