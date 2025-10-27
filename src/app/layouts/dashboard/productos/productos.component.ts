@@ -11,7 +11,7 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Subscription, forkJoin } from 'rxjs';
+import { Subscription, debounceTime, distinctUntilChanged, forkJoin } from 'rxjs';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -167,6 +167,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
   swiper5: any;
   archivos: any[] = [];
 
+  searchControl = new FormControl('');
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _productoService: ProductoService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute, private router: Router,
@@ -231,6 +233,19 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.obtenerProductos();
     this.obtenerCatalogos();
+
+    this.subscription.add(
+      this.searchControl.valueChanges
+        .pipe(
+          debounceTime(1000),
+          distinctUntilChanged()
+        )
+        .subscribe(value => {
+          this.filtros.name.value = value || '';
+          this.obtenerProductosPorFiltroSimple();
+        })
+    );
+
   }
 
   obtenerProductos(alta: boolean = false) {

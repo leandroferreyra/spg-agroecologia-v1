@@ -93,7 +93,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
       this._productoService.showProduct(this.producto.uuid, this.rol).subscribe({
         next: res => {
           this.archivos = res.data?.files;
-          console.log("🚀 ~ ArchivosComponent ~ obtenerArchivos ~ this.archivos:", this.archivos)
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
