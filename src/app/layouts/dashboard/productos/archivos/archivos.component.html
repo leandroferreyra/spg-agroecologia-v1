@@ -18,22 +18,18 @@
         <table class="table-hover">
             <thead>
                 <tr>
-                    <th class="text-center w-auto whitespace-nowrap">Orden</th>
-                    <th class="w-auto text-center"></th>
-                    <th class="text-center w-auto whitespace-nowrap">Descripción</th>
-                    <th class="text-center w-auto whitespace-nowrap">Thumbnail</th>
-                    <th>
-                        Acciones
-                    </th>
+                    <th class="text-center align-middle w-auto whitespace-nowrap">Orden</th>
+                    <th class="text-center align-middle w-auto"></th>
+                    <th class="text-center align-middle w-auto whitespace-nowrap">Descripción</th>
+                    <th class="text-center align-middle w-auto whitespace-nowrap">Thumbnail</th>
+                    <th class="text-center align-middle whitespace-nowrap">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @for(data of archivos | slice: pageSize | slice: 0:itemsPerPage ; let index = $index; track data.uuid)
                 {
                 <tr>
-                    <td class="text-center whitespace-nowrap">
-                        {{ data.order_column }}
-                    </td>
+                    <td class="text-center align-middle whitespace-nowrap">{{ data.order_column }}</td>
                     <td class="text-center px-0 w-auto">
                         <button class="text-gray-500 hover:text-blue-600 mr-4" type="button" ngxTippy="Mover abajo"
                             (click)="mover('down', data)">
@@ -46,17 +42,17 @@
                         </button>
                     </td>
 
-                    <td class="whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
+                    <td class="text-center whitespace-nowrap hover:text-blue-600 hover:underline hover:cursor-pointer"
                         (click)="abrirArchivo(data.url)">
                         {{data.description}} </td>
 
-                    <td class="text-center w-auto">
+                    <td class="text-center align-middle w-auto">
                         @if (data.is_image) {
                         <img [src]="data.thumbnail_url" alt="{{ data.description }}" (click)="abrirArchivo(data.url)"
-                            [ngxTippy]="data.description" class="w-5 h-5" />
+                            [ngxTippy]="data.description" class="w-5 h-5 mx-auto" />
                         }@else {
                         <img [src]="getImageByType(data.mime_type)" [ngxTippy]="data.description"
-                            alt="{{ data.description }}" class="w-5 h-5" (click)="abrirArchivo(data.url)" />
+                            alt="{{ data.description }}" class="w-5 h-5 mx-auto" (click)="abrirArchivo(data.url)" />
                         }
                     </td>
                     <td>
