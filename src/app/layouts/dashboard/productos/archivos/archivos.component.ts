@@ -51,8 +51,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
 
   archivos: any[] = [];
 
-  // imagenes: any[] = [];
-
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
@@ -95,7 +93,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
       this._productoService.showProduct(this.producto.uuid, this.rol).subscribe({
         next: res => {
           this.archivos = res.data?.files;
-          // this.imagenes = res.data?.files?.filter((x: any) => x.is_image);
+          console.log("🚀 ~ ArchivosComponent ~ obtenerArchivos ~ this.archivos:", this.archivos)
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -115,6 +113,20 @@ export class ArchivosComponent implements OnInit, OnDestroy {
       case 'application/zip': return faFileZipper;
       case 'application/image': return faFileImage;
       default: return faFile;
+    }
+  }
+
+  getImageByType(mimeType: string): string {
+    if (!mimeType) return 'assets/images/files/other.png';
+    mimeType = mimeType.toLowerCase();
+    if (mimeType.includes('pdf')) {
+      return 'assets/images/files/imagen-pdf.jpg';
+    } else if (mimeType.includes('word') || mimeType.includes('doc')) {
+      return 'assets/images/files/imagen-word.png';
+    } else if (mimeType.includes('zip') || mimeType.includes('rar')) {
+      return 'assets/images/files/imagen-rar.jpg';
+    } else {
+      return 'assets/images/files/other.png';
     }
   }
 

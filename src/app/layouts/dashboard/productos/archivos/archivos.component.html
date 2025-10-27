@@ -50,9 +50,14 @@
                         (click)="abrirArchivo(data.url)">
                         {{data.description}} </td>
 
-                    <td class="text-center align-middle">
-                        <fa-icon [icon]="getIconByType(data.mime_type)" class="text-2xl text-gray-600"
-                            (click)="abrirArchivo(data.url)"></fa-icon>
+                    <td class="text-center w-auto">
+                        @if (data.is_image) {
+                        <img [src]="data.thumbnail_url" alt="{{ data.description }}" (click)="abrirArchivo(data.url)"
+                            [ngxTippy]="data.description" class="w-5 h-5" />
+                        }@else {
+                        <img [src]="getImageByType(data.mime_type)" [ngxTippy]="data.description"
+                            alt="{{ data.description }}" class="w-5 h-5" (click)="abrirArchivo(data.url)" />
+                        }
                     </td>
                     <td>
                         <div class="flex items-center">

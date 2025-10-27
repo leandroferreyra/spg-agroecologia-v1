@@ -1248,13 +1248,17 @@ export class ProductosComponent implements OnInit, OnDestroy {
     window.open(url, '_blank');
   }
 
-  getIconByType(tipo: string) {
-    switch (tipo) {
-      case 'application/pdf': return faFilePdf;
-      case 'application/word': return faFileWord;
-      case 'application/zip': return faFileZipper;
-      case 'application/image': return faFileImage;
-      default: return faFile;
+  getImageByType(mimeType: string): string {
+    if (!mimeType) return 'assets/images/files/other.png';
+    mimeType = mimeType.toLowerCase();
+    if (mimeType.includes('pdf')) {
+      return 'assets/images/files/imagen-pdf.jpg';
+    } else if (mimeType.includes('word') || mimeType.includes('doc')) {
+      return 'assets/images/files/imagen-word.png';
+    } else if (mimeType.includes('zip') || mimeType.includes('rar')) {
+      return 'assets/images/files/imagen-rar.jpg';
+    } else {
+      return 'assets/images/files/other.png';
     }
   }
 
