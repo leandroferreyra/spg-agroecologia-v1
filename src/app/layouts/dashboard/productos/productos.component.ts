@@ -190,7 +190,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
         // Aquí puedes ejecutar cualquier acción adicional al cierre
       });
     }
+    this.inicializarSwiper();
+  }
 
+  inicializarSwiper() {
     this.swiper5 = new Swiper('#slider5', {
       modules: [Navigation, Pagination],
       navigation: { nextEl: '.swiper-button-next-ex5', prevEl: '.swiper-button-prev-ex5' },
@@ -306,24 +309,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
         next: res => {
           this.showDataProducto(res.data, updateTab);
           this.archivos = res.data?.files;
-          console.log(res);
           this.isLoadingProductos = false;
           this.tokenService.setToken(res.token);
           // Reinicializar el swiper por si cambió desde tab archivos.
-          this.swiper5 = new Swiper('#slider5', {
-            modules: [Navigation, Pagination],
-            navigation: { nextEl: '.swiper-button-next-ex5', prevEl: '.swiper-button-prev-ex5' },
-            breakpoints: {
-              1024: { slidesPerView: 3, spaceBetween: 30 },
-              768: { slidesPerView: 2, spaceBetween: 40 },
-              320: { slidesPerView: 1, spaceBetween: 20 },
-            },
-            pagination: {
-              el: '#slider5 .swiper-pagination',
-              type: 'bullets',
-              clickable: true
-            }
-          });
+          this.inicializarSwiper();
         },
         error: error => {
           // this.isLoadingProductos = false;
