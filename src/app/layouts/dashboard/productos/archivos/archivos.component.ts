@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
@@ -89,30 +88,22 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   }
 
   obtenerArchivos() {
-    this.subscription.add(
-      this._productoService.showProduct(this.producto.uuid, this.rol).subscribe({
-        next: res => {
-          this.archivos = res.data?.files;
-          this._tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          this._swalService.toastError('top-right', error.error.message);
-          console.error(error);
-          this.spinner.hide();
-        }
-      })
-    )
-  }
-
-  getIconByType(tipo: string) {
-    switch (tipo) {
-      case 'application/pdf': return faFilePdf;
-      case 'application/word': return faFileWord;
-      case 'application/zip': return faFileZipper;
-      case 'application/image': return faFileImage;
-      default: return faFile;
-    }
+    this.archivos = this.producto?.files;
+    this.spinner.hide();
+    // this.subscription.add(
+    //   this._productoService.showProduct(this.producto.uuid, this.rol).subscribe({
+    //     next: res => {
+    //       this.archivos = res.data?.files;
+    //       this._tokenService.setToken(res.token);
+    // this.spinner.hide();
+    //     },
+    //     error: error => {
+    //       this._swalService.toastError('top-right', error.error.message);
+    //       console.error(error);
+    //       this.spinner.hide();
+    //     }
+    //   })
+    // )
   }
 
   getImageByType(mimeType: string): string {
