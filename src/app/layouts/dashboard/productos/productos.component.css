@@ -1,0 +1,6 @@
+/* Ocultar botones de navegación del swiper cuando están deshabilitados */
+.swiper-button-prev-ex5.swiper-button-disabled,
+.swiper-button-next-ex5.swiper-button-disabled {
+  display: none !important;
+}
+

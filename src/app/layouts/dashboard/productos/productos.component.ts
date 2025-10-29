@@ -200,9 +200,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
       modules: [Navigation, Pagination],
       navigation: { nextEl: '.swiper-button-next-ex5', prevEl: '.swiper-button-prev-ex5' },
       breakpoints: {
-        1024: { slidesPerView: 3, spaceBetween: 30 },
-        768: { slidesPerView: 2, spaceBetween: 40 },
-        320: { slidesPerView: 1, spaceBetween: 20 },
+        1024: { slidesPerView: 4, spaceBetween: 30 },
+        768: { slidesPerView: 3, spaceBetween: 40 },
+        320: { slidesPerView: 2, spaceBetween: 20 },
       },
       pagination: {
         el: '#slider5 .swiper-pagination',

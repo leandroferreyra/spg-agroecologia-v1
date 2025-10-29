@@ -181,10 +181,10 @@
                     <div class="swiper-zoom-container">
                         @if (item.is_image) {
                         <img [src]="item.thumbnail_url" alt="{{ item.description }}" (click)="abrirArchivo(item.url)"
-                            [ngxTippy]="item.description" />
+                            [ngxTippy]="item.description" class="h-[100px] w-auto object-contain" />
                         }@else {
                         <img [src]="getImageByType(item.mime_type)" [ngxTippy]="item.description"
-                            alt="{{ item.description }}" class="w-40 h-40" (click)="abrirArchivo(item.url)" />
+                            alt="{{ item.description }}" class="h-[100px] w-auto object-contain" (click)="abrirArchivo(item.url)" />
                         }
                     </div>
                 </div>
