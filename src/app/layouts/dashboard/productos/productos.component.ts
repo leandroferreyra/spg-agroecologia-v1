@@ -328,10 +328,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.isLoadingProductos = false;
           this.tokenService.setToken(res.token);
           // Reinicializar el swiper por si cambió desde tab archivos.
-          this.inicializarSwiper();
+          // this.inicializarSwiper();
         },
         error: error => {
-          this.spinner.hide(); 
+          this.spinner.hide();
           console.error(error);
         }
       })
@@ -880,7 +880,21 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   actualizarProducto() {
     // Viene del evento de actualización de archivos
-    this.showProductByUuid(this.uuidFromUrl, false);
+    this.subscription.add(
+      this._productoService.getFiles(this.selectedProducto.uuid, this.actual_role).subscribe({
+        next: res => {
+          this.selectedProducto = {
+            ...this.selectedProducto,
+            files: res?.data
+          };
+          this.archivos = res.data;
+          this.inicializarSwiper();
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    )
   }
 
   volverAlProductoAnterior() {

@@ -73,6 +73,13 @@ export class ProductoService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiProductos + "/" + uuidProducto + "/files", formData);
   }
 
+  getFiles(uuidProducto: string, rolActual: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .set('actual_role', rolActual);
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiProductos + '/' + uuidProducto + "/files", { headers, params });
+  }
+
   deleteFile(uuidProducto: string, uuidFile: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
