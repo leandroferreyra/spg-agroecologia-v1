@@ -234,6 +234,7 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   }
 
   showProduccionByUuid(uuid: string, updateTab: boolean, event?: MouseEvent) {
+    this.spinner.show();
     this.isSubmit = false; // Para que no quede en verde el input al editar
     this.showMensajeAsignaNumero = false;
     this.showMensajeIsMayor = false;
@@ -250,11 +251,14 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._produccionService.showProduccion(uuid, this.actual_role).subscribe({
         next: res => {
+          this.spinner.hide();
           this.showDataProduccion(res.data, updateTab);
           this.isLoadingProducciones = false;
           this.tokenService.setToken(res.token);
         },
         error: error => {
+          this.spinner.hide();
+          this.swalService.toastError('top-right', error.error.message);
           console.error(error);
         }
       })

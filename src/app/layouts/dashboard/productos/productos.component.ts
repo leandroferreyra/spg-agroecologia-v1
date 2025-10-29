@@ -308,6 +308,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showProductByUuid(uuid: string, updateTab: boolean, event?: MouseEvent) {
+    this.spinner.show();
     if (event?.ctrlKey || event?.metaKey) {
       const baseUrl = window.location.origin + window.location.pathname;
       const urlTree = this.router.createUrlTree([`/dashboard/productos/${uuid}`], {
@@ -321,6 +322,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._productoService.showProduct(uuid, this.actual_role).subscribe({
         next: res => {
+          this.spinner.hide();
           this.showDataProducto(res.data, updateTab);
           this.archivos = res.data?.files;
           this.isLoadingProductos = false;
@@ -329,7 +331,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
           this.inicializarSwiper();
         },
         error: error => {
-          // this.isLoadingProductos = false;
+          this.spinner.hide(); 
           console.error(error);
         }
       })
