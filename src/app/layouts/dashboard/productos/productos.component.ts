@@ -38,7 +38,6 @@ import { ReemplazosComponent } from './reemplazos/reemplazos.component';
 import { ProveedoresProductoComponent } from './proveedores-producto/proveedores-producto.component';
 import { StocksComponent } from './stocks/stocks.component';
 import { ComprasProductoComponent } from './compras-producto/compras-producto.component';
-import { VinculosComponent } from './vinculos/vinculos.component';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
@@ -63,7 +62,7 @@ import { Navigation, Pagination } from 'swiper/modules';
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconPencilComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
-    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, VinculosComponent, IconSettingsComponent,
+    ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, IconSettingsComponent,
     FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent, ProduccionesComponent, ArchivosComponent
   ],
   animations: [toggleAnimation],
@@ -223,7 +222,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     });
     this.route.queryParamMap.subscribe(params => {
       const tab = params.get('tab')?.toLowerCase();
-      const validTabs = ['datos-generales', 'componentes', 'componente-de', 'reemplazos', 'proveedores', 'stocks', 'compras', 'vinculos', 'archivos'];
+      const validTabs = ['datos-generales', 'componentes', 'componente-de', 'reemplazos', 'proveedores', 'stocks', 'compras', 'archivos'];
       if (tab && validTabs.includes(tab)) {
         this.tab1 = tab;
       } else {

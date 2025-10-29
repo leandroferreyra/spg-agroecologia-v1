@@ -19,3 +19,7 @@
   opacity: 0;
   cursor: pointer;
 }
+
+tr {
+  transition: all 0.25s ease;
+}
