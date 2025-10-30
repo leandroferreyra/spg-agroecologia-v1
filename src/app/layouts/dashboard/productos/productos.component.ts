@@ -87,7 +87,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   isEdicion: boolean = false;
   isEdicionCostos: boolean = false;
   isShowMailMenu = false;
-  isTabDisabled = false;
+  // isTabDisabled = false;
 
   //Paginación
   MAX_ITEMS_PER_PAGE = 20;
@@ -271,11 +271,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
           } else {
             if (this.productos.length === 0) {
               this.swalService.toastSuccess('center', 'No existen productos.');
-              this.isTabDisabled = true;
+              // this.isTabDisabled = true;
               this.tab1 = 'datos-generales';
               this.selectedProducto = null;
             } else {
-              this.isTabDisabled = false;
+              // this.isTabDisabled = false;
             }
             if (!alta && this.productos.length > 0) {
               this.isEdicion = false;
@@ -307,6 +307,19 @@ export class ProductosComponent implements OnInit, OnDestroy {
         this.itemsInPage = this.currentPage * this.itemsPerPage;
       }
     }
+  }
+
+  isTabDisabled(tab: string) {
+    if (tab === 'componentes') {
+      return !(this.selectedProducto?.product_type?.product_compound === 1);
+    }
+    if (tab === 'proveedores') {
+      return !(this.selectedProducto?.product_type?.can_be_provided === 1);
+    }
+    if (tab === 'stock') {
+      return !(this.selectedProducto?.product_type?.stock_controlled === 1);
+    }
+    return false;
   }
 
   showProductByUuid(uuid: string, updateTab: boolean, event?: MouseEvent) {
@@ -1208,7 +1221,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
         })
       );
     }
-  } 
+  }
 
   cancelarEdicionCostos() {
     this.isSubmit = false;

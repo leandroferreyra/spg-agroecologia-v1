@@ -227,8 +227,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'datos-generales',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('datos-generales')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('datos-generales')
+                        }" (click)="!isTabDisabled('datos-generales') && cambiarTab('datos-generales')">
                     Datos generales
                 </a>
 
@@ -236,8 +236,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'componentes',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('componentes')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('componentes')
+                        }" (click)="!isTabDisabled('componentes') && cambiarTab('componentes')">
                     Componentes
                 </a>
 
@@ -245,8 +245,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'componente-de',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('componente-de')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('componente-de')
+                        }" (click)="!isTabDisabled('componente-de') && cambiarTab('componente-de')">
                     Componente de
                 </a>
 
@@ -254,8 +254,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'reemplazos',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('reemplazos')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('reemplazos')
+                        }" (click)="!isTabDisabled('reemplazos') && cambiarTab('reemplazos')">
                     Reemplazos
                 </a>
 
@@ -263,8 +263,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'proveedores',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('proveedores')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('proveedores')
+                        }" (click)="!isTabDisabled('proveedores') && cambiarTab('proveedores')">
                     Proveedores
                 </a>
 
@@ -272,8 +272,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'stocks',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('stocks')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('stocks')
+                        }" (click)="!isTabDisabled('stocks') && cambiarTab('stocks')">
                     Stock
                 </a>
 
@@ -281,8 +281,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'compras',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('compras')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('compras')
+                        }" (click)="!isTabDisabled('compras') && cambiarTab('compras')">
                     Compras
                 </a>
 
@@ -290,8 +290,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'producciones',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('producciones')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('producciones')
+                        }" (click)="!isTabDisabled('producciones') && cambiarTab('producciones')">
                     Producciones
                 </a>
 
@@ -299,8 +299,8 @@
                     hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
                             '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
                             tab1.toLowerCase() === 'archivos',
-                            'cursor-not-allowed tab-disabled': isTabDisabled
-                        }" (click)="!isTabDisabled && cambiarTab('archivos')">
+                            'cursor-not-allowed tab-disabled': isTabDisabled('archivos')
+                        }" (click)="!isTabDisabled('archivos') && cambiarTab('archivos')">
                     Archivos
                 </a>
 
