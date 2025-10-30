@@ -1195,9 +1195,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._productoService.editarParametrosCalculo(this.selectedProducto.uuid, gastos).subscribe({
           next: res => {
-            this.spinner.hide();
+            // this.spinner.hide();
             this.cancelarEdicionCostos();
-            this.obtenerProductos(true);
+            // this.obtenerProductos(true);
+            this.showProductByUuid(this.uuidFromUrl, false);
           },
           error: error => {
             console.error(error);
@@ -1207,7 +1208,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
         })
       );
     }
-  }
+  } 
 
   cancelarEdicionCostos() {
     this.isSubmit = false;
@@ -1243,8 +1244,9 @@ export class ProductosComponent implements OnInit, OnDestroy {
       this._productoService.deleteParametrosCalculo(this.selectedProducto.uuid, this.actual_role.toUpperCase()).subscribe({
         next: res => {
           this.tokenService.setToken(res.token);
-          this.spinner.hide();
-          this.obtenerProductos(true);
+          // this.spinner.hide();
+          this.cancelarEdicionCostos();
+          this.showProductByUuid(this.uuidFromUrl, false);
         },
         error: error => {
           console.error(error);
