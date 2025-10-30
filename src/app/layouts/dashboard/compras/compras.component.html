@@ -98,8 +98,8 @@
                 </div>
                 <div class="flex w-full">
                     <div class="relative flex-grow">
-                        <input id="switchRight1" type="text" placeholder="Buscar compra..." [disabled]="compras.length === 0"
-                            [(ngModel)]="filtroSimpleName" (input)="obtenerComprasPorFiltroSimple()"
+                        <input id="switchRight1" type="text" placeholder="Buscar compra..."
+                            [formControl]="searchControl"
                             class="form-input w-full ltr:rounded-r-none rtl:rounded-l-none" />
                         <div class="absolute top-1/2 -translate-y-1/2 ltr:right-[11px] rtl:left-[11px]">
                             <icon-search />
@@ -108,7 +108,8 @@
                     <div
                         class="flex items-center justify-center border border-[#e0e6ed] bg-[#eee] px-3 font-semibold dark:border-[#17263c] dark:bg-[#1b2e4b] ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
                         <label class="relative mb-0 h-4 w-7 cursor-pointer">
-                            <input type="checkbox" (change)="obtenerComprasPorFiltroSimple();" [disabled]="compras.length === 0"
+                            <input type="checkbox" (change)="obtenerComprasPorFiltroSimple();"
+                                [disabled]="compras.length === 0"
                                 class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
                                 id="custom_switch_checkbox2" [(ngModel)]="filtroSimpleContiene" />
                             <span

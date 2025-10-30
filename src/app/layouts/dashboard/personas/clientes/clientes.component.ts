@@ -8,7 +8,7 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Subscription, forkJoin } from 'rxjs';
+import { Subscription, debounceTime, distinctUntilChanged, forkJoin } from 'rxjs';
 import { ClienteDTO, Human, LegalEntity, Person } from 'src/app/core/models/request/clienteDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { ClientesService } from 'src/app/core/services/clientes.service';
@@ -160,6 +160,8 @@ export class ClientesComponent implements OnInit, OnDestroy {
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
+  searchControl = new FormControl('');
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _clienteService: ClientesService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private router: Router) {
@@ -212,12 +214,25 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.obtenerClientes();
     this.obtenerCatalogos();
+
+    this.subscription.add(
+      this.searchControl.valueChanges
+        .pipe(
+          debounceTime(1000),
+          distinctUntilChanged()
+        )
+        .subscribe(value => {
+          this.filtroSimpleName = value || '';
+          this.obtenerClientesPorFiltroSimple();
+        })
+    );
   }
 
   obtenerClientes(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
-
+    this.spinner.show();
+    this.searchControl.disable();
     // Inicializamos un objeto vacío para los parámetros
     const params: any = {};
     params.with = ["person.city.district.country", "person.human.gender", "person.human.documentType", "person.human.user", "person.legalEntity", "person.currentState"];
@@ -253,9 +268,12 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
             }
           }
+          this.searchControl.enable();
           this.spinner.hide();
         },
         error: error => {
+          this.searchControl.enable();
+          this.swalService.toastError('top-right', error.error.message);
           console.error(error);
           this.spinner.hide();
         }

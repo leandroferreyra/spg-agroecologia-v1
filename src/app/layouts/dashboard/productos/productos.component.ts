@@ -249,7 +249,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   obtenerProductos(alta: boolean = false) {
     this.spinner.show();
-
+    this.searchControl.disable();
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
 
@@ -287,10 +287,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
             }
           }
           this.spinner.hide();
+          this.searchControl.enable();
         },
         error: error => {
           console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
           this.spinner.hide();
+          this.searchControl.enable();
         }
       })
     )

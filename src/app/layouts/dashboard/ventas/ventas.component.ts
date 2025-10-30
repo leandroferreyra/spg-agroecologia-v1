@@ -175,6 +175,8 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   private ultimaMonedaVentaSeleccionada: any = null;
 
+  searchControl = new FormControl('');
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _ventaService: VentasService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService,
@@ -208,6 +210,19 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.obtenerClientes();
     this.obtenerProductos();
     this.obtenerCatalogos();
+
+    this.subscription.add(
+      this.searchControl.valueChanges
+        .pipe(
+          debounceTime(1000),
+          distinctUntilChanged()
+        )
+        .subscribe(value => {
+          this.filtroSimpleName = value || '';
+          this.obtenerVentasPorFiltroSimple();
+        })
+    );
+
   }
 
   ngOnDestroy(): void {
@@ -217,7 +232,8 @@ export class VentasComponent implements OnInit, OnDestroy {
   obtenerVentas(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
-
+    this.spinner.show();
+    this.searchControl.disable();
     // Inicializamos un objeto vacío para los parámetros
     this.params.with = ["transaction.person.human",
       "transaction.person.legalEntity",
@@ -258,8 +274,11 @@ export class VentasComponent implements OnInit, OnDestroy {
             }
           }
           this.spinner.hide();
+          this.searchControl.enable();
         },
         error: error => {
+          this.searchControl.enable();
+          this.swalService.toastError('top-right', error.error.message);
           console.error(error);
           this.spinner.hide();
         }

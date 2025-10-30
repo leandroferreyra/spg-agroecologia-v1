@@ -62,10 +62,10 @@
                                     </td>
                                     @if (hasInvalidaData(data)) {
                                     <td style="color: #dc3545" ngxTippy="Existen datos inválidos">
-                                        <icon-info-circle  class="w-5 h-5" />
+                                        <icon-info-circle class="w-5 h-5" />
                                     </td>
                                     }@else {
-                                        <td></td>
+                                    <td></td>
                                     }
                                     <td class="w-0 whitespace-nowrap text-right align-middle">
                                         <div hlMenu class="dropdown">
@@ -108,7 +108,7 @@
                     <div class="flex w-full">
                         <div class="relative flex-grow">
                             <input id="switchRight" type="text" placeholder="Buscar proveedor..."
-                                (input)="obtenerProveedoresPorFiltroSimple()" [(ngModel)]="filtroSimpleName"
+                                [formControl]="searchControl"
                                 class="form-input w-full ltr:rounded-r-none rtl:rounded-l-none" />
                             <div class="absolute top-1/2 -translate-y-1/2 ltr:right-[11px] rtl:left-[11px]">
                                 <icon-search />

@@ -10,7 +10,7 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { forkJoin, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, forkJoin, Subscription } from 'rxjs';
 import { Human, LegalEntity, Person, ProveedorDTO } from 'src/app/core/models/request/proveedorDTO';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
@@ -164,6 +164,8 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
 
+  searchControl = new FormControl('');
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _proveedoresService: ProveedoresService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private route: ActivatedRoute, private location: Location, private router: Router) {
@@ -220,12 +222,25 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
     this.inicializarForm();
     this.obtenerProveedores();
     this.obtenerCatalogos();
+
+    this.subscription.add(
+      this.searchControl.valueChanges
+        .pipe(
+          debounceTime(1000),
+          distinctUntilChanged()
+        )
+        .subscribe(value => {
+          this.filtroSimpleName = value || '';
+          this.obtenerProveedoresPorFiltroSimple();
+        })
+    );
   }
 
   obtenerProveedores(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
-
+    this.spinner.show();
+    this.searchControl.disable();
     this.parametrosProvedores = new ParametrosIndex();
     this.parametrosProvedores.with = ["person.city.district.country", "person.human.gender", "person.human.documentType", "person.human.user", "person.legalEntity", "person.currentState"];
     this.parametrosProvedores.page = this.currentPage;
@@ -261,8 +276,11 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
             }
           }
           this.spinner.hide();
+          this.searchControl.enable();
         },
         error: error => {
+          this.searchControl.enable();
+          this.swalService.toastError('top-right', error.error.message);
           console.error(error);
           this.spinner.hide();
         }

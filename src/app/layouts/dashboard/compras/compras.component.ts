@@ -191,6 +191,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   private ultimaMonedaFacturacionSeleccionada: any = null;
   private ultimaMonedaCompraSeleccionada: any = null;
 
+  searchControl = new FormControl('');
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
     private _catalogoService: CatalogoService, private _userLogged: UserLoggedService, private titleService: Title,
@@ -230,12 +232,25 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.obtenerProductos();
     this.obtenerProveedores();
     this.obtenerCatalogos();
+
+    this.subscription.add(
+      this.searchControl.valueChanges
+        .pipe(
+          debounceTime(1000),
+          distinctUntilChanged()
+        )
+        .subscribe(value => {
+          this.filtroSimpleName = value || '';
+          this.obtenerComprasPorFiltroSimple();
+        })
+    );
   }
 
   obtenerCompras(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
-
+    this.spinner.show();
+    this.searchControl.disable();
     // Inicializamos un objeto vacío para los parámetros
     this.params.with = [
       "transaction.person.human",
@@ -275,10 +290,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
               this.location.replaceState(`/dashboard/compras/${this.compras[0].uuid}`);
             }
           }
+          this.searchControl.enable();
           this.spinner.hide();
         },
         error: error => {
           console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.searchControl.enable();
           this.spinner.hide();
         }
       })

@@ -12,7 +12,7 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Subscription, forkJoin } from 'rxjs';
+import { Subscription, debounceTime, distinctUntilChanged, forkJoin } from 'rxjs';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { IndexService } from 'src/app/core/services/index.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -138,6 +138,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
   showMensajeAsignaNumero: boolean = false;
   modificaCantidad: boolean = false;
 
+  searchControl = new FormControl('');
+
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _userLogged: UserLoggedService, private _produccionService: ProduccionService, private spinner: NgxSpinnerService,
     private tokenService: TokenService, private _catalogoService: CatalogoService, private location: Location, private route: ActivatedRoute,
@@ -185,12 +187,25 @@ export class ProduccionComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.obtenerProducciones();
     this.obtenerCatalogos();
+
+    this.subscription.add(
+      this.searchControl.valueChanges
+        .pipe(
+          debounceTime(1000),
+          distinctUntilChanged()
+        )
+        .subscribe(value => {
+          this.filtroSimpleName = value || '';
+          this.obtenerProduccionesPorFiltroSimple();
+        })
+    );
   }
 
   obtenerProducciones(alta: boolean = false) {
     // El booleano 'alta' es para que cuando da de alta un nuevo registro, no entre a inicializar, sino siempre muestra el primero de 
     // la lista y no el que acabo de agregar.
-
+    this.spinner.show();
+    this.searchControl.disable();
     // Inicializamos un objeto vacío para los parámetros
     this.params.with = ["product", "batch", "currentState"];
     this.params.paging = this.itemsPerPage;
@@ -224,10 +239,13 @@ export class ProduccionComponent implements OnInit, OnDestroy {
             }
           }
           this.spinner.hide();
+          this.searchControl.enable();
         },
         error: error => {
+          this.swalService.toastError('top-right', error.error.message);
           console.error(error);
           this.spinner.hide();
+          this.searchControl.enable();
         }
       })
     )
