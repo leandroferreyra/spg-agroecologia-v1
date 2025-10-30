@@ -358,7 +358,7 @@ export class ComponentesComponent implements OnInit, OnDestroy {
       this.componenteForm = new FormGroup({
         uuid: new FormControl(dato.uuid),
         parent_product_uuid: new FormControl(this.producto.uuid, Validators.required),
-        child_product_uuid: new FormControl(dato.child_product, []),
+        child_product_uuid: new FormControl({ value: dato.child_product, disabled: true }, []),
         quantity: new FormControl(this.mostrarCantidad(dato), Validators.required),
         supplier_uuid: new FormControl(dato.supplier?.uuid, []),
         orden: new FormControl(dato.order, [])
