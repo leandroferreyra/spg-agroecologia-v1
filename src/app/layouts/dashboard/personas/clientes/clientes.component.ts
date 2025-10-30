@@ -214,18 +214,11 @@ export class ClientesComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.obtenerClientes();
     this.obtenerCatalogos();
+  }
 
-    this.subscription.add(
-      this.searchControl.valueChanges
-        .pipe(
-          debounceTime(1000),
-          distinctUntilChanged()
-        )
-        .subscribe(value => {
-          this.filtroSimpleName = value || '';
-          this.obtenerClientesPorFiltroSimple();
-        })
-    );
+  buscadorSimple() {
+    this.filtroSimpleName = this.searchControl.value || '';
+    this.obtenerClientesPorFiltroSimple();
   }
 
   obtenerClientes(alta: boolean = false) {

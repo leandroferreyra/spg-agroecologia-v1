@@ -232,18 +232,11 @@ export class ComprasComponent implements OnInit, OnDestroy {
     this.obtenerProductos();
     this.obtenerProveedores();
     this.obtenerCatalogos();
+  }
 
-    this.subscription.add(
-      this.searchControl.valueChanges
-        .pipe(
-          debounceTime(1000),
-          distinctUntilChanged()
-        )
-        .subscribe(value => {
-          this.filtroSimpleName = value || '';
-          this.obtenerComprasPorFiltroSimple();
-        })
-    );
+  buscadorSimple() {
+    this.filtroSimpleName = this.searchControl.value || '';
+    this.obtenerComprasPorFiltroSimple();
   }
 
   obtenerCompras(alta: boolean = false) {

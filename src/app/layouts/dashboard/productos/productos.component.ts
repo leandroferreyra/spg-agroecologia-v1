@@ -232,19 +232,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.obtenerProductos();
     this.obtenerCatalogos();
+  }
 
-    this.subscription.add(
-      this.searchControl.valueChanges
-        .pipe(
-          debounceTime(1000),
-          distinctUntilChanged()
-        )
-        .subscribe(value => {
-          this.filtros.name.value = value || '';
-          this.obtenerProductosPorFiltroSimple();
-        })
-    );
-
+  buscadorSimple() {
+    this.filtros.name.value = this.searchControl.value || '';
+    this.obtenerProductosPorFiltroSimple();
   }
 
   obtenerProductos(alta: boolean = false) {

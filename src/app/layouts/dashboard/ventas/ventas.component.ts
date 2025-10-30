@@ -210,19 +210,11 @@ export class VentasComponent implements OnInit, OnDestroy {
     this.obtenerClientes();
     this.obtenerProductos();
     this.obtenerCatalogos();
+  }
 
-    this.subscription.add(
-      this.searchControl.valueChanges
-        .pipe(
-          debounceTime(1000),
-          distinctUntilChanged()
-        )
-        .subscribe(value => {
-          this.filtroSimpleName = value || '';
-          this.obtenerVentasPorFiltroSimple();
-        })
-    );
-
+  buscadorSimple() {
+    this.filtroSimpleName = this.searchControl.value || '';
+    this.obtenerVentasPorFiltroSimple();
   }
 
   ngOnDestroy(): void {
