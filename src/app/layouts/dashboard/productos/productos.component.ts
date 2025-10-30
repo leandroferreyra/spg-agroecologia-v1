@@ -54,6 +54,7 @@ import { TipoProductoService } from 'src/app/core/services/tipoProducto.service'
 import { ArchivosComponent } from './archivos/archivos.component';
 import Swiper from 'swiper';
 import { Navigation, Pagination } from 'swiper/modules';
+import { IconXComponent } from 'src/app/shared/icon/icon-x';
 
 @Component({
   selector: 'app-productos',
@@ -63,7 +64,7 @@ import { Navigation, Pagination } from 'swiper/modules';
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
     ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, IconSettingsComponent,
-    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent, ProduccionesComponent, ArchivosComponent
+    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent, ProduccionesComponent, ArchivosComponent, IconXComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -236,6 +237,12 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   buscadorSimple() {
     this.filtros.name.value = this.searchControl.value || '';
+    this.obtenerProductosPorFiltroSimple();
+  }
+
+  limpiarBusqueda() {
+    this.searchControl.setValue('');
+    this.filtros.name.value = '';
     this.obtenerProductosPorFiltroSimple();
   }
 

@@ -37,6 +37,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
+import { IconXComponent } from 'src/app/shared/icon/icon-x';
 
 @Component({
   selector: 'app-proveedores',
@@ -44,7 +45,8 @@ import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
-    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, IconPencilComponent, IconInfoCircleComponent],
+    ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, IconPencilComponent, IconInfoCircleComponent,
+    IconXComponent],
   templateUrl: './proveedores.component.html',
   styleUrl: './proveedores.component.css',
   animations: [toggleAnimation]
@@ -226,6 +228,12 @@ export class ProveedoresComponent implements OnInit, OnDestroy {
 
   buscadorSimple() {
     this.filtroSimpleName = this.searchControl.value || '';
+    this.obtenerProveedoresPorFiltroSimple();
+  }
+
+  limpiarBusqueda() {
+    this.searchControl.setValue('');
+    this.filtroSimpleName = '';
     this.obtenerProveedoresPorFiltroSimple();
   }
 

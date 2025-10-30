@@ -46,6 +46,7 @@ import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { IconExpandAllComponent2 } from 'src/app/shared/icon/icon-expand-all2';
 import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
 import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-item';
+import { IconXComponent } from 'src/app/shared/icon/icon-x';
 
 @Component({
   selector: 'app-produccion',
@@ -54,7 +55,7 @@ import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-ite
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconPencilComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, IconSettingsComponent, NgbPaginationModule, FlatpickrDirective,
     TimelineComponent, ComponentesProduccionComponent, TrazabilidadComponent, FaltantesComponent, IconExpandComponent, IconCollapseComponent,
-    IconExpandAllComponent, IconExpandAllComponent2, IconExpandItemComponent, IconCollapseItemComponent],
+    IconExpandAllComponent, IconExpandAllComponent2, IconExpandItemComponent, IconCollapseItemComponent, IconXComponent],
   animations: [toggleAnimation],
   templateUrl: './produccion.component.html',
   styleUrl: './produccion.component.css'
@@ -191,6 +192,12 @@ export class ProduccionComponent implements OnInit, OnDestroy {
 
   buscadorSimple() {
     this.filtroSimpleName = this.searchControl.value || '';
+    this.obtenerProduccionesPorFiltroSimple();
+  }
+
+  limpiarBusqueda() {
+    this.searchControl.setValue('');
+    this.filtroSimpleName = '';
     this.obtenerProduccionesPorFiltroSimple();
   }
 

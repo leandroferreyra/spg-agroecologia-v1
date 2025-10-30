@@ -44,6 +44,7 @@ import { FacturaDTO } from 'src/app/core/models/request/facturaDTO';
 import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTransaccionDTO';
 import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
 import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
+import { IconXComponent } from 'src/app/shared/icon/icon-x';
 
 @Component({
   selector: 'app-ventas',
@@ -51,7 +52,7 @@ import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule, IconSettingsComponent,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective,
-    IconPencilComponent],
+    IconPencilComponent, IconXComponent],
   animations: [toggleAnimation],
   providers: [DatePipe],
   templateUrl: './ventas.component.html',
@@ -214,6 +215,12 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   buscadorSimple() {
     this.filtroSimpleName = this.searchControl.value || '';
+    this.obtenerVentasPorFiltroSimple();
+  }
+
+  limpiarBusqueda() {
+    this.searchControl.setValue('');
+    this.filtroSimpleName = '';
     this.obtenerVentasPorFiltroSimple();
   }
 

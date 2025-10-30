@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
@@ -35,10 +35,9 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ProductosEnPosesionComponent } from './productos-en-posesion/productos-en-posesion.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { timeStamp } from 'console';
-import { Title } from '@angular/platform-browser';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
+import { IconXComponent } from 'src/app/shared/icon/icon-x';
 
 @Component({
   selector: 'app-clientes',
@@ -47,7 +46,7 @@ import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, ComprasClientesComponent, ContactosComponent, ContactosPersonaComponent,
     IconSettingsComponent, IconPlusComponent, ProductosAdquiridosComponent, FontAwesomeModule, NgbPaginationModule, IconPencilComponent,
-    ProductosEnPosesionComponent, IconInfoCircleComponent
+    ProductosEnPosesionComponent, IconInfoCircleComponent, IconXComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.css',
@@ -218,6 +217,12 @@ export class ClientesComponent implements OnInit, OnDestroy {
 
   buscadorSimple() {
     this.filtroSimpleName = this.searchControl.value || '';
+    this.obtenerClientesPorFiltroSimple();
+  }
+
+  limpiarBusqueda() {
+    this.searchControl.setValue('');
+    this.filtroSimpleName = '';
     this.obtenerClientesPorFiltroSimple();
   }
 

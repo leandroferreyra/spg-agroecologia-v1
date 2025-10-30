@@ -48,6 +48,7 @@ import { BatchUpdateControlDTO } from 'src/app/core/models/request/batchUpdateCo
 import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePriceRangeDTO';
 import { IconDollarSignComponent } from 'src/app/shared/icon/icon-dollar-sign';
 import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
+import { IconXComponent } from 'src/app/shared/icon/icon-x';
 
 @Component({
   selector: 'app-compras',
@@ -55,7 +56,7 @@ import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule, IconSettingsComponent,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective,
-    IconPencilComponent, IconDollarSignComponent
+    IconPencilComponent, IconDollarSignComponent, IconXComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './compras.component.html',
@@ -236,6 +237,12 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   buscadorSimple() {
     this.filtroSimpleName = this.searchControl.value || '';
+    this.obtenerComprasPorFiltroSimple();
+  }
+
+  limpiarBusqueda() {
+    this.searchControl.setValue('');
+    this.filtroSimpleName = '';
     this.obtenerComprasPorFiltroSimple();
   }
 
