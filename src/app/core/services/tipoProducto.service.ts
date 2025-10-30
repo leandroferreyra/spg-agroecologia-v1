@@ -33,6 +33,7 @@ export class TipoProductoService {
   showTipoProducto(uuid: string, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()
+      .set('with[]', 'costParam')
       .set('actual_role', rol);
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiTipoProducto + '/' + uuid, { headers, params });
   }

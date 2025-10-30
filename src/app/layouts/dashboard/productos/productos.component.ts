@@ -418,11 +418,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
             puedeSerProvisto: tipoProducto.can_be_provided,
             comprable: tipoProducto.can_be_purchased,
             producible: tipoProducto.can_be_produced,
+            cantidadComprasTipoProducto: tipoProducto.cost_param?.purchases_quantity,
+            funcionCalculoTipoProducto: tipoProducto.cost_param?.calculation_function
           });
           this.configureTrazabilidadPorTipo(form, tipoProducto);
           this.configureStockPorTipo(form, tipoProducto);
           if (!this.isEdicion) {
-            this.mostrarParametrosCalculo = tipoProducto.can_be_purchased === 1;
+            this.mostrarParametrosCalculo = (tipoProducto.can_be_purchased === 1);
           }
         },
         error: error => {
@@ -481,6 +483,8 @@ export class ProductosComponent implements OnInit, OnDestroy {
       valorActualizadoCompra: new FormControl({ value: this.showCosts(producto?.costs?.purchase_cost_pesos), disabled: true }),
       cantidadCompras: new FormControl({ value: producto?.cost_param?.purchases_quantity ?? null, disabled: true }),
       funcionCalculo: new FormControl({ value: producto?.cost_param?.calculation_function ?? null, disabled: true }),
+      cantidadComprasTipoProducto: new FormControl({ value: producto?.product_type?.cost_param?.purchases_quantity, disabled: true }, []),
+      funcionCalculoTipoProducto: new FormControl({ value: producto?.product_type?.cost_param?.calculation_function, disabled: true }, [])
     });
   }
 
@@ -587,13 +591,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
       stock_minimum: new FormControl({ value: null, disabled: true }, []),
       stock_optimum: new FormControl({ value: null, disabled: true }, []),
       cantidadCompras: new FormControl({ value: null, disabled: false }, [Validators.min(1)]),
-      funcionCalculo: new FormControl({ value: null, disabled: false }, [])
+      funcionCalculo: new FormControl({ value: null, disabled: false }, []),
+      cantidadComprasTipoProducto: new FormControl({ value: null, disabled: true }, []),
+      funcionCalculoTipoProducto: new FormControl({ value: null, disabled: true }, [])
     });
-    // if (!this.newProductoForm.get('trazable')?.value) {
-    //   // Deshabilitar asignaNumSerie si trazable es OFF
-    //   this.newProductoForm.get('asignaNumSerie')?.disable();
-    //   this.newProductoForm.get('asignaNumSerie')?.updateValueAndValidity({ emitEvent: false });
-    // }
     this.onNewForm();
   }
   onNewForm() {
@@ -627,7 +628,6 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   showDataProducto(producto: any, updateTab: boolean = true) {
-    // console.log("🚀 ~ ProductosComponent ~ showDataProducto ~ producto:", producto)
     this.productoAnterior = [];
     this.isEdicion = false;
     this.uuidFromUrl = producto.uuid;

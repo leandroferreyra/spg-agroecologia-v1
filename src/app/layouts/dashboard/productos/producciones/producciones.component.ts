@@ -77,7 +77,6 @@ export class ProduccionesComponent implements OnInit, OnDestroy {
       this._indexService.getProduccionesWithParam(params, this.rol).subscribe({
         next: res => {
           this.producciones = res.data;
-          console.log("🚀 ~ ProduccionesComponent ~ obtenerProducciones ~ this.producciones:", this.producciones)
           this.modificarPaginacion(res);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
