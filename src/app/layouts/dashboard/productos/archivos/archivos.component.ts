@@ -140,7 +140,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
       this.subscription.add(
         this._productoService.saveFile(this.producto.uuid, archivoDTO).subscribe({
           next: res => {
-            // this.obtenerArchivos();
             this.cerrarModal();
             this._tokenService.setToken(res.token);
             this.spinner.hide();
@@ -235,7 +234,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
       this._productoService.deleteFile(this.producto.uuid, archivo.uuid, this.rol.toUpperCase()).subscribe({
         next: res => {
           this.eventArchivo.emit();
-          // this.obtenerArchivos();
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
@@ -261,7 +259,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._productoService.moveUpFile(this.producto.uuid, data.uuid, this.rol.toUpperCase()).subscribe({
         next: res => {
-          // this.obtenerArchivos();
           this._tokenService.setToken(res.token);
           this.eventArchivo.emit();
           this.spinner.hide();
@@ -279,7 +276,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._productoService.moveDownFile(this.producto.uuid, data.uuid, this.rol.toUpperCase()).subscribe({
         next: res => {
-          // this.obtenerArchivos();
           this._tokenService.setToken(res.token);
           this.eventArchivo.emit();
           this.spinner.hide();
