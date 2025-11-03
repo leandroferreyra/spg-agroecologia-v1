@@ -133,6 +133,10 @@
                                         formControlName="archivo" accept="image/*,.pdf,.doc,.docx,.zip,.rar" />
                                 </div>
 
+                                <div *ngIf="isInvalidArchivo()" class="text-red-600 text-sm mt-1">
+                                    ⚠️ Debes seleccionar un archivo.
+                                </div>
+
                                 <img *ngIf="archivoSeleccionado && archivoSeleccionado.type.startsWith('image/')"
                                     [src]="imagenPreview" class="w-20 h-20 object-cover mt-2 rounded" />
                             </div>

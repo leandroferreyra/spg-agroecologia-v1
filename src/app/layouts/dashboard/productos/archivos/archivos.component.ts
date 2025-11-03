@@ -90,20 +90,6 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   obtenerArchivos() {
     this.archivos = this.producto?.files;
     this.spinner.hide();
-    // this.subscription.add(
-    //   this._productoService.showProduct(this.producto.uuid, this.rol).subscribe({
-    //     next: res => {
-    //       this.archivos = res.data?.files;
-    //       this._tokenService.setToken(res.token);
-    // this.spinner.hide();
-    //     },
-    //     error: error => {
-    //       this._swalService.toastError('top-right', error.error.message);
-    //       console.error(error);
-    //       this.spinner.hide();
-    //     }
-    //   })
-    // )
   }
 
   getImageByType(mimeType: string): string {
@@ -145,7 +131,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
 
   confirmarArchivo() {
     this.isSubmit = true;
-    if (this.archivoForm.valid) {
+    if (this.archivoForm.get('descripcion')?.valid && this.archivoSeleccionado !== null && this.archivoSeleccionado !== undefined) {
       this.spinner.show();
       let archivoDTO = new ArchivoDTO();
       archivoDTO.actual_role = this.rol;
@@ -168,6 +154,10 @@ export class ArchivosComponent implements OnInit, OnDestroy {
         })
       )
     }
+  }
+
+  isInvalidArchivo(): boolean {
+    return (this.isSubmit && (this.archivoSeleccionado == null || this.archivoSeleccionado == undefined));
   }
 
   onArchivoSeleccionado(event: Event) {
@@ -210,6 +200,7 @@ export class ArchivosComponent implements OnInit, OnDestroy {
   borrarArchivo() {
     this.archivoSeleccionado = undefined;
     this.imagenPreview = null;
+    this.archivoForm.get('archivo')?.setValue(null);
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
