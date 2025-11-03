@@ -134,6 +134,8 @@ export class ComprasComponent implements OnInit, OnDestroy {
   productos$!: Observable<any[]>;
   loadingProductos = false;
 
+  showThumbnail = false;
+
   placeholderCantidad: string = '';
 
   @ViewChild('modalCompra') modalCompra!: NgxCustomModalComponent;
@@ -594,6 +596,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         return this._indexService.getProductosWithParamAsync(params, this.actual_role).pipe(
           map((res: any) => {
             this.productosGuardados = res.data;
+            // console.log("🚀 ~ ComprasComponent ~ obtenerProductos ~ this.productosGuardados:", this.productosGuardados)
             return res.data;
           }), finalize(() => this.loadingProductos = false)
         );
@@ -840,6 +843,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.modalProducto.open();
     } else {
       this.inEdicionProducto = true;
+      this.showThumbnail = true;
       this.tituloModal = 'Edición de producto';
       if (producto.product?.stocks?.length > 0 && producto.product.stocks[0].location !== null) {
         this.getParentsFromLocation(producto.product.stocks[0].location);
@@ -966,6 +970,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       control_comments: new FormControl({ value: data ? data.control_comments : null, disabled: false }, []),
       location_uuid: new FormControl({ value: data ? this.getLocation(data) : null, disabled: false }, []),
       control_description: new FormControl({ value: data ? data.product.control_description : null, disabled: true }, []),
+      file: new FormControl({ value: data ? data.product?.first_file : null, disabled: false }, []),
     });
     if (this.selectedCompra.transaction?.current_state?.state?.name === 'Entregada pendiente de factura' ||
       this.selectedCompra.transaction?.current_state?.state?.name === 'Finalizada') {
@@ -977,12 +982,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
-        this.productoForm.get('control_description')?.setValue(producto.control_description);
-        // if (producto?.product_type?.stock_controlled === 1 && producto.traceable === 1) {
-        //   this.showInputUbicacion = true;
-        // } else {
-        //   this.showInputUbicacion = false;
-        // }
+        this.productoForm.get('control_description')?.setValue(producto?.control_description);
         // Quantity
         if (producto) {
           this.productoForm.get('quantity')?.enable();
@@ -991,6 +991,13 @@ export class ComprasComponent implements OnInit, OnDestroy {
         } else {
           this.productoForm.get('quantity')?.disable();
           this.placeholderCantidad = '';
+        }
+        // Mostrar thumbnail
+        this.productoForm.get('file')?.setValue(producto?.first_file);
+        if (producto?.first_file) {
+          this.showThumbnail = true;
+        } else {
+          this.showThumbnail = false;
         }
       });
 
@@ -1044,6 +1051,24 @@ export class ComprasComponent implements OnInit, OnDestroy {
           this.showWarningUbicacion = false;
         }
       });
+  }
+
+  getImageByType(mimeType: string): string {
+    if (!mimeType) return 'assets/images/files/other.png';
+    mimeType = mimeType.toLowerCase();
+    if (mimeType.includes('pdf')) {
+      return 'assets/images/files/imagen-pdf.jpg';
+    } else if (mimeType.includes('word') || mimeType.includes('doc')) {
+      return 'assets/images/files/imagen-word.png';
+    } else if (mimeType.includes('zip') || mimeType.includes('rar')) {
+      return 'assets/images/files/imagen-rar.jpg';
+    } else {
+      return 'assets/images/files/other.png';
+    }
+  }
+  abrirArchivo(url: string) {
+    if (!url) return;
+    window.open(url, '_blank');
   }
 
   getLocation(data: any) {
@@ -1546,6 +1571,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   cerrarModalAltaProducto() {
     this.isSubmit = false;
+    this.showThumbnail = false;
     this.inEdicionProducto = false;
     this.breadcrumb = [];
     this.ultimaUbicacion = null;

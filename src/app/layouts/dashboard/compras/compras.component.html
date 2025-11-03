@@ -379,6 +379,7 @@
                                     <th class="px-2 py-1">Precio total
                                         ({{selectedCompra?.transaction?.currency?.symbol}})</th>
                                     <th class="px-2 py-1">IVA (%)</th>
+                                    <th class="px-2 py-1">Thumbnail</th>
                                     <th class="px-2 py-1">Descripción del control</th>
                                     <th class="px-2 py-1">Control realizado</th>
                                     <th class="px-2 py-1">Resultado del control</th>
@@ -407,6 +408,21 @@
                                     <td class="border px-2 py-1">{{ data.unit_price }}</td>
                                     <td class="border px-2 py-1">{{ showPrecioTotal(data) }}</td>
                                     <td class="border px-2 py-1">{{ data.product.vat_percent }}</td>
+                                    <td class="border px-2 py-1">
+                                        @if (data.product?.first_file?.is_image) {
+                                        <img [src]="data.product?.first_file?.thumbnail_url"
+                                            alt="{{ data.product?.first_file?.description }}"
+                                            (click)="abrirArchivo(data.product?.first_file?.url)"
+                                            [ngxTippy]="data.product?.first_file?.description"
+                                            class="h-[100px] w-auto mx-auto object-contain cursor-pointer" />
+                                        }@else {
+                                        <img [src]="getImageByType(data.product?.first_file?.mime_type)"
+                                            [ngxTippy]="data.product?.first_file?.description"
+                                            alt="{{ data.product?.first_file?.description }}"
+                                            class="h-[100px] w-auto mx-auto object-contain cursor-pointer"
+                                            (click)="abrirArchivo(data.product?.first_file?.url)" />
+                                        }
+                                    </td>
                                     <td class="border px-2 py-1">{{ data.product.control_description }}</td>
                                     <td class="border px-2 py-1">
                                         <div class="flex items-center gap-2 mt-2">
@@ -745,6 +761,25 @@
                 <div class="flex flex-col sm:flex-row">
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
 
+                        @if (showThumbnail) {
+                        <div class="col-span-full flex justify-center">
+                            @if (productoForm.get('file')?.value?.is_image) {
+                            <img [src]="productoForm.get('file')?.value?.thumbnail_url"
+                                alt="{{ productoForm.get('file')?.value?.description }}"
+                                (click)="abrirArchivo(productoForm.get('file')?.value?.url)"
+                                [ngxTippy]="productoForm.get('file')?.value?.description"
+                                class="h-[100px] w-auto mx-auto object-contain cursor-pointer" />
+                            }@else {
+                            <img [src]="getImageByType(productoForm.get('file')?.value?.mime_type)"
+                                [ngxTippy]="productoForm.get('file')?.value?.description"
+                                alt="{{ productoForm.get('file')?.value?.description }}"
+                                class="h-[100px] w-auto mx-auto object-contain cursor-pointer"
+                                (click)="abrirArchivo(productoForm.get('file')?.value?.url)" />
+                            }
+                        </div>
+                        }
+
+
                         <div class="flex-grow-1">
                             <label>Producto</label>
                             <ng-select [items]="productos$ | async" bindLabel="name" [typeahead]="productoInput$"
@@ -767,7 +802,7 @@
                             <label for="unit_price">Precio unitario
                                 ({{selectedCompra?.transaction?.currency?.symbol}})</label>
                             <input id="unit_price" type="text" placeholder="" class="form-control"
-                                formControlName="unit_price" />
+                                formControlName="unit_price" autocomplete="off" />
                         </div>
 
                         <!-- @if (showInputUbicacion) { -->
@@ -868,7 +903,7 @@
                             <label>Password</label>
                             <div class="input-group">
                                 <input [type]="showPassword ? 'text' : 'password'" class="form-control"
-                                    formControlName="password">
+                                    formControlName="password" autocomplete="off">
                                 <fa-icon [icon]="showPassword ? iconEyeSlash : iconEye" class="input-group-text"
                                     style="cursor: pointer;" (click)="togglePassword()"></fa-icon>
                             </div>
