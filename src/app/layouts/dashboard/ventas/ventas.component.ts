@@ -45,6 +45,8 @@ import { ProductoTransaccionDTO } from 'src/app/core/models/request/productoTran
 import { PagoDTO } from 'src/app/core/models/request/pagoDTO';
 import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
 import { IconXComponent } from 'src/app/shared/icon/icon-x';
+import { IconFileComponent } from 'src/app/shared/icon/icon-file';
+import { ArchivoDTO } from 'src/app/core/models/request/archivoDTO';
 
 @Component({
   selector: 'app-ventas',
@@ -52,7 +54,7 @@ import { IconXComponent } from 'src/app/shared/icon/icon-x';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule, IconSettingsComponent,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective,
-    IconPencilComponent, IconXComponent],
+    IconPencilComponent, IconXComponent, IconFileComponent],
   animations: [toggleAnimation],
   providers: [DatePipe],
   templateUrl: './ventas.component.html',
@@ -66,6 +68,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   @ViewChild('modalComprobante') modalComprobante!: NgxCustomModalComponent;
   @ViewChild('modalProducto') modalProducto!: NgxCustomModalComponent;
   @ViewChild('modalPago') modalPago!: NgxCustomModalComponent;
+  @ViewChild('modalArchivo') modalArchivo!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -74,6 +77,12 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   store: any;
   private subscription: Subscription = new Subscription();
+
+  archivoForm!: FormGroup;
+  archivoSeleccionado?: File;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  imagenPreview: string | null = null;
+  isDragging = false;
 
   actual_role: string = '';
   isShowMailMenu = false;
@@ -2050,6 +2059,139 @@ export class VentasComponent implements OnInit, OnDestroy {
   abrirArchivo(url: string) {
     if (!url) return;
     window.open(url, '_blank');
+  }
+
+  openModalArchivo(data: any) {
+    this.archivoForm = new FormGroup({
+      transactionDocumentUuid: new FormControl(data.uuid, Validators.required),
+      descripcion: new FormControl(null, Validators.required),
+      archivo: new FormControl(null, Validators.required)
+    });
+    this.modalArchivo.options = this.modalOptions;
+    this.modalArchivo.open();
+  }
+
+  cerrarModalArchivo() {
+    this.isSubmit = false;
+    this.archivoSeleccionado = undefined;
+    this.modalArchivo.close();
+  }
+
+  confirmarArchivo() {
+    this.isSubmit = true;
+    if (this.archivoForm.get('descripcion')?.valid && this.archivoSeleccionado !== null && this.archivoSeleccionado !== undefined) {
+      this.spinner.show();
+      let archivoDTO = new ArchivoDTO();
+      archivoDTO.actual_role = this.actual_role;
+      archivoDTO.description = this.archivoForm.get('descripcion')?.value;
+      archivoDTO.file = this.archivoSeleccionado;
+      this.subscription.add(
+        this._transactionDocumentsService.saveFile(this.archivoForm.get('transactionDocumentUuid')?.value, archivoDTO).subscribe({
+          next: res => {
+            this.obtenerVentaPorId(this.uuidFromUrl);
+            this.cerrarModalArchivo();
+            this.tokenService.setToken(res.token);
+            this.spinner.hide();
+          },
+          error: error => {
+            this.swalService.toastError('top-right', error.error.message);
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
+  }
+
+  openSwalEliminarArchivo(documento: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el archivo ${documento.file?.description}?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarArchivo(documento);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarArchivo(documento: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._transactionDocumentsService.deleteFile(documento.uuid, documento.file.uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerVentaPorId(this.uuidFromUrl);
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  borrarArchivo() {
+    this.archivoSeleccionado = undefined;
+    this.imagenPreview = null;
+    this.archivoForm.get('archivo')?.setValue(null);
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  isInvalidArchivo(): boolean {
+    return (this.isSubmit && (this.archivoSeleccionado == null || this.archivoSeleccionado == undefined));
+  }
+
+  onArchivoSeleccionado(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.setFile(input.files[0]);
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  onFileDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+
+    if (event.dataTransfer?.files.length) {
+      this.setFile(event.dataTransfer.files[0]);
+    }
+  }
+
+  private setFile(file: File) {
+    this.archivoSeleccionado = file;
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => this.imagenPreview = reader.result as string;
+      reader.readAsDataURL(file);
+    } else {
+      this.imagenPreview = null;
+    }
   }
 
 }

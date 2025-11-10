@@ -483,6 +483,7 @@
                                     <th class="px-2 py-1">Número</th>
                                     <th class="px-2 py-1">Moneda</th>
                                     <th class="px-2 py-1">Tipo de cambio</th>
+                                    <th class="px-2 py-1">Thumbnail</th>
                                     <th class="px-2 py-1">
                                         Acciones
                                     </th>
@@ -511,6 +512,34 @@
                                     </td>
                                     <td class="border px-2 py-1">{{ data.currency?.name }}</td>
                                     <td class="border px-2 py-1">{{ data.exchange_rate }}</td>
+                                    <td class="border px-2 py-1">
+                                        @if (data.file) {
+                                        <div class="flex items-center justify-center space-x-2">
+                                            @if (data.file?.is_image) {
+                                            <img [src]="data.file.thumbnail_url" alt="{{ data.file.description }}"
+                                                (click)="abrirArchivo(data.file.url)" [ngxTippy]="data.file.description"
+                                                class="h-[100px] w-auto object-contain cursor-pointer" />
+                                            } @else {
+                                            <img [src]="getImageByType(data.file.mime_type)"
+                                                [ngxTippy]="data.file.description" alt="{{ data.file.description }}"
+                                                class="h-[100px] w-auto object-contain cursor-pointer"
+                                                (click)="abrirArchivo(data.file.url)" />
+                                            }
+
+                                            <button type="button" class="text-gray-600 hover:text-red-600 transition"
+                                                ngxTippy="Eliminar archivo" (click)="openSwalEliminarArchivo(data)">
+                                                <icon-trash-lines/>
+                                            </button>
+                                        </div>
+                                        } @else {
+                                        <div class="text-center">
+                                            <button type="button" class="text-gray-600 hover:text-blue-600 transition"
+                                                ngxTippy="Agregar archivo" (click)="openModalArchivo(data)">
+                                                <icon-file />
+                                            </button>
+                                        </div>
+                                        }
+                                    </td>
 
                                     <td class="border px-2 py-1">
                                         <div class="flex items-center">
@@ -1231,3 +1260,77 @@
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
     <p style="font-size: 20px; color: white">Cargando</p>
 </ngx-spinner>
+
+<!-- MODAL ARCHIVO -->
+<div>
+    <ngx-custom-modal #modalArchivo class="modal-top animate extra-large-modal animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">Nuevo archivo</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="archivoForm" (keydown.enter)="confirmarArchivo()">
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? archivoForm.controls['descripcion'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Descripción</label>
+                                <input type="text" class="form-control" formControlName="descripcion">
+                            </div>
+
+                            <div class="mb-4 mt-4">
+                                <label class="block mb-1 text-sm font-medium">
+                                    Archivo
+                                    @if (archivoSeleccionado) {
+                                    <button type="button" class="text-red-500 hover:text-red-700"
+                                        (click)="borrarArchivo()" ngxTippy="Eliminar archivo">
+                                        ✕
+                                    </button>
+                                    }
+                                </label>
+
+                                <div class="dropzone" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                                    (drop)="onFileDrop($event)" [class.dragging]="isDragging">
+                                    @if (!archivoSeleccionado) {
+                                    <p>
+                                        Arrastrá y soltá tu archivo aquí<br>
+                                        <span class="text-sm text-gray-500">o hacé click para seleccionarlo</span>
+                                    </p>
+                                    } @else {
+                                    <p class="text-sm text-gray-700">
+                                        📎 {{ archivoSeleccionado.name }}
+                                    </p>
+                                    }
+                                    <input type="file" (change)="onArchivoSeleccionado($event)" class="file-input"
+                                        formControlName="archivo" accept="image/*,.pdf,.doc,.docx,.zip,.rar" />
+                                </div>
+
+                                <div *ngIf="isInvalidArchivo()" class="text-red-600 text-sm mt-1">
+                                    ⚠️ Debes seleccionar un archivo.
+                                </div>
+
+                                <img *ngIf="archivoSeleccionado && archivoSeleccionado.type.startsWith('image/')"
+                                    [src]="imagenPreview" class="w-20 h-20 object-cover mt-2 rounded" />
+                            </div>
+
+
+                            <div class="row mt-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarArchivo()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModalArchivo()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
