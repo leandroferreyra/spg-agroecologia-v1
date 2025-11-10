@@ -49,6 +49,7 @@ import { ValidatePriceRangeDTO } from 'src/app/core/models/request/validatePrice
 import { IconDollarSignComponent } from 'src/app/shared/icon/icon-dollar-sign';
 import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
 import { IconXComponent } from 'src/app/shared/icon/icon-x';
+import { ArchivoDTO } from 'src/app/core/models/request/archivoDTO';
 
 @Component({
   selector: 'app-compras',
@@ -77,6 +78,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   productoForm!: FormGroup;
   controlTotalForm!: FormGroup;
   pagoForm!: FormGroup;
+  archivoForm!: FormGroup;
 
   // cargandoProductos: boolean = true;
   filtroSimpleName: string = '';
@@ -143,6 +145,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   @ViewChild('modalControlarTodos') modalControlarTodos!: NgxCustomModalComponent;
   @ViewChild('modalPago') modalPago!: NgxCustomModalComponent;
   @ViewChild('modalEditarProveedor') modalEditarProveedor!: NgxCustomModalComponent;
+  @ViewChild('modalArchivo') modalArchivo!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -195,6 +198,12 @@ export class ComprasComponent implements OnInit, OnDestroy {
   private ultimaMonedaCompraSeleccionada: any = null;
 
   searchControl = new FormControl('');
+
+  archivoSeleccionado?: File;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  imagenPreview: string | null = null;
+  isDragging = false;
+
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _indexService: IndexService,
     private _comprasService: ComprasProveedorService, private spinner: NgxSpinnerService, private tokenService: TokenService,
@@ -322,6 +331,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._comprasService.getCompraById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedCompra = res.data;
+          console.log("🚀 ~ ComprasComponent ~ obtenerCompraPorId ~ this.selectedCompra:", this.selectedCompra)
           this.obtenerPagos(this.selectedCompra?.transaction?.uuid);
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedCompra.uuid;
@@ -1054,7 +1064,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   }
 
   getImageByType(mimeType: string): string {
-    if (!mimeType) return 'assets/images/files/other.png';
+    if (!mimeType) return '';
     mimeType = mimeType.toLowerCase();
     if (mimeType.includes('pdf')) {
       return 'assets/images/files/imagen-pdf.jpg';
@@ -1063,7 +1073,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
     } else if (mimeType.includes('zip') || mimeType.includes('rar')) {
       return 'assets/images/files/imagen-rar.jpg';
     } else {
-      return 'assets/images/files/other.png';
+      return '';
     }
   }
   abrirArchivo(url: string) {
@@ -1886,6 +1896,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
         this.openCloseEditarDescuentosCompra();
       }
       this.compraForm.get('fechaFacturacion')?.enable();
+      this.compraForm.get('archivoFacturacion')?.enable();
       if (this.inAltaFactura) {
         this.compraForm.get('fechaFacturacion')?.setValue(this.compraForm.get('fechaCompra')?.value);
       }
@@ -1896,6 +1907,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this.compraForm.get('tipoCambio')?.enable();
     } else {
       this.compraForm.get('fechaFacturacion')?.disable({ emitEvent: false });
+      this.compraForm.get('archivoFacturacion')?.disable();
       this.compraForm.get('tipoComprobante')?.disable();
       this.compraForm.get('prefijoComprobante')?.disable();
       this.compraForm.get('documentoComprobante')?.disable();
@@ -2369,6 +2381,138 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
     this.buildActiveFilters();
     this.obtenerComprasPorFiltroAvanzado();
+  }
+
+  borrarArchivo() {
+    this.archivoSeleccionado = undefined;
+    this.imagenPreview = null;
+    this.archivoForm.get('archivo')?.setValue(null);
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  isInvalidArchivo(): boolean {
+    return (this.isSubmit && (this.archivoSeleccionado == null || this.archivoSeleccionado == undefined));
+  }
+
+  onArchivoSeleccionado(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.setFile(input.files[0]);
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  onFileDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+
+    if (event.dataTransfer?.files.length) {
+      this.setFile(event.dataTransfer.files[0]);
+    }
+  }
+
+  private setFile(file: File) {
+    this.archivoSeleccionado = file;
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => this.imagenPreview = reader.result as string;
+      reader.readAsDataURL(file);
+    } else {
+      this.imagenPreview = null;
+    }
+  }
+
+  openModalArchivo() {
+    this.archivoForm = new FormGroup({
+      descripcion: new FormControl(null, Validators.required),
+      archivo: new FormControl(null, Validators.required)
+    });
+    this.modalArchivo.options = this.modalOptions;
+    this.modalArchivo.open();
+  }
+
+  cerrarModalArchivo() {
+    this.isSubmit = false;
+    this.archivoSeleccionado = undefined;
+    this.modalArchivo.close();
+  }
+
+  confirmarArchivo() {
+    this.isSubmit = true;
+    if (this.archivoForm.get('descripcion')?.valid && this.archivoSeleccionado !== null && this.archivoSeleccionado !== undefined) {
+      this.spinner.show();
+      let archivoDTO = new ArchivoDTO();
+      archivoDTO.actual_role = this.actual_role;
+      archivoDTO.description = this.archivoForm.get('descripcion')?.value;
+      archivoDTO.file = this.archivoSeleccionado;
+      this.subscription.add(
+        this._facturaService.saveFile(this.selectedCompra.transaction?.transaction_documents[0]?.uuid, archivoDTO).subscribe({
+          next: res => {
+            this.obtenerCompraPorId(this.uuidFromUrl);
+            this.cerrarModalArchivo();
+            this.tokenService.setToken(res.token);
+            this.spinner.hide();
+          },
+          error: error => {
+            this.swalService.toastError('top-right', error.error.message);
+            console.error(error);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
+  }
+
+  openSwalEliminarArchivo(archivo: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el archivo ${archivo.description}?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarArchivo(archivo);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarArchivo(archivo: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._facturaService.deleteFile(this.selectedCompra.transaction?.transaction_documents[0]?.uuid, archivo.uuid, this.actual_role.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerCompraPorId(this.uuidFromUrl);
+          this.tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this.swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
   }
 
 }

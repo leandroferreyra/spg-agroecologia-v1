@@ -1276,7 +1276,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   }
 
   getImageByType(mimeType: string): string {
-    if (!mimeType) return 'assets/images/files/other.png';
+    if (!mimeType) return '';
     mimeType = mimeType.toLowerCase();
     if (mimeType.includes('pdf')) {
       return 'assets/images/files/imagen-pdf.jpg';
@@ -1285,7 +1285,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     } else if (mimeType.includes('zip') || mimeType.includes('rar')) {
       return 'assets/images/files/imagen-rar.jpg';
     } else {
-      return 'assets/images/files/other.png';
+      return '';
     }
   }
 

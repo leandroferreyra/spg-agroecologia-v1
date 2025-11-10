@@ -309,6 +309,40 @@
                         }" class="form-input" formControlName="fechaFacturacion" />
                     </div>
                     <div>
+                        <label class="flex items-center font-medium mb-1">
+                            <span>Imagen de factura</span>
+                            @if (selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' ||
+                            selectedCompra?.transaction?.current_state?.state?.name === 'Entregada pendiente de
+                            factura') {
+                            @if (selectedCompra?.transaction?.transaction_documents[0]?.file) {
+                            <button type="button" ngxTippy="Eliminar imagen"
+                                (click)="openSwalEliminarArchivo(selectedCompra?.transaction?.transaction_documents[0]?.file)">
+                                <icon-trash-lines class="text-gray-600 cursor-pointer hover:text-red-600 ml-2" />
+                            </button>
+                            }
+                            }
+                        </label>
+                        @if (selectedCompra?.transaction?.transaction_documents[0]?.file) {
+                        @if (selectedCompra?.transaction?.transaction_documents[0]?.file.is_image) {
+                        <img [src]="selectedCompra?.transaction?.transaction_documents[0]?.file.thumbnail_url"
+                            alt="{{ selectedCompra?.transaction?.transaction_documents[0]?.file.description }}"
+                            (click)="abrirArchivo(selectedCompra?.transaction?.transaction_documents[0]?.file.url)"
+                            [ngxTippy]="selectedCompra?.transaction?.transaction_documents[0]?.file.description"
+                            class="h-[60px] w-auto mx-auto object-contain cursor-pointer" />
+                        }@else {
+                        <img [src]="getImageByType(selectedCompra?.transaction?.transaction_documents[0]?.file.mime_type)"
+                            [ngxTippy]="selectedCompra?.transaction?.transaction_documents[0]?.file.description"
+                            alt="{{ selectedCompra?.transaction?.transaction_documents[0]?.file.description }}"
+                            class="h-[60px] w-auto mx-auto object-contain cursor-pointer"
+                            (click)="abrirArchivo(selectedCompra?.transaction?.transaction_documents[0]?.file.url)" />
+                        }
+                        }@else {
+                        <span class="badge badge-outline-dark cursor-pointer" (click)="openModalArchivo();">
+                            Agregar imagen de factura
+                        </span>
+                        }
+                    </div>
+                    <div>
                         <label class="block font-medium">Tipo de comprobante</label>
                         <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
                             clearAllText="Limpiar" [virtualScroll]="true" notFoundText="No hay tipos de comprobante"
@@ -1351,6 +1385,80 @@
                     </button>
                     <button id="back-button-with-border" type="button" class="btn btn-wd"
                         (click)="cerrarModalControl()">Cancelar</button>
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<!-- MODAL ARCHIVO -->
+<div>
+    <ngx-custom-modal #modalArchivo class="modal-top animate extra-large-modal animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">Nuevo archivo</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="archivoForm" (keydown.enter)="confirmarArchivo()">
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? archivoForm.controls['descripcion'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Descripción</label>
+                                <input type="text" class="form-control" formControlName="descripcion">
+                            </div>
+
+                            <div class="mb-4 mt-4">
+                                <label class="block mb-1 text-sm font-medium">
+                                    Archivo
+                                    @if (archivoSeleccionado) {
+                                    <button type="button" class="text-red-500 hover:text-red-700"
+                                        (click)="borrarArchivo()" ngxTippy="Eliminar archivo">
+                                        ✕
+                                    </button>
+                                    }
+                                </label>
+
+                                <div class="dropzone" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                                    (drop)="onFileDrop($event)" [class.dragging]="isDragging">
+                                    @if (!archivoSeleccionado) {
+                                    <p>
+                                        Arrastrá y soltá tu archivo aquí<br>
+                                        <span class="text-sm text-gray-500">o hacé click para seleccionarlo</span>
+                                    </p>
+                                    } @else {
+                                    <p class="text-sm text-gray-700">
+                                        📎 {{ archivoSeleccionado.name }}
+                                    </p>
+                                    }
+                                    <input type="file" (change)="onArchivoSeleccionado($event)" class="file-input"
+                                        formControlName="archivo" accept="image/*,.pdf,.doc,.docx,.zip,.rar" />
+                                </div>
+
+                                <div *ngIf="isInvalidArchivo()" class="text-red-600 text-sm mt-1">
+                                    ⚠️ Debes seleccionar un archivo.
+                                </div>
+
+                                <img *ngIf="archivoSeleccionado && archivoSeleccionado.type.startsWith('image/')"
+                                    [src]="imagenPreview" class="w-20 h-20 object-cover mt-2 rounded" />
+                            </div>
+
+
+                            <div class="row mt-2">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarArchivo()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModalArchivo()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </ng-template>
