@@ -79,6 +79,8 @@ export class VentasComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
 
   archivoForm!: FormGroup;
+  tipoEliminacion: string = "comprobante | pago";
+
   archivoSeleccionado?: File;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   imagenPreview: string | null = null;
@@ -2122,7 +2124,8 @@ export class VentasComponent implements OnInit, OnDestroy {
     }
   }
 
-  openSwalEliminarArchivo(documento: any) {
+  openSwalEliminarArchivo(type: string = "comprobante | pago", documento: any) {
+    this.tipoEliminacion = type;
     Swal.fire({
       title: '',
       text: `¿Desea eliminar el archivo ${documento.file?.description}?`,
@@ -2147,7 +2150,7 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   eliminarArchivo(documento: any) {
     this.spinner.show();
-    if (this.archivoForm.get('type')?.value === 'comprobante') {
+    if (this.tipoEliminacion === 'comprobante') {
       this.subscription.add(
         this._transactionDocumentsService.deleteFile(documento.uuid, documento.file.uuid, this.actual_role.toUpperCase()).subscribe({
           next: res => {

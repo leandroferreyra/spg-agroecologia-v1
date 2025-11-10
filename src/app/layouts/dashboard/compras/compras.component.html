@@ -316,7 +316,7 @@
                             factura') {
                             @if (selectedCompra?.transaction?.transaction_documents[0]?.file) {
                             <button type="button" ngxTippy="Eliminar imagen"
-                                (click)="openSwalEliminarArchivo(selectedCompra?.transaction?.transaction_documents[0]?.file)">
+                                (click)="openSwalEliminarArchivo('factura', selectedCompra?.transaction?.transaction_documents[0])">
                                 <icon-trash-lines class="text-gray-600 cursor-pointer hover:text-red-600 ml-2" />
                             </button>
                             }
@@ -337,7 +337,8 @@
                             (click)="abrirArchivo(selectedCompra?.transaction?.transaction_documents[0]?.file.url)" />
                         }
                         }@else {
-                        <span class="badge badge-outline-dark cursor-pointer" (click)="openModalArchivo();">
+                        <span class="badge badge-outline-dark cursor-pointer"
+                            (click)="openModalArchivo('factura', null);">
                             Agregar imagen de factura
                         </span>
                         }
@@ -645,6 +646,7 @@
                                     <th class="px-2 py-1">Moneda</th>
                                     <th class="px-2 py-1">Importe</th>
                                     <th class="px-2 py-1">Tipo de cambio</th>
+                                    <th class="px-2 py-1">Thumbnail</th>
                                     <th class="px-2 py-1">
                                         Acciones
                                     </th>
@@ -659,6 +661,35 @@
                                     <td class="border px-2 py-1">{{ data.currency.name }}</td>
                                     <td class="border px-2 py-1"> {{ data.amount }} </td>
                                     <td class="border px-2 py-1">{{ data.exchange_rate }}</td>
+                                    <td class="border px-2 py-1">
+                                        @if (data.file) {
+                                        <div class="flex items-center justify-center space-x-2">
+                                            @if (data.file?.is_image) {
+                                            <img [src]="data.file.thumbnail_url" alt="{{ data.file.description }}"
+                                                (click)="abrirArchivo(data.file.url)" [ngxTippy]="data.file.description"
+                                                class="h-[100px] w-auto object-contain cursor-pointer" />
+                                            } @else {
+                                            <img [src]="getImageByType(data.file.mime_type)"
+                                                [ngxTippy]="data.file.description" alt="{{ data.file.description }}"
+                                                class="h-[100px] w-auto object-contain cursor-pointer"
+                                                (click)="abrirArchivo(data.file.url)" />
+                                            }
+
+                                            <button type="button" class="text-gray-600 hover:text-red-600 transition"
+                                                ngxTippy="Eliminar archivo"
+                                                (click)="openSwalEliminarArchivo('pago', data)">
+                                                <icon-trash-lines />
+                                            </button>
+                                        </div>
+                                        } @else {
+                                        <div class="text-center">
+                                            <button type="button" class="text-gray-600 hover:text-blue-600 transition"
+                                                ngxTippy="Agregar archivo" (click)="openModalArchivo('pago',data)">
+                                                <icon-file />
+                                            </button>
+                                        </div>
+                                        }
+                                    </td>
                                     <td class="border px-2 py-1">
                                         <div class="flex items-center">
                                             <div>

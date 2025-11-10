@@ -50,6 +50,7 @@ import { IconDollarSignComponent } from 'src/app/shared/icon/icon-dollar-sign';
 import { TiposCambioService } from 'src/app/core/services/tiposCambio.service';
 import { IconXComponent } from 'src/app/shared/icon/icon-x';
 import { ArchivoDTO } from 'src/app/core/models/request/archivoDTO';
+import { IconFileComponent } from 'src/app/shared/icon/icon-file';
 
 @Component({
   selector: 'app-compras',
@@ -57,7 +58,7 @@ import { ArchivoDTO } from 'src/app/core/models/request/archivoDTO';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgScrollbarModule, NgxTippyModule, IconMenuComponent, IconUserComponent,
     IconPlusComponent, IconSearchComponent, IconEditComponent, IconTrashLinesComponent, NgxCustomModalComponent, NgxSpinnerModule, IconSettingsComponent,
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, NgbPaginationModule, FlatpickrDirective,
-    IconPencilComponent, IconDollarSignComponent, IconXComponent
+    IconPencilComponent, IconDollarSignComponent, IconXComponent, IconFileComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './compras.component.html',
@@ -79,7 +80,7 @@ export class ComprasComponent implements OnInit, OnDestroy {
   controlTotalForm!: FormGroup;
   pagoForm!: FormGroup;
   archivoForm!: FormGroup;
-
+  tipoEliminacion: string = "factura | pago";
   // cargandoProductos: boolean = true;
   filtroSimpleName: string = '';
   filtroSimpleContiene: boolean = true;
@@ -2432,8 +2433,10 @@ export class ComprasComponent implements OnInit, OnDestroy {
     }
   }
 
-  openModalArchivo() {
+  openModalArchivo(type: string = "factura | pago", data: any) {
     this.archivoForm = new FormGroup({
+      type: new FormControl(type, []),
+      uuid: new FormControl(data?.uuid, []),
       descripcion: new FormControl(null, Validators.required),
       archivo: new FormControl(null, Validators.required)
     });
@@ -2455,28 +2458,48 @@ export class ComprasComponent implements OnInit, OnDestroy {
       archivoDTO.actual_role = this.actual_role;
       archivoDTO.description = this.archivoForm.get('descripcion')?.value;
       archivoDTO.file = this.archivoSeleccionado;
-      this.subscription.add(
-        this._facturaService.saveFile(this.selectedCompra.transaction?.transaction_documents[0]?.uuid, archivoDTO).subscribe({
-          next: res => {
-            this.obtenerCompraPorId(this.uuidFromUrl);
-            this.cerrarModalArchivo();
-            this.tokenService.setToken(res.token);
-            this.spinner.hide();
-          },
-          error: error => {
-            this.swalService.toastError('top-right', error.error.message);
-            console.error(error);
-            this.spinner.hide();
-          }
-        })
-      )
+      if (this.archivoForm.get('type')?.value === 'factura') {
+        this.subscription.add(
+          this._facturaService.saveFile(this.selectedCompra.transaction?.transaction_documents[0]?.uuid, archivoDTO).subscribe({
+            next: res => {
+              this.obtenerCompraPorId(this.uuidFromUrl);
+              this.cerrarModalArchivo();
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._pagoService.saveFile(this.archivoForm.get('uuid')?.value, archivoDTO).subscribe({
+            next: res => {
+              this.obtenerCompraPorId(this.uuidFromUrl);
+              this.cerrarModalArchivo();
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
+        )
+      }
     }
   }
 
-  openSwalEliminarArchivo(archivo: any) {
+  openSwalEliminarArchivo(type: string = "factura | pago", archivo: any) {
+    this.tipoEliminacion = type;
+    // this.archivoForm.get('type')?.setValue(type);
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el archivo ${archivo.description}?`,
+      text: `¿Desea eliminar el archivo ${archivo.file?.description}?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -2498,20 +2521,37 @@ export class ComprasComponent implements OnInit, OnDestroy {
 
   eliminarArchivo(archivo: any) {
     this.spinner.show();
-    this.subscription.add(
-      this._facturaService.deleteFile(this.selectedCompra.transaction?.transaction_documents[0]?.uuid, archivo.uuid, this.actual_role.toUpperCase()).subscribe({
-        next: res => {
-          this.obtenerCompraPorId(this.uuidFromUrl);
-          this.tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          console.error(error);
-          this.swalService.toastError('top-right', error.error.message);
-          this.spinner.hide();
-        }
-      })
-    )
+    if (this.tipoEliminacion === 'factura') {
+      this.subscription.add(
+        this._facturaService.deleteFile(archivo.uuid, archivo.file.uuid, this.actual_role.toUpperCase()).subscribe({
+          next: res => {
+            this.obtenerCompraPorId(this.uuidFromUrl);
+            this.tokenService.setToken(res.token);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.swalService.toastError('top-right', error.error.message);
+            this.spinner.hide();
+          }
+        })
+      )
+    } else {
+      this.subscription.add(
+        this._pagoService.deleteFile(archivo.uuid, archivo.file.uuid, this.actual_role.toUpperCase()).subscribe({
+          next: res => {
+            this.obtenerCompraPorId(this.uuidFromUrl);
+            this.tokenService.setToken(res.token);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.swalService.toastError('top-right', error.error.message);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
   }
 
 }
