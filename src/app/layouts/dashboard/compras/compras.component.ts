@@ -331,7 +331,6 @@ export class ComprasComponent implements OnInit, OnDestroy {
       this._comprasService.getCompraById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedCompra = res.data;
-          console.log("🚀 ~ ComprasComponent ~ obtenerCompraPorId ~ this.selectedCompra:", this.selectedCompra)
           this.obtenerPagos(this.selectedCompra?.transaction?.uuid);
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedCompra.uuid;

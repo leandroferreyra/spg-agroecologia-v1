@@ -312,6 +312,7 @@
                                 <tr>
                                     <th class="px-2 py-1">Código</th>
                                     <th class="px-2 py-1">Nombre</th>
+                                    <th class="px-2 py-1">Thumbnail</th>
                                     <th class="px-2 py-1">Lote/Partida</th>
                                     <th class="px-2 py-1">Número de serie</th>
                                     <th class="px-2 py-1">Cantidad adquirida</th>
@@ -328,6 +329,21 @@
                                     <td class="border px-2 py-1">{{ data.product.code }}</td>
                                     <td class="border px-2 py-1 hover:text-blue-600 hover:underline hover:cursor-pointer"
                                         (click)="irAlProducto($event, data.product)"> {{ data.product.name}}
+                                    </td>
+                                    <td class="border px-2 py-1">
+                                        @if (data.product?.first_file?.is_image) {
+                                        <img [src]="data.product?.first_file?.thumbnail_url"
+                                            alt="{{ data.product?.first_file?.description }}"
+                                            (click)="abrirArchivo(data.product?.first_file?.url)"
+                                            [ngxTippy]="data.product?.first_file?.description"
+                                            class="h-[100px] w-auto mx-auto object-contain cursor-pointer" />
+                                        }@else {
+                                        <img [src]="getImageByType(data.product?.first_file?.mime_type)"
+                                            [ngxTippy]="data.product?.first_file?.description"
+                                            alt="{{ data.product?.first_file?.description }}"
+                                            class="h-[100px] w-auto mx-auto object-contain cursor-pointer"
+                                            (click)="abrirArchivo(data.product?.first_file?.url)" />
+                                        }
                                     </td>
                                     <td class="border px-2 py-1" [ngClass]="{
                                                 'bg-yellow-100': data.product.traceable === 1 && !data.sale_product?.stock?.batch?.batch_identification
@@ -702,6 +718,24 @@
             <form [formGroup]="productoForm" class="p-1">
                 <div class="flex flex-col sm:flex-row">
                     <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
+
+                        @if (showThumbnail) {
+                        <div class="col-span-full flex justify-center">
+                            @if (productoForm.get('file')?.value?.is_image) {
+                            <img [src]="productoForm.get('file')?.value?.thumbnail_url"
+                                alt="{{ productoForm.get('file')?.value?.description }}"
+                                (click)="abrirArchivo(productoForm.get('file')?.value?.url)"
+                                [ngxTippy]="productoForm.get('file')?.value?.description"
+                                class="h-[100px] w-auto mx-auto object-contain cursor-pointer" />
+                            }@else {
+                            <img [src]="getImageByType(productoForm.get('file')?.value?.mime_type)"
+                                [ngxTippy]="productoForm.get('file')?.value?.description"
+                                alt="{{ productoForm.get('file')?.value?.description }}"
+                                class="h-[100px] w-auto mx-auto object-contain cursor-pointer"
+                                (click)="abrirArchivo(productoForm.get('file')?.value?.url)" />
+                            }
+                        </div>
+                        }
 
                         <div class="flex-grow-1">
                             <label>Producto</label>

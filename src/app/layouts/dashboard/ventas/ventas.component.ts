@@ -170,6 +170,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   showStocks: boolean = false;
   showSerialNumber: boolean = false;
   mostrarCantidad: boolean = false;
+  showThumbnail = false;
 
   // Manejo de filtros activos.
   activeFilters: Array<{ key: string; label: string; display: string }> = [];
@@ -241,7 +242,8 @@ export class VentasComponent implements OnInit, OnDestroy {
       "transaction.transactionProducts.product.productType",
       "transaction.transactionProducts.saleProduct.productInstances",
       "transaction.transactionProducts.saleProduct.stock.batch",
-      "transaction.currency"
+      "transaction.currency",
+      "transaction.transactionProducts.product.firstFile"
     ];
     this.params.paging = this.itemsPerPage;
     this.params.page = this.currentPage;
@@ -326,13 +328,10 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   obtenerProductos() {
     const params: any = {};
-    params.with = ["productType", "productCategory", "currentState", "productStates", "measure", "country", "stocks"];
+    params.with = ["productType", "productCategory", "currentState", "productStates", "measure", "country", "stocks", "firstFile"];
     params.paging = 20;
     params.page = null;
     params.order_by = {};
-    /* params.filters = {
-      'salable': { value: '1', op: '=', contiene: false }
-    }; */
 
     this.productos$ = this.productoInput$.pipe(
       debounceTime(300),
@@ -654,6 +653,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this._ventaService.getVentaById(uuid, this.actual_role).subscribe({
         next: res => {
           this.selectedVenta = res.data;
+          console.log("🚀 ~ VentasComponent ~ obtenerVentaPorId ~ this.selectedVenta:", this.selectedVenta)
           this.inicializarFormEdit();
           this.uuidFromUrl = this.selectedVenta.uuid;
           this.location.replaceState(`/dashboard/ventas/${this.selectedVenta.uuid}`);
@@ -1031,6 +1031,7 @@ export class VentasComponent implements OnInit, OnDestroy {
       this.inicializarFormProducto();
     } else {
       this.inEdicionProducto = true;
+      this.showThumbnail = true;
       this.inicializarFormProducto(producto);
       this.tituloModal = 'Edición de producto';
       this.showItems(producto);
@@ -1089,54 +1090,67 @@ export class VentasComponent implements OnInit, OnDestroy {
       quantity: new FormControl({ value: data ? this.showCantidad(data) : null, disabled: false }, []),
       unit_price: new FormControl(data ? data.unit_price : null, [Validators.required]),
       traceable: new FormControl(data ? data.traceable : null, []),
+      file: new FormControl({ value: data ? data.product?.first_file : null, disabled: false }, []),
     })
     this.onFormProductoChange();
   }
   onFormProductoChange() {
     this.productoForm.get('product_uuid')!.valueChanges.subscribe(
       (producto: any) => {
-        this.productoForm.get('traceable')?.setValue(producto.traceable);
-        this.obtenerStocks(producto);
-        if (producto.product_type?.stock_controlled === 1) {
-          this.productoForm.get('stock_uuid')?.setValue(null);
-          this.productoForm.get('serial_number')?.setValue(null);
-          this.showStocks = true;
-          if (producto.assign_serial_number === 0 && producto.has_serial_number === 0) {
-            // No asigna ni tiene por lo que pide cantidad
+        if (producto) {
+          this.productoForm.get('traceable')?.setValue(producto?.traceable);
+          this.obtenerStocks(producto);
+          if (producto.product_type?.stock_controlled === 1) {
+            this.productoForm.get('stock_uuid')?.setValue(null);
+            this.productoForm.get('serial_number')?.setValue(null);
+            this.showStocks = true;
+            if (producto.assign_serial_number === 0 && producto.has_serial_number === 0) {
+              // No asigna ni tiene por lo que pide cantidad
+              this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
+              this.mostrarCantidad = true;
+              this.showSerialNumber = false;
+              this.productoForm.get('quantity')?.setValue(null);
+              ['quantity'].forEach((field) => {
+                const control = this.productoForm.get(field);
+                control?.setValidators(Validators.required);
+                control?.updateValueAndValidity({ emitEvent: false });
+              });
+            } else {
+              // Asigna o tiene número de serie
+              this.mostrarCantidad = false;
+              this.placeholderCantidad = '';
+              this.showSerialNumber = true;
+              this.productoForm.get('quantity')?.setValue(1);
+              ['quantity'].forEach((field) => {
+                const control = this.productoForm.get(field);
+                control?.setValidators([]);
+                control?.updateValueAndValidity({ emitEvent: false });
+              });
+            }
+          } else {
             this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
             this.mostrarCantidad = true;
-            this.showSerialNumber = false;
             this.productoForm.get('quantity')?.setValue(null);
             ['quantity'].forEach((field) => {
               const control = this.productoForm.get(field);
               control?.setValidators(Validators.required);
               control?.updateValueAndValidity({ emitEvent: false });
             });
+            // No tiene stock controlled por lo que no muestra el select de stocks.
+            this.showStocks = false;
+            this.showSerialNumber = false;
+          }
+          // Mostrar thumbnail
+          this.productoForm.get('file')?.setValue(producto?.first_file);
+          if (producto?.first_file) {
+            this.showThumbnail = true;
           } else {
-            // Asigna o tiene número de serie
-            this.mostrarCantidad = false;
-            this.placeholderCantidad = '';
-            this.showSerialNumber = true;
-            this.productoForm.get('quantity')?.setValue(1);
-            ['quantity'].forEach((field) => {
-              const control = this.productoForm.get(field);
-              control?.setValidators([]);
-              control?.updateValueAndValidity({ emitEvent: false });
-            });
+            this.showThumbnail = false;
           }
         } else {
-          this.placeholderCantidad = 'Cantidad en ' + producto.measure?.name;
-          this.mostrarCantidad = true;
-          this.productoForm.get('quantity')?.setValue(null);
-          ['quantity'].forEach((field) => {
-            const control = this.productoForm.get(field);
-            control?.setValidators(Validators.required);
-            control?.updateValueAndValidity({ emitEvent: false });
-          });
-          // No tiene stock controlled por lo que no muestra el select de stocks.
-          this.showStocks = false;
-          this.showSerialNumber = false;
+          this.showThumbnail = false;
         }
+
       });
 
     this.productoForm.get('stock_uuid')!.valueChanges.subscribe(
@@ -1347,6 +1361,7 @@ export class VentasComponent implements OnInit, OnDestroy {
   cerrarModalProducto() {
     this.isSubmit = false;
     this.inEdicionProducto = false;
+    this.showThumbnail = false;
     this.showStocks = false;
     this.mostrarCantidad = false;
     this.showSerialNumber = false;
@@ -2018,6 +2033,24 @@ export class VentasComponent implements OnInit, OnDestroy {
 
     this.buildActiveFilters();
     this.obtenerVentasPorFiltroAvanzado();
+  }
+
+  getImageByType(mimeType: string): string {
+    if (!mimeType) return '';
+    mimeType = mimeType.toLowerCase();
+    if (mimeType.includes('pdf')) {
+      return 'assets/images/files/imagen-pdf.jpg';
+    } else if (mimeType.includes('word') || mimeType.includes('doc')) {
+      return 'assets/images/files/imagen-word.png';
+    } else if (mimeType.includes('zip') || mimeType.includes('rar')) {
+      return 'assets/images/files/imagen-rar.jpg';
+    } else {
+      return '';
+    }
+  }
+  abrirArchivo(url: string) {
+    if (!url) return;
+    window.open(url, '_blank');
   }
 
 }
