@@ -444,6 +444,7 @@
                                     <td class="border px-2 py-1">{{ showPrecioTotal(data) }}</td>
                                     <td class="border px-2 py-1">{{ data.product.vat_percent }}</td>
                                     <td class="border px-2 py-1">
+                                        @if (data.product?.first_file) {
                                         @if (data.product?.first_file?.is_image) {
                                         <img [src]="data.product?.first_file?.thumbnail_url"
                                             alt="{{ data.product?.first_file?.description }}"
@@ -456,6 +457,7 @@
                                             alt="{{ data.product?.first_file?.description }}"
                                             class="h-[100px] w-auto mx-auto object-contain cursor-pointer"
                                             (click)="abrirArchivo(data.product?.first_file?.url)" />
+                                        }
                                         }
                                     </td>
                                     <td class="border px-2 py-1">{{ data.product.control_description }}</td>
