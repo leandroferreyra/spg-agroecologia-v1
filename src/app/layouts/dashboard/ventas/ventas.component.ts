@@ -2061,8 +2061,9 @@ export class VentasComponent implements OnInit, OnDestroy {
     window.open(url, '_blank');
   }
 
-  openModalArchivo(data: any) {
+  openModalArchivo(type: string = 'comprobante | pago', data: any) {
     this.archivoForm = new FormGroup({
+      type: new FormControl(type, Validators.required),
       transactionDocumentUuid: new FormControl(data.uuid, Validators.required),
       descripcion: new FormControl(null, Validators.required),
       archivo: new FormControl(null, Validators.required)
@@ -2085,21 +2086,39 @@ export class VentasComponent implements OnInit, OnDestroy {
       archivoDTO.actual_role = this.actual_role;
       archivoDTO.description = this.archivoForm.get('descripcion')?.value;
       archivoDTO.file = this.archivoSeleccionado;
-      this.subscription.add(
-        this._transactionDocumentsService.saveFile(this.archivoForm.get('transactionDocumentUuid')?.value, archivoDTO).subscribe({
-          next: res => {
-            this.obtenerVentaPorId(this.uuidFromUrl);
-            this.cerrarModalArchivo();
-            this.tokenService.setToken(res.token);
-            this.spinner.hide();
-          },
-          error: error => {
-            this.swalService.toastError('top-right', error.error.message);
-            console.error(error);
-            this.spinner.hide();
-          }
-        })
-      )
+      if (this.archivoForm.get('type')?.value === 'comprobante') {
+        this.subscription.add(
+          this._transactionDocumentsService.saveFile(this.archivoForm.get('transactionDocumentUuid')?.value, archivoDTO).subscribe({
+            next: res => {
+              this.obtenerVentaPorId(this.uuidFromUrl);
+              this.cerrarModalArchivo();
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
+        )
+      } else {
+        this.subscription.add(
+          this._pagoService.saveFile(this.archivoForm.get('transactionDocumentUuid')?.value, archivoDTO).subscribe({
+            next: res => {
+              this.obtenerVentaPorId(this.uuidFromUrl);
+              this.cerrarModalArchivo();
+              this.tokenService.setToken(res.token);
+              this.spinner.hide();
+            },
+            error: error => {
+              this.swalService.toastError('top-right', error.error.message);
+              console.error(error);
+              this.spinner.hide();
+            }
+          })
+        )
+      }
     }
   }
 
@@ -2128,20 +2147,37 @@ export class VentasComponent implements OnInit, OnDestroy {
 
   eliminarArchivo(documento: any) {
     this.spinner.show();
-    this.subscription.add(
-      this._transactionDocumentsService.deleteFile(documento.uuid, documento.file.uuid, this.actual_role.toUpperCase()).subscribe({
-        next: res => {
-          this.obtenerVentaPorId(this.uuidFromUrl);
-          this.tokenService.setToken(res.token);
-          this.spinner.hide();
-        },
-        error: error => {
-          console.error(error);
-          this.swalService.toastError('top-right', error.error.message);
-          this.spinner.hide();
-        }
-      })
-    )
+    if (this.archivoForm.get('type')?.value === 'comprobante') {
+      this.subscription.add(
+        this._transactionDocumentsService.deleteFile(documento.uuid, documento.file.uuid, this.actual_role.toUpperCase()).subscribe({
+          next: res => {
+            this.obtenerVentaPorId(this.uuidFromUrl);
+            this.tokenService.setToken(res.token);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.swalService.toastError('top-right', error.error.message);
+            this.spinner.hide();
+          }
+        })
+      )
+    } else {
+      this.subscription.add(
+        this._pagoService.deleteFile(documento.uuid, documento.file.uuid, this.actual_role.toUpperCase()).subscribe({
+          next: res => {
+            this.obtenerVentaPorId(this.uuidFromUrl);
+            this.tokenService.setToken(res.token);
+            this.spinner.hide();
+          },
+          error: error => {
+            console.error(error);
+            this.swalService.toastError('top-right', error.error.message);
+            this.spinner.hide();
+          }
+        })
+      )
+    }
   }
 
   borrarArchivo() {
