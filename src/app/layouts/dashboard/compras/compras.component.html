@@ -317,7 +317,6 @@
                     </div>
 
                     <div>
-                        <!-- Encabezado con “Archivo” + ícono -->
                         <div class="flex items-center mb-1">
                             <label class="font-medium">Archivo</label>
                             @if (
@@ -334,7 +333,6 @@
                             }
                         </div>
 
-                        <!-- Imagen del archivo -->
                         @if (selectedCompra?.transaction?.transaction_documents[0]?.file) {
                         @if (selectedCompra?.transaction?.transaction_documents[0]?.file.is_image) {
                         <img [src]="selectedCompra?.transaction?.transaction_documents[0]?.file.thumbnail_url"
