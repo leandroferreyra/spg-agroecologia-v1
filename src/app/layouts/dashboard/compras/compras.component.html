@@ -295,6 +295,13 @@
                                 <icon-dollar-sign class="w-7 h-7" />
                             </button>
                         </div>
+                        <div>
+                            <button type="button" class="text-gray-600 hover:text-blue-600 transition"
+                                [disabled]="!selectedCompra?.transaction?.transaction_documents[0]"
+                                ngxTippy="Agregar archivo" (click)="openModalArchivo('factura',null)">
+                                <icon-file class="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
 
                 </legend>
@@ -308,20 +315,26 @@
                             enableSeconds: false
                         }" class="form-input" formControlName="fechaFacturacion" />
                     </div>
+
                     <div>
-                        <label class="flex items-center font-medium mb-1">
-                            <span>Imagen de factura</span>
-                            @if (selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' ||
-                            selectedCompra?.transaction?.current_state?.state?.name === 'Entregada pendiente de
-                            factura') {
+                        <!-- Encabezado con “Archivo” + ícono -->
+                        <div class="flex items-center mb-1">
+                            <label class="font-medium">Archivo</label>
+                            @if (
+                            selectedCompra?.transaction?.current_state?.state?.name === 'Borrador' ||
+                            selectedCompra?.transaction?.current_state?.state?.name === 'Entregada pendiente de factura'
+                            ) {
                             @if (selectedCompra?.transaction?.transaction_documents[0]?.file) {
-                            <button type="button" ngxTippy="Eliminar imagen"
+                            <button type="button" class="mb-2 ml-2 text-gray-600 hover:text-red-600 transition"
+                                ngxTippy="Eliminar archivo"
                                 (click)="openSwalEliminarArchivo('factura', selectedCompra?.transaction?.transaction_documents[0])">
-                                <icon-trash-lines class="text-gray-600 cursor-pointer hover:text-red-600 ml-2" />
+                                <icon-trash-lines />
                             </button>
                             }
                             }
-                        </label>
+                        </div>
+
+                        <!-- Imagen del archivo -->
                         @if (selectedCompra?.transaction?.transaction_documents[0]?.file) {
                         @if (selectedCompra?.transaction?.transaction_documents[0]?.file.is_image) {
                         <img [src]="selectedCompra?.transaction?.transaction_documents[0]?.file.thumbnail_url"
@@ -329,20 +342,17 @@
                             (click)="abrirArchivo(selectedCompra?.transaction?.transaction_documents[0]?.file.url)"
                             [ngxTippy]="selectedCompra?.transaction?.transaction_documents[0]?.file.description"
                             class="h-[60px] w-auto mx-auto object-contain cursor-pointer" />
-                        }@else {
+                        } @else {
                         <img [src]="getImageByType(selectedCompra?.transaction?.transaction_documents[0]?.file.mime_type)"
                             [ngxTippy]="selectedCompra?.transaction?.transaction_documents[0]?.file.description"
                             alt="{{ selectedCompra?.transaction?.transaction_documents[0]?.file.description }}"
                             class="h-[60px] w-auto mx-auto object-contain cursor-pointer"
                             (click)="abrirArchivo(selectedCompra?.transaction?.transaction_documents[0]?.file.url)" />
                         }
-                        }@else {
-                        <span class="badge badge-outline-dark cursor-pointer"
-                            (click)="openModalArchivo('factura', null);">
-                            Agregar imagen de factura
-                        </span>
                         }
                     </div>
+
+
                     <div>
                         <label class="block font-medium">Tipo de comprobante</label>
                         <ng-select [items]="tiposDocumentosContables" bindLabel="name" bindValue="uuid"
