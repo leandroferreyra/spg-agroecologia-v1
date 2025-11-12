@@ -316,7 +316,7 @@
                         }" class="form-input" formControlName="fechaFacturacion" />
                     </div>
 
-                    <div>
+                    <div class="flex items-start">
                         <div class="flex items-center mb-1">
                             <label class="font-medium">Archivo</label>
                             @if (
@@ -333,6 +333,7 @@
                             }
                         </div>
 
+                        <div class="flex w-100 mt-1">
                         @if (selectedCompra?.transaction?.transaction_documents[0]?.file) {
                         @if (selectedCompra?.transaction?.transaction_documents[0]?.file.is_image) {
                         <img [src]="selectedCompra?.transaction?.transaction_documents[0]?.file.thumbnail_url"
@@ -348,6 +349,7 @@
                             (click)="abrirArchivo(selectedCompra?.transaction?.transaction_documents[0]?.file.url)" />
                         }
                         }
+                        </div>
                     </div>
 
 
