@@ -4,3 +4,34 @@
   display: none !important;
 }
 
+/* Ancho fijo para cada slide del swiper de imágenes */
+#slider5 .swiper-slide {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+/* Padding para evitar que las imágenes se superpongan con los botones de navegación */
+#slider5 .swiper-wrapper {
+  padding-left: 1.7rem;
+  padding-right: 1.7rem;
+}
+
+/* Estilos para la barra de scroll del swiper */
+#slider5 .swiper-scrollbar {
+  position: relative;
+  margin-top: 1rem;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+#slider5 .swiper-scrollbar-drag {
+  background: #4361ee;
+  border-radius: 10px;
+  cursor: grab;
+}
+
+#slider5 .swiper-scrollbar-drag:active {
+  cursor: grabbing;
+}
+

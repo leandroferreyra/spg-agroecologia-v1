@@ -53,7 +53,7 @@ import { ProduccionesComponent } from './producciones/producciones.component';
 import { TipoProductoService } from 'src/app/core/services/tipoProducto.service';
 import { ArchivosComponent } from './archivos/archivos.component';
 import Swiper from 'swiper';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation, Scrollbar } from 'swiper/modules';
 import { IconXComponent } from 'src/app/shared/icon/icon-x';
 
 @Component({
@@ -197,17 +197,13 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   inicializarSwiper() {
     this.swiper5 = new Swiper('#slider5', {
-      modules: [Navigation, Pagination],
+      modules: [Navigation, Scrollbar],
       navigation: { nextEl: '.swiper-button-next-ex5', prevEl: '.swiper-button-prev-ex5' },
-      breakpoints: {
-        1024: { slidesPerView: 4, spaceBetween: 30 },
-        768: { slidesPerView: 3, spaceBetween: 40 },
-        320: { slidesPerView: 2, spaceBetween: 20 },
-      },
-      pagination: {
-        el: '#slider5 .swiper-pagination',
-        type: 'bullets',
-        clickable: true
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      scrollbar: {
+        el: '#slider5 .swiper-scrollbar',
+        draggable: true
       }
     });
   }
