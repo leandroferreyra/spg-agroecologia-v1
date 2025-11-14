@@ -313,7 +313,7 @@
                         <div class="flex flex-col sm:flex-row">
                             <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
 
-                                <div (keydown.enter)="confirmarProducto(productoForm)">
+                                <div class="sm:col-span-2" (keydown.enter)="confirmarProducto(productoForm)">
                                     <label for="nombre">Nombre</label>
                                     <input id="nombre" type="text" placeholder="" class="form-control"
                                         formControlName="nombre" />
