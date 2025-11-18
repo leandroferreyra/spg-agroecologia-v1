@@ -445,6 +445,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   private buildProductoForm(producto: any): FormGroup {
     return new FormGroup({
       nombre: new FormControl({ value: producto?.name, disabled: !this.isEdicion }, [Validators.required]),
+      numeroproducto: new FormControl({ value: producto?.number, disabled: true }, []),
       codigo: new FormControl({ value: producto?.code, disabled: !this.isEdicion }),
       tipoProducto: new FormControl({ value: producto?.product_type, disabled: !this.isEdicion }, [Validators.required]),
       categoria: new FormControl({ value: producto?.product_category?.uuid, disabled: !this.isEdicion }),
