@@ -1,0 +1,323 @@
+<div class="panel mt-6 pb-2">
+
+    <div class="mb-2 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <h5 class="text-lg font-semibold dark:text-white-light">Reservas</h5>
+
+            <button type="button" ngxTippy="Agregar reserva" (click)="openModalRegistro('NEW', 'Reserva')">
+                <icon-plus />
+            </button>
+        </div>
+
+        <button type="button" (click)="toggleReservas()" class="text-sm hover:underline flex items-center gap-1"
+            style="color:#000000a3" [ngxTippy]="getMostrarOcultarTooltipReservas()">
+            <fa-icon [icon]="mostrarReservas ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
+        </button>
+    </div>
+
+
+    @if (mostrarReservas) {
+    @if (reservas && reservas.length > 0) {
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>Fecha de excepción</th>
+                    <th>Lote</th>
+                    <th>Instancias de producto</th>
+                    <th>Usuario responsable</th>
+                    <th>Cantidad</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of reservas | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ showFecha(data.detection_datetime)}} </td>
+                    <td class="whitespace-nowrap">{{ data.stock?.batch?.batch_identification}} </td>
+                    <td class="whitespace-nowrap">
+                        {{ getSerials(data.product_instances) }}
+                    </td>
+                    <td class="whitespace-nowrap">{{ data.responsible_user?.user_name}} </td>
+                    <td class="whitespace-nowrap">{{ showCantidad(data.stock, data.quantity)}} </td>
+                    <td class="whitespace-nowrap">{{ data.description}} </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalRegistro('EDIT', data.record_type, data)">
+                                    <icon-pencil />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+    }@else{
+    <div
+        class="mb-2 flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee reservas</strong></span>
+    </div>
+    }
+    }
+
+</div>
+
+<div class="panel mt-3 pb-2">
+
+    <div class="mb-2 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <h5 class="text-lg font-semibold dark:text-white-light">Muestras</h5>
+
+            <button type="button" ngxTippy="Agregar muestra" (click)="openModalRegistro('NEW', 'Muestra')">
+                <icon-plus />
+            </button>
+        </div>
+
+        <button type="button" (click)="toggleMuestras()" class="text-sm hover:underline flex items-center gap-1"
+            style="color:#000000a3" [ngxTippy]="getMostrarOcultarTooltipMuestras()">
+            <fa-icon [icon]="mostrarMuestras ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
+        </button>
+    </div>
+
+    @if(mostrarMuestras) {
+    @if (muestras && muestras.length > 0) {
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>Fecha de excepción</th>
+                    <th>Lote</th>
+                    <th>Intancias de producto</th>
+                    <th>Usuario responsable</th>
+                    <th>Cantidad</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of muestras | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ showFecha(data.detection_datetime)}} </td>
+                    <td class="whitespace-nowrap">{{ data.stock?.batch?.batch_identification}} </td>
+                    <td class="whitespace-nowrap">
+                        {{ getSerials(data.product_instances) }}
+                    </td>
+                    <td class="whitespace-nowrap">{{ data.responsible_user?.user_name}} </td>
+                    <td class="whitespace-nowrap">{{ showCantidad(data.stock, data.quantity)}} </td>
+                    <td class="whitespace-nowrap">{{ data.description}} </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalRegistro('EDIT', data.record_type, data)">
+                                    <icon-pencil />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+    }@else {
+    <div
+        class="mb-2 flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee muestras</strong></span>
+    </div>
+    }
+    }
+
+</div>
+
+<div class="panel mt-3 pb-2">
+
+    <div class="mb-2 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <h5 class="text-lg font-semibold dark:text-white-light">No conformidades</h5>
+
+            <button type="button" ngxTippy="Agregar no conformidad"
+                (click)="openModalRegistro('NEW', 'No conformidad')">
+                <icon-plus />
+            </button>
+        </div>
+
+        <button type="button" (click)="toggleNoConformidades()" class="text-sm hover:underline flex items-center gap-1"
+            style="color:#000000a3" [ngxTippy]="getMostrarOcultarTooltipNoConformidades()">
+            <fa-icon [icon]="mostrarNoConformidades ? iconEyeSlash : iconEye" style="cursor: pointer;"></fa-icon>
+        </button>
+    </div>
+
+    @if(mostrarNoConformidades) {
+    @if(noConformidades && noConformidades.length > 0) {
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>Fecha de excepción</th>
+                    <th>Lote</th>
+                    <th>Intancias de producto</th>
+                    <th>Usuario responsable</th>
+                    <th>Cantidad</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(data of noConformidades | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ showFecha(data.detection_datetime)}} </td>
+                    <td class="whitespace-nowrap">{{ data.stock?.batch?.batch_identification}} </td>
+                    <td class="whitespace-nowrap">
+                        {{ getSerials(data.product_instances) }}
+                    </td>
+                    <td class="whitespace-nowrap">{{ data.responsible_user?.user_name}} </td>
+                    <td class="whitespace-nowrap">{{ showCantidad(data.stock, data.quantity)}} </td>
+                    <td class="whitespace-nowrap">{{ data.description}} </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalRegistro('EDIT', data.record_type, data)">
+                                    <icon-pencil />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+    }@else {
+    <div
+        class="mb-2 flex justify-content-center items-center p-3.5 rounded text-primary bg-primary-light dark:bg-primary-dark-light">
+        <span class="ltr:pr-2 rtl:pl-2"><strong class="ltr:mr-1 rtl:ml-1"> No posee no conformidades</strong></span>
+    </div>
+    }
+    }
+
+</div>
+
+
+<div>
+    <ngx-custom-modal #modalExcepcion class=" modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <div class="position-relative text-center w-100">
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
+            </div>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="registroForm">
+
+
+                            <div
+                                [ngClass]="isSubmit ? registroForm.controls['record_type'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Tipo de registro</label>
+                                <ng-select [items]="['Reserva', 'Muestra', 'No conformidad']"
+                                    formControlName="record_type" [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? registroForm.controls['record_type'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? registroForm.controls['detection_datetime'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Fecha de detección</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                                enableTime: false, 
+                                                dateFormat: 'd-m-Y',
+                                                time24hr: true,
+                                                enableSeconds: false
+                                            }" class="form-input" formControlName="detection_datetime" />
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? registroForm.controls['stock_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Stocks</label>
+                                <ng-select [items]="stocks" formControlName="stock_uuid" [virtualScroll]="true"
+                                    [appendTo]="'body'" bindLabel="nombreCompleto" [compareWith]="compararStocks"
+                                    [ngClass]="isSubmit ? registroForm.controls['stock_uuid'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? registroForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Cantidad</label>
+                                <input type="number" class="form-control" formControlName="quantity">
+                            </div>
+
+                            @if (requiereInstancias) {
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? registroForm.controls['product_instance_uuids'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Instancias de producto</label>
+                                <ng-select [items]="instanciasProducto" formControlName="product_instance_uuids"
+                                    [virtualScroll]="true" [appendTo]="'body'" bindLabel="serial_number"
+                                    bindValue="uuid" multiple="true" closeOnSelect="false"
+                                    [maxSelectedItems]="registroForm.controls['quantity'].value"
+                                    [ngClass]="isSubmit ? registroForm.controls['product_instance_uuids'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+                            }
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? registroForm.controls['description'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="description">Descripción</label>
+                                <textarea class="form-control" id="description" formControlName="description"
+                                    rows="1"></textarea>
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? registroForm.controls['usuario'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Usuarios</label>
+                                <ng-select [items]="usuarios" formControlName="usuario" [virtualScroll]="true"
+                                    [appendTo]="'body'" bindLabel="user_name" bindValue="uuid"
+                                    [ngClass]="isSubmit ? registroForm.controls['usuario'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button class="btn btn-primary mr-3" (click)="confirmarRegistroCalidad()">
+                                        Confirmar
+                                    </button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>

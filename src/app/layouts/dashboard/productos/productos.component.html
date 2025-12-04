@@ -304,6 +304,15 @@
                     Archivos
                 </a>
 
+                <a href="javascript:;" class="flex items-center border-transparent bg-[#f6f7f8] p-7 py-3 !outline-none transition duration-300 hover:border-secondary 
+                    hover:text-secondary border-b-2 border-t-2 dark:bg-transparent dark:hover:bg-[#191e3a]" [ngClass]="{
+                            '!border-b-4 !border-t-4 !border-secondary text-secondary font-semibold bg-white shadow-md':
+                            tab1.toLowerCase() === 'excepciones-stock',
+                            'cursor-not-allowed tab-disabled': isTabDisabled('excepciones-stock')
+                        }" (click)="!isTabDisabled('excepciones-stock') && cambiarTab('excepciones-stock')">
+                    Excepciones de stock
+                </a>
+
             </div>
 
             <div class="flex-1 text-sm">
@@ -848,6 +857,12 @@
                     <app-archivos [producto]="selectedProducto" [rol]="actual_role"
                         (eventArchivo)="actualizarProducto()">
                     </app-archivos>
+                </div>
+
+                <div *ngIf="tab1.toLowerCase() === 'excepciones-stock'">
+                    <app-excepciones-stock [producto]="selectedProducto" [rol]="actual_role"
+                        (eventArchivo)="actualizarProducto()">
+                    </app-excepciones-stock>
                 </div>
 
             </div>

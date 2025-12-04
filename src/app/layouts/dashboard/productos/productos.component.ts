@@ -55,6 +55,7 @@ import { ArchivosComponent } from './archivos/archivos.component';
 import Swiper from 'swiper';
 import { Navigation, Scrollbar } from 'swiper/modules';
 import { IconXComponent } from 'src/app/shared/icon/icon-x';
+import { ExcepcionesStockComponent } from './excepciones-stock/excepciones-stock.component';
 
 @Component({
   selector: 'app-productos',
@@ -64,7 +65,7 @@ import { IconXComponent } from 'src/app/shared/icon/icon-x';
     NgSelectModule, IconHorizontalDotsComponent, MenuModule, FontAwesomeModule, CuentasBancariasComponent, ComprasProveedorComponent,
     ContactosComponent, ContactosPersonaComponent, IconSettingsComponent, NgbPaginationModule, ComponentesComponent, ComponenteDeComponent,
     ReemplazosComponent, ProveedoresProductoComponent, StocksComponent, ComprasProductoComponent, IconSettingsComponent,
-    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent, ProduccionesComponent, ArchivosComponent, IconXComponent
+    FlatpickrDirective, IconSearchComponent, IconInfoCircleComponent, ProduccionesComponent, ArchivosComponent, IconXComponent, ExcepcionesStockComponent
   ],
   animations: [toggleAnimation],
   templateUrl: './productos.component.html',
@@ -219,7 +220,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
     });
     this.route.queryParamMap.subscribe(params => {
       const tab = params.get('tab')?.toLowerCase();
-      const validTabs = ['datos-generales', 'componentes', 'componente-de', 'reemplazos', 'proveedores', 'stocks', 'compras', 'archivos'];
+      const validTabs = ['datos-generales', 'componentes', 'componente-de', 'reemplazos', 'proveedores', 'stocks', 'compras', 'archivos', 'excepciones-stock'];
       if (tab && validTabs.includes(tab)) {
         this.tab1 = tab;
       } else {
