@@ -154,7 +154,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
 
   obtenerStocks() {
     const params: any = {};
-    params.with = ["batch", "productInstances", "product"];
+    params.with = ["batch", "productInstances.qualityRecords", "product"];
     params.filters = {
       'product.uuid': { value: this.producto.uuid, op: '=', contiene: false },
       'product.productType.stock_controlled': { value: '1', op: '=', contiene: false },
