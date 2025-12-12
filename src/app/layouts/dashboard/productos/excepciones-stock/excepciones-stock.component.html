@@ -194,6 +194,12 @@
                     <td>
                         <div class="flex items-center">
                             <div>
+                                <button (click)="toggleNC(data)" class="ltr:mr-3 rtl:ml-2" ngxTippy="Disposiciones">
+                                    <icon-expand-item *ngIf="!expandedNC[data.uuid]" />
+                                    <icon-collapse-item *ngIf="expandedNC[data.uuid]" />
+                                </button>
+                            </div>
+                            <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
                                     (click)="openModalRegistro('EDIT', data.record_type, data)">
                                     <icon-pencil />
@@ -207,6 +213,70 @@
                         </div>
                     </td>
                 </tr>
+
+                @if (expandedNC[data.uuid]) {
+                <tr>
+                    <td colspan="7" class="bg-gray-50 p-3">
+                        <ng-container *ngIf="disposicionesPorNC[data.uuid]?.length; else sinDisp">
+                            <table class="w-full text-sm border border-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th colspan="8" class="bg-gray-200 italic font-semibold tracking-wide py-2">
+
+                                            <div class="flex items-center justify-center gap-2">
+                                                <span>Disposiciones</span>
+
+                                                <button type="button" ngxTippy="Agregar disposición"
+                                                    (click)="openModalDisposicion('NEW', data)"
+                                                    class="hover:text-blue-600">
+                                                    <icon-plus />
+                                                </button>
+                                            </div>
+
+                                        </th>
+
+                                    </tr>
+                                </thead>
+
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Responsable</th>
+                                        <th>Tipo de defecto</th>
+                                        <th>Disposición</th>
+                                        <th>Instrucciones</th>
+                                        <th class="text-center">Acción correlativa</th>
+                                        <th>Comentarios de acción correlativa</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @for (disp of disposicionesPorNC[data.uuid]; track disp.uuid) {
+                                    <!-- nivel 2 -->
+                                    <ng-container [ngTemplateOutlet]="disposicionRow"
+                                        [ngTemplateOutletContext]="{ disp: disp }">
+                                    </ng-container>
+                                    }
+                                </tbody>
+                            </table>
+                        </ng-container>
+
+                        <ng-template #sinDisp>
+                            <div class="flex items-center justify-center gap-2 text-gray-500 italic">
+                                <span>No posee disposiciones</span>
+
+                                <button type="button" ngxTippy="Agregar disposición"
+                                    (click)="openModalDisposicion('NEW', data)" class="hover:text-blue-600">
+                                    <icon-plus />
+                                </button>
+                            </div>
+
+                        </ng-template>
+                    </td>
+                </tr>
+                }
+
                 }
             </tbody>
         </table>
@@ -221,6 +291,125 @@
     }
 
 </div>
+
+<ng-template #disposicionRow let-disp="disp">
+
+    <tr>
+        <td> {{showFecha(disp.disposition_datetime)}} </td>
+        <td> {{disp.responsible_user?.user_name}} </td>
+        <td> {{disp.defect_type}} </td>
+        <td> {{disp.disposition_action}} </td>
+        <td> {{disp.disposition_instruction}} </td>
+        <td>
+            <div
+                class="flex items-center justify-center font-semibold  ltr:rounded-r-md ltr:border-l-0 rtl:rounded-l-md rtl:border-r-0">
+                <label class="relative mb-0 h-4 w-7 cursor-pointer">
+                    <input type="checkbox" [checked]="disp.corrective_action" [disabled]="true"
+                        class="peer absolute z-10 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
+                        id="custom_switch_checkbox2" />
+                    <span
+                        class="block h-full rounded-full border border-[#adb5bd] bg-blue before:absolute before:bottom-[2px] before:h-3 before:w-3 before:rounded-full before:bg-[#adb5bd] before:transition-all before:duration-300 peer-checked:border-primary peer-checked:bg-primary peer-checked:before:bg-white dark:bg-dark dark:before:bg-white-dark ltr:before:left-0.5 ltr:peer-checked:before:left-3.5 rtl:before:right-0.5 rtl:peer-checked:before:right-3.5"></span>
+                </label>
+            </div>
+        </td>
+        <td> {{disp.corrective_action_comments}} </td>
+        <td>
+            <div class="flex items-center">
+                <div>
+                    <button (click)="toggleND(disp)" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ejecuciones">
+                        <icon-expand-item *ngIf="!expandedND[disp.uuid]" />
+                        <icon-collapse-item *ngIf="expandedND[disp.uuid]" />
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
+                        <icon-pencil />
+                    </button>
+                </div>
+                <div>
+                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminarDisposicion(disp)">
+                        <icon-trash-lines />
+                    </button>
+                </div>
+            </div>
+        </td>
+    </tr>
+
+    @if (expandedND[disp.uuid]) {
+    <tr>
+        <td colspan="8" class="bg-gray-100 p-2">
+
+            @if (disp.disposition_executions?.length) {
+            <table class="w-full text-sm border border-gray-200">
+                <thead>
+                    <tr>
+                        <th colspan="8" class="bg-gray-200 italic font-semibold tracking-wide py-2">
+
+                            <div class="flex items-center justify-center gap-2">
+                                <span>Ejecuciones</span>
+
+                                <button type="button" ngxTippy="Agregar ejecución"
+                                    (click)="openModalEjecucion('NEW', disp)" class="hover:text-blue-600">
+                                    <icon-plus />
+                                </button>
+                            </div>
+
+                        </th>
+                    </tr>
+                </thead>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Responsable</th>
+                        <th>Acción ejecutada</th>
+                        <th>Cantidad</th>
+                        <th>Comentarios</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (ej of disp.disposition_executions; track ej.uuid) {
+                    <tr>
+                        <td>{{ showFecha(ej.execution_datetime) }}</td>
+                        <td>{{ ej.responsible_user?.user_name }}</td>
+                        <td>{{ ej.execution_action }}</td>
+                        <td>{{ ej.quantity }}</td>
+                        <td>{{ ej.execution_comments }}</td>
+                        <td>
+                            <div class="flex items-center">
+                                <div>
+                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
+                                        <icon-pencil />
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminarEjecucion(ej, disp)">
+                                        <icon-trash-lines />
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            } @else {
+            <div class="flex items-center justify-center gap-2 text-gray-500 italic">
+                <span>No posee ejecuciones</span>
+
+                <button type="button" ngxTippy="Agregar ejecución" (click)="openModalEjecucion('NEW', disp)"
+                    class="hover:text-blue-600">
+                    <icon-plus />
+                </button>
+            </div> }
+
+        </td>
+    </tr>
+    }
+
+</ng-template>
+
 
 
 <div>
@@ -310,6 +499,181 @@
                                     </button>
                                     <button id="back-button-with-border" type="button" class="btn btn-wd"
                                         (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<div>
+    <ngx-custom-modal #modalDisposicion class=" modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <div class="position-relative text-center w-100">
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
+            </div>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="disposicionForm">
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? disposicionForm.controls['disposition_datetime'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Fecha de disposicón</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                                enableTime: false, 
+                                                dateFormat: 'd-m-Y',
+                                                time24hr: true,
+                                                enableSeconds: false
+                                            }" class="form-input" formControlName="disposition_datetime" />
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? disposicionForm.controls['user'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Usuarios</label>
+                                <ng-select [items]="usuarios" formControlName="user" [virtualScroll]="true"
+                                    [appendTo]="'body'" bindLabel="user_name" bindValue="uuid"
+                                    [ngClass]="isSubmit ? disposicionForm.controls['user'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? disposicionForm.controls['defect_type'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Tipo de defecto</label>
+                                <ng-select [items]="['Crítico', 'Mayor', 'Visual']" formControlName="defect_type"
+                                    [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? disposicionForm.controls['defect_type'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? disposicionForm.controls['disposition_action'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Disposición</label>
+                                <ng-select [items]="['Corregir', 'Descartar']" formControlName="disposition_action"
+                                    [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? disposicionForm.controls['disposition_action'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? disposicionForm.controls['disposition_instruction'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="disposition_instruction">Instrucciones</label>
+                                <textarea class="form-control" id="disposition_instruction"
+                                    formControlName="disposition_instruction" rows="1"></textarea>
+                            </div>
+
+                            <div class="flex items-center gap-2 mt-3">
+                                <label>Acción correlativa</label>
+                                <label class="w-12 h-6 relative">
+                                    <input type="checkbox"
+                                        class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
+                                        formControlName="corrective_action" />
+                                    <span class="outline_checkbox bg-icon border-2 border-[#ebedf2] block h-full rounded-full before:absolute before:left-1
+          before:bg-[#ebedf2] before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7
+          peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300"></span>
+                                </label>
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? disposicionForm.controls['corrective_action_comments'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="corrective_action_comments">Comentarios de acción correctiva</label>
+                                <textarea class="form-control" id="corrective_action_comments"
+                                    formControlName="corrective_action_comments" rows="1"></textarea>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button class="btn btn-primary mr-3" (click)="confirmarDisposicion()">
+                                        Confirmar
+                                    </button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModalDisposicionOEjecucion()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+
+<div>
+    <ngx-custom-modal #modalEjecucion class=" modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <div class="position-relative text-center w-100">
+                <h5 class="text-lg font-semibold dark:text-white-light m-0">{{tituloModal}}</h5>
+            </div>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="ejecucionForm">
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? ejecucionForm.controls['execution_datetime'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Fecha de ejecución</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                                enableTime: false, 
+                                                dateFormat: 'd-m-Y',
+                                                time24hr: true,
+                                                enableSeconds: false
+                                            }" class="form-input" formControlName="execution_datetime" />
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? ejecucionForm.controls['user'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Usuarios</label>
+                                <ng-select [items]="usuarios" formControlName="user" [virtualScroll]="true"
+                                    [appendTo]="'body'" bindLabel="user_name" bindValue="uuid"
+                                    [ngClass]="isSubmit ? ejecucionForm.controls['user'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div
+                                [ngClass]="isSubmit ? ejecucionForm.controls['execution_action'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Acción ejecutada</label>
+                                <ng-select [items]="['Corregir', 'Descartar']" formControlName="execution_action"
+                                    [virtualScroll]="true" [appendTo]="'body'"
+                                    [ngClass]="isSubmit ? ejecucionForm.controls['execution_action'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? ejecucionForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="quantity">Cantidad</label>
+                                <input class="form-control" id="quantity" formControlName="quantity" />
+                            </div>
+
+                            <div class="mt-2"
+                                [ngClass]="isSubmit ? ejecucionForm.controls['execution_comments'].errors ? 'has-error' : 'has-success' : ''">
+                                <label for="execution_comments">Comentarios </label>
+                                <textarea class="form-control" id="execution_comments"
+                                    formControlName="execution_comments" rows="1"></textarea>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button class="btn btn-primary mr-3" (click)="confirmarEjecucion()">
+                                        Confirmar
+                                    </button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModalDisposicionOEjecucion()">Cancelar</button>
                                 </div>
                             </div>
 

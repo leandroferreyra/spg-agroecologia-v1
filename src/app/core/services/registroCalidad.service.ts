@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { RegistroCalidadDTO } from '../models/request/registroCalidadDTO';
+import { DisposicionDTO } from '../models/request/disposicionDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,8 @@ import { RegistroCalidadDTO } from '../models/request/registroCalidadDTO';
 export class RegistroCalidadService {
 
   private apiRegistros = '/quality_records';
+  private apiDisposiciones = '/dispositions';
+  private apiEjecucion = '/disposition_executions';
 
   constructor(private http: HttpClient) { }
 
@@ -29,6 +32,25 @@ export class RegistroCalidadService {
     const params = new HttpParams()
       .set('actual_role', rolActual);
     return this.http.delete<AuthResponse>(environment.baseUrl + this.apiRegistros + '/' + uuid, { headers, params });
+  }
+
+  saveDisposicion(disposicion: DisposicionDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiDisposiciones, JSON.stringify(disposicion), { headers });
+  }
+
+  eliminarDisposicion(uuid: string, rolActual: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .set('actual_role', rolActual);
+    return this.http.delete<AuthResponse>(environment.baseUrl + this.apiDisposiciones + '/' + uuid, { headers, params });
+  }
+
+  eliminarEjecucion(uuid: string, rolActual: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const params = new HttpParams()
+      .set('actual_role', rolActual);
+    return this.http.delete<AuthResponse>(environment.baseUrl + this.apiEjecucion + '/' + uuid, { headers, params });
   }
 
 }

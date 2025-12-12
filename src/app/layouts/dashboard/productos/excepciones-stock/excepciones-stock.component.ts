@@ -21,6 +21,9 @@ import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 import { format } from 'date-fns';
+import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
+import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-item';
+import { DisposicionDTO } from 'src/app/core/models/request/disposicionDTO';
 
 enum RecordType {
   Reserva = 'Reserva',
@@ -32,7 +35,7 @@ enum RecordType {
   selector: 'app-excepciones-stock',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxTippyModule, NgSelectModule, NgbPaginationModule, NgxSpinnerModule, IconPencilComponent,
-    IconTrashLinesComponent, FontAwesomeModule, IconPlusComponent, NgxCustomModalComponent, FlatpickrDirective],
+    IconTrashLinesComponent, FontAwesomeModule, IconPlusComponent, NgxCustomModalComponent, FlatpickrDirective, IconExpandItemComponent, IconCollapseItemComponent],
   templateUrl: './excepciones-stock.component.html',
   styleUrl: './excepciones-stock.component.css'
 })
@@ -62,10 +65,21 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
   muestras: any[] = [];
   noConformidades: any[] = [];
 
+  expandedRows: { [uuid: string]: boolean } = {};
+  isEditing: { [uuid: string]: boolean } = {};
+  disposiciones: any[] = [];
+
+  expandedNC: Record<string, boolean> = {};
+  expandedND: Record<string, boolean> = {};
+
+  disposicionesPorNC: Record<string, any[]> = {};
+
   usuarios: any[] = [];
   stocks: any[] = [];
 
   @ViewChild('modalExcepcion') modalExcepcion!: NgxCustomModalComponent;
+  @ViewChild('modalDisposicion') modalDisposicion!: NgxCustomModalComponent;
+  @ViewChild('modalEjecucion') modalEjecucion!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -73,6 +87,8 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
   };
 
   registroForm!: FormGroup;
+  disposicionForm!: FormGroup;
+  ejecucionForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
@@ -105,7 +121,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       this.filtros['stock.product.uuid'].value = this.producto.uuid;
       this.obtenerRegistrosCalidad();
       this.obtenerUsuarios();
-      this.obtenerStocks();
+
     }
   }
 
@@ -202,6 +218,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
 
 
   openModalRegistro(type: string, record_type: string, registro?: any) {
+    this.obtenerStocks();
     if (type === 'NEW') {
       this.isEdicion = false;
       this.tituloModal = 'Nuevo registro de calidad';
@@ -455,4 +472,247 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
   toggleNoConformidades() {
     this.mostrarNoConformidades = !this.mostrarNoConformidades;
   }
+
+  toggleNC(nc: any) {
+    const id = nc.uuid;
+    this.expandedNC[id] = !this.expandedNC[id];
+
+    if (this.expandedNC[id] && !this.disposicionesPorNC[id]) {
+      this.obtenerDisposiciones(id);
+    }
+  }
+
+  obtenerDisposiciones(noConformidadID: any) {
+    const params: any = {};
+    params.with = ["qualityRecord", "dispositionExecutions", "responsibleUser", "dispositionExecutions.responsibleUser"];
+    params.filters = {
+      'qualityRecord.uuid': { value: noConformidadID, op: '=', contiene: false }
+    };
+    params.ordenamiento = {
+      'disposition_datetime': 'asc'
+    };
+    params.paging = 10;
+    this.subscription.add(
+      this._indexService.getDisposiciones(params, this.rol).subscribe({
+        next: res => {
+          console.log(res);
+          this.disposicionesPorNC[noConformidadID] = res.data
+          this._tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          this._swalService.toastError('top-right', error.error.message);
+          console.error(error);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  toggleND(nd: any) {
+    this.expandedND[nd.uuid] = !this.expandedND[nd.uuid];
+  }
+
+  openModalDisposicion(type: string, noConformidad: any) {
+    if (type === 'NEW') {
+      this.inicializarFormDisposicion(noConformidad);
+      this.tituloModal = 'Nueva disposición';
+    } else {
+      this.tituloModal = 'Edición de disposición';
+    }
+    this.modalDisposicion.options = this.modalOptions;
+    this.modalDisposicion.open();
+  }
+
+  openModalEjecucion(type: string, disposicion: any) {
+    if (type === 'NEW') {
+      this.inicializarFormEjecucion(disposicion);
+      this.tituloModal = 'Nueva ejecució|n';
+    } else {
+      this.tituloModal = 'Edición de ejecución';
+    }
+    this.modalEjecucion.options = this.modalOptions;
+    this.modalEjecucion.open();
+  }
+
+  inicializarFormDisposicion(noConformidad: any) {
+    this.disposicionForm = new FormGroup({
+      quality_record_uuid: new FormControl({ value: noConformidad.uuid, disabled: false }, [Validators.required]),
+      disposition_datetime: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
+      defect_type: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      disposition_action: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      disposition_instruction: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      corrective_action: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      corrective_action_comments: new FormControl({ value: null, disabled: false }, []),
+      user: new FormControl({ value: null, disabled: false }, [Validators.required]),
+    })
+  }
+
+  inicializarFormEjecucion(disposicion: any) {
+    this.ejecucionForm = new FormGroup({
+      disposition_uuid: new FormControl({ value: disposicion.uuid, disabled: false }, [Validators.required]),
+      execution_datetime: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
+      execution_action: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      quantity: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      execution_comments: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      user: new FormControl({ value: null, disabled: false }, [Validators.required]),
+    })
+  }
+
+  confirmarDisposicion() {
+    this.isSubmit = true;
+    if (this.disposicionForm.valid) {
+      let disposicion = new DisposicionDTO();
+      disposicion.actual_role = this.rol;
+      disposicion.quality_record_uuid = this.disposicionForm.get('quality_record_uuid')?.value;
+      disposicion['user->responsible_user_uuid'] = this.disposicionForm.get('user')?.value;
+      const fechaFormateada = this.disposicionForm.get('disposition_datetime')?.value instanceof Date
+        ? format(this.disposicionForm.get('disposition_datetime')?.value, 'dd-MM-yyyy')
+        : this.disposicionForm.get('disposition_datetime')?.value;
+      disposicion.disposition_datetime = this.convertirFechaADateBackend(fechaFormateada);
+      disposicion.corrective_action = this.disposicionForm.get('corrective_action')?.value ?? false;
+      disposicion.corrective_action_comments = this.disposicionForm.get('corrective_action_comments')?.value;
+      disposicion.defect_type = this.disposicionForm.get('defect_type')?.value;
+      disposicion.disposition_action = this.disposicionForm.get('disposition_action')?.value;
+      disposicion.disposition_instruction = this.disposicionForm.get('disposition_instruction')?.value;
+      this.subscription.add(
+        this._registroService.saveDisposicion(disposicion).subscribe({
+          next: res => {
+            this.spinner.hide();
+            this._tokenService.setToken(res.token);
+            this.obtenerDisposiciones(this.disposicionForm.get('quality_record_uuid')?.value);
+            this.cerrarModalDisposicionOEjecucion();
+          },
+          error: error => {
+            this.spinner.hide();
+            console.error(error);
+            this._swalService.toastError('top-right', error.error.message);
+          }
+        })
+      );
+    }
+  }
+
+  cerrarModalDisposicionOEjecucion() {
+    this.modalDisposicion.close();
+    this.modalEjecucion.close();
+    this.isSubmit = false;
+  }
+
+  openSwalEliminarDisposicion(disposicion: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el disposicion?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarDisposicion(disposicion);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarDisposicion(disposicion: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._registroService.eliminarDisposicion(disposicion.uuid, this.rol.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerDisposiciones(disposicion.quality_record.uuid);
+          this._tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this._swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
+  confirmarEjecucion() {
+    this.isSubmit = true;
+    if (this.ejecucionForm.valid) {
+      // let disposicion = new DisposicionDTO();
+      // disposicion.actual_role = this.rol;
+      // disposicion.quality_record_uuid = this.disposicionForm.get('quality_record_uuid')?.value;
+      // disposicion['user->responsible_user_uuid'] = this.disposicionForm.get('user')?.value;
+      // const fechaFormateada = this.disposicionForm.get('disposition_datetime')?.value instanceof Date
+      //   ? format(this.disposicionForm.get('disposition_datetime')?.value, 'dd-MM-yyyy')
+      //   : this.disposicionForm.get('disposition_datetime')?.value;
+      // disposicion.disposition_datetime = this.convertirFechaADateBackend(fechaFormateada);
+      // disposicion.corrective_action = this.disposicionForm.get('corrective_action')?.value ?? false;
+      // disposicion.corrective_action_comments = this.disposicionForm.get('corrective_action_comments')?.value;
+      // disposicion.defect_type = this.disposicionForm.get('defect_type')?.value;
+      // disposicion.disposition_action = this.disposicionForm.get('disposition_action')?.value;
+      // disposicion.disposition_instruction = this.disposicionForm.get('disposition_instruction')?.value;
+      // this.subscription.add(
+      //   this._registroService.saveDisposicion(disposicion).subscribe({
+      //     next: res => {
+      //       this.spinner.hide();
+      //       this._tokenService.setToken(res.token);
+      //       this.obtenerDisposiciones(this.disposicionForm.get('quality_record_uuid')?.value);
+      //       this.cerrarModalDisposicionOEjecucion();
+      //     },
+      //     error: error => {
+      //       this.spinner.hide();
+      //       console.error(error);
+      //       this._swalService.toastError('top-right', error.error.message);
+      //     }
+      //   })
+      // );
+    }
+  }
+
+  openSwalEliminarEjecucion(ejecucion: any, disposicion: any) {
+    Swal.fire({
+      title: '',
+      text: `¿Desea eliminar el registro?`,
+      icon: 'info',
+      confirmButtonText: 'Confirmar',
+      showDenyButton: true,
+      denyButtonText: 'Cancelar',
+      didRender: () => {
+        const cancelButton = Swal.getDenyButton();
+        if (cancelButton) {
+          cancelButton.setAttribute('id', 'back-button-with-border');
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.eliminarEjecucion(ejecucion, disposicion);
+      } else if (result.isDenied) {
+
+      }
+    })
+  }
+
+  eliminarEjecucion(ejecucion: any, disposicion: any) {
+    this.spinner.show();
+    this.subscription.add(
+      this._registroService.eliminarEjecucion(ejecucion.uuid, this.rol.toUpperCase()).subscribe({
+        next: res => {
+          this.obtenerDisposiciones(disposicion.uuid);
+          this._tokenService.setToken(res.token);
+          this.spinner.hide();
+        },
+        error: error => {
+          console.error(error);
+          this._swalService.toastError('top-right', error.error.message);
+          this.spinner.hide();
+        }
+      })
+    )
+  }
+
 }

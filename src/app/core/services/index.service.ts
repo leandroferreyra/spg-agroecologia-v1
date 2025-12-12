@@ -52,6 +52,8 @@ export class IndexService {
   apiMissingFrozenComponentes = '/missing_frozen_components';
 
   apiRegistrosCalidad = '/quality_records';
+  apiDisposiciones = '/dispositions';
+
 
 
   constructor(private http: HttpClient) { }
@@ -406,6 +408,11 @@ export class IndexService {
   getRegistrosCalidad(paramsObj: any, rol: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiRegistrosCalidad, { headers, params: this.getNewParams(paramsObj, rol) });
+  }
+
+  getDisposiciones(paramsObj: any, rol: string): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<AuthResponse>(environment.baseUrl + this.apiDisposiciones, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
 }
