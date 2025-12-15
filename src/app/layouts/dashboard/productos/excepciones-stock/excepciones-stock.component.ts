@@ -128,7 +128,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
 
   obtenerRegistrosCalidad() {
     const params: any = {};
-    params.with = ["responsibleUser", "stock.product.measure", "stock.batch", "stock.productInstances", "productInstances"];
+    params.with = ["responsibleUser", "stock.product.measure", "stock.batch", "stock.productInstances.qualityRecords", "productInstances"];
     params.paging = this.itemsPerPage;
     params.page = this.currentPage;
     params.order_by = this.ordenamiento;
@@ -228,11 +228,29 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       this.isEdicion = true;
       this.tituloModal = 'Editar registro de calidad';
       this.requiereInstancias = registro?.product_instances?.length > 0;
-      this.instanciasProducto = this.requiereInstancias ? registro.stock?.product_instances : [];
+      // this.instanciasProducto = this.requiereInstancias ? registro.stock?.product_instances : [];
+      // Se arman las instancias según si las usa otro registro o no.
+      this.instanciasProducto = this.requiereInstancias
+        ? this.mapInstanciasEdicion(registro.stock?.product_instances, registro.uuid)
+        : [];
       this.inicializarForm(record_type, registro);
     }
     this.modalExcepcion.options = this.modalOptions;
     this.modalExcepcion.open();
+  }
+  mapInstanciasEdicion(instancias: any[], registroUuid: string) {
+    return instancias.map(instancia => {
+      const usadaPorOtro =
+        instancia.quality_records?.length > 0 &&
+        !instancia.quality_records.some(
+          (qr: any) => qr.uuid === registroUuid
+        );
+
+      return {
+        ...instancia,
+        disabled: usadaPorOtro
+      };
+    });
   }
 
   inicializarForm(record_type: string, registro?: any) {
@@ -259,7 +277,13 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
         }
         if (stock.product?.assign_serial_number === 1 || stock.product?.has_serial_number === 1) {
           this.requiereInstancias = true;
-          this.instanciasProducto = stock.product_instances;
+          // Se deshabilitan aquellas instancias que ya fueron seleccionadas por otro registro de calidad.
+          this.instanciasProducto = stock.product_instances.map((instancia: any) => ({
+            ...instancia,
+            disabled: Array.isArray(instancia.quality_records) &&
+              instancia.quality_records.length > 0
+          }));
+          // this.instanciasProducto = stock.product_instances;
         } else {
           this.requiereInstancias = false;
           this.instanciasProducto = [];
