@@ -71,7 +71,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
   disposiciones: any[] = [];
 
   expandedNC: Record<string, boolean> = {};
-  expandedND: Record<string, boolean> = {};
+  expandedDisposicion: Record<string, boolean> = {};
 
   disposicionesPorNC: Record<string, any[]> = {};
 
@@ -331,7 +331,6 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       this.isSubmit = true;
       this.confirmarNuevoRegistro();
     }
-
   }
 
   confirmarNuevoRegistro() {
@@ -427,6 +426,24 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     });
   }
 
+  armarDTOEdicionEjecucion(ejecucionDTO: EjecucionDTO) {
+    Object.keys(this.ejecucionForm.controls).forEach(key => {
+      const control = this.ejecucionForm.get(key);
+      if (!control) return;
+
+      if (!control?.pristine) {
+        if (key === 'execution_datetime') {
+          const fechaFormateada = control.value instanceof Date
+            ? format(control.value, 'dd-MM-yyyy')
+            : control.value;
+          ejecucionDTO[key] = this.convertirFechaADateBackend(fechaFormateada);
+        } else {
+          (ejecucionDTO as any)[key] = control.value;
+        }
+      }
+    });
+  }
+
   showFecha(dato: any) {
     const date = new Date(dato.replace(' ', 'T'));
     return date.toLocaleDateString('es-AR', {
@@ -510,8 +527,8 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     )
   }
 
-  toggleND(nd: any) {
-    this.expandedND[nd.uuid] = !this.expandedND[nd.uuid];
+  toggleDisposicion(disposicion: any) {
+    this.expandedDisposicion[disposicion.uuid] = !this.expandedDisposicion[disposicion.uuid];
   }
 
   openModalDisposicion(type: string, noConformidad: any) {
@@ -525,12 +542,15 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     this.modalDisposicion.open();
   }
 
-  openModalEjecucion(type: string, disposicion: any) {
+  openModalEjecucion(type: string, disposicion: any, ejecucion?: any) {
     if (type === 'NEW') {
       this.inicializarFormEjecucion(disposicion);
-      this.tituloModal = 'Nueva ejecució|n';
+      this.tituloModal = 'Nueva ejecución';
+      this.isEdicion = false;
     } else {
+      this.inicializarFormEjecucion(disposicion, ejecucion);
       this.tituloModal = 'Edición de ejecución';
+      this.isEdicion = true;
     }
     this.modalEjecucion.options = this.modalOptions;
     this.modalEjecucion.open();
@@ -549,16 +569,17 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     })
   }
 
-  inicializarFormEjecucion(disposicion: any) {
+  inicializarFormEjecucion(disposicion: any, ejecucion?: any) {
     this.ejecucionForm = new FormGroup({
+      ejecucion_uuid: new FormControl({ value: ejecucion.uuid, disabled: false }, []),
       quality_record_uuid: new FormControl({ value: disposicion.quality_record.uuid, disabled: false }, []),
       disposition_uuid: new FormControl({ value: disposicion.uuid, disabled: false }, [Validators.required]),
-      execution_datetime: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
-      execution_action: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      quantity: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      execution_datetime: new FormControl({ value: ejecucion ? this.showFecha(ejecucion.execution_datetime) : new Date(), disabled: false }, [Validators.required]),
+      execution_action: new FormControl({ value: ejecucion ? ejecucion.execution_action : null, disabled: false }, [Validators.required]),
+      quantity: new FormControl({ value: ejecucion ? ejecucion.quantity : null, disabled: false }, [Validators.required]),
       quantityNoConformidad: new FormControl({ value: disposicion.quality_record.quantity, disabled: false }, [Validators.required]),
-      execution_comments: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      user: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      execution_comments: new FormControl({ value: ejecucion ? ejecucion.execution_comments : null, disabled: false }, [Validators.required]),
+      user: new FormControl({ value: ejecucion ? ejecucion.responsible_user?.uuid : this.usuarioLogueado.uuid, disabled: false }, [Validators.required]),
     })
     this.initQuantityValidation();
   }
@@ -596,7 +617,6 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
 
     control.setErrors(Object.keys(rest).length ? rest : null);
   }
-
 
 
   confirmarDisposicion() {
@@ -681,7 +701,15 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
   }
 
   confirmarEjecucion() {
-    this.isSubmit = true;
+    if (this.isEdicion) {
+      this.confirmarEdicionEjecucion();
+    } else {
+      this.isSubmit = true;
+      this.confirmarNuevaEjecucion();
+    }
+  }
+
+  confirmarNuevaEjecucion() {
     if (this.ejecucionForm.valid) {
       this.spinner.show();
       let ejecucion = new EjecucionDTO();
@@ -697,6 +725,35 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       ejecucion.execution_comments = this.ejecucionForm.get('execution_comments')?.value;
       this.subscription.add(
         this._registroService.saveEjecucion(ejecucion).subscribe({
+          next: res => {
+            this.spinner.hide();
+            this._tokenService.setToken(res.token);
+            this.obtenerDisposiciones(this.ejecucionForm.get('quality_record_uuid')?.value);
+            this.cerrarModalDisposicionOEjecucion();
+          },
+          error: error => {
+            this.spinner.hide();
+            console.error(error);
+            this._swalService.toastError('top-right', error.error.message);
+          }
+        })
+      );
+    }
+  }
+
+  confirmarEdicionEjecucion() {
+    if (this.ejecucionForm.pristine) {
+      this._swalService.toastInfo('top-right', 'No hubo modificaciones.')
+      return;
+    }
+    this.isSubmit = true;
+    if (this.ejecucionForm.valid) {
+      this.spinner.show();
+      let ejecucion = new EjecucionDTO();
+      this.armarDTOEdicionEjecucion(ejecucion);
+      ejecucion.actual_role = this.rol;
+      this.subscription.add(
+        this._registroService.editEjecucion(this.ejecucionForm.get('ejecucion_uuid')?.value, ejecucion).subscribe({
           next: res => {
             this.spinner.hide();
             this._tokenService.setToken(res.token);

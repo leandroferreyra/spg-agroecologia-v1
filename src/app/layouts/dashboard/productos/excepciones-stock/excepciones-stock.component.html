@@ -316,9 +316,9 @@
         <td>
             <div class="flex items-center">
                 <div>
-                    <button (click)="toggleND(disp)" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ejecuciones">
-                        <icon-expand-item *ngIf="!expandedND[disp.uuid]" />
-                        <icon-collapse-item *ngIf="expandedND[disp.uuid]" />
+                    <button (click)="toggleDisposicion(disp)" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ejecuciones">
+                        <icon-expand-item *ngIf="!expandedDisposicion[disp.uuid]" />
+                        <icon-collapse-item *ngIf="expandedDisposicion[disp.uuid]" />
                     </button>
                 </div>
                 <div>
@@ -335,7 +335,7 @@
         </td>
     </tr>
 
-    @if (expandedND[disp.uuid]) {
+    @if (expandedDisposicion[disp.uuid]) {
     <tr>
         <td colspan="8" class="bg-gray-100 p-2">
 
@@ -379,7 +379,8 @@
                         <td>
                             <div class="flex items-center">
                                 <div>
-                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
+                                    <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                        (click)="openModalEjecucion('EDIT', disp, ej)">
                                         <icon-pencil />
                                     </button>
                                 </div>
