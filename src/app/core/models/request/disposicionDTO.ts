@@ -7,7 +7,7 @@ export class DisposicionDTO {
     disposition_instruction?: number;
     corrective_action?: string;
     "user->responsible_user_uuid": string;
-    corrective_action_comments?: string[] = [];
+    corrective_action_comments?: string;
 
     with: string[] = [];
     actual_role?: string;

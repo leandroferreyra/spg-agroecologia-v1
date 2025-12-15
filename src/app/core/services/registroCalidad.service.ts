@@ -38,6 +38,11 @@ export class RegistroCalidadService {
     return this.http.put<AuthResponse>(environment.baseUrl + this.apiEjecucion + '/' + uuid, JSON.stringify(ejecucion), { headers });
   }
 
+  editDisposicion(uuid: string, disposicion: DisposicionDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<AuthResponse>(environment.baseUrl + this.apiDisposiciones + '/' + uuid, JSON.stringify(disposicion), { headers });
+  }
+
   eliminarRegistro(uuid: string, rolActual: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const params = new HttpParams()

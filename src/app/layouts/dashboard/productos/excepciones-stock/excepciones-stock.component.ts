@@ -444,6 +444,24 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     });
   }
 
+  armarDTOEdicionDisposicion(disposicion: DisposicionDTO) {
+    Object.keys(this.disposicionForm.controls).forEach(key => {
+      const control = this.disposicionForm.get(key);
+      if (!control) return;
+
+      if (!control?.pristine) {
+        if (key === 'disposition_datetime') {
+          const fechaFormateada = control.value instanceof Date
+            ? format(control.value, 'dd-MM-yyyy')
+            : control.value;
+          disposicion[key] = this.convertirFechaADateBackend(fechaFormateada);
+        } else {
+          (disposicion as any)[key] = control.value;
+        }
+      }
+    });
+  }
+
   showFecha(dato: any) {
     const date = new Date(dato.replace(' ', 'T'));
     return date.toLocaleDateString('es-AR', {
@@ -531,11 +549,14 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     this.expandedDisposicion[disposicion.uuid] = !this.expandedDisposicion[disposicion.uuid];
   }
 
-  openModalDisposicion(type: string, noConformidad: any) {
+  openModalDisposicion(type: string, noConformidad: any, disposicion?: any) {
     if (type === 'NEW') {
       this.inicializarFormDisposicion(noConformidad);
       this.tituloModal = 'Nueva disposición';
+      this.isEdicion = false;
     } else {
+      this.inicializarFormDisposicion(noConformidad, disposicion);
+      this.isEdicion = true;
       this.tituloModal = 'Edición de disposición';
     }
     this.modalDisposicion.options = this.modalOptions;
@@ -556,22 +577,36 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     this.modalEjecucion.open();
   }
 
-  inicializarFormDisposicion(noConformidad: any) {
+  inicializarFormDisposicion(noConformidad: any, disposicion?: any) {
     this.disposicionForm = new FormGroup({
-      quality_record_uuid: new FormControl({ value: noConformidad.uuid, disabled: false }, [Validators.required]),
-      disposition_datetime: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
-      defect_type: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      disposition_action: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      disposition_instruction: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      corrective_action: new FormControl({ value: null, disabled: false }, [Validators.required]),
-      corrective_action_comments: new FormControl({ value: null, disabled: false }, []),
-      user: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      disposicion_uuid: new FormControl({ value: disposicion ? disposicion.uuid : null, disabled: false }, []),
+      quality_record_uuid: new FormControl({ value: disposicion ? disposicion.quality_record?.uuid : noConformidad.uuid, disabled: false }, [Validators.required]),
+      disposition_datetime: new FormControl({ value: disposicion ? this.showFecha(disposicion.disposition_datetime) : new Date(), disabled: false }, [Validators.required]),
+      defect_type: new FormControl({ value: disposicion ? disposicion.defect_type : null, disabled: false }, [Validators.required]),
+      disposition_action: new FormControl({ value: disposicion ? disposicion.disposition_action : null, disabled: false }, [Validators.required]),
+      disposition_instruction: new FormControl({ value: disposicion ? disposicion.disposition_instruction : null, disabled: false }, [Validators.required]),
+      corrective_action: new FormControl({ value: disposicion ? disposicion.corrective_action : null, disabled: false }, [Validators.required]),
+      corrective_action_comments: new FormControl({ value: disposicion ? disposicion.corrective_action_comments : null, disabled: false }, []),
+      user: new FormControl({ value: disposicion ? disposicion.responsible_user?.uuid : this.usuarioLogueado.uuid, disabled: false }, [Validators.required]),
     })
+    this.formDisposicionChange();
+  }
+
+  formDisposicionChange() {
+    this.disposicionForm.get('corrective_action')?.valueChanges.subscribe(action => {
+      if (!action) {
+        this.disposicionForm.get('corrective_action_comments')?.setValidators([]);
+        this.disposicionForm.get('corrective_action_comments')?.updateValueAndValidity();
+      } else {
+        this.disposicionForm.get('corrective_action_comments')?.setValidators([Validators.required]);
+        this.disposicionForm.get('corrective_action_comments')?.updateValueAndValidity();
+      }
+    });
   }
 
   inicializarFormEjecucion(disposicion: any, ejecucion?: any) {
     this.ejecucionForm = new FormGroup({
-      ejecucion_uuid: new FormControl({ value: ejecucion.uuid, disabled: false }, []),
+      ejecucion_uuid: new FormControl({ value: ejecucion ? ejecucion.uuid : null, disabled: false }, []),
       quality_record_uuid: new FormControl({ value: disposicion.quality_record.uuid, disabled: false }, []),
       disposition_uuid: new FormControl({ value: disposicion.uuid, disabled: false }, [Validators.required]),
       execution_datetime: new FormControl({ value: ejecucion ? this.showFecha(ejecucion.execution_datetime) : new Date(), disabled: false }, [Validators.required]),
@@ -618,9 +653,16 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     control.setErrors(Object.keys(rest).length ? rest : null);
   }
 
-
   confirmarDisposicion() {
-    this.isSubmit = true;
+    if (this.isEdicion) {
+      this.confirmarEdicionDisposicion();
+    } else {
+      this.isSubmit = true;
+      this.confirmarNuevaDisposicion();
+    }
+  }
+
+  confirmarNuevaDisposicion() {
     if (this.disposicionForm.valid) {
       let disposicion = new DisposicionDTO();
       disposicion.actual_role = this.rol;
@@ -637,6 +679,35 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       disposicion.disposition_instruction = this.disposicionForm.get('disposition_instruction')?.value;
       this.subscription.add(
         this._registroService.saveDisposicion(disposicion).subscribe({
+          next: res => {
+            this.spinner.hide();
+            this._tokenService.setToken(res.token);
+            this.obtenerDisposiciones(this.disposicionForm.get('quality_record_uuid')?.value);
+            this.cerrarModalDisposicionOEjecucion();
+          },
+          error: error => {
+            this.spinner.hide();
+            console.error(error);
+            this._swalService.toastError('top-right', error.error.message);
+          }
+        })
+      );
+    }
+  }
+
+  confirmarEdicionDisposicion() {
+    if (this.disposicionForm.pristine) {
+      this._swalService.toastInfo('top-right', 'No hubo modificaciones.')
+      return;
+    }
+    this.isSubmit = true;
+    if (this.disposicionForm.valid) {
+      this.spinner.show();
+      let disposicion = new DisposicionDTO();
+      this.armarDTOEdicionDisposicion(disposicion);
+      disposicion.actual_role = this.rol;
+      this.subscription.add(
+        this._registroService.editDisposicion(this.disposicionForm.get('disposicion_uuid')?.value, disposicion).subscribe({
           next: res => {
             this.spinner.hide();
             this._tokenService.setToken(res.token);
