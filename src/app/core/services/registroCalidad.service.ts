@@ -23,6 +23,11 @@ export class RegistroCalidadService {
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiRegistros, JSON.stringify(registroCalidad), { headers });
   }
 
+  saveDisposicion(disposicion: DisposicionDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiDisposiciones, JSON.stringify(disposicion), { headers });
+  }
+
   saveEjecucion(ejecucion: EjecucionDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiEjecucion, JSON.stringify(ejecucion), { headers });
@@ -48,11 +53,6 @@ export class RegistroCalidadService {
     const params = new HttpParams()
       .set('actual_role', rolActual);
     return this.http.delete<AuthResponse>(environment.baseUrl + this.apiRegistros + '/' + uuid, { headers, params });
-  }
-
-  saveDisposicion(disposicion: DisposicionDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiDisposiciones, JSON.stringify(disposicion), { headers });
   }
 
   eliminarDisposicion(uuid: string, rolActual: string): Observable<AuthResponse> {

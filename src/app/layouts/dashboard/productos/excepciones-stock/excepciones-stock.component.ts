@@ -585,7 +585,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       defect_type: new FormControl({ value: disposicion ? disposicion.defect_type : null, disabled: false }, [Validators.required]),
       disposition_action: new FormControl({ value: disposicion ? disposicion.disposition_action : null, disabled: false }, [Validators.required]),
       disposition_instruction: new FormControl({ value: disposicion ? disposicion.disposition_instruction : null, disabled: false }, [Validators.required]),
-      corrective_action: new FormControl({ value: disposicion ? disposicion.corrective_action : null, disabled: false }, [Validators.required]),
+      corrective_action: new FormControl({ value: disposicion ? disposicion.corrective_action : null, disabled: false }, []),
       corrective_action_comments: new FormControl({ value: disposicion ? disposicion.corrective_action_comments : null, disabled: false }, []),
       user: new FormControl({ value: disposicion ? disposicion.responsible_user?.uuid : this.usuarioLogueado.uuid, disabled: false }, [Validators.required]),
     })
