@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
 import { RegistroCalidadDTO } from '../models/request/registroCalidadDTO';
 import { DisposicionDTO } from '../models/request/disposicionDTO';
+import { EjecucionDTO } from '../models/request/ejecucionDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,11 @@ export class RegistroCalidadService {
   saveRegistro(registroCalidad: RegistroCalidadDTO): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<AuthResponse>(environment.baseUrl + this.apiRegistros, JSON.stringify(registroCalidad), { headers });
+  }
+
+  saveEjecucion(ejecucion: EjecucionDTO): Observable<AuthResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<AuthResponse>(environment.baseUrl + this.apiEjecucion, JSON.stringify(ejecucion), { headers });
   }
 
   editRegistro(uuid: string, registroCalidad: RegistroCalidadDTO): Observable<AuthResponse> {

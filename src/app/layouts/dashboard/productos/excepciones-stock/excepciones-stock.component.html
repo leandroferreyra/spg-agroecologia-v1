@@ -384,7 +384,8 @@
                                     </button>
                                 </div>
                                 <div>
-                                    <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminarEjecucion(ej, disp)">
+                                    <button type="button" ngxTippy="Eliminar"
+                                        (click)="openSwalEliminarEjecucion(ej, disp)">
                                         <icon-trash-lines />
                                     </button>
                                 </div>
@@ -645,10 +646,10 @@
                                 </ng-select>
                             </div>
 
-                            <div
+                            <div class="mt-2"
                                 [ngClass]="isSubmit ? ejecucionForm.controls['execution_action'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Acción ejecutada</label>
-                                <ng-select [items]="['Corregir', 'Descartar']" formControlName="execution_action"
+                                <ng-select [items]="['Corregido', 'Descartado']" formControlName="execution_action"
                                     [virtualScroll]="true" [appendTo]="'body'"
                                     [ngClass]="isSubmit ? ejecucionForm.controls['execution_action'].errors ? 'has-error' : 'has-success' : ''">
                                 </ng-select>
@@ -658,6 +659,10 @@
                                 [ngClass]="isSubmit ? ejecucionForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
                                 <label for="quantity">Cantidad</label>
                                 <input class="form-control" id="quantity" formControlName="quantity" />
+                                <div *ngIf="ejecucionForm.get('quantity')?.errors?.['exceedsNoConformidad']"
+                                    class="text-red-600 text-sm mt-1">
+                                    La cantidad ingresada no puede ser mayor a la cantidad de la no conformidad.
+                                </div>
                             </div>
 
                             <div class="mt-2"

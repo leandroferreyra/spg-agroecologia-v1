@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -24,6 +24,7 @@ import { format } from 'date-fns';
 import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
 import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-item';
 import { DisposicionDTO } from 'src/app/core/models/request/disposicionDTO';
+import { EjecucionDTO } from 'src/app/core/models/request/ejecucionDTO';
 
 enum RecordType {
   Reserva = 'Reserva',
@@ -550,14 +551,53 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
 
   inicializarFormEjecucion(disposicion: any) {
     this.ejecucionForm = new FormGroup({
+      quality_record_uuid: new FormControl({ value: disposicion.quality_record.uuid, disabled: false }, []),
       disposition_uuid: new FormControl({ value: disposicion.uuid, disabled: false }, [Validators.required]),
       execution_datetime: new FormControl({ value: new Date(), disabled: false }, [Validators.required]),
       execution_action: new FormControl({ value: null, disabled: false }, [Validators.required]),
       quantity: new FormControl({ value: null, disabled: false }, [Validators.required]),
+      quantityNoConformidad: new FormControl({ value: disposicion.quality_record.quantity, disabled: false }, [Validators.required]),
       execution_comments: new FormControl({ value: null, disabled: false }, [Validators.required]),
       user: new FormControl({ value: null, disabled: false }, [Validators.required]),
     })
+    this.initQuantityValidation();
   }
+
+  private initQuantityValidation(): void {
+
+    const quantityCtrl = this.ejecucionForm.get('quantity');
+    const quantityNCCtrl = this.ejecucionForm.get('quantityNoConformidad');
+
+    quantityCtrl?.valueChanges.subscribe(quantity => {
+
+      const quantityNC = quantityNCCtrl?.value;
+
+      if (quantity == null || quantityNC == null) {
+        this.clearQuantityError(quantityCtrl);
+        return;
+      }
+
+      if (quantity > quantityNC) {
+        quantityCtrl.setErrors({
+          ...quantityCtrl.errors,
+          exceedsNoConformidad: true
+        });
+      } else {
+        this.clearQuantityError(quantityCtrl);
+      }
+    });
+  }
+
+  private clearQuantityError(control: AbstractControl) {
+
+    if (!control.errors) return;
+
+    const { exceedsNoConformidad, ...rest } = control.errors;
+
+    control.setErrors(Object.keys(rest).length ? rest : null);
+  }
+
+
 
   confirmarDisposicion() {
     this.isSubmit = true;
@@ -643,34 +683,33 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
   confirmarEjecucion() {
     this.isSubmit = true;
     if (this.ejecucionForm.valid) {
-      // let disposicion = new DisposicionDTO();
-      // disposicion.actual_role = this.rol;
-      // disposicion.quality_record_uuid = this.disposicionForm.get('quality_record_uuid')?.value;
-      // disposicion['user->responsible_user_uuid'] = this.disposicionForm.get('user')?.value;
-      // const fechaFormateada = this.disposicionForm.get('disposition_datetime')?.value instanceof Date
-      //   ? format(this.disposicionForm.get('disposition_datetime')?.value, 'dd-MM-yyyy')
-      //   : this.disposicionForm.get('disposition_datetime')?.value;
-      // disposicion.disposition_datetime = this.convertirFechaADateBackend(fechaFormateada);
-      // disposicion.corrective_action = this.disposicionForm.get('corrective_action')?.value ?? false;
-      // disposicion.corrective_action_comments = this.disposicionForm.get('corrective_action_comments')?.value;
-      // disposicion.defect_type = this.disposicionForm.get('defect_type')?.value;
-      // disposicion.disposition_action = this.disposicionForm.get('disposition_action')?.value;
-      // disposicion.disposition_instruction = this.disposicionForm.get('disposition_instruction')?.value;
-      // this.subscription.add(
-      //   this._registroService.saveDisposicion(disposicion).subscribe({
-      //     next: res => {
-      //       this.spinner.hide();
-      //       this._tokenService.setToken(res.token);
-      //       this.obtenerDisposiciones(this.disposicionForm.get('quality_record_uuid')?.value);
-      //       this.cerrarModalDisposicionOEjecucion();
-      //     },
-      //     error: error => {
-      //       this.spinner.hide();
-      //       console.error(error);
-      //       this._swalService.toastError('top-right', error.error.message);
-      //     }
-      //   })
-      // );
+      this.spinner.show();
+      let ejecucion = new EjecucionDTO();
+      ejecucion.actual_role = this.rol;
+      ejecucion.disposition_uuid = this.ejecucionForm.get('disposition_uuid')?.value;
+      ejecucion['user->responsible_user_uuid'] = this.ejecucionForm.get('user')?.value;
+      const fechaFormateada = this.ejecucionForm.get('execution_datetime')?.value instanceof Date
+        ? format(this.ejecucionForm.get('execution_datetime')?.value, 'dd-MM-yyyy')
+        : this.ejecucionForm.get('execution_datetime')?.value;
+      ejecucion.execution_datetime = this.convertirFechaADateBackend(fechaFormateada);
+      ejecucion.execution_action = this.ejecucionForm.get('execution_action')?.value ?? false;
+      ejecucion.quantity = this.ejecucionForm.get('quantity')?.value;
+      ejecucion.execution_comments = this.ejecucionForm.get('execution_comments')?.value;
+      this.subscription.add(
+        this._registroService.saveEjecucion(ejecucion).subscribe({
+          next: res => {
+            this.spinner.hide();
+            this._tokenService.setToken(res.token);
+            this.obtenerDisposiciones(this.ejecucionForm.get('quality_record_uuid')?.value);
+            this.cerrarModalDisposicionOEjecucion();
+          },
+          error: error => {
+            this.spinner.hide();
+            console.error(error);
+            this._swalService.toastError('top-right', error.error.message);
+          }
+        })
+      );
     }
   }
 
@@ -702,7 +741,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._registroService.eliminarEjecucion(ejecucion.uuid, this.rol.toUpperCase()).subscribe({
         next: res => {
-          this.obtenerDisposiciones(disposicion.uuid);
+          this.obtenerDisposiciones(disposicion.quality_record.uuid);
           this._tokenService.setToken(res.token);
           this.spinner.hide();
         },
