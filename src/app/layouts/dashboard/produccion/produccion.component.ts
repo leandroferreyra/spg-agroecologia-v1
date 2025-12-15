@@ -742,7 +742,8 @@ export class ProduccionComponent implements OnInit, OnDestroy {
         next: res => {
           this.obtenerProducciones(false);
           this.tokenService.setToken(res.token);
-          this.spinner.hide();
+          // Se saca este spinner hide ya que al llamar al obtenerProducciones, se hace el hide ahí. 
+          // this.spinner.hide();
         },
         error: error => {
           console.error(error);
