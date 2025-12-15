@@ -531,7 +531,6 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexService.getDisposiciones(params, this.rol).subscribe({
         next: res => {
-          console.log(res);
           this.disposicionesPorNC[noConformidadID] = res.data
           this._tokenService.setToken(res.token);
           this.spinner.hide();
