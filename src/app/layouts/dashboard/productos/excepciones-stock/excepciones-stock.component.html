@@ -216,15 +216,17 @@
 
                 @if (expandedNC[data.uuid]) {
                 <tr>
-                    <td colspan="7" class="bg-gray-50 p-3">
-                        <ng-container *ngIf="disposicionesPorNC[data.uuid]?.length; else sinDisp">
+                    <td colspan="8" class="bg-sky-50 p-2 border-l-4 border-sky-300"> <ng-container
+                            *ngIf="disposicionesPorNC[data.uuid]?.length; else sinDisp">
                             <table class="w-full text-sm border border-gray-200">
                                 <thead>
                                     <tr>
-                                        <th colspan="8" class="bg-gray-200 italic font-semibold tracking-wide py-2">
+                                        <th colspan="8">
 
-                                            <div class="flex items-center justify-center gap-2">
-                                                <span>Disposiciones</span>
+                                            <div class="flex items-center gap-2">
+                                                <h5 class="text-lg font-semibold dark:text-white-light">
+                                                    Disposiciones
+                                                </h5>
 
                                                 <button type="button" ngxTippy="Agregar disposición"
                                                     (click)="openModalDisposicion('NEW', data)"
@@ -253,7 +255,6 @@
 
                                 <tbody>
                                     @for (disp of disposicionesPorNC[data.uuid]; track disp.uuid) {
-                                    <!-- nivel 2 -->
                                     <ng-container [ngTemplateOutlet]="disposicionRow"
                                         [ngTemplateOutletContext]="{ disp: disp }">
                                     </ng-container>
@@ -338,16 +339,17 @@
 
     @if (expandedDisposicion[disp.uuid]) {
     <tr>
-        <td colspan="8" class="bg-gray-100 p-2">
+        <td colspan="8" class="bg-sky-150 p-2">
 
             @if (disp.disposition_executions?.length) {
-            <table class="w-full text-sm border border-gray-200">
+            <table class="w-full text-sm bg-sky-100 border-l-4 border-sky-400">
                 <thead>
                     <tr>
-                        <th colspan="8" class="bg-gray-200 italic font-semibold tracking-wide py-2">
-
-                            <div class="flex items-center justify-center gap-2">
-                                <span>Ejecuciones</span>
+                        <th colspan="8">
+                            <div class="flex items-center gap-2">
+                                <h5 class="text-lg font-semibold dark:text-white-light">
+                                    Ejecuciones
+                                </h5>
 
                                 <button type="button" ngxTippy="Agregar ejecución"
                                     (click)="openModalEjecucion('NEW', disp)" class="hover:text-blue-600">
