@@ -545,6 +545,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
   }
 
   obtenerDisposiciones(noConformidadID: any) {
+    this.spinner.show();
     const params: any = {};
     params.with = ["qualityRecord", "dispositionExecutions", "responsibleUser", "dispositionExecutions.responsibleUser"];
     params.filters = {
