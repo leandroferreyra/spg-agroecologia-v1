@@ -125,7 +125,6 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       this.filtros['stock.product.uuid'].value = this.producto.uuid;
       this.obtenerRegistrosCalidad();
       this.obtenerUsuarios();
-
     }
   }
 
@@ -908,7 +907,16 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     )
   }
 
-  // getEstadoNoConformidad(noConformidad: any) {
-  //   console.log(noConformidad);
-  // }
+  getEstadoRowClass(estado: string): string {
+    switch (estado) {
+      case 'Sin disposición':
+        return 'text-blue-600';
+
+      case 'Sin ejecución':
+        return 'text-red-600';
+
+      default:
+        return '';
+    }
+  }
 }

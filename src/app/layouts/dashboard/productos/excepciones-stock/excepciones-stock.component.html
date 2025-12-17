@@ -176,7 +176,7 @@
                     <th>Fecha de excepción</th>
                     <th>Lote</th>
                     <th>Intancias de producto</th>
-                    <!-- <th>Estado</th> -->
+                    <th>Estado</th>
                     <th>Usuario responsable</th>
                     <th>Cantidad</th>
                     <th>Descripción</th>
@@ -185,13 +185,13 @@
             </thead>
             <tbody>
                 @for(data of noConformidades | slice: pageSize | slice: 0:itemsPerPage ; track data.uuid) {
-                <tr>
+                <tr [ngClass]="getEstadoRowClass(data.disposition_status)">
                     <td class="whitespace-nowrap">{{ showFecha(data.detection_datetime)}} </td>
                     <td class="whitespace-nowrap">{{ data.stock?.batch?.batch_identification}} </td>
                     <td class="whitespace-nowrap">
                         {{ getSerials(data.product_instances) }}
                     </td>
-                    <!-- <td> {{getEstadoNoConformidad(data)}} </td> -->
+                    <td> {{ data.disposition_status }} </td>
                     <td class="whitespace-nowrap">{{ data.responsible_user?.user_name}} </td>
                     <td class="whitespace-nowrap">{{ showCantidad(data.stock, data.quantity)}} </td>
                     <td class="whitespace-nowrap">{{ data.description}} </td>
