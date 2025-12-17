@@ -689,6 +689,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
 
   confirmarNuevaDisposicion() {
     if (this.disposicionForm.valid) {
+      this.spinner.show();
       let disposicion = new DisposicionDTO();
       disposicion.actual_role = this.rol;
       disposicion.quality_record_uuid = this.disposicionForm.get('quality_record_uuid')?.value;
@@ -707,6 +708,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
           next: res => {
             this.spinner.hide();
             this._tokenService.setToken(res.token);
+            this.obtenerRegistrosCalidad();
             this.obtenerDisposiciones(this.disposicionForm.get('quality_record_uuid')?.value);
             this.cerrarModalDisposicionOEjecucion();
           },
@@ -824,6 +826,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
           next: res => {
             this.spinner.hide();
             this._tokenService.setToken(res.token);
+            this.obtenerRegistrosCalidad();
             this.obtenerDisposiciones(this.ejecucionForm.get('quality_record_uuid')?.value);
             this.cerrarModalDisposicionOEjecucion();
           },
@@ -912,7 +915,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       case 'Sin disposición':
         return 'text-blue-600';
 
-      case 'Sin ejecución':
+      case 'Sin resolución':
         return 'text-red-600';
 
       default:
