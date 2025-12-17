@@ -26,6 +26,7 @@ import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-ite
 import { DisposicionDTO } from 'src/app/core/models/request/disposicionDTO';
 import { EjecucionDTO } from 'src/app/core/models/request/ejecucionDTO';
 import { IconMultipleForwardRightComponent } from 'src/app/shared/icon/icon-multiple-forward-right';
+import { __makeTemplateObject } from 'tslib';
 
 enum RecordType {
   Reserva = 'Reserva',
@@ -907,4 +908,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
     )
   }
 
+  // getEstadoNoConformidad(noConformidad: any) {
+  //   console.log(noConformidad);
+  // }
 }

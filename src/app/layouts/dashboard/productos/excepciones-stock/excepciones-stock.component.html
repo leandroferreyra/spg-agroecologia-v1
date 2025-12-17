@@ -51,8 +51,9 @@
                                 </button>
                             </div>
                             <div>
-                                <button type="button" ngxTippy="Devolver al stock disponible" (click)="openSwalEliminar(data)">
-                                    <icon-multiple-forward-right class="w-5 h-5"/>
+                                <button type="button" ngxTippy="Devolver al stock disponible"
+                                    (click)="openSwalEliminar(data)">
+                                    <icon-multiple-forward-right class="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
@@ -125,8 +126,9 @@
                                 </button>
                             </div>
                             <div>
-                                <button type="button" ngxTippy="Devolver al stock disponible" (click)="openSwalEliminar(data)">
-                                    <icon-multiple-forward-right class="w-5 h-5"/>
+                                <button type="button" ngxTippy="Devolver al stock disponible"
+                                    (click)="openSwalEliminar(data)">
+                                    <icon-multiple-forward-right class="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
@@ -174,6 +176,7 @@
                     <th>Fecha de excepción</th>
                     <th>Lote</th>
                     <th>Intancias de producto</th>
+                    <!-- <th>Estado</th> -->
                     <th>Usuario responsable</th>
                     <th>Cantidad</th>
                     <th>Descripción</th>
@@ -188,6 +191,7 @@
                     <td class="whitespace-nowrap">
                         {{ getSerials(data.product_instances) }}
                     </td>
+                    <!-- <td> {{getEstadoNoConformidad(data)}} </td> -->
                     <td class="whitespace-nowrap">{{ data.responsible_user?.user_name}} </td>
                     <td class="whitespace-nowrap">{{ showCantidad(data.stock, data.quantity)}} </td>
                     <td class="whitespace-nowrap">{{ data.description}} </td>
