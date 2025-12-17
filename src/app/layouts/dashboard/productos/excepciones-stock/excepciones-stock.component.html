@@ -51,8 +51,8 @@
                                 </button>
                             </div>
                             <div>
-                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                    <icon-trash-lines />
+                                <button type="button" ngxTippy="Devolver al stock disponible" (click)="openSwalEliminar(data)">
+                                    <icon-multiple-forward-right class="w-5 h-5"/>
                                 </button>
                             </div>
                         </div>
@@ -125,8 +125,8 @@
                                 </button>
                             </div>
                             <div>
-                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
-                                    <icon-trash-lines />
+                                <button type="button" ngxTippy="Devolver al stock disponible" (click)="openSwalEliminar(data)">
+                                    <icon-multiple-forward-right class="w-5 h-5"/>
                                 </button>
                             </div>
                         </div>
@@ -151,7 +151,7 @@
 
     <div class="mb-2 flex items-center justify-between">
         <div class="flex items-center gap-2">
-            <h5 class="text-lg font-semibold dark:text-white-light">No conformidades</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">No conformidades de producto</h5>
 
             <button type="button" ngxTippy="Agregar no conformidad"
                 (click)="openModalRegistro('NEW', 'No conformidad')">
@@ -205,11 +205,11 @@
                                     <icon-pencil />
                                 </button>
                             </div>
-                            <div>
+                            <!-- <div>
                                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                     <icon-trash-lines />
                                 </button>
-                            </div>
+                            </div> -->
                         </div>
                     </td>
                 </tr>
@@ -328,11 +328,11 @@
                         <icon-pencil />
                     </button>
                 </div>
-                <div>
+                <!-- <div>
                     <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminarDisposicion(disp)">
                         <icon-trash-lines />
                     </button>
-                </div>
+                </div> -->
             </div>
         </td>
     </tr>
@@ -365,7 +365,7 @@
                         <th>Fecha</th>
                         <th>Responsable</th>
                         <th>Acción ejecutada</th>
-                        <th>Cantidad</th>
+                        <!-- <th>Cantidad</th> -->
                         <th>Comentarios</th>
                         <th>Acciones</th>
                     </tr>
@@ -377,7 +377,7 @@
                         <td>{{ showFecha(ej.execution_datetime) }}</td>
                         <td>{{ ej.responsible_user?.user_name }}</td>
                         <td>{{ ej.execution_action }}</td>
-                        <td>{{ ej.quantity }}</td>
+                        <!-- <td>{{ ej.quantity }}</td> -->
                         <td>{{ ej.execution_comments }}</td>
                         <td>
                             <div class="flex items-center">
@@ -387,12 +387,12 @@
                                         <icon-pencil />
                                     </button>
                                 </div>
-                                <div>
+                                <!-- <div>
                                     <button type="button" ngxTippy="Eliminar"
                                         (click)="openSwalEliminarEjecucion(ej, disp)">
                                         <icon-trash-lines />
                                     </button>
-                                </div>
+                                </div> -->
                             </div>
                         </td>
                     </tr>
@@ -659,7 +659,7 @@
                                 </ng-select>
                             </div>
 
-                            <div class="mt-2"
+                            <!-- <div class="mt-2"
                                 [ngClass]="isSubmit ? ejecucionForm.controls['quantity'].errors ? 'has-error' : 'has-success' : ''">
                                 <label for="quantity">Cantidad</label>
                                 <input class="form-control" id="quantity" formControlName="quantity" />
@@ -667,7 +667,7 @@
                                     class="text-red-600 text-sm mt-1">
                                     La cantidad ingresada no puede ser mayor a la cantidad de la no conformidad.
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="mt-2"
                                 [ngClass]="isSubmit ? ejecucionForm.controls['execution_comments'].errors ? 'has-error' : 'has-success' : ''">

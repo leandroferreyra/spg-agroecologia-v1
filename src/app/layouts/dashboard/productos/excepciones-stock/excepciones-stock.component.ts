@@ -25,6 +25,7 @@ import { IconExpandItemComponent } from 'src/app/shared/icon/icon-expand-item';
 import { IconCollapseItemComponent } from 'src/app/shared/icon/icon-collapse-item';
 import { DisposicionDTO } from 'src/app/core/models/request/disposicionDTO';
 import { EjecucionDTO } from 'src/app/core/models/request/ejecucionDTO';
+import { IconMultipleForwardRightComponent } from 'src/app/shared/icon/icon-multiple-forward-right';
 
 enum RecordType {
   Reserva = 'Reserva',
@@ -36,7 +37,8 @@ enum RecordType {
   selector: 'app-excepciones-stock',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxTippyModule, NgSelectModule, NgbPaginationModule, NgxSpinnerModule, IconPencilComponent,
-    IconTrashLinesComponent, FontAwesomeModule, IconPlusComponent, NgxCustomModalComponent, FlatpickrDirective, IconExpandItemComponent, IconCollapseItemComponent],
+    IconTrashLinesComponent, FontAwesomeModule, IconPlusComponent, NgxCustomModalComponent, FlatpickrDirective, IconExpandItemComponent, IconCollapseItemComponent,
+    IconMultipleForwardRightComponent],
   templateUrl: './excepciones-stock.component.html',
   styleUrl: './excepciones-stock.component.css'
 })
@@ -304,7 +306,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
   openSwalEliminar(registro: any) {
     Swal.fire({
       title: '',
-      text: `¿Desea eliminar el registro?`,
+      text: `¿Desea devolver el registro al stock disponible?`,
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -634,47 +636,47 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
       disposition_uuid: new FormControl({ value: disposicion.uuid, disabled: false }, [Validators.required]),
       execution_datetime: new FormControl({ value: ejecucion ? this.showFecha(ejecucion.execution_datetime) : new Date(), disabled: false }, [Validators.required]),
       execution_action: new FormControl({ value: ejecucion ? ejecucion.execution_action : null, disabled: false }, [Validators.required]),
-      quantity: new FormControl({ value: ejecucion ? ejecucion.quantity : null, disabled: false }, [Validators.required]),
-      quantityNoConformidad: new FormControl({ value: disposicion.quality_record.quantity, disabled: false }, [Validators.required]),
+      // quantity: new FormControl({ value: ejecucion ? ejecucion.quantity : null, disabled: false }, [Validators.required]),
+      // quantityNoConformidad: new FormControl({ value: disposicion.quality_record.quantity, disabled: false }, [Validators.required]),
       execution_comments: new FormControl({ value: ejecucion ? ejecucion.execution_comments : null, disabled: false }, [Validators.required]),
       user: new FormControl({ value: ejecucion ? ejecucion.responsible_user?.uuid : this.usuarioLogueado.uuid, disabled: false }, [Validators.required]),
     })
-    this.initQuantityValidation();
+    // this.initQuantityValidation();
   }
 
-  private initQuantityValidation(): void {
+  // private initQuantityValidation(): void {
 
-    const quantityCtrl = this.ejecucionForm.get('quantity');
-    const quantityNCCtrl = this.ejecucionForm.get('quantityNoConformidad');
+  //   const quantityCtrl = this.ejecucionForm.get('quantity');
+  //   const quantityNCCtrl = this.ejecucionForm.get('quantityNoConformidad');
 
-    quantityCtrl?.valueChanges.subscribe(quantity => {
+  //   quantityCtrl?.valueChanges.subscribe(quantity => {
 
-      const quantityNC = quantityNCCtrl?.value;
+  //     const quantityNC = quantityNCCtrl?.value;
 
-      if (quantity == null || quantityNC == null) {
-        this.clearQuantityError(quantityCtrl);
-        return;
-      }
+  //     if (quantity == null || quantityNC == null) {
+  //       this.clearQuantityError(quantityCtrl);
+  //       return;
+  //     }
 
-      if (quantity > quantityNC) {
-        quantityCtrl.setErrors({
-          ...quantityCtrl.errors,
-          exceedsNoConformidad: true
-        });
-      } else {
-        this.clearQuantityError(quantityCtrl);
-      }
-    });
-  }
+  //     if (quantity > quantityNC) {
+  //       quantityCtrl.setErrors({
+  //         ...quantityCtrl.errors,
+  //         exceedsNoConformidad: true
+  //       });
+  //     } else {
+  //       this.clearQuantityError(quantityCtrl);
+  //     }
+  //   });
+  // }
 
-  private clearQuantityError(control: AbstractControl) {
+  // private clearQuantityError(control: AbstractControl) {
 
-    if (!control.errors) return;
+  //   if (!control.errors) return;
 
-    const { exceedsNoConformidad, ...rest } = control.errors;
+  //   const { exceedsNoConformidad, ...rest } = control.errors;
 
-    control.setErrors(Object.keys(rest).length ? rest : null);
-  }
+  //   control.setErrors(Object.keys(rest).length ? rest : null);
+  // }
 
   confirmarDisposicion() {
     if (this.isEdicion) {
@@ -815,7 +817,7 @@ export class ExcepcionesStockComponent implements OnInit, OnDestroy {
         : this.ejecucionForm.get('execution_datetime')?.value;
       ejecucion.execution_datetime = this.convertirFechaADateBackend(fechaFormateada);
       ejecucion.execution_action = this.ejecucionForm.get('execution_action')?.value ?? false;
-      ejecucion.quantity = this.ejecucionForm.get('quantity')?.value;
+      // ejecucion.quantity = this.ejecucionForm.get('quantity')?.value;
       ejecucion.execution_comments = this.ejecucionForm.get('execution_comments')?.value;
       this.subscription.add(
         this._registroService.saveEjecucion(ejecucion).subscribe({
