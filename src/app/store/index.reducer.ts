@@ -69,41 +69,35 @@ export function indexReducer(state = initialState, action: any) {
 function getMenuByRole(role: string) {
     switch (role) {
         case 'SUPER_ADMIN':
-        case 'ADMIN':
-        case 'ADMINISTRACION':
+        case 'ROLE_ADMIN':
             return [
-                { label: 'Productos', route: 'productos' },
-                { label: 'Producciones', route: 'producciones' },
-                { label: 'Compras', route: 'compras' },
-                { label: 'Ventas', route: 'ventas' },
-                { label: 'Proveedores', route: 'proveedores' },
-                { label: 'Clientes', route: 'clientes' },
-                {
-                    label: 'Configuraciones', route: 'config', submenu: [
-                        { label: 'Usuarios', route: 'usuarios' },
-                        { label: 'Bancos', route: 'bancos' },
-                        { label: 'Países', route: 'paises' },
-                        { label: 'Provincias', route: 'provincias' },
-                        { label: 'Ciudades', route: 'ciudades' },
-                        { label: 'Géneros', route: 'generos' },
-                        { label: 'Monedas', route: 'monedas' },
-                        { label: 'Ubicaciones', route: 'ubicaciones' },
-                        { label: 'Tipos de cambio', route: 'exchanges' },
-                        { label: 'Tipos de productos', route: 'tipos-productos' },
-                        { label: 'Cuentas bancarias de LADIE', route: 'cuentas-bancarias' },
-                        { label: 'Categorías de productos', route: 'categorias-productos' },
-                        { label: 'Parámetros generales', route: 'parametros-generales' },
-                        { label: 'Métodos de pago', route: 'metodos-pago' },
-                    ]
-                },
-                { label: 'Mis datos', route: 'user-profile' },
+                { label: 'Usuarios', route: 'usuarios' },
+                { label: 'Posiciones', route: 'posiciones' },
+                // { label: 'Compras', route: 'compras' },
+                // { label: 'Ventas', route: 'ventas' },
+                // { label: 'Proveedores', route: 'proveedores' },
+                // { label: 'Clientes', route: 'clientes' },
+                // {
+                //     label: 'Configuraciones', route: 'config', submenu: [
+                //         { label: 'Usuarios', route: 'usuarios' },
+                //         { label: 'Bancos', route: 'bancos' },
+                //         { label: 'Países', route: 'paises' },
+                //         { label: 'Provincias', route: 'provincias' },
+                //         { label: 'Ciudades', route: 'ciudades' },
+                //         { label: 'Géneros', route: 'generos' },
+                //         { label: 'Monedas', route: 'monedas' },
+                //         { label: 'Ubicaciones', route: 'ubicaciones' },
+                //         { label: 'Tipos de cambio', route: 'exchanges' },
+                //         { label: 'Tipos de productos', route: 'tipos-productos' },
+                //         { label: 'Cuentas bancarias de LADIE', route: 'cuentas-bancarias' },
+                //         { label: 'Categorías de productos', route: 'categorias-productos' },
+                //         { label: 'Parámetros generales', route: 'parametros-generales' },
+                //         { label: 'Métodos de pago', route: 'metodos-pago' },
+                //     ]
+                // },
+                // { label: 'Mis datos', route: 'user-profile' },
             ];
-        case 'PRODUCCION':
-            return [
-                { label: 'Producción', route: 'produccion' },
-                { label: 'Mis datos', route: 'user-profile' },
-            ];
-        case 'USUARIO':
+        case 'ROLE_USER':
         default:
             return [
                 { label: 'Mis datos', route: 'user-profile' },

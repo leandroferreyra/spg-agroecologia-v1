@@ -43,12 +43,12 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     iconEyeSlash = faEyeSlash;
 
     // // Obtén la referencia al modal
-    @ViewChild('modalSeleccionRol') modalSeleccionRol!: NgxCustomModalComponent;
-    modalOptions: ModalOptions = {
-        closeOnOutsideClick: false,
-        hideCloseButton: true,
-        closeOnEscape: false
-    };
+    // @ViewChild('modalSeleccionRol') modalSeleccionRol!: NgxCustomModalComponent;
+    // modalOptions: ModalOptions = {
+    //     closeOnOutsideClick: false,
+    //     hideCloseButton: true,
+    //     closeOnEscape: false
+    // };
 
     constructor(
         public storeData: Store<any>,
@@ -80,7 +80,6 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
 
     inicializarForm() {
         this.loginForm = new FormGroup({
-            usuario: new FormControl(null, [Validators.required]),
             email: new FormControl(null, [Validators.email]),
             password: new FormControl(null, [Validators.required])
         });
@@ -91,37 +90,28 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         if (this.loginForm.valid) {
             this._spinner.show();
             let login = new LoginDTO();
-            let usuario = this.loginForm.get('usuario')?.value;
-            if (this.isEmail(usuario)) {
-                login.email = usuario;
-            } else {
-                login.user_name = usuario;
-            }
+            login.email = this.loginForm.get('email')?.value;
             login.password = this.loginForm.get('password')?.value;
-            login.with.push('roles');
-            login.with.push('permissions');
             this.subscription.add(
                 this._authService.login(login).subscribe({
                     next: res => {
-                        this.usuarioLogueado = res.data;
+                        console.log(res);
+                        this.usuarioLogueado = res;
                         this._tokenService.setToken(this.usuarioLogueado.token);
                         this._userLogged.setUsuarioLogueado(this.usuarioLogueado);
-                        if (this.tieneVariosRoles()) {
-                            this.modalSeleccionRol.options = this.modalOptions;
-                            this.modalSeleccionRol.open();
-                        } else {
-                            localStorage.setItem('userRole', this.usuarioLogueado.roles[0].name);
-                            this.storeData.dispatch({ type: 'setUserRole', payload: this.usuarioLogueado.roles[0].name });
-                            this.router.navigate(['/dashboard/user-profile']);
-                        }
+                        localStorage.setItem('userRole', this.usuarioLogueado.authorities[0].authority);
+                        this.storeData.dispatch({ type: 'setUserRole', payload: this.usuarioLogueado.authorities[0].authority });
+                        this.router.navigate(['/dashboard/user-profile']);
                         this._spinner.hide();
                     },
                     error: error => {
-                        if (error.error.message.includes('no fue verificado')) {
-                            this.openSwalResendMailVerificacion(error.error.message);
+                        if (error.error.detalleError === "El email se encuentra deshabilitado. Revise su correo para activarlo.") {
+                            // this.openSwalResendMailVerificacion(error.error.message);
+                            this.swalService.toastError('top-right', error.error.detalleError);
+
                         } else {
                             console.error(error);
-                            this.swalService.toastError('top-right', error.error.message);
+                            this.swalService.toastError('top-right', error.error.detalleError);
                         }
                         this._spinner.hide();
                     }
@@ -173,9 +163,9 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         this._authService.cambioRol(rol.name);
     }
 
-    cancelarSeleccionDashboard() {
-        this.closeModalSeleccionRol();
-    }
+    // cancelarSeleccionDashboard() {
+    //     this.closeModalSeleccionRol();
+    // }
 
     isEmail(value: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -210,9 +200,9 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         }
     }
 
-    closeModalSeleccionRol() {
-        this.modalSeleccionRol.close();
-    }
+    // closeModalSeleccionRol() {
+    //     this.modalSeleccionRol.close();
+    // }
 
     showSwalFire(text: string) {
         Swal.fire({

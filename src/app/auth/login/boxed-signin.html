@@ -18,18 +18,17 @@
                         <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Iniciar
                             sesión
                         </h1>
-                        <p class="text-base font-bold leading-normal text-white-dark">Ingresa tu email o usuario para
+                        <p class="text-base font-bold leading-normal text-white-dark">Ingresa tu email para
                             loguearte</p>
                     </div>
 
                     <form class="space-y-4 dark:text-white" [formGroup]="loginForm">
 
 
-                        <div [ngClass]="isSubmitLogin ? loginForm.controls['usuario'].errors ? 'has-error'
+                        <div [ngClass]="isSubmitLogin ? loginForm.controls['email'].errors ? 'has-error'
                         : 'has-success' : ''">
-                            <label for=" usuario">Nombre de usuario o Email</label>
-                            <input id="usuario" type="text" placeholder="" class="form-control"
-                                formControlName="usuario" />
+                            <label for=" email">Email</label>
+                            <input id="email" type="text" placeholder="" class="form-control" formControlName="email" />
                         </div>
 
                         <div
@@ -70,44 +69,6 @@
     </div>
 </div>
 
-
-<div>
-    <ngx-custom-modal #modalSeleccionRol class="modal-top extra-large-modal animate animate-fade-in">
-
-        <ng-template #modalHeader>
-            <h5 class="text-lg font-semibold dark:text-white-light">Ingresar con rol</h5>
-        </ng-template>
-
-        <ng-template #modalBody>
-
-            <div class="row justify-content-center flex-grow-1 align-items-center mt-5 mb-5">
-                <div class="col-md-12 d-flex flex-wrap justify-content-center">
-                    @for(rol of usuarioLogueado.roles ; track rol) {
-                    <div [ngClass]="{'col-lg-4': usuarioLogueado.roles.length === 3, 'col-lg-6': usuarioLogueado.roles.length === 2}"
-                        class="col-md-6 col-sm-6 col-xs-6 d-flex flex-column align-items-center">
-                        <button class="btn btn-wd btn-primary m-2" (click)="ingresarAlDashboard(rol)">
-                            <span style="font-size: 1.3em;">
-                                {{ rol.name }}
-                            </span>
-                        </button>
-                    </div>
-                    }
-                </div>
-            </div>
-
-            <div class="row mt-3">
-                <div class="col-12 d-flex justify-content-center">
-                    <button id="back-button-with-border" type="button" class="btn btn-wd"
-                        (click)="cancelarSeleccionDashboard()">Cancelar</button>
-                </div>
-            </div>
-
-
-
-
-        </ng-template>
-    </ngx-custom-modal>
-</div>
 
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
     <p style="font-size: 20px; color: white">Cargando</p>

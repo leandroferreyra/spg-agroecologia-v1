@@ -12,6 +12,7 @@ import { Rol } from '../models/response/rol';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { ChangePasswordDTO } from '../models/request/changePasswordDTO';
+import { Token } from '../models/response/token';
 
 @Injectable({
   providedIn: 'root'
@@ -27,18 +28,22 @@ export class AuthService {
   private apiRegister = '/register';
   private apiChangePassword = '/change_password';
 
+
+  private authURL = '/auth';
+
+
   constructor(private http: HttpClient, public storeData: Store<any>, private router: Router) {
   }
 
-  register(registro: RegistroDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiRegister, JSON.stringify(registro), { headers });
-  }
+  // register(registro: RegistroDTO): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiRegister, JSON.stringify(registro), { headers });
+  // }
 
-  login(login: LoginDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiLogin, JSON.stringify(login), { headers });
-  }
+  // login(login: LoginDTO): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiLogin, JSON.stringify(login), { headers });
+  // }
 
   logout(): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
@@ -67,20 +72,22 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    return !!localStorage.getItem('usuarioLogueado');
   }
 
   getUserRoles(): Rol[] {
     let usuarioLogueado = JSON.parse(localStorage.getItem('usuarioLogueado') || '[]');
-    if (usuarioLogueado && usuarioLogueado.roles.length > 0) {
-      return usuarioLogueado.roles;
+    if (usuarioLogueado && usuarioLogueado.authorities.length > 0) {
+      return usuarioLogueado.authorities;
     }
     return [];
   }
 
   hasAnyRole(expectedRoles: string[]): boolean {
     const roles = this.getUserRoles();
-    return expectedRoles.some(role => roles.some((r: Rol) => r.name === role));
+    return expectedRoles.some(role =>
+      roles.some((r: any) => r.authority === role)
+    );
   }
 
   changePassword(actual_role: string, changePasswordDTO: ChangePasswordDTO): Observable<any> {
@@ -104,6 +111,17 @@ export class AuthService {
     }
   }
 
+  // ----------------------------------------------------------------
+
+  register(registroDTO: RegistroDTO): Observable<Token> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<Token>(environment.baseUrl + this.authURL + '/registro', JSON.stringify(registroDTO), { headers });
+  }
+
+  login(loginDTO: LoginDTO): Observable<Token> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<Token>(environment.baseUrl + this.authURL + '/login', JSON.stringify(loginDTO), { headers });
+  }
 
 
 }

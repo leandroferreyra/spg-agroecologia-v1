@@ -10,10 +10,21 @@ export class UserLoggedService {
   public user: Observable<any>;
 
   constructor() {
-    const storedUser = JSON.parse(localStorage.getItem('usuarioLogueado') || 'null');
-    const storedRole = storedUser ? storedUser.role : null;
+    const stored = localStorage.getItem('usuarioLogueado');
 
-    this.userSubject = new BehaviorSubject<any>(storedUser);
+    let parsedUser = null;
+
+    try {
+      parsedUser = stored && stored !== 'undefined'
+        ? JSON.parse(stored)
+        : null;
+    } catch (e) {
+      console.warn('Error parseando usuarioLogueado:', e);
+      parsedUser = null;
+      localStorage.removeItem('usuarioLogueado');
+    }
+
+    this.userSubject = new BehaviorSubject<any>(parsedUser);
     this.user = this.userSubject.asObservable();
   }
 

@@ -31,25 +31,14 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
     showPassword: boolean = false;
     showConfirmPassword: boolean = false;
 
+    mostrarOrganizacion: boolean = false;
 
     // Iconos
     iconEye = faEye;
     iconEyeSlash = faEyeSlash;
 
-    // Obtén la referencia al modal
-    // @ViewChild('modalSeleccionTipoUsuario') modalSeleccionTipoUsuario!: NgxCustomModalComponent;
-    // modalOptions: ModalOptions = {
-    //     closeOnOutsideClick: false,
-    //     hideCloseButton: true,
-    //     closeOnEscape: false
-    // };
-
     // Catalogos
-    paises: any[] = [];
-    provincias: any[] = [];
-    ciudades: any[] = [];
-    generos: any[] = [];
-    documentos: any[] = [];
+    posiciones: any[] = [];
 
     constructor(
         public storeData: Store<any>,
@@ -62,14 +51,10 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
         this.inicializarFormRegistro();
 
         forkJoin({
-            generos: this._catalogService.getGeneros(),
-            paises: this._catalogService.getPaises(),
-            documentos: this._catalogService.getDocumentos()
+            posiciones: this._catalogService.getPosiciones(),
         }).subscribe({
             next: res => {
-                this.generos = res.generos.data;
-                this.paises = res.paises.data;
-                this.documentos = res.documentos.data;
+                this.posiciones = res.posiciones;
             },
             error: error => {
                 console.error('Error cargando catalogos:', error);
@@ -96,53 +81,33 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
     inicializarFormRegistro() {
         this.registroFormGroup = new FormGroup({
             nombre: new FormControl(null, [Validators.required]),
-            apellido: new FormControl(null, [Validators.required]),
-            usuario: new FormControl(null, [Validators.required]),
+            posicion: new FormControl(null, [Validators.required]),
+            organizacion: new FormControl(null, [Validators.required]),
+            celular: new FormControl(null, [Validators.required]),
             email: new FormControl(null, [Validators.required, Validators.email]),
             password: new FormControl(null, [Validators.required]),
             confirmPassword: new FormControl(null, [Validators.required]),
-            tipoDocumento: new FormControl(null, []),
-            numeroDocumento: new FormControl(null, []),
-            cuit: new FormControl(null, []),
-            genero: new FormControl(null, []),
-            direccionCalle: new FormControl(null, []),
-            direccionNumero: new FormControl(null, []),
-            direccionDetalle: new FormControl(null, []),
-            pais: new FormControl(null, []),
-            provincia: new FormControl(null, []),
-            ciudad: new FormControl(null, [])
+            tipoDocumento: new FormControl(null, [])
         });
         this.onChange();
     }
     onChange() {
-        this.registroFormGroup.get('pais')!.valueChanges.subscribe(
-            (uuid: string) => {
-                this._catalogService.getProvinciasByCountry(uuid).subscribe({
-                    next: res => {
-                        this.registroFormGroup.get('provincia')?.setValue(null);
-                        this.provincias = res.data.districts;
-                    },
-                    error: error => {
-                        this.swalService.toastError('center', 'Error al traer provincias del servidor.');
-                        console.error(error);
-                    }
-                });
-            });
-
-        this.registroFormGroup.get('provincia')!.valueChanges.subscribe(
-            (uuid: string) => {
-                if (uuid) {
-                    this._catalogService.getCiudadesByProvincia(uuid).subscribe({
-                        next: res => {
-                            this.registroFormGroup.get('ciudad')?.setValue(null);
-                            this.ciudades = res.data.cities;
-                        },
-                        error: error => {
-                            this.swalService.toastError('center', 'Error al traer ciudades del servidor.');
-                            console.error(error);
-                        }
-                    });
+        this.registroFormGroup.get('posicion')!.valueChanges.subscribe(
+            (valor: string) => {
+                const posicionSeleccionada = this.posiciones.find(posicion => posicion.id === +valor);
+                this.mostrarOrganizacion = (posicionSeleccionada.nombre !== 'Consumidor/a');
+                if (!this.mostrarOrganizacion) {
+                    this.registroFormGroup.get('organizacion')!.reset(); // Restablecer el valor de organizacion si no se muestra
+                    const organizacionControl = this.registroFormGroup.get('organizacion');
+                    organizacionControl!.setValidators([]);
+                    organizacionControl!.updateValueAndValidity();
+                } else {
+                    // Si es true, se actualiza para que sea requerido.
+                    const organizacionControl = this.registroFormGroup.get('organizacion');
+                    organizacionControl!.setValidators([Validators.required]);
+                    organizacionControl!.updateValueAndValidity();
                 }
+
             });
     }
 
@@ -152,23 +117,17 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
             if (this.coincidePassword()) {
                 this.spinner.show();
                 let registro = new RegistroDTO();
-                registro.firstname = this.registroFormGroup.get('nombre')?.value;
-                registro.lastname = this.registroFormGroup.get('apellido')?.value;
+                registro.nombre = this.registroFormGroup.get('nombre')?.value;
+                registro.posicion = this.registroFormGroup.get('posicion')?.value;
+                registro.organizacion = this.registroFormGroup.get('organizacion')?.value;
                 registro.email = this.registroFormGroup.get('email')?.value;
-                registro.user_name = this.registroFormGroup.get('usuario')?.value;
+                registro.celular = this.registroFormGroup.get('celular')?.value;
                 registro.password = this.registroFormGroup.get('password')?.value;
-                registro.password_confirmation = this.registroFormGroup.get('confirmPassword')?.value;
-                registro.CUIT = this.registroFormGroup.get('cuit')?.value;
-                registro.document_type_uuid = this.registroFormGroup.get('tipoDocumento')?.value;
-                registro.document_number = this.registroFormGroup.get('numeroDocumento')?.value;
-                registro.city_uuid = this.registroFormGroup.get('ciudad')?.value;
-                registro.street_name = this.registroFormGroup.get('direccionCalle')?.value;
-                registro.door_number = this.registroFormGroup.get('direccionNumero')?.value;
-                registro.address_detail = this.registroFormGroup.get('direccionDetalle')?.value;
+                registro.confirmPassword = this.registroFormGroup.get('confirmPassword')?.value;
                 this.subscription.add(
                     this._authService.register(registro).subscribe({
                         next: res => {
-                            this.showSwalFire("¡Genial!. Se te ha enviado un e-mail a tu casilla de correo electrónico para confirmar tu cuenta. Recordá revisar SPAM.");
+                            this.showSwalFire("¡Genial!. Aguardá a ser habilitado/a para poder ingresar");
                             this.router.navigate(['auth/boxed-signin']);
                             this.spinner.hide();
                         },
@@ -179,7 +138,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                     })
                 )
             } else {
-                this.swalService.toastError('center', 'Las contraseñas no coinciden');
+                this.swalService.toastError('top-right', 'Las contraseñas no coinciden');
             }
         }
     }
@@ -209,7 +168,5 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
     toggleConfirmPassword() {
         this.showConfirmPassword = !this.showConfirmPassword;
     }
-
-
 
 }

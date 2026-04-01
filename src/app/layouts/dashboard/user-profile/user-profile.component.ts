@@ -91,22 +91,22 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
-    this.spinner.show();
-    this.subscription.add(
-      this.userService.getUser(this.actual_role, this.usuarioLogueado.uuid).subscribe({
-        next: res => {
-          this.usuarioLogueado = res.data;
-          this.dataLoaded = true;
-          this.inicializarForm();
-          this._tokenService.setToken(res.token);
-          this.obtenerCatalogos();
-        },
-        error: error => {
-          this.spinner.hide();
-          console.error(error);
-        }
-      })
-    );
+    // this.spinner.show();
+    // this.subscription.add(
+    //   this.userService.getUser(this.actual_role, this.usuarioLogueado.uuid).subscribe({
+    //     next: res => {
+    //       this.usuarioLogueado = res.data;
+    //       this.dataLoaded = true;
+    //       this.inicializarForm();
+    //       this._tokenService.setToken(res.token);
+    //       this.obtenerCatalogos();
+    //     },
+    //     error: error => {
+    //       this.spinner.hide();
+    //       console.error(error);
+    //     }
+    //   })
+    // );
   }
 
   obtenerCatalogos() {
@@ -309,20 +309,17 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
   armarDTORegistro() {
     let registro = new RegistroDTO();
-    registro.actual_role = this.actual_role;
-    registro.with = ['gender', 'person.city', 'person.city.district', 'person.city.district.country'];
-    registro.email = this.userForm.get('email')?.value;
-    registro.user_name = this.userForm.get('usuario')?.value;
-    registro.firstname = this.userForm.get('nombres')?.value;
-    registro.lastname = this.userForm.get('apellidos')?.value;
-    registro.gender_uuid = this.userForm.get('genero')?.value;
-    registro.city_uuid = this.userForm.get('ciudad')?.value;
-    registro.street_name = this.userForm.get('direccionCalle')?.value;
-    registro.door_number = this.userForm.get('direccionNumero')?.value;
-    registro.address_detail = this.userForm.get('direccionDetalle')?.value;
-    // cuit 
-    // document_number!: string;
-    // document_type_uuid!: string;
+    // registro.actual_role = this.actual_role;
+    // registro.with = ['gender', 'person.city', 'person.city.district', 'person.city.district.country'];
+    // registro.email = this.userForm.get('email')?.value;
+    // registro.user_name = this.userForm.get('usuario')?.value;
+    // registro.firstname = this.userForm.get('nombres')?.value;
+    // registro.lastname = this.userForm.get('apellidos')?.value;
+    // registro.gender_uuid = this.userForm.get('genero')?.value;
+    // registro.city_uuid = this.userForm.get('ciudad')?.value;
+    // registro.street_name = this.userForm.get('direccionCalle')?.value;
+    // registro.door_number = this.userForm.get('direccionNumero')?.value;
+    // registro.address_detail = this.userForm.get('direccionDetalle')?.value;
 
     return registro;
   }

@@ -30,7 +30,7 @@ export class AppComponent {
             }),
             mergeMap((route) => route.data)
         ).subscribe((data) => {
-            const title = data['title'] ? `LADIE - ${data['title']}` : 'LADIE';
+            const title = data['title'] ? `SPG Agroecología - ${data['title']}` : 'SPG Agroecología';
             this.titleService.setTitle(title);
         });
     }

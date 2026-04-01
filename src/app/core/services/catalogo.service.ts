@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { filter, map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthResponse } from '../models/response/authResponse';
+import { PosicionResponse } from '../models/response/posicionResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,9 @@ export class CatalogoService {
   apiDocumentosContables = '/account_document_types';
   apiQualification = '/qualification_options';
   apiUsers = '/users';
+
+  urlPosicion = '/posiciones/';
+
 
   constructor(private http: HttpClient) { }
 
@@ -168,6 +172,12 @@ export class CatalogoService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     let params = new HttpParams().append('actual_role', rol);
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiUsers, { headers, params: params });
+  }
+
+  getPosiciones(): Observable<PosicionResponse[]> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json').set('ngrok-skip-browser-warning', "true");
+    return this.http.get<PosicionResponse[]>(environment.baseUrl + this.urlPosicion, { headers });
   }
 
 }
