@@ -5,14 +5,11 @@ import { Constantes } from 'src/Constantes';
 import { environment } from 'src/environments/environment';
 import { LoginDTO } from '../models/request/loginDTO';
 import { AuthResponse } from '../models/response/authResponse';
-import { EmailDTO } from '../models/request/emailDTO';
-import { RegistroDTO } from '../models/request/registroDTO';
-import { ResetPasswordDTO } from '../models/request/resetPasswordDTO';
 import { Rol } from '../models/response/rol';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
-import { ChangePasswordDTO } from '../models/request/changePasswordDTO';
 import { Token } from '../models/response/token';
+import { RegistroDTO } from '../models/request/registroDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -51,20 +48,20 @@ export class AuthService {
   }
 
 
-  sendMail(email: EmailDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetMail, JSON.stringify(email), { headers });
-  }
+  // sendMail(email: EmailDTO): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetMail, JSON.stringify(email), { headers });
+  // }
 
-  reSendMail(email: EmailDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiResendMail, JSON.stringify(email), { headers });
-  }
+  // reSendMail(email: EmailDTO): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiResendMail, JSON.stringify(email), { headers });
+  // }
 
-  resetPassword(resetPassword: ResetPasswordDTO): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-    return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetPass, JSON.stringify(resetPassword), { headers });
-  }
+  // resetPassword(resetPassword: ResetPasswordDTO): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
+  //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetPass, JSON.stringify(resetPassword), { headers });
+  // }
 
   verifyUser(hash: string, token: string): Observable<AuthResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
@@ -90,26 +87,26 @@ export class AuthService {
     );
   }
 
-  changePassword(actual_role: string, changePasswordDTO: ChangePasswordDTO): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const params = new HttpParams()
-      .append('actual_role', actual_role)
-    return this.http.put<any>(environment.baseUrl + this.apiChangePassword, JSON.stringify(changePasswordDTO), { headers, params });
-  }
+  // changePassword(actual_role: string, changePasswordDTO: ChangePasswordDTO): Observable<any> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   const params = new HttpParams()
+  //     .append('actual_role', actual_role)
+  //   return this.http.put<any>(environment.baseUrl + this.apiChangePassword, JSON.stringify(changePasswordDTO), { headers, params });
+  // }
 
-  cambioRol(rol: any) {
-    localStorage.setItem('userRole', rol);
-    this.storeData.dispatch({ type: 'setUserRole', payload: rol });
-    if (rol === Constantes.ADMIN || rol === Constantes.ADMINISTRACION || Constantes.SUPER_ADMIN) {
-      this.router.navigate(['/dashboard/producciones']);
-    }
-    if (rol === Constantes.PRODUCCION) {
-      this.router.navigate(['/dashboard/producciones']);
-    }
-    if (rol === Constantes.USUARIO) {
-      this.router.navigate(['/dashboard/user-profile']);
-    }
-  }
+  // cambioRol(rol: any) {
+  //   localStorage.setItem('userRole', rol);
+  //   this.storeData.dispatch({ type: 'setUserRole', payload: rol });
+  //   if (rol === Constantes.ADMIN || rol === Constantes.ADMINISTRACION || Constantes.SUPER_ADMIN) {
+  //     this.router.navigate(['/dashboard/producciones']);
+  //   }
+  //   if (rol === Constantes.PRODUCCION) {
+  //     this.router.navigate(['/dashboard/producciones']);
+  //   }
+  //   if (rol === Constantes.USUARIO) {
+  //     this.router.navigate(['/dashboard/user-profile']);
+  //   }
+  // }
 
   // ----------------------------------------------------------------
 

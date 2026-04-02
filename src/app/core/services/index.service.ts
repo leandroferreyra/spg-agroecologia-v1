@@ -415,4 +415,8 @@ export class IndexService {
     return this.http.get<AuthResponse>(environment.baseUrl + this.apiDisposiciones, { headers, params: this.getNewParams(paramsObj, rol) });
   }
 
+  // ----------------------------------------------------
+
+  
+
 }

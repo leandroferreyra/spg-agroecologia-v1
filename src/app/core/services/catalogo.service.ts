@@ -175,8 +175,7 @@ export class CatalogoService {
   }
 
   getPosiciones(): Observable<PosicionResponse[]> {
-    let headers = new HttpHeaders();
-    headers = headers.set('Content-type', 'application/json').set('ngrok-skip-browser-warning', "true");
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.get<PosicionResponse[]>(environment.baseUrl + this.urlPosicion, { headers });
   }
 

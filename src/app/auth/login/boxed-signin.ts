@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -8,11 +8,10 @@ import { Subscription } from 'rxjs';
 import { LoginDTO } from '../../core/models/request/loginDTO';
 import { AuthService } from '../../core/services/auth.service';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
-import { EmailDTO } from '../../core/models/request/emailDTO';
 import Swal from 'sweetalert2';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
-import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
+import { NgxCustomModalComponent } from 'ngx-custom-modal';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -121,46 +120,46 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     }
 
     openSwalResendMailVerificacion(error: string) {
-        Swal.fire({
-            title: error,
-            text: '¿Desea que le reenviemos el email de habilitación de usuario?',
-            icon: 'info',
-            confirmButtonText: 'Enviar',
-            showDenyButton: true,
-            denyButtonText: 'Cancelar',
-            didRender: () => {
-                const cancelButton = Swal.getDenyButton();
-                if (cancelButton) {
-                    cancelButton.setAttribute('id', 'back-button-with-border');
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this._spinner.show();
-                let email = new EmailDTO();
-                if (this.isEmail(this.loginForm.get('usuario')?.value)) {
-                    email.email = this.loginForm.get('usuario')?.value;
-                } else {
-                    email.user_name = this.loginForm.get('usuario')?.value
-                }
-                this.subscription.add(
-                    this._authService.reSendMail(email).subscribe({
-                        next: res => {
-                            this._spinner.hide();
-                            this.showSwalFire("¡Genial!. Se te ha enviado un e-mail a tu casilla de correo electrónico para confirmar tu cuenta. Recordá revisar SPAM.");
-                        },
-                        error: error => {
-                            this._spinner.hide();
-                            console.error(error);
-                        }
-                    }
-                    ));
-            }
-        })
+        // Swal.fire({
+        //     title: error,
+        //     text: '¿Desea que le reenviemos el email de habilitación de usuario?',
+        //     icon: 'info',
+        //     confirmButtonText: 'Enviar',
+        //     showDenyButton: true,
+        //     denyButtonText: 'Cancelar',
+        //     didRender: () => {
+        //         const cancelButton = Swal.getDenyButton();
+        //         if (cancelButton) {
+        //             cancelButton.setAttribute('id', 'back-button-with-border');
+        //         }
+        //     }
+        // }).then((result) => {
+        //     if (result.isConfirmed) {
+        //         this._spinner.show();
+        //         let email = new EmailDTO();
+        //         if (this.isEmail(this.loginForm.get('usuario')?.value)) {
+        //             email.email = this.loginForm.get('usuario')?.value;
+        //         } else {
+        //             email.user_name = this.loginForm.get('usuario')?.value
+        //         }
+        //         this.subscription.add(
+        //             this._authService.reSendMail(email).subscribe({
+        //                 next: res => {
+        //                     this._spinner.hide();
+        //                     this.showSwalFire("¡Genial!. Se te ha enviado un e-mail a tu casilla de correo electrónico para confirmar tu cuenta. Recordá revisar SPAM.");
+        //                 },
+        //                 error: error => {
+        //                     this._spinner.hide();
+        //                     console.error(error);
+        //                 }
+        //             }
+        //             ));
+        //     }
+        // })
     }
 
     ingresarAlDashboard(rol: any) {
-        this._authService.cambioRol(rol.name);
+        // this._authService.cambioRol(rol.name);
     }
 
     // cancelarSeleccionDashboard() {
@@ -177,27 +176,27 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     }
 
     enviarEmail() {
-        this.isSubmitRecuperoClave = true;
-        if (this.envioEmailForm.valid) {
-            this._spinner.show();
-            let email = new EmailDTO();
-            email.email = this.envioEmailForm.get('email')?.value;
+        // this.isSubmitRecuperoClave = true;
+        // if (this.envioEmailForm.valid) {
+        //     this._spinner.show();
+        //     let email = new EmailDTO();
+        //     email.email = this.envioEmailForm.get('email')?.value;
 
-            this.subscription.add(
-                this._authService.sendMail(email).subscribe({
-                    next: res => {
-                        this._spinner.hide();
-                        this.showSwalFire("Se le envió un correo con el link para cambiar la clave. Recuerde revisar los spam.");
-                        // this.closeModalRecuperoClave();
-                    },
-                    error: error => {
-                        console.error(error);
-                        this._spinner.hide();
-                    }
-                }
-                ));
+        //     this.subscription.add(
+        //         this._authService.sendMail(email).subscribe({
+        //             next: res => {
+        //                 this._spinner.hide();
+        //                 this.showSwalFire("Se le envió un correo con el link para cambiar la clave. Recuerde revisar los spam.");
+        //                 // this.closeModalRecuperoClave();
+        //             },
+        //             error: error => {
+        //                 console.error(error);
+        //                 this._spinner.hide();
+        //             }
+        //         }
+        //         ));
 
-        }
+        // }
     }
 
     // closeModalSeleccionRol() {
@@ -223,41 +222,41 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
 
 
     async openModalRecuperoClave() {
-        const { value: email } = await Swal.fire({
-            title: 'Recupera tu clave',
-            input: 'email',
-            inputLabel: 'Email',
-            inputPlaceholder: 'tuemail@ejemplo.com',
-            confirmButtonText: 'Recuperar',
-            showCancelButton: true,
-            allowOutsideClick: false,
-            inputValidator: (value) => {
-                if (!value) {
-                    return '¡Email es requerido!';
-                }
-                return null;
-            },
-        });
+        // const { value: email } = await Swal.fire({
+        //     title: 'Recupera tu clave',
+        //     input: 'email',
+        //     inputLabel: 'Email',
+        //     inputPlaceholder: 'tuemail@ejemplo.com',
+        //     confirmButtonText: 'Recuperar',
+        //     showCancelButton: true,
+        //     allowOutsideClick: false,
+        //     inputValidator: (value) => {
+        //         if (!value) {
+        //             return '¡Email es requerido!';
+        //         }
+        //         return null;
+        //     },
+        // });
 
-        if (email) {
-            this._spinner.show();
-            let emailDto = new EmailDTO();
-            emailDto.email = email;
+        // if (email) {
+        //     this._spinner.show();
+        //     let emailDto = new EmailDTO();
+        //     emailDto.email = email;
 
-            this.subscription.add(
-                this._authService.sendMail(emailDto).subscribe({
-                    next: res => {
-                        this._spinner.hide();
-                        this.showSwalFire("Se le envió un correo con el link para cambiar la clave. Recuerde revisar los spam.");
-                    },
-                    error: error => {
-                        console.error(error);
-                        this._spinner.hide();
-                        this.swalService.toastError('top-right', error.error.message);
-                    }
-                }
-                ));
-        }
+        //     this.subscription.add(
+        //         this._authService.sendMail(emailDto).subscribe({
+        //             next: res => {
+        //                 this._spinner.hide();
+        //                 this.showSwalFire("Se le envió un correo con el link para cambiar la clave. Recuerde revisar los spam.");
+        //             },
+        //             error: error => {
+        //                 console.error(error);
+        //                 this._spinner.hide();
+        //                 this.swalService.toastError('top-right', error.error.message);
+        //             }
+        //         }
+        //         ));
+        // }
     }
 
 

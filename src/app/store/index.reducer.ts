@@ -73,7 +73,7 @@ function getMenuByRole(role: string) {
             return [
                 { label: 'Usuarios', route: 'usuarios' },
                 { label: 'Posiciones', route: 'posiciones' },
-                // { label: 'Compras', route: 'compras' },
+                { label: 'Principios', route: 'principios' },
                 // { label: 'Ventas', route: 'ventas' },
                 // { label: 'Proveedores', route: 'proveedores' },
                 // { label: 'Clientes', route: 'clientes' },
@@ -95,7 +95,7 @@ function getMenuByRole(role: string) {
                 //         { label: 'Métodos de pago', route: 'metodos-pago' },
                 //     ]
                 // },
-                // { label: 'Mis datos', route: 'user-profile' },
+                { label: 'Mis datos', route: 'user-profile' },
             ];
         case 'ROLE_USER':
         default:

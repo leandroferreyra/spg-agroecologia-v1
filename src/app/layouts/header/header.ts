@@ -12,7 +12,6 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { ChangePasswordDTO } from 'src/app/core/models/request/changePasswordDTO';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { Subscription } from 'rxjs';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -135,9 +134,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.modalCambioRol.open();
     }
     ingresarAlDashboard(rol: any) {
-        this.closeModalCambioRol();
-        this.actual_role = rol;
-        this._authService.cambioRol(rol.name);
+        // this.closeModalCambioRol();
+        // this.actual_role = rol;
+        // this._authService.cambioRol(rol.name);
     }
     closeModalCambioRol() {
         this.modalCambioRol.close();
@@ -155,33 +154,33 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.modalCambioClave.open();
     }
     confirmarCambioClave() {
-        this.isSubmitChangePassword = true;
-        if (this.changePasswordForm.valid) {
-            if (this.changePasswordForm.get('newPassword')?.value === this.changePasswordForm.get('confirmPassword')?.value) {
-                this.spinner.show();
-                let changePasswordDTO = new ChangePasswordDTO();
-                changePasswordDTO.password = this.changePasswordForm.get('password')?.value;
-                changePasswordDTO.new_password = this.changePasswordForm.get('newPassword')?.value;
-                changePasswordDTO.new_password_confirmation = this.changePasswordForm.get('confirmPassword')?.value;
-                this.subscription.add(
-                    this._authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
-                        next: res => {
-                            this.spinner.hide();
-                            this.closeModalCambioClave();
-                            this._tokenService.setToken(res.token);
-                            this.swalService.toastSuccess("top-right", "Contraseña actualizada.");
-                        },
-                        error: error => {
-                            this.spinner.hide();
-                            console.error(error);
-                            this.swalService.toastError("top-right", "Error en la actualización de contraseña.");
-                        }
-                    })
-                );
-            } else {
-                this.swalService.toastError('top-right', "Las contraseñas no coinciden.");
-            }
-        }
+        // this.isSubmitChangePassword = true;
+        // if (this.changePasswordForm.valid) {
+        //     if (this.changePasswordForm.get('newPassword')?.value === this.changePasswordForm.get('confirmPassword')?.value) {
+        //         this.spinner.show();
+        //         let changePasswordDTO = new ChangePasswordDTO();
+        //         changePasswordDTO.password = this.changePasswordForm.get('password')?.value;
+        //         changePasswordDTO.new_password = this.changePasswordForm.get('newPassword')?.value;
+        //         changePasswordDTO.new_password_confirmation = this.changePasswordForm.get('confirmPassword')?.value;
+        //         this.subscription.add(
+        //             this._authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
+        //                 next: res => {
+        //                     this.spinner.hide();
+        //                     this.closeModalCambioClave();
+        //                     this._tokenService.setToken(res.token);
+        //                     this.swalService.toastSuccess("top-right", "Contraseña actualizada.");
+        //                 },
+        //                 error: error => {
+        //                     this.spinner.hide();
+        //                     console.error(error);
+        //                     this.swalService.toastError("top-right", "Error en la actualización de contraseña.");
+        //                 }
+        //             })
+        //         );
+        //     } else {
+        //         this.swalService.toastError('top-right', "Las contraseñas no coinciden.");
+        //     }
+        // }
     }
     togglePassword() {
         this.showPassword = !this.showPassword;

@@ -9,7 +9,6 @@ import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
-import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
 import { Rol } from 'src/app/core/models/response/rol';
 import { UsuarioResponse } from 'src/app/core/models/response/usuarioResponse';
 import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
@@ -57,29 +56,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   filtros: any = {};
   MIN_FILTER_SIZE = 3;
 
-  // Referencia al modal para crear y editar países.
-  // @ViewChild('modalUsuarioView') modalUsuarioView!: NgxCustomModalComponent;
-  // modalOptions: ModalOptions = {
-  //   closeOnOutsideClick: false,
-  //   hideCloseButton: true,
-  //   closeOnEscape: true
-  // };
-  // usuarioView: any;
-
-  // @ViewChild('modalRoles') modalRoles!: NgxCustomModalComponent;
-  // modalOptionsRoles: ModalOptions = {
-  //   closeOnOutsideClick: false,
-  //   hideCloseButton: true,
-  //   closeOnEscape: true
-  // };
-
-  // rolesForm!: FormGroup;
-  // usuarioInEdicion: any;
-  // roles: any[] = [];
-
-
   showFilter: boolean = false;
-
 
   constructor(public storeData: Store<any>, private userService: UserService, private spinner: NgxSpinnerService,
     private tokenService: TokenService, private swalService: SwalService, private rolService: RolesService,
@@ -102,7 +79,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
     this.obtenerUsuarios();
-    // this.obtenerRoles();
     this.titleService.setTitle('SPG Agroecología - Usuarios');
   }
 

@@ -9,7 +9,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowAltCircleLeft, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
-import { ResetPasswordDTO } from 'src/app/core/models/request/resetPasswordDTO';
+// import { ResetPasswordDTO } from 'src/app/core/models/request/resetPasswordDTO';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -85,57 +85,57 @@ export class BoxedPasswordResetComponent implements OnInit, OnDestroy {
 
 
     confirmarReset() {
-        this.isSubmitResetForm = true;
-        if (this.resetPasswordForm.valid) {
-            if (this.resetPasswordForm.get('password')?.value === this.resetPasswordForm.get('confirmPassword')?.value) {
-                this.spinner.show();
-                let resetPass = new ResetPasswordDTO();
-                resetPass.new_password = this.resetPasswordForm.get('password')?.value;
-                resetPass.new_password_confirmation = this.resetPasswordForm.get('confirmPassword')?.value;
-                resetPass.hash = this.hash;
-                this.subscription.add(
-                    this._authService.resetPassword(resetPass).subscribe({
-                        next: res => {
-                            this.spinner.hide();
-                            Swal.fire({
-                                title: '',
-                                text: `Password modificado correctamente.`,
-                                icon: 'success',
-                                confirmButtonText: 'Continuar',
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    this.router.navigate(['auth/boxed-signin']);
-                                }
-                            });
-                        },
-                        error: error => {
-                            console.error(error);
-                            this.spinner.hide();
-                            Swal.fire({
-                                position: "top-right",
-                                toast: true,
-                                width: '30em',
-                                icon: "error",
-                                title: error.error.message,
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        }
-                    })
-                );
-            } else {
-                this.spinner.hide();
-                Swal.fire({
-                    position: "top-right",
-                    toast: true,
-                    width: '30em',
-                    icon: "error",
-                    title: 'Las contraseñas no coinciden.',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            }
-        }
+        // this.isSubmitResetForm = true;
+        // if (this.resetPasswordForm.valid) {
+        //     if (this.resetPasswordForm.get('password')?.value === this.resetPasswordForm.get('confirmPassword')?.value) {
+        //         this.spinner.show();
+        //         let resetPass = new ResetPasswordDTO();
+        //         resetPass.new_password = this.resetPasswordForm.get('password')?.value;
+        //         resetPass.new_password_confirmation = this.resetPasswordForm.get('confirmPassword')?.value;
+        //         resetPass.hash = this.hash;
+        //         this.subscription.add(
+        //             this._authService.resetPassword(resetPass).subscribe({
+        //                 next: res => {
+        //                     this.spinner.hide();
+        //                     Swal.fire({
+        //                         title: '',
+        //                         text: `Password modificado correctamente.`,
+        //                         icon: 'success',
+        //                         confirmButtonText: 'Continuar',
+        //                     }).then((result) => {
+        //                         if (result.isConfirmed) {
+        //                             this.router.navigate(['auth/boxed-signin']);
+        //                         }
+        //                     });
+        //                 },
+        //                 error: error => {
+        //                     console.error(error);
+        //                     this.spinner.hide();
+        //                     Swal.fire({
+        //                         position: "top-right",
+        //                         toast: true,
+        //                         width: '30em',
+        //                         icon: "error",
+        //                         title: error.error.message,
+        //                         showConfirmButton: false,
+        //                         timer: 1500
+        //                     });
+        //                 }
+        //             })
+        //         );
+        //     } else {
+        //         this.spinner.hide();
+        //         Swal.fire({
+        //             position: "top-right",
+        //             toast: true,
+        //             width: '30em',
+        //             icon: "error",
+        //             title: 'Las contraseñas no coinciden.',
+        //             showConfirmButton: false,
+        //             timer: 1500
+        //         });
+        //     }
+        // }
     }
 
 }

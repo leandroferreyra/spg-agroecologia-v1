@@ -6,8 +6,6 @@ import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { forkJoin, Subscription } from 'rxjs';
-import { ChangePasswordDTO } from 'src/app/core/models/request/changePasswordDTO';
-import { RegistroDTO } from 'src/app/core/models/request/registroDTO';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -21,8 +19,6 @@ import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
 import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
 import { IconLockComponent } from 'src/app/shared/icon/icon-lock';
 import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
-import { HumanService } from 'src/app/core/services/human.service';
-import { Title } from '@angular/platform-browser';
 
 
 @Component({
@@ -74,7 +70,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   constructor(public storeData: Store<any>, private _userLogged: UserLoggedService, private userService: UserService,
     private _tokenService: TokenService, private spinner: NgxSpinnerService, private _catalogService: CatalogoService,
-    private authService: AuthService, private router: Router, private swalService: SwalService, private humanService: HumanService
+    private authService: AuthService, private router: Router, private swalService: SwalService
   ) {
     this.initStore();
   }
@@ -241,74 +237,64 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   confirmarEdicion() {
-    if (this.userForm.valid && !this.userForm.pristine) {
-      this.spinner.show();
-      let registro = this.armarDTORegistro();
-      this.subscription.add(
-        this.humanService.updateHuman(this.usuarioLogueado.human.uuid, registro).subscribe({
-          next: res => {
-            this._tokenService.setToken(res.token);
-            if (this.usuarioLogueado.email !== registro.email) {
-              this.authService.logout().subscribe({
-                next: res => {
-                  Swal.fire({
-                    title: "",
-                    text: `Se le envió un correo para verificar el nuevo email. Recuerde revisar spam`,
-                    icon: 'info',
-                    confirmButtonText: 'Aceptar',
-                    showDenyButton: false,
-                    // denyButtonText: 'Cancelar',
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      // this.registroForm.get(formControl)!.setValue(true, { emitEvent: false });
-                      this.router.navigate(['auth/boxed-signin'])
-                    }
-                  });
-                },
-                error: error => {
-                  console.error(error);
-                }
-              });
-            }
-            this.spinner.hide();
-            this.usuarioLogueado.human.firstname = res.data.firstname;
-            this.usuarioLogueado.human.lastname = res.data.lastname;
-            this.usuarioLogueado.user_name = res.data.user.user_name;
-            // this.usuarioLogueado.document_number = registro.document_number;
-            // this.usuarioLogueado.document_type.uuid = registro.document_type_uuid;
-            if (res.data.gender?.uuid) {
-              this.usuarioLogueado.human.gender.uuid = res.data.gender?.uuid;
-            }
-            this.usuarioLogueado.human.person.city.uuid = res.data.person.city.uuid;;
-            this.usuarioLogueado.human.person.address_detail = res.data.person.address_detail;
-            this.usuarioLogueado.human.person.door_number = res.data.person.door_number;
-            this.usuarioLogueado.human.person.street_name = res.data.person.street_name;
-            this.usuarioLogueado.human.person.city.district.country.uuid = res.data.person.city.district.country.uuid;
-            // let roles = res.data?.roles;
-            // this.usuarioLogueado.roles = [];
-            // roles.forEach((element: string) => {
-            //   let rol = new Rol();
-            //   rol.name = element;
-            //   this.usuarioLogueado.roles.push(rol);
-            // });
-            this._userLogged.setUsuarioLogueado(this.usuarioLogueado);
-            this.inicializarForm();
-            this.isEdicion = false;
-            this.swalService.toastSuccess('top-right', "Usuario actualizado.");
-          },
-          error: error => {
-            this.spinner.hide();
-            console.error(error);
-            this.swalService.toastError('top-right', error.error.message);
-          }
-        })
-      );
-    } else {
-      this.swalService.toastError('top-right', "Formulario inválido o sin cambios.");
-    }
+    // if (this.userForm.valid && !this.userForm.pristine) {
+    //   this.spinner.show();
+    //   let registro = this.armarDTORegistro();
+    //   this.subscription.add(
+    //     this.humanService.updateHuman(this.usuarioLogueado.human.uuid, registro).subscribe({
+    //       next: res => {
+    //         this._tokenService.setToken(res.token);
+    //         if (this.usuarioLogueado.email !== registro.email) {
+    //           this.authService.logout().subscribe({
+    //             next: res => {
+    //               Swal.fire({
+    //                 title: "",
+    //                 text: `Se le envió un correo para verificar el nuevo email. Recuerde revisar spam`,
+    //                 icon: 'info',
+    //                 confirmButtonText: 'Aceptar',
+    //                 showDenyButton: false,
+    //               }).then((result) => {
+    //                 if (result.isConfirmed) {
+    //                   this.router.navigate(['auth/boxed-signin'])
+    //                 }
+    //               });
+    //             },
+    //             error: error => {
+    //               console.error(error);
+    //             }
+    //           });
+    //         }
+    //         this.spinner.hide();
+    //         this.usuarioLogueado.human.firstname = res.data.firstname;
+    //         this.usuarioLogueado.human.lastname = res.data.lastname;
+    //         this.usuarioLogueado.user_name = res.data.user.user_name;
+    //         if (res.data.gender?.uuid) {
+    //           this.usuarioLogueado.human.gender.uuid = res.data.gender?.uuid;
+    //         }
+    //         this.usuarioLogueado.human.person.city.uuid = res.data.person.city.uuid;;
+    //         this.usuarioLogueado.human.person.address_detail = res.data.person.address_detail;
+    //         this.usuarioLogueado.human.person.door_number = res.data.person.door_number;
+    //         this.usuarioLogueado.human.person.street_name = res.data.person.street_name;
+    //         this.usuarioLogueado.human.person.city.district.country.uuid = res.data.person.city.district.country.uuid;
+    //         this._userLogged.setUsuarioLogueado(this.usuarioLogueado);
+    //         this.inicializarForm();
+    //         this.isEdicion = false;
+    //         this.swalService.toastSuccess('top-right', "Usuario actualizado.");
+    //       },
+    //       error: error => {
+    //         this.spinner.hide();
+    //         console.error(error);
+    //         this.swalService.toastError('top-right', error.error.message);
+    //       }
+    //     })
+    //   );
+    // } else {
+    //   this.swalService.toastError('top-right', "Formulario inválido o sin cambios.");
+    // }
   }
+
   armarDTORegistro() {
-    let registro = new RegistroDTO();
+    // let registro = new RegistroDTO();
     // registro.actual_role = this.actual_role;
     // registro.with = ['gender', 'person.city', 'person.city.district', 'person.city.district.country'];
     // registro.email = this.userForm.get('email')?.value;
@@ -321,7 +307,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     // registro.door_number = this.userForm.get('direccionNumero')?.value;
     // registro.address_detail = this.userForm.get('direccionDetalle')?.value;
 
-    return registro;
+    // return registro;
   }
 
   // Modal cambio clave 
@@ -335,33 +321,33 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.modalCambioClave.open();
   }
   confirmarCambioClave() {
-    this.isSubmitChangePassword = true;
-    if (this.changePasswordForm.valid) {
-      if (this.changePasswordForm.get('newPassword')?.value === this.changePasswordForm.get('confirmPassword')?.value) {
-        this.spinner.show();
-        let changePasswordDTO = new ChangePasswordDTO();
-        changePasswordDTO.password = this.changePasswordForm.get('password')?.value;
-        changePasswordDTO.new_password = this.changePasswordForm.get('newPassword')?.value;
-        changePasswordDTO.new_password_confirmation = this.changePasswordForm.get('confirmPassword')?.value;
-        this.subscription.add(
-          this.authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
-            next: res => {
-              this.spinner.hide();
-              this.closeModalCambioClave();
-              this._tokenService.setToken(res.token);
-              this.swalService.toastSuccess("top-right", "Contraseña actualizada.");
-            },
-            error: error => {
-              this.spinner.hide();
-              console.error(error);
-              this.swalService.toastError("top-right", "Error en la actualización de contraseña.");
-            }
-          })
-        );
-      } else {
-        this.swalService.toastError('top-right', "Las contraseñas no coinciden.");
-      }
-    }
+    // this.isSubmitChangePassword = true;
+    // if (this.changePasswordForm.valid) {
+    //   if (this.changePasswordForm.get('newPassword')?.value === this.changePasswordForm.get('confirmPassword')?.value) {
+    //     this.spinner.show();
+    //     let changePasswordDTO = new ChangePasswordDTO();
+    //     changePasswordDTO.password = this.changePasswordForm.get('password')?.value;
+    //     changePasswordDTO.new_password = this.changePasswordForm.get('newPassword')?.value;
+    //     changePasswordDTO.new_password_confirmation = this.changePasswordForm.get('confirmPassword')?.value;
+    //     this.subscription.add(
+    //       this.authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
+    //         next: res => {
+    //           this.spinner.hide();
+    //           this.closeModalCambioClave();
+    //           this._tokenService.setToken(res.token);
+    //           this.swalService.toastSuccess("top-right", "Contraseña actualizada.");
+    //         },
+    //         error: error => {
+    //           this.spinner.hide();
+    //           console.error(error);
+    //           this.swalService.toastError("top-right", "Error en la actualización de contraseña.");
+    //         }
+    //       })
+    //     );
+    //   } else {
+    //     this.swalService.toastError('top-right', "Las contraseñas no coinciden.");
+    //   }
+    // }
   }
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -384,9 +370,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.modalCambioRol.open();
   }
   ingresarAlDashboard(rol: any) {
-    this.closeModalCambioRol();
-    this.actual_role = rol;
-    this.authService.cambioRol(rol);
+    // this.closeModalCambioRol();
+    // this.actual_role = rol;
+    // this.authService.cambioRol(rol);
   }
   closeModalCambioRol() {
     this.modalCambioRol.close();

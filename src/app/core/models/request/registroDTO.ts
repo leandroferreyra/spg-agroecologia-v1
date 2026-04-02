@@ -7,7 +7,7 @@ export class RegistroDTO {
     confirmPassword!: string;
     posicion!: number;
     celular!: string;
-    roles!: string [];
+    roles!: string[];
 
     constructor() {
 
