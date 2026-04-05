@@ -114,19 +114,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     cerrarSesion() {
-        this.spinner.show();  // Mostrar spinner al inicio
-        this._authService.logout().subscribe({
-            next: res => {
-                this._tokenService.logout();
-                this._userLogged.clearUsuarioLogueado();
-                this.router.navigate(['/auth/boxed-signin']);
-                this.spinner.hide();
-            },
-            error: error => {
-                this.spinner.hide();
-                console.error(error);
-            }
-        });
+        this._tokenService.logout();
+        this._userLogged.clearUsuarioLogueado();
     }
 
     openModalCambiarRol() {

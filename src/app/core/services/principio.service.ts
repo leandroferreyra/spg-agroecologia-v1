@@ -19,6 +19,11 @@ export class PrincipioService {
     return this.http.get<PrincipioResponse[]>(environment.baseUrl + this.urlPrincipios, { headers });
   }
 
+  getPrincipiosHabilitados(): Observable<PrincipioResponse[]> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<PrincipioResponse[]>(environment.baseUrl + this.urlPrincipios + 'habilitados', { headers });
+  }
+
   save(principio: PrincipioDTO): Observable<PrincipioResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<PrincipioResponse>(environment.baseUrl + this.urlPrincipios, JSON.stringify(principio), { headers });

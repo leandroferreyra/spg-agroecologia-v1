@@ -12,8 +12,6 @@ import { Subscription } from 'rxjs';
 import { Rol } from 'src/app/core/models/response/rol';
 import { UsuarioResponse } from 'src/app/core/models/response/usuarioResponse';
 import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
-import { IndexService } from 'src/app/core/services/index.service';
-import { RolesService } from 'src/app/core/services/roles.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
@@ -59,8 +57,8 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   showFilter: boolean = false;
 
   constructor(public storeData: Store<any>, private userService: UserService, private spinner: NgxSpinnerService,
-    private tokenService: TokenService, private swalService: SwalService, private rolService: RolesService,
-    private _userLogged: UserLoggedService, private _indexService: IndexService, private titleService: Title
+    private tokenService: TokenService, private swalService: SwalService,
+    private _userLogged: UserLoggedService, private titleService: Title
   ) {
     this.initStore();
   }

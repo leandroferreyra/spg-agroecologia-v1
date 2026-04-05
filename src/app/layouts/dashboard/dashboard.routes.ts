@@ -36,6 +36,11 @@ export const DASHBOARD_ROUTES: Routes = [
                 loadComponent: () => import('./config/listado-principios/listado-principios.component').then(m => m.ListadoPrincipiosComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Principios' }
             },
+            {
+                path: 'estrategias',
+                loadComponent: () => import('./config/listado-estrategias/listado-estrategias.component').then(m => m.ListadoEstrategiasComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Estrategias' }
+            },
 
         ]
     }

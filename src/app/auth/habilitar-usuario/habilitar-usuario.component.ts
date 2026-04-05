@@ -32,37 +32,37 @@ export class HabilitarUsuarioComponent implements OnInit, OnDestroy {
       this.uuid = params['uuid'];
       this.token = params['token'];
     });
-    this.subscription.add(
-      this._authService.verifyUser(this.uuid, this.token).subscribe({
-        next: res => {
-          this.spinner.hide();
-          Swal.fire({
-            title: '',
-            text: `¡Excelente! Estás habilitado.`,
-            icon: 'success',
-            confirmButtonText: 'Continuar',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              this.router.navigate(['auth/boxed-signin']);
-            }
-          });
-        },
-        error: error => {
-          this.spinner.hide();
-          Swal.fire({
-            title: '',
-            text: `Ocurrio un error en la habilitación.`,
-            icon: 'error',
-            confirmButtonText: 'Continuar',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              this.router.navigate(['auth/boxed-signin']);
-            }
-          });
-          console.error(error);
-        }
-      })
-    );
+    // this.subscription.add(
+    //   this._authService.verifyUser(this.uuid, this.token).subscribe({
+    //     next: res => {
+    //       this.spinner.hide();
+    //       Swal.fire({
+    //         title: '',
+    //         text: `¡Excelente! Estás habilitado.`,
+    //         icon: 'success',
+    //         confirmButtonText: 'Continuar',
+    //       }).then((result) => {
+    //         if (result.isConfirmed) {
+    //           this.router.navigate(['auth/boxed-signin']);
+    //         }
+    //       });
+    //     },
+    //     error: error => {
+    //       this.spinner.hide();
+    //       Swal.fire({
+    //         title: '',
+    //         text: `Ocurrio un error en la habilitación.`,
+    //         icon: 'error',
+    //         confirmButtonText: 'Continuar',
+    //       }).then((result) => {
+    //         if (result.isConfirmed) {
+    //           this.router.navigate(['auth/boxed-signin']);
+    //         }
+    //       });
+    //       console.error(error);
+    //     }
+    //   })
+    // );
   }
 
   ngOnDestroy(): void {

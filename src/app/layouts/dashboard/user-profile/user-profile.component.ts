@@ -106,25 +106,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   obtenerCatalogos() {
-    forkJoin({
-      generos: this._catalogService.getGeneros(),
-      paises: this._catalogService.getPaises(),
-      provincias: this._catalogService.getProvinciasByCountry(this.usuarioLogueado.human?.person?.city?.district?.country.uuid),
-      ciudades: this._catalogService.getCiudadesByProvincia(this.usuarioLogueado.human?.person?.city?.district.uuid),
-      // tiposDocumento: this._catalogService.getDocumentos(),
-    }).subscribe({
-      next: res => {
-        this.generos = res.generos.data;
-        this.paises = res.paises.data;
-        this.provincias = res.provincias.data.districts;
-        this.ciudades = res.ciudades.data.cities;
-        this.spinner.hide();
-      },
-      error: error => {
-        this.spinner.hide();
-        console.error('Error cargando catalogos: ', error);
-      }
-    });
+
   }
 
   inicializarForm() {
@@ -146,38 +128,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   onFormChange() {
 
-    this.userForm.get('pais')!.valueChanges.subscribe(
-      (valor: string) => {
-        this._catalogService.getProvinciasByCountry(valor).subscribe({
-          next: res => {
-            if (this.userForm.get('pais')?.value !== this.usuarioLogueado.human.person.city.district.country.uuid) {
-              this.userForm.get('provincia')?.setValue('');
-              this.userForm.get('ciudad')?.setValue('');
-            }
-            this.provincias = res.data.districts;
-            this.ciudades = [];
-          },
-          error: error => {
-            console.error(error);
-          }
-        });
-      });
-
-    this.userForm.get('provincia')!.valueChanges.subscribe(
-      (valor: string) => {
-        this._catalogService.getCiudadesByProvincia(valor).subscribe({
-          next: res => {
-            if (this.userForm.get('provincia')?.value !== this.usuarioLogueado.human.person.city.district.uuid) {
-              this.userForm.get('ciudad')?.setValue('');
-            }
-            this.ciudades = res.data.cities;
-          },
-          error: error => {
-            console.error(error);
-          }
-        });
-      });
-
   }
 
   toggleEdicion() {
@@ -190,34 +140,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   cancelarEdicion() {
-    if (this.userForm.get('pais')?.value !== this.usuarioLogueado.human.person.city.district.country.uuid) {
-      // Si es distinto quiere decir que modificó el select de país por lo que cambiaron las ciudades, hay que volverlo a su estado original.
-      this.subscription.add(
-        this._catalogService.getProvinciasByCountry(this.usuarioLogueado.human.person.city.district.country.uuid).subscribe({
-          next: res => {
-            this.provincias = res.data.districts;
-          },
-          error: error => {
-            console.error(error);
-          }
-        })
-      )
-    }
-
-    if (this.userForm.get('provincia')?.value !== this.usuarioLogueado.human.person.city.district.uuid) {
-      // Si es distinto quiere decir que modificó el select de provincia por lo que cambiaron las ciudades, hay que volverlo a su estado original.
-      this.subscription.add(
-        this._catalogService.getCiudadesByProvincia(this.usuarioLogueado.human.person.city.district.uuid).subscribe({
-          next: res => {
-            this.ciudades = res.data.cities;
-          },
-          error: error => {
-            console.error(error);
-          }
-        })
-      )
-    }
-
     this.isEdicion = false;
     this.inicializarForm();
   }

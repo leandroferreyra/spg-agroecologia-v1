@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { Constantes } from 'src/Constantes';
 import { environment } from 'src/environments/environment';
 import { LoginDTO } from '../models/request/loginDTO';
-import { AuthResponse } from '../models/response/authResponse';
 import { Rol } from '../models/response/rol';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
@@ -42,10 +41,10 @@ export class AuthService {
   //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiLogin, JSON.stringify(login), { headers });
   // }
 
-  logout(): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiLogout, { headers });
-  }
+  // logout(): Observable<AuthResponse> {
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  //   return this.http.get<AuthResponse>(environment.baseUrl + this.apiLogout, { headers });
+  // }
 
 
   // sendMail(email: EmailDTO): Observable<AuthResponse> {
@@ -62,11 +61,6 @@ export class AuthService {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
   //   return this.http.post<AuthResponse>(environment.baseUrl + this.apiResetPass, JSON.stringify(resetPassword), { headers });
   // }
-
-  verifyUser(hash: string, token: string): Observable<AuthResponse> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'APP-KEY': Constantes.APPKEY });
-    return this.http.get<AuthResponse>(environment.baseUrl + this.apiVerifyUser + hash + '/' + token, { headers });
-  }
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('usuarioLogueado');
