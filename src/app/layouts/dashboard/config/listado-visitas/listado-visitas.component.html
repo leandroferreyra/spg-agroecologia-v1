@@ -1,9 +1,9 @@
 <div class="panel mt-6 pb-0">
 
     <div class="mb-5 flex flex-wrap items-center gap-2">
-        <h5 class="text-lg font-semibold dark:text-white-light">Estrategias</h5>
+        <h5 class="text-lg font-semibold dark:text-white-light">Principios</h5>
         @if(actual_role === 'ROLE_ADMIN') {
-        <button type="button" ngxTippy="Agregar estrategia" (click)="openModalNuevoEstrategia('NEW')">
+        <button type="button" ngxTippy="Agregar principio" (click)="openModalNuevoPrincipio('NEW')">
             <icon-plus />
         </button>
         }
@@ -15,13 +15,13 @@
 
     <div class="row mb-2">
         <div class="col-6">
-            <span *ngIf="estrategias && estrategias.length > 0" class="float-md-start color-gris">
+            <span *ngIf="principios && principios.length > 0" class="float-md-start color-gris">
                 Página: {{ currentPage}}/{{numPages.pageCount }}
             </span>
         </div>
         <div class="col-6" style="text-align: right;">
-            <span *ngIf="estrategias && estrategias.length > 0" class="float-md-end color-gris">
-                Ítems: {{itemsInPage}}/{{ estrategias.length }}
+            <span *ngIf="principios && principios.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ principios.length }}
             </span>
         </div>
     </div>
@@ -32,9 +32,6 @@
                 <tr>
                     <th>
                         Nombre
-                    </th>
-                    <th>
-                        Principio
                     </th>
                     <th>
                         Estado
@@ -50,8 +47,6 @@
                     <td>
                         <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.nombre" />
                     </td>
-                    <td> <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.principio" />
-                    </td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -59,12 +54,11 @@
                 @for(data of filtrarDatos() | slice: pageSize | slice: 0:itemsPerPage ; track data.id) {
                 <tr>
                     <td class="whitespace-nowrap">{{ data.nombre}} </td>
-                    <td class="whitespace-nowrap">{{ data.principioAgroecologico.nombre}} </td>
                     <td>
                         <div class="flex items-center gap-2 mt-2">
                             <label class="w-12 h-6 relative">
                                 <input type="checkbox"
-                                    (click)="openSwalCambiarEstadoEstrategia(data, 'checkbox' + data.id)"
+                                    (click)="openSwalCambiarEstadoPrincipio(data, 'checkbox' + data.id)"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
                                     [checked]="data.habilitado" [id]="'checkbox' + data.id" />
                                 <span for="custom_switch_checkbox5"
@@ -79,15 +73,15 @@
                             @if (actual_role === 'ROLE_ADMIN') {
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                    (click)="openModalNuevoEstrategia('EDIT', data)">
+                                    (click)="openModalNuevoPrincipio('EDIT', data)">
                                     <icon-pencil />
                                 </button>
                             </div>
-                            <div>
-                                <button type="button" ngxTippy="Info" (click)="openModalNuevoEstrategia('INFO', data)">
-                                    <icon-info-circle />
+                            <!-- <div>
+                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
                                 </button>
-                            </div>
+                            </div> -->
                             }
                         </div>
                     </td>
@@ -102,7 +96,7 @@
                     [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
                     [boundaryLinks]="true" (pageChange)="obtenerBancos()" /> -->
 
-                <ngb-pagination class="float-md-end" [collectionSize]="estrategias.length" #numPages
+                <ngb-pagination class="float-md-end" [collectionSize]="principios.length" #numPages
                     [pageSize]="itemsPerPage" [(page)]="currentPage" (pageChange)="onPageChange(currentPage)">
                 </ngb-pagination>
             </div>
@@ -110,7 +104,7 @@
             <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
                 <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
                 <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
-                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerEstrategiasAndPrincipios()">
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerPrincipios()">
                 </ng-select>
             </div>
         </div>
@@ -121,7 +115,7 @@
 
 
 <div>
-    <ngx-custom-modal #modalEstrategia class="modal-top animate animate-fade-in">
+    <ngx-custom-modal #modalPrincipio class="modal-top animate animate-fade-in">
         <ng-template #modalHeader>
             <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
         </ng-template>
@@ -131,35 +125,18 @@
                 <div class="row justify-content-center">
 
                     <div class="col-md-12">
-                        <form [formGroup]="estrategiaForm" (keydown.enter)="confirmarEstrategia()">
-
-                            <div class="mb-2"
-                                [ngClass]="isSubmit ? estrategiaForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>Principio</label>
-                                <input type="text" class="form-control" formControlName="nombre">
-                            </div>
-
-                            <div class="mb-2" [ngClass]=" isSubmit ? estrategiaForm.controls['situacionEsperable'].errors
-                                ? 'has-error' : 'has-success' : ''">
-                                <label>Situación esperable</label>
-                                <textarea class="form-control" formControlName="situacionEsperable">
-                                </textarea>
-                            </div>
+                        <form [formGroup]="principioForm" (keydown.enter)="confirmarPrincipio()">
 
                             <div
-                                [ngClass]="isSubmit ? estrategiaForm.controls['principio'].errors ? 'has-error' : 'has-success' : ''">
+                                [ngClass]="isSubmit ? principioForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
                                 <label>Principio</label>
-                                <ng-select [items]="principios" bindLabel="nombre" bindValue="id"
-                                    formControlName="principio" [virtualScroll]="true" [appendTo]="'body'"
-                                    clearAllText="Limpiar"
-                                    [ngClass]="isSubmit ? estrategiaForm.controls['principio'].errors ? 'has-error' : 'has-success' : ''">
-                                </ng-select>
+                                <input type="text" class="form-control" formControlName="nombre">
                             </div>
 
                             <div class="row mt-3">
                                 <div class="col-12 d-flex justify-content-center">
                                     <button type="button" class="btn btn-wd btn-primary mr-4"
-                                        (click)="confirmarEstrategia()">Confirmar</button>
+                                        (click)="confirmarPrincipio()">Confirmar</button>
                                     <button id="back-button-with-border" type="button" class="btn btn-wd"
                                         (click)="cerrarModal()">Cancelar</button>
                                 </div>

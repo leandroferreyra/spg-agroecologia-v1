@@ -1,0 +1,331 @@
+<div class="panel mt-6 pb-0">
+
+    <div class="mb-5 flex flex-wrap items-center gap-2">
+        <h5 class="text-lg font-semibold dark:text-white-light">Quintas</h5>
+        @if(actual_role === 'ROLE_ADMIN') {
+        <button type="button" ngxTippy="Agregar estrategia" (click)="openModalNuevaQuinta('NEW')">
+            <icon-plus />
+        </button>
+        }
+        <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+            <icon-search />
+        </button>
+    </div>
+
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="quintas && quintas.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="quintas && quintas.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ quintas.length }}
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Organizacion
+                    </th>
+                    <th>
+                        Productor
+                    </th>
+                    <th>
+                        Dirección
+                    </th>
+                    <th>
+                        Sello de garantía
+                    </th>
+                    <th>
+                        Última visita
+                    </th>
+                    <th>
+                        Siguiente visita
+                    </th>
+                    <th>
+                        Visitas
+                    </th>
+                    <th>
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (showFilter) {
+                <tr>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.organizacion" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.productor" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.direccion" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.sello" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                }
+                @for(data of filtrarDatos() | slice: pageSize | slice: 0:itemsPerPage ; track data.id) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.organizacion}} </td>
+                    <td class="whitespace-nowrap">{{ data.nombreProductor}} </td>
+                    <td class="whitespace-nowrap">{{ data.direccion}} </td>
+                    <td class="whitespace-nowrap">{{ data.selloGarantia}} </td>
+                    <td class="whitespace-nowrap">{{ data.fechaUltimaVisita | date:'dd/MM/yyyy'}} </td>
+                    <td class="whitespace-nowrap">{{ siguienteVisita(data.fechaUltimaVisita) | date:'dd/MM/yyyy'}} </td>
+                    <td>
+                        <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Ir a las visitas"
+                            (click)="visitas(data)">
+                            <icon-eye />
+                        </button>
+                    </td>
+                    <td>
+                        <div class="flex items-center">
+                            @if (actual_role === 'ROLE_ADMIN') {
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Imágenes"
+                                    (click)="openModalImagenes(data)">
+                                    <icon-file />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalNuevaQuinta('EDIT', data)">
+                                    <icon-pencil />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Info"
+                                    (click)="openModalNuevaQuinta('INFO', data)">
+                                    <icon-info-circle />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Eliminar"
+                                    (click)="openSwalEliminar(data)">
+                                    <icon-trash-lines />
+                                </button>
+                            </div>
+                            }
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-md-end">
+                <ngb-pagination class="float-md-end" [collectionSize]="quintas.length" #numPages [ellipses]=true
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" (pageChange)="onPageChange(currentPage)"
+                    [rotate]="true" [boundaryLinks]="true" [maxSize]="5">
+                </ngb-pagination>
+            </div>
+
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerQuintas()">
+                </ng-select>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div>
+    <ngx-custom-modal #modalQuinta class="modal-top animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="quintaForm" (keydown.enter)="confirmarQuinta()">
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? quintaForm.controls['organizacion'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Organización</label>
+                                <input type="text" class="form-control" formControlName="organizacion">
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? quintaForm.controls['productor'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Productor</label>
+                                <input type="text" class="form-control" formControlName="productor">
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? quintaForm.controls['direccion'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Dirección</label>
+                                <input type="text" class="form-control" formControlName="direccion">
+                            </div>
+
+                            <div class="mb-3 text-center">
+                                <label class="font-semibold text-gray-700 d-block">Sello de garantía:</label>
+                                <div class="d-flex justify-content-center gap-3">
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioTodos">
+                                            <input class="form-radio rounded-full" type="radio" name="sello"
+                                                id="radioTodos" value="Si" formControlName="sello">
+                                            <span class="ml-2 cursor-pointer">Si</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioFisica">
+                                            <input class="form-radio rounded-full" type="radio" name="sello"
+                                                id="radioFisica" value="No" formControlName="sello">
+                                            <span class="ml-2 cursor-pointer">No</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <label class="inline-flex items-center" for="radioJuridica">
+                                            <input class="form-radio rounded-full" type="radio" name="sello"
+                                                id="radioJuridica" value="Suspendido" formControlName="sello">
+                                            <span class="ml-2 cursor-pointer">Suspendido</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? quintaForm.controls['superficieTotalCampo'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Sup. Total Campo (Hectáreas)</label>
+                                <input type="number" class="form-control" formControlName="superficieTotalCampo">
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? quintaForm.controls['superficieTotalInvernaculo'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Sup. Total Invernáculo (Hectáreas)</label>
+                                <input type="number" class="form-control" formControlName="superficieTotalInvernaculo">
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? quintaForm.controls['superficieAgroecologiaCampo'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Sup. Agroecololgía Campo (Hectáreas)</label>
+                                <input type="number" class="form-control" formControlName="superficieAgroecologiaCampo">
+                            </div>
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? quintaForm.controls['superficieAgroecologiaInvernaculo'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Sup. Agroecololgía Invernáculo (Hectáreas)</label>
+                                <input type="number" class="form-control"
+                                    formControlName="superficieAgroecologiaInvernaculo">
+                            </div>
+
+                            <div class="mb-2" [ngClass]=" isSubmit ? quintaForm.controls['comentarios'].errors
+                                ? 'has-error' : 'has-success' : ''">
+                                <label>Comentarios</label>
+                                <textarea class="form-control" formControlName="comentarios"
+                                    placeholder="Ingrese si produce otra cosa además de verduras ya sea para venta o consumo propio u otro comentario">
+                                </textarea>
+                            </div>
+
+                            <div class="form-group mb-2" *ngIf="selectedType === 'NEW'">
+                                <label class="label-modal" for="imagenes">
+                                    Imágenes de la quinta
+                                    <span>(Máximo 2)</span>
+                                </label>
+                                <input type="file" (change)="seleccionarImagen($event)" accept="image/*"
+                                    class="form-control mb-3" id="imagenes" multiple>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarQuinta()">Confirmar</button>
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+<div>
+    <ngx-custom-modal #modalImagen class="modal-top animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        @if (imagenesQuinta.length > 0) {
+                        <ngb-carousel [showNavigationIndicators]="false">
+                            <ng-template ngbSlide *ngFor="let imagen of imagenesQuinta; let i = index">
+                                <div class="row mb-3">
+                                    <div class="col-12 d-flex justify-content-center">
+                                        <button type="button" class="btn btn-wd btn-primary mr-4"
+                                            (click)="agregarImagenes()">Agregar imágenes</button>
+                                        <button type="button" class="btn btn-wd btn-primary mr-4"
+                                            (click)="eliminarImagen(imagen, i)">Eliminar imágen</button>
+                                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                            style="z-index: 999" (click)="cerrarModalImagenes()">Cancelar</button>
+                                    </div>
+                                </div>
+
+                                <div class="picsum-img-wrapper">
+                                    <img [src]="imagen.dato" alt="Imagen {{ i }}" />
+                                </div>
+
+                            </ng-template>
+                        </ngb-carousel>
+                        }@else{
+
+                        <div class="form-group mb-2">
+                            <label class="label-modal" for="imagenes">
+                                Imágenes de la quinta
+                                <span>(Máximo 2)</span>
+                            </label>
+                            <input type="file" (change)="seleccionarImagen($event)" accept="image/*"
+                                class="form-control mb-3" id="imagenes" multiple>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-center">
+                            <button type="button" class="btn btn-wd btn-primary mr-4"
+                                (click)="agregarImagenes()">Agregar imágenes</button>
+                            <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                (click)="cerrarModalImagenes()">Cancelar</button>
+                        </div>
+
+
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
+
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+</ngx-spinner>

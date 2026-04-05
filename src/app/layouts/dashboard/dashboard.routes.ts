@@ -41,6 +41,16 @@ export const DASHBOARD_ROUTES: Routes = [
                 loadComponent: () => import('./config/listado-estrategias/listado-estrategias.component').then(m => m.ListadoEstrategiasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Estrategias' }
             },
+            {
+                path: 'quintas',
+                loadComponent: () => import('./config/listado-quintas/listado-quintas.component').then(m => m.ListadoQuintasComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Quintas' }
+            },
+            {
+                path: 'quintas/:id/visitas',
+                loadComponent: () => import('./config/listado-visitas/listado-visitas.component').then(m => m.ListadoVisitasComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Visitas' }
+            },
 
         ]
     }

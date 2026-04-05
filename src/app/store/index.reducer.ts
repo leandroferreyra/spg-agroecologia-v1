@@ -75,7 +75,7 @@ function getMenuByRole(role: string) {
                 { label: 'Posiciones', route: 'posiciones' },
                 { label: 'Principios', route: 'principios' },
                 { label: 'Estrategias', route: 'estrategias' },
-                // { label: 'Proveedores', route: 'proveedores' },
+                { label: 'Quintas', route: 'quintas' },
                 // { label: 'Clientes', route: 'clientes' },
                 // {
                 //     label: 'Configuraciones', route: 'config', submenu: [

@@ -3,19 +3,22 @@ import { Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { forkJoin, Subscription } from 'rxjs';
-import { EstrategiaDTO } from 'src/app/core/models/request/estrategiaDTO';
-import { EstrategiaResponse } from 'src/app/core/models/response/estrategiaResponse';
-import { EstrategiasService } from 'src/app/core/services/estrategias.service';
+import { Subscription } from 'rxjs';
+import { PosicionDTO } from 'src/app/core/models/request/posicionDTO';
+import { PrincipioDTO } from 'src/app/core/models/request/principioDTO';
+import { PosicionResponse } from 'src/app/core/models/response/posicionResponse';
+import { PrincipioResponse } from 'src/app/core/models/response/principioResponse';
+import { PosicionService } from 'src/app/core/services/posicion.service';
 import { PrincipioService } from 'src/app/core/services/principio.service';
 import { SwalService } from 'src/app/core/services/swal.service';
-import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
+import { TokenService } from 'src/app/core/services/token.service';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconPlusComponent } from 'src/app/shared/icon/icon-plus';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
@@ -23,23 +26,22 @@ import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-listado-estrategias',
+  selector: 'app-listado-visitas',
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
-    IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, IconInfoCircleComponent, NgbPagination, IconSearchComponent, FontAwesomeModule, NgSelectModule],
-  templateUrl: './listado-estrategias.component.html',
-  styleUrl: './listado-estrategias.component.css'
+    IconPlusComponent, IconPencilComponent, IconTrashLinesComponent, NgbPagination, IconSearchComponent, FontAwesomeModule, NgSelectModule],
+  templateUrl: './listado-visitas.component.html',
+  styleUrl: './listado-visitas.component.css'
 })
-export class ListadoEstrategiasComponent {
+export class ListadoVisitasComponent {
 
   store: any;
   private subscription: Subscription = new Subscription();
 
   actual_role: string = '';
 
-  estrategias: any[] = [];
   principios: any[] = [];
-  estrategiaForm!: FormGroup;
+  principioForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
@@ -57,8 +59,11 @@ export class ListadoEstrategiasComponent {
   MIN_FILTER_SIZE = 3;
   showFilter: boolean = false;
 
+  iconArrowUp = faArrowUp;
+  iconArrowDown = faArrowDown;
+
   // Referencia al modal para crear y editar bancos.
-  @ViewChild('modalEstrategia') modalEstrategia!: NgxCustomModalComponent;
+  @ViewChild('modalPrincipio') modalPrincipio!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
     hideCloseButton: true,
@@ -66,7 +71,7 @@ export class ListadoEstrategiasComponent {
   };
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _principioService: PrincipioService,
-    private spinner: NgxSpinnerService, private _estrategiasService: EstrategiasService) {
+    private spinner: NgxSpinnerService, private tokenService: TokenService) {
     this.initStore();
   }
 
@@ -83,34 +88,28 @@ export class ListadoEstrategiasComponent {
   }
 
   ngOnInit(): void {
-    this.obtenerEstrategiasAndPrincipios();
+    this.obtenerPrincipios();
   }
 
-  obtenerEstrategiasAndPrincipios() {
-    let $parametros = this._estrategiasService.getEstrategias();
-    let $principios = this._principioService.getPrincipiosHabilitados();
-
+  obtenerPrincipios() {
+    this.spinner.show();
     this.subscription.add(
-      forkJoin([$parametros, $principios]).subscribe(
-        ([respuesta1, respuesta2]) => {
-          this.estrategias = respuesta1.sort((a, b) => a.principioAgroecologico.nombre.localeCompare(b.principioAgroecologico.nombre));
-          this.modificarPaginacion(respuesta1);
-          // if (this.estrategias.length <= this.MAX_ITEMS_PER_PAGE) {
-          //   this.itemsInPage = this.estrategias.length;
-          // }
-          this.principios = respuesta2;
+      this._principioService.getPrincipios().subscribe({
+        next: res => {
           this.spinner.hide();
+          this.principios = res;
+          this.modificarPaginacion(res);
         },
-        error => {
+        error: error => {
           this.spinner.hide();
           console.error(error);
         }
-      )
-    );
+      })
+    )
   }
 
   modificarPaginacion(res: any) {
-    if (this.estrategias.length <= this.itemsPerPage) {
+    if (this.principios.length <= this.itemsPerPage) {
       this.itemsInPage = res.length;
     } else {
       this.itemsInPage = this.currentPage * this.itemsPerPage;
@@ -120,8 +119,8 @@ export class ListadoEstrategiasComponent {
   public onPageChange(pageNum: number): void {
     this.pageSize = this.itemsPerPage * (pageNum - 1);
     this.itemsInPage = pageNum * this.itemsPerPage;
-    if (this.itemsInPage > this.estrategias.length) {
-      this.itemsInPage = this.estrategias.length;
+    if (this.itemsInPage > this.principios.length) {
+      this.itemsInPage = this.principios.length;
     }
   }
 
@@ -129,64 +128,45 @@ export class ListadoEstrategiasComponent {
     this.itemsPerPage = this.pageSize + num;
   }
 
-  filtrarDatos(): EstrategiaResponse[] {
-    let resultados = this.estrategias;
+  filtrarDatos(): PrincipioResponse[] {
+    let resultados = this.principios;
     if (this.filtros.nombre && this.filtros.nombre.length >= this.MIN_FILTER_SIZE) {
       resultados = resultados.filter(dato =>
         dato.nombre.toLocaleLowerCase().includes(this.filtros.nombre.toLowerCase()))
     }
-    if (this.filtros.principio && this.filtros.principio.length >= this.MIN_FILTER_SIZE) {
-      resultados = resultados.filter(dato =>
-        dato.principioAgroecologico.nombre.toLocaleLowerCase().includes(this.filtros.principio.toLowerCase()))
-    }
     return resultados;
   }
 
-  openModalNuevoEstrategia(type: string, estrategia?: any) {
+  openModalNuevoPrincipio(type: string, principio?: any) {
     if (type === 'NEW') {
       this.isEdicion = false;
-      this.tituloModal = 'Nueva estrategia';
-      this.estrategiaForm = new FormGroup({
+      this.tituloModal = 'Nueva posición';
+      this.principioForm = new FormGroup({
         nombre: new FormControl(null, [Validators.required]),
-        situacionEsperable: new FormControl(null, []),
-        principio: new FormControl(null, [Validators.required])
-      });
-    } else if (type === 'EDIT') {
-      this.isEdicion = true;
-      this.tituloModal = 'Edición estrategia';
-      this.estrategiaForm = new FormGroup({
-        id: new FormControl(estrategia?.id, []),
-        nombre: new FormControl(estrategia?.nombre, [Validators.required]),
-        situacionEsperable: new FormControl(estrategia?.situacionEsperable, [Validators.required]),
-        principio: new FormControl(estrategia?.principioAgroecologico?.id, [Validators.required])
       });
     } else {
-      this.isEdicion = false;
-      this.tituloModal = 'Información de estrategia';
-      this.estrategiaForm = new FormGroup({
-        id: new FormControl({ value: estrategia?.id, disabled: true }, []),
-        nombre: new FormControl({ value: estrategia?.nombre, disabled: true }, [Validators.required]),
-        situacionEsperable: new FormControl({ value: estrategia?.situacionEsperable, disabled: true }, [Validators.required]),
-        principio: new FormControl({ value: estrategia?.principioAgroecologico?.id, disabled: true }, [Validators.required])
+      this.isEdicion = true;
+      this.tituloModal = 'Edición posición';
+      this.principioForm = new FormGroup({
+        id: new FormControl(principio?.id, []),
+        nombre: new FormControl(principio?.nombre, [Validators.required])
       });
     }
-    this.modalEstrategia.options = this.modalOptions;
-    this.modalEstrategia.open();
+    this.modalPrincipio.options = this.modalOptions;
+    this.modalPrincipio.open();
   }
 
-  confirmarEstrategia() {
+  confirmarPrincipio() {
     this.isSubmit = true;
-    if (this.estrategiaForm.valid) {
+    if (this.principioForm.valid) {
       this.spinner.show();
-      let estrategia = new EstrategiaDTO();
-      estrategia.nombre = this.estrategiaForm.get('nombre')?.value;
-      estrategia.situacionEsperable = this.estrategiaForm.get('situacionEsperable')?.value;
-      estrategia.principioAgroecologico = this.estrategiaForm.get('principio')?.value;
+      let principio = new PrincipioDTO();
+      principio.nombre = this.principioForm.get('nombre')?.value;
       if (!this.isEdicion) {
         this.subscription.add(
-          this._estrategiasService.save(estrategia).subscribe({
+          this._principioService.save(principio).subscribe({
             next: res => {
-              this.obtenerEstrategiasAndPrincipios();
+              this.obtenerPrincipios();
               this.cerrarModal();
               this.spinner.hide();
             },
@@ -199,9 +179,9 @@ export class ListadoEstrategiasComponent {
         )
       } else {
         this.subscription.add(
-          this._estrategiasService.updateEstrategia(estrategia, this.estrategiaForm.get('id')?.value).subscribe({
+          this._principioService.updatePrincipio(principio, this.principioForm.get('id')?.value).subscribe({
             next: res => {
-              this.obtenerEstrategiasAndPrincipios();
+              this.obtenerPrincipios();
               this.cerrarModal();
               this.spinner.hide();
             },
@@ -218,14 +198,14 @@ export class ListadoEstrategiasComponent {
 
   cerrarModal() {
     this.isSubmit = false;
-    this.modalEstrategia.close();
+    this.modalPrincipio.close();
   }
 
-  openSwalCambiarEstadoEstrategia(estrategia: any, checkboxId: string) {
-    this.originalCheckedState = estrategia.habilitado;
+  openSwalCambiarEstadoPrincipio(principio: any, checkboxId: string) {
+    this.originalCheckedState = principio.habilitado;
     Swal.fire({
       title: '',
-      text: '¿Desea habilitar/deshabilitar la estrategia?',
+      text: '¿Desea habilitar/deshabilitar la posición?',
       icon: 'info',
       confirmButtonText: 'Confirmar',
       showDenyButton: true,
@@ -239,17 +219,17 @@ export class ListadoEstrategiasComponent {
     }).then((result) => {
       const checkbox = document.getElementById(checkboxId) as HTMLInputElement;
       if (result.isConfirmed) {
-        this.cambiarEstadoEstrategia(estrategia, checkbox);
+        this.cambiarEstadoPrincipio(principio, checkbox);
       } else if (result.isDenied) {
         checkbox.checked = this.originalCheckedState;
       }
     })
   }
 
-  cambiarEstadoEstrategia(estrategia: any, checkbox: any) {
+  cambiarEstadoPrincipio(principio: any, checkbox: any) {
     this.spinner.show();
     this.subscription.add(
-      this._estrategiasService.updateStatus(estrategia.id).subscribe({
+      this._principioService.updateStatus(principio.id).subscribe({
         next: res => {
           this.swalService.toastSuccess('top-right', 'Estado modificado con éxito.');
           this.spinner.hide();
@@ -270,7 +250,7 @@ export class ListadoEstrategiasComponent {
       this.filtros = {
         'nombre': ''
       };
-      this.obtenerEstrategiasAndPrincipios();
+      this.obtenerPrincipios();
     }
   }
 
