@@ -360,7 +360,6 @@ export class ListadoQuintasComponent {
     if (fileList) {
       const nuevosArchivos: File[] = Array.from(fileList);
       this.selectedImagenes = nuevosArchivos;
-      console.log("🚀 ~ ListadoQuintasComponent ~ seleccionarImagen ~ this.selectedImagenes:", this.selectedImagenes)
     }
   }
 
@@ -444,7 +443,7 @@ export class ListadoQuintasComponent {
 
     console.log(this.imagenesQuinta);
     // this.modalService.open(content, { backdrop: 'static', size: 'xl', scrollable: true, centered: true });
-    this.modalQuinta.options = this.modalOptions;
+    this.modalImagen.options = this.modalOptions;
     this.modalImagen.open();
   }
 

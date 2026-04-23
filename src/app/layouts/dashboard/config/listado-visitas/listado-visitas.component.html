@@ -1,27 +1,30 @@
 <div class="panel mt-6 pb-0">
 
+    <div class="mb-3">
+        <a href="javascript:void(0)" (click)="volver()" class="text-primary cursor-pointer">
+            ← Volver a la quinta
+        </a>
+    </div>
+
     <div class="mb-5 flex flex-wrap items-center gap-2">
-        <h5 class="text-lg font-semibold dark:text-white-light">Principios</h5>
+        <h5 class="text-lg font-semibold dark:text-white-light">Visitas</h5>
         @if(actual_role === 'ROLE_ADMIN') {
-        <button type="button" ngxTippy="Agregar principio" (click)="openModalNuevoPrincipio('NEW')">
+        <button type="button" ngxTippy="Agregar visita" (click)="openModalNuevaVisita('NEW')">
             <icon-plus />
         </button>
         }
-        <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
-            <icon-search />
-        </button>
     </div>
 
 
     <div class="row mb-2">
         <div class="col-6">
-            <span *ngIf="principios && principios.length > 0" class="float-md-start color-gris">
+            <span *ngIf="visitas && visitas.length > 0" class="float-md-start color-gris">
                 Página: {{ currentPage}}/{{numPages.pageCount }}
             </span>
         </div>
         <div class="col-6" style="text-align: right;">
-            <span *ngIf="principios && principios.length > 0" class="float-md-end color-gris">
-                Ítems: {{itemsInPage}}/{{ principios.length }}
+            <span *ngIf="visitas && visitas.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ visitas.length }}
             </span>
         </div>
     </div>
@@ -30,58 +33,46 @@
         <table class="table-hover">
             <thead>
                 <tr>
+                    <th>Visita</th>
                     <th>
-                        Nombre
+                        Fecha visita
                     </th>
-                    <th>
-                        Estado
-                    </th>
+                    <th>Comentarios</th>
                     <th>
                         Acciones
                     </th>
                 </tr>
             </thead>
             <tbody>
-                @if (showFilter) {
+                @for(data of visitas | slice: pageSize | slice: 0:itemsPerPage ; track data.id; let i = $index) {
                 <tr>
-                    <td>
-                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.nombre" />
-                    </td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                }
-                @for(data of filtrarDatos() | slice: pageSize | slice: 0:itemsPerPage ; track data.id) {
-                <tr>
-                    <td class="whitespace-nowrap">{{ data.nombre}} </td>
-                    <td>
-                        <div class="flex items-center gap-2 mt-2">
-                            <label class="w-12 h-6 relative">
-                                <input type="checkbox"
-                                    (click)="openSwalCambiarEstadoPrincipio(data, 'checkbox' + data.id)"
-                                    class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    [checked]="data.habilitado" [id]="'checkbox' + data.id" />
-                                <span for="custom_switch_checkbox5"
-                                    class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
-                                </span>
-                            </label>
-                            <span></span>
-                        </div>
-                    </td>
+                    <td class="whitespace-nowrap">{{ i+1}} </td>
+                    <td class="whitespace-nowrap">{{ data.fechaVisita | date:'dd/MM/yyyy'}} </td>
+                    <td class="whitespace-nowrap">{{data.comentarios}} </td>
                     <td>
                         <div class="flex items-center">
                             @if (actual_role === 'ROLE_ADMIN') {
                             <div>
-                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
-                                    (click)="openModalNuevoPrincipio('EDIT', data)">
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Imágenes"
+                                    (click)="openModalImagenes(data)">
+                                    <icon-file />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
                                     <icon-pencil />
                                 </button>
                             </div>
-                            <!-- <div>
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Info">
+                                    <icon-info-circle />
+                                </button>
+                            </div>
+                            <div>
                                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
                                     <icon-trash-lines />
                                 </button>
-                            </div> -->
+                            </div>
                             }
                         </div>
                     </td>
@@ -92,11 +83,7 @@
 
         <div class="row mt-4 gy-3">
             <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
-                <!-- <ngb-pagination class="ngb-pagination float-md-end" [collectionSize]="total_rows"
-                    [pageSize]="itemsPerPage" [(page)]="currentPage" [maxSize]="2" [rotate]="true" #numPages
-                    [boundaryLinks]="true" (pageChange)="obtenerBancos()" /> -->
-
-                <ngb-pagination class="float-md-end" [collectionSize]="principios.length" #numPages
+                <ngb-pagination class="float-md-end" [collectionSize]="visitas.length" #numPages
                     [pageSize]="itemsPerPage" [(page)]="currentPage" (pageChange)="onPageChange(currentPage)">
                 </ngb-pagination>
             </div>
@@ -104,7 +91,7 @@
             <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
                 <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
                 <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
-                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerPrincipios()">
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerVisitas()">
                 </ng-select>
             </div>
         </div>
@@ -115,7 +102,7 @@
 
 
 <div>
-    <ngx-custom-modal #modalPrincipio class="modal-top animate animate-fade-in">
+    <ngx-custom-modal #modalImagen class="modal-top animate animate-fade-in">
         <ng-template #modalHeader>
             <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
         </ng-template>
@@ -123,33 +110,78 @@
         <ng-template #modalBody>
             <div class="container">
                 <div class="row justify-content-center">
-
                     <div class="col-md-12">
-                        <form [formGroup]="principioForm" (keydown.enter)="confirmarPrincipio()">
-
-                            <div
-                                [ngClass]="isSubmit ? principioForm.controls['nombre'].errors ? 'has-error' : 'has-success' : ''">
-                                <label>Principio</label>
-                                <input type="text" class="form-control" formControlName="nombre">
-                            </div>
-
-                            <div class="row mt-3">
+                        @if (imagenesVisita.length > 0) {
+                        @if (imagenesVisita.length < 5) { <div class="form-group mb-2">
+                            <label class="label-modal" for="imagenes">
+                                Imágenes de la visita
+                                <span>(Máximo 5)</span>
+                            </label>
+                            <input type="file" (change)="seleccionarImagen($event)" accept="image/*"
+                                class="form-control mb-3" id="imagenes" multiple>
+                    </div>
+                    <!-- <div class="form-group col-12 mb-2">
+                        <label for="comentarioImagenes">Comentarios generales sobre las imágenes:</label>
+                        <textarea type="text" class="form-control" id="comentarioImagenes"
+                            [(ngModel)]="comentariosImagenes">
+                            </textarea>
+                    </div> -->
+                    }
+                    <ngb-carousel [showNavigationIndicators]="false">
+                        <ng-template ngbSlide *ngFor="let imagen of imagenesVisita; let i = index">
+                            <div class="row mb-3">
                                 <div class="col-12 d-flex justify-content-center">
-                                    <button type="button" class="btn btn-wd btn-primary mr-4"
-                                        (click)="confirmarPrincipio()">Confirmar</button>
-                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
-                                        (click)="cerrarModal()">Cancelar</button>
+                                    @if (imagenesVisita.length < 5) { <button type="button"
+                                        class="btn btn-wd btn-primary mr-4" (click)="agregarImagenes()">Agregar
+                                        imágenes</button>
+                                        }
+                                        <button type="button" class="btn btn-wd btn-primary mr-4"
+                                            (click)="eliminarImagen(imagen, i)">Eliminar imágen</button>
+                                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                            style="z-index: 999" (click)="cerrarModalImagenes()">Cancelar</button>
                                 </div>
                             </div>
 
-                        </form>
+                            <div class="picsum-img-wrapper">
+                                <img [src]="imagen.dato" alt="Imagen {{ i }}" />
+                            </div>
+
+                        </ng-template>
+                    </ngb-carousel>
+                    }@else{
+                    <div class="form-group mb-2">
+                        <label class="label-modal" for="imagenes">
+                            Imágenes de la quinta
+                            <span>(Máximo 5)</span>
+                        </label>
+                        <input type="file" (change)="seleccionarImagen($event)" accept="image/*"
+                            class="form-control mb-3" id="imagenes" multiple>
+                    </div>
+                    <!-- <div class="form-group col-12 mb-2">
+                        <label for="comentarioImagenes">Comentarios generales sobre las imágenes:</label>
+                        <textarea type="text" class="form-control" id="comentarioImagenes"
+                            [(ngModel)]="comentariosImagenes">
+                            </textarea>
+                    </div> -->
+
+                    <div class="col-12 d-flex justify-content-center">
+                        <button type="button" class="btn btn-wd btn-primary mr-4" (click)="agregarImagenes()">Agregar
+                            imágenes</button>
+                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                            (click)="cerrarModalImagenes()">Cancelar</button>
                     </div>
 
+
+                    }
+
                 </div>
+
             </div>
-        </ng-template>
-    </ngx-custom-modal>
 </div>
+</ng-template>
+</ngx-custom-modal>
+</div>
+
 
 
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">

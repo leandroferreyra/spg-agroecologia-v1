@@ -249,8 +249,10 @@
 
                             <div class="row mt-3">
                                 <div class="col-12 d-flex justify-content-center">
+                                    @if (selectedType != 'INFO') {
                                     <button type="button" class="btn btn-wd btn-primary mr-4"
                                         (click)="confirmarQuinta()">Confirmar</button>
+                                    }
                                     <button id="back-button-with-border" type="button" class="btn btn-wd"
                                         (click)="cerrarModal()">Cancelar</button>
                                 </div>
@@ -276,53 +278,67 @@
                 <div class="row justify-content-center">
 
                     <div class="col-md-12">
+
+
+
                         @if (imagenesQuinta.length > 0) {
-                        <ngb-carousel [showNavigationIndicators]="false">
-                            <ng-template ngbSlide *ngFor="let imagen of imagenesQuinta; let i = index">
-                                <div class="row mb-3">
-                                    <div class="col-12 d-flex justify-content-center">
-                                        <button type="button" class="btn btn-wd btn-primary mr-4"
-                                            (click)="agregarImagenes()">Agregar imágenes</button>
-                                        <button type="button" class="btn btn-wd btn-primary mr-4"
-                                            (click)="eliminarImagen(imagen, i)">Eliminar imágen</button>
-                                        <button id="back-button-with-border" type="button" class="btn btn-wd"
-                                            style="z-index: 999" (click)="cerrarModalImagenes()">Cancelar</button>
-                                    </div>
-                                </div>
-
-                                <div class="picsum-img-wrapper">
-                                    <img [src]="imagen.dato" alt="Imagen {{ i }}" />
-                                </div>
-
-                            </ng-template>
-                        </ngb-carousel>
-                        }@else{
-
-                        <div class="form-group mb-2">
+                        @if (imagenesQuinta.length < 2) { <div class="form-group mb-2">
                             <label class="label-modal" for="imagenes">
                                 Imágenes de la quinta
                                 <span>(Máximo 2)</span>
                             </label>
                             <input type="file" (change)="seleccionarImagen($event)" accept="image/*"
                                 class="form-control mb-3" id="imagenes" multiple>
-                        </div>
+                    </div>
+                    }
+                    <ngb-carousel [showNavigationIndicators]="false">
+                        <ng-template ngbSlide *ngFor="let imagen of imagenesQuinta; let i = index">
+                            <div class="row mb-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    @if (imagenesQuinta.length < 2) { <button type="button"
+                                        class="btn btn-wd btn-primary mr-4" (click)="agregarImagenes()">Agregar
+                                        imágenes</button>
+                                        }
+                                        <button type="button" class="btn btn-wd btn-primary mr-4"
+                                            (click)="eliminarImagen(imagen, i)">Eliminar imágen</button>
+                                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                            style="z-index: 999" (click)="cerrarModalImagenes()">Cancelar</button>
+                                </div>
+                            </div>
 
-                        <div class="col-12 d-flex justify-content-center">
-                            <button type="button" class="btn btn-wd btn-primary mr-4"
-                                (click)="agregarImagenes()">Agregar imágenes</button>
-                            <button id="back-button-with-border" type="button" class="btn btn-wd"
-                                (click)="cerrarModalImagenes()">Cancelar</button>
-                        </div>
+                            <div class="picsum-img-wrapper">
+                                <img [src]="imagen.dato" alt="Imagen {{ i }}" />
+                            </div>
 
+                        </ng-template>
+                    </ngb-carousel>
+                    }@else{
 
-                        }
-
+                    <div class="form-group mb-2">
+                        <label class="label-modal" for="imagenes">
+                            Imágenes de la quinta
+                            <span>(Máximo 2)</span>
+                        </label>
+                        <input type="file" (change)="seleccionarImagen($event)" accept="image/*"
+                            class="form-control mb-3" id="imagenes" multiple>
                     </div>
 
+                    <div class="col-12 d-flex justify-content-center">
+                        <button type="button" class="btn btn-wd btn-primary mr-4" (click)="agregarImagenes()">Agregar
+                            imágenes</button>
+                        <button id="back-button-with-border" type="button" class="btn btn-wd"
+                            (click)="cerrarModalImagenes()">Cancelar</button>
+                    </div>
+
+
+                    }
+
                 </div>
+
             </div>
-        </ng-template>
-    </ngx-custom-modal>
+</div>
+</ng-template>
+</ngx-custom-modal>
 </div>
 
 
