@@ -9,7 +9,7 @@
     <div class="mb-5 flex flex-wrap items-center gap-2">
         <h5 class="text-lg font-semibold dark:text-white-light">Visitas</h5>
         @if(actual_role === 'ROLE_ADMIN') {
-        <button type="button" ngxTippy="Agregar visita" (click)="openModalNuevaVisita('NEW')">
+        <button type="button" ngxTippy="Agregar visita" (click)="openModalVisita('NEW')">
             <icon-plus />
         </button>
         }
@@ -59,7 +59,8 @@
                                 </button>
                             </div>
                             <div>
-                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar">
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
+                                    (click)="openModalVisita('EDIT',data)">
                                     <icon-pencil />
                                 </button>
                             </div>
@@ -136,7 +137,7 @@
                                         imágenes</button>
                                         }
                                         <button type="button" class="btn btn-wd btn-primary mr-4"
-                                            (click)="eliminarImagen(imagen, i)">Eliminar imágen</button>
+                                            (click)="eliminarImagen(imagen, i)">Eliminar imagen</button>
                                         <button id="back-button-with-border" type="button" class="btn btn-wd"
                                             style="z-index: 999" (click)="cerrarModalImagenes()">Cancelar</button>
                                 </div>
@@ -182,6 +183,121 @@
 </ngx-custom-modal>
 </div>
 
+
+<div>
+    <ngx-custom-modal #modalVisita class="modal-top extra-large-modal animate animate-fade-in">
+        <ng-template #modalHeader>
+            <h5 class="text-lg font-semibold dark:text-white-light">{{tituloModal}}</h5>
+        </ng-template>
+
+        <ng-template #modalBody>
+            <div class="container">
+                <div class="row justify-content-center">
+
+                    <div class="col-md-12">
+                        <form [formGroup]="visitaForm" (keydown.enter)="confirmarVisita()">
+
+                            <div class="mb-2"
+                                [ngClass]="isSubmit ? visitaForm.controls['integrantes'].errors ? 'has-error' : 'has-success' : ''">
+                                <label>Integrantes de la visita</label>
+                                <ng-select [items]="usuariosActivos" bindLabel="nombre" bindValue="id"
+                                    formControlName="integrantes" [virtualScroll]="true" [appendTo]="'body'"
+                                    clearAllText="Limpiar" [multiple]="true"
+                                    [ngClass]="isSubmit ? visitaForm.controls['integrantes'].errors ? 'has-error' : 'has-success' : ''">
+                                </ng-select>
+                            </div>
+
+                            <div class="col-md-12 pr-1 mb-2">
+                                <label>Fecha</label>
+                                <input type="text" mwlFlatpickr [options]="{ 
+                                        enableTime: false, 
+                                        dateFormat: 'd-m-Y',
+                                        time24hr: true,
+                                        enableSeconds: false
+                                    }" class="form-input" formControlName="fechaVisita" />
+                            </div>
+
+                            <div class="form-group col-12 mb-2">
+                                <label for="comentarios">Comentarios</label>
+                                <textarea type="text" class="form-control" id="comentarios"
+                                    formControlName="comentarios">
+                            </textarea>
+                            </div>
+
+                            <!-- Si es nueva, solo carga integrantes y fecha -->
+                            <div class="row mt-2 g-3" *ngIf="selectedType !== 'NEW'" formArrayName="visitasParametros">
+                                <div *ngFor="let visita of visitasParametros.controls; let i = index"
+                                    class="col-12 col-lg-6">
+
+                                    <div class="border rounded p-3 h-100 bg-white shadow-sm">
+                                        <div [formGroupName]="i">
+
+                                            <div class="text-center mb-3 border-bottom pb-2">
+                                                <h5 class="card-title mb-2">
+                                                    {{ visita.get('paramNombre')?.value }}
+                                                </h5>
+
+                                                <span class="badge bg-success text-wrap d-inline-block px-3 py-2">
+                                                    {{ visita.get('principioAgroecologico')?.value }}
+                                                </span>
+                                            </div>
+
+                                            <div
+                                                class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3">
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input" formControlName="cumple"
+                                                        type="checkbox" [id]="'cumple-' + i" />
+                                                    <label class="form-check-label" [for]="'cumple-' + i">
+                                                        Cumple
+                                                    </label>
+                                                </div>
+
+                                                <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                    [ngxTippy]="visita.get('situacionEsperable')?.value">
+                                                    Situación esperable
+                                                </button>
+                                            </div>
+
+                                            <div class="form-group mb-2">
+                                                <label>Comentarios</label>
+                                                <input type="text" formControlName="comentarios" class="form-control" />
+                                            </div>
+
+                                            <div class="form-group mb-2">
+                                                <label>Aspiraciones familiares</label>
+                                                <input type="text" formControlName="aspiracionesFamiliares"
+                                                    class="form-control" />
+                                            </div>
+
+                                            <div class="form-group mb-2">
+                                                <label>Sugerencias</label>
+                                                <input type="text" formControlName="sugerencias" class="form-control" />
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12 d-flex justify-content-center">
+                                    @if (selectedType != 'INFO') {
+                                    <button type="button" class="btn btn-wd btn-primary mr-4"
+                                        (click)="confirmarVisita()">Confirmar</button>
+                                    }
+                                    <button id="back-button-with-border" type="button" class="btn btn-wd"
+                                        (click)="cerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </ng-template>
+    </ngx-custom-modal>
+</div>
 
 
 <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">

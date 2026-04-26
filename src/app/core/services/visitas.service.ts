@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { PrincipioResponse } from '../models/response/principioResponse';
 import { PrincipioDTO } from '../models/request/principioDTO';
+import { VisitaDTO } from '../models/request/visitaDTO';
+import { VisitaResponse } from '../models/response/visitaResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +16,11 @@ export class VisitasService {
 
   constructor(private http: HttpClient) { }
 
-  // getPrincipios(): Observable<PrincipioResponse[]> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.get<PrincipioResponse[]>(environment.baseUrl + this.url, { headers });
-  // }
+  save(visitaDto: VisitaDTO): Observable<VisitaResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<VisitaResponse>(environment.baseUrl + this.url, JSON.stringify(visitaDto), { headers });
+
+  }
 
   // getPrincipiosHabilitados(): Observable<PrincipioResponse[]> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

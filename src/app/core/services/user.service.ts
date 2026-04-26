@@ -18,6 +18,11 @@ export class UserService {
     return this.http.get<UsuarioResponse[]>(environment.baseUrl + this.apiUser, { headers });
   }
 
+  getUsuariosActivos(): Observable<UsuarioResponse[]> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<UsuarioResponse[]>(environment.baseUrl + this.apiUser + "activos", { headers });
+  }
+
   deleteUsuario(id: number) {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.delete(environment.baseUrl + this.apiUser + 'deleteByID/' + id, { headers });

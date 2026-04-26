@@ -1,23 +1,31 @@
 import { CommonModule } from '@angular/common';
 import { Component, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Route, Router } from '@angular/router';
 import { DataTableModule } from '@bhplugin/ng-datatable';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
-import { NgbCarouselModule, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCarouselModule, NgbDatepicker, NgbDateStruct, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
+import { FlatpickrDirective } from 'angularx-flatpickr';
 import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { imagenInfoVisita } from 'src/app/core/models/request/imagenInfoVisita';
+import { VisitaDTO } from 'src/app/core/models/request/visitaDTO';
+import { VisitaParametroDTO } from 'src/app/core/models/request/visitaParametroDTO';
+import { ParametroResponse } from 'src/app/core/models/response/parametroResponse';
+import { UsuarioResponse } from 'src/app/core/models/response/usuarioResponse';
+import { VisitaResponse } from 'src/app/core/models/response/visitaResponse';
+import { EstrategiasService } from 'src/app/core/services/estrategias.service';
 import { ImagenQuintaService } from 'src/app/core/services/imagenQuinta.service';
 import { ImagenVisitaService } from 'src/app/core/services/imagenVisita.service';
 import { PrincipioService } from 'src/app/core/services/principio.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { UserService } from 'src/app/core/services/user.service';
 import { VisitasService } from 'src/app/core/services/visitas.service';
 import { IconFileComponent } from 'src/app/shared/icon/icon-file';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
@@ -32,7 +40,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     IconPlusComponent, IconPencilComponent, IconInfoCircleComponent, IconFileComponent, IconTrashLinesComponent,
-    NgbPagination, IconSearchComponent, FontAwesomeModule, NgSelectModule, NgbCarouselModule],
+    NgbPagination, IconSearchComponent, FontAwesomeModule, NgSelectModule, NgbCarouselModule, FlatpickrDirective],
   templateUrl: './listado-visitas.component.html',
   styleUrl: './listado-visitas.component.css'
 })
@@ -42,15 +50,17 @@ export class ListadoVisitasComponent {
   private subscription: Subscription = new Subscription();
 
   actual_role: string = '';
+  selectedType!: string;
 
   quintaId: number | undefined;
   selectedImagenes: File[] = [];
   imagenesVisita: imagenInfoVisita[] = [];
   selectedVisita: any;
-  // comentariosImagenes: string = '';
+  usuariosActivos: UsuarioResponse[] = [];
+  parametros: ParametroResponse[] = [];
 
   visitas: any[] = [];
-  principioForm!: FormGroup;
+  visitaForm!: FormGroup;
   tituloModal: string = '';
   isSubmit = false;
   isEdicion = false;
@@ -71,6 +81,7 @@ export class ListadoVisitasComponent {
   iconArrowUp = faArrowUp;
   iconArrowDown = faArrowDown;
 
+
   // Referencia al modal para crear y editar bancos.
   @ViewChild('modalVisita') modalVisita!: NgxCustomModalComponent;
   @ViewChild('modalImagen') modalImagen!: NgxCustomModalComponent;
@@ -80,9 +91,9 @@ export class ListadoVisitasComponent {
     closeOnEscape: false
   };
 
-  constructor(public storeData: Store<any>, private swalService: SwalService, private _principioService: PrincipioService,
+  constructor(public storeData: Store<any>, private swalService: SwalService, private _estrategiaService: EstrategiasService,
     private spinner: NgxSpinnerService, private imagenService: ImagenVisitaService, private _visitaService: VisitasService,
-    private route: ActivatedRoute, private router: Router) {
+    private route: ActivatedRoute, private router: Router, private _usuarioService: UserService) {
     this.initStore();
   }
 
@@ -102,6 +113,21 @@ export class ListadoVisitasComponent {
     // this.obtenerPrincipios();
     this.quintaId = this.route.snapshot.params['id'];
     this.obtenerVisitas();
+    let $parametros = this._estrategiaService.getParametrosHabilitados();
+    let $usuariosActivos = this._usuarioService.getUsuariosActivos();
+
+    this.subscription.add(
+      forkJoin([$usuariosActivos, $parametros]).subscribe(
+        ([respuesta1, respuesta2]) => {
+          // console.log(respuesta3);
+          this.usuariosActivos = respuesta1;
+          this.parametros = respuesta2;
+        },
+        error => {
+          console.error(error);
+        }
+      )
+    );
   }
 
   obtenerVisitas() {
@@ -125,23 +151,6 @@ export class ListadoVisitasComponent {
       })
     )
   }
-
-  // obtenerPrincipios() {
-  //   this.spinner.show();
-  //   this.subscription.add(
-  //     this._principioService.getPrincipios().subscribe({
-  //       next: res => {
-  //         this.spinner.hide();
-  //         this.principios = res;
-  //         this.modificarPaginacion(res);
-  //       },
-  //       error: error => {
-  //         this.spinner.hide();
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
 
   modificarPaginacion(res: any) {
     if (res.length <= this.itemsPerPage) {
@@ -172,23 +181,164 @@ export class ListadoVisitasComponent {
   //   return resultados;
   // }
 
-  openModalNuevaVisita(type: string, principio?: any) {
+  openModalVisita(type: string, visita?: any) {
+    this.selectedType = type;
+    this.selectedVisita = visita;
     if (type === 'NEW') {
       this.isEdicion = false;
-      this.tituloModal = 'Nueva posición';
-      this.principioForm = new FormGroup({
-        nombre: new FormControl(null, [Validators.required]),
-      });
+      this.tituloModal = 'Nueva visita';
     } else {
       this.isEdicion = true;
-      this.tituloModal = 'Edición posición';
-      this.principioForm = new FormGroup({
-        id: new FormControl(principio?.id, []),
-        nombre: new FormControl(principio?.nombre, [Validators.required])
-      });
+      this.tituloModal = 'Edición visita';
     }
+    this.inicializarForm(visita);
     this.modalVisita.options = this.modalOptions;
     this.modalVisita.open();
+  }
+
+  inicializarForm(visita?: VisitaResponse) {
+    if (this.selectedType === 'NEW') {
+      this.visitaForm = new FormGroup({
+        integrantes: new FormControl(null, [Validators.required]),
+        fechaVisita: new FormControl(null, [Validators.required]),
+        comentarios: new FormControl(null, []),
+        visitasParametros: new FormArray([])
+      });
+      // Arma de manera dinámica los forms según la cantidad de parámetros.
+      for (let i = this.visitasParametros.length; i < this.parametros.length; i++) {
+        let param = this.parametros[i];
+        this.visitasParametros.push(new FormGroup({
+          paramNombre: new FormControl(param.nombre, []),
+          situacionEsperable: new FormControl(param.situacionEsperable, []),
+          principioAgroecologico: new FormControl(param.principioAgroecologico.nombre, []),
+          parametroId: new FormControl(param.id, [Validators.required]),
+          cumple: new FormControl(false, [Validators.required]),
+          sugerencias: new FormControl(null, []),
+          comentarios: new FormControl(null, []),
+          aspiracionesFamiliares: new FormControl(null, [])
+        }));
+      }
+    } else if (this.selectedType === 'EDIT') {
+      // let fechaVisita = new Date(visita!.fechaVisita);
+      // const ngbDate: NgbDateStruct = {
+      //   year: fechaVisita.getFullYear(),
+      //   month: fechaVisita.getMonth() + 1,
+      //   day: fechaVisita.getDate()
+      // };
+      this.visitaForm = new FormGroup({
+        integrantes: new FormControl(visita?.integrantes, [Validators.required]),
+        comentarios: new FormControl(visita?.comentarios, []),
+        fechaVisita: new FormControl(this.formatearFechaParaFlatpickr(visita!.fechaVisita), [Validators.required]),
+        visitasParametros: new FormArray([])
+      });
+      let idsIntegrantes: number[] = [];
+      visita!.integrantes.forEach(element => {
+        idsIntegrantes.push(element.id);
+      });
+      this.visitaForm.get('integrantes')!.setValue(idsIntegrantes);
+      // if (!this.esAdmin) {
+      //   this.formVisita.get('integrantes').disable();
+      //   this.formVisita.get('fechaVisita').disable();
+      // }
+      for (let i = this.visitasParametros.length; i < visita!.visitaParametrosResponse.length; i++) {
+        let param = visita!.visitaParametrosResponse[i].parametro;
+        let visitaParametro = visita!.visitaParametrosResponse[i];
+        this.visitasParametros.push(new FormGroup({
+          paramNombre: new FormControl(param.nombre, []),
+          situacionEsperable: new FormControl(param.situacionEsperable, []),
+          principioAgroecologico: new FormControl(param.principioAgroecologico.nombre, []),
+          parametroId: new FormControl(param.id, [Validators.required]),
+          cumple: new FormControl(visitaParametro.cumple, [Validators.required]),
+          sugerencias: new FormControl(visitaParametro.sugerencias, []),
+          comentarios: new FormControl(visitaParametro.comentarios, []),
+          aspiracionesFamiliares: new FormControl(visitaParametro.aspiracionesFamiliares, [])
+        }));
+      }
+    } else {
+      let fechaVisita = new Date(visita!.fechaVisita);
+      const ngbDate: NgbDateStruct = {
+        year: fechaVisita.getFullYear(),
+        month: fechaVisita.getMonth() + 1,
+        day: fechaVisita.getDate()
+      };
+      this.visitaForm = new FormGroup({
+        integrantes: new FormControl({ value: visita?.integrantes, disabled: true }, [Validators.required]),
+        comentarios: new FormControl({ value: visita?.comentarios, disabled: true }, []),
+        fechaVisita: new FormControl({ value: ngbDate, disabled: true }, [Validators.required]),
+        visitasParametros: new FormArray([])
+      });
+      let idsIntegrantes: number[] = [];
+      visita?.integrantes?.forEach(element => {
+        idsIntegrantes.push(element.id);
+      });
+      this.visitaForm.get('integrantes')!.setValue(idsIntegrantes);
+      for (let i = this.visitasParametros.length; i < visita!.visitaParametrosResponse.length; i++) {
+        let param = visita!.visitaParametrosResponse[i].parametro;
+        let visitaParametro = visita!.visitaParametrosResponse[i];
+        this.visitasParametros.push(new FormGroup({
+          paramNombre: new FormControl(param.nombre, []),
+          situacionEsperable: new FormControl(param.situacionEsperable, []),
+          principioAgroecologico: new FormControl(param.principioAgroecologico.nombre, []),
+          parametroId: new FormControl(param.id, [Validators.required]),
+          cumple: new FormControl({ value: visitaParametro.cumple, disabled: true }, [Validators.required]),
+          sugerencias: new FormControl({ value: visitaParametro.sugerencias, disabled: true }, []),
+          comentarios: new FormControl({ value: visitaParametro.comentarios, disabled: true }, []),
+          aspiracionesFamiliares: new FormControl({ value: visitaParametro.aspiracionesFamiliares, disabled: true }, [])
+        }));
+      }
+    }
+  }
+
+  get params() { return this.visitaForm.controls; }
+  get visitasParametros(): FormArray {
+    return this.visitaForm.get('visitasParametros') as FormArray;
+  }
+  private formatearFechaParaFlatpickr(fecha: string): string {
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}-${mes}-${anio}`;
+  }
+
+  confirmarVisita() {
+    if (this.visitaForm.valid) {
+      this.spinner.show();
+      let visitaDTO = new VisitaDTO();
+      // const [dia, mes, anio] = this.visitaForm.get('fechaVisita')!.value.split('-');
+      // let fechaVisita = `${anio}-${mes}-${dia}`;
+      // visitaDTO.fechaVisita = fechaVisita;
+      visitaDTO.fechaVisita = this.visitaForm.get('fechaVisita')!.value;
+      visitaDTO.integrantes = this.visitaForm.get('integrantes')!.value;
+      visitaDTO.usuarioOperacion = localStorage.getItem('usuario')!;
+      visitaDTO.quintaId = this.quintaId!;
+      visitaDTO.comentarios = this.visitaForm.get('comentarios')!.value;
+      this.visitasParametros.controls.forEach((element: any) => {
+        let visitaParametroDTO = new VisitaParametroDTO();
+        visitaParametroDTO.parametroId = element.get('parametroId').value;
+        visitaParametroDTO.cumple = element.get('cumple').value;
+        visitaParametroDTO.comentarios = element.get('comentarios').value;
+        visitaParametroDTO.aspiracionesFamiliares = element.get('aspiracionesFamiliares').value;
+        visitaParametroDTO.sugerencias = element.get('sugerencias').value;
+        visitaDTO.parametros.push(visitaParametroDTO);
+      });
+      if (this.selectedType == 'NEW') {
+        this.subscription.add(
+          this._visitaService.save(visitaDTO).subscribe(
+            res => {
+              console.log(res);
+              this.obtenerVisitas();
+              this.cerrarModal();
+              this.spinner.hide();
+              // this.aumentarPaginacion();
+              // this._toastr.success('Visita guardada correctamente', '');
+            },
+            error => {
+              // this._toastr.error('Error al guardar la visita.', '');
+              console.error(error);
+              this.spinner.hide();
+            }
+          )
+        );
+      }
+    }
   }
 
   // confirmarPrincipio() {
@@ -234,49 +384,6 @@ export class ListadoVisitasComponent {
   cerrarModal() {
     this.isSubmit = false;
     this.modalVisita.close();
-  }
-
-  openSwalCambiarEstadoPrincipio(principio: any, checkboxId: string) {
-    this.originalCheckedState = principio.habilitado;
-    Swal.fire({
-      title: '',
-      text: '¿Desea habilitar/deshabilitar la posición?',
-      icon: 'info',
-      confirmButtonText: 'Confirmar',
-      showDenyButton: true,
-      denyButtonText: 'Cancelar',
-      didRender: () => {
-        const cancelButton = Swal.getDenyButton();
-        if (cancelButton) {
-          cancelButton.setAttribute('id', 'back-button-with-border');
-        }
-      }
-    }).then((result) => {
-      const checkbox = document.getElementById(checkboxId) as HTMLInputElement;
-      if (result.isConfirmed) {
-        this.cambiarEstadoPrincipio(principio, checkbox);
-      } else if (result.isDenied) {
-        checkbox.checked = this.originalCheckedState;
-      }
-    })
-  }
-
-  cambiarEstadoPrincipio(principio: any, checkbox: any) {
-    this.spinner.show();
-    this.subscription.add(
-      this._principioService.updateStatus(principio.id).subscribe({
-        next: res => {
-          this.swalService.toastSuccess('top-right', 'Estado modificado con éxito.');
-          this.spinner.hide();
-        },
-        error: error => {
-          this.spinner.hide();
-          this.swalService.toastError('top-right', error.error.detalleError);
-          checkbox.checked = this.originalCheckedState;
-          console.error(error);
-        }
-      })
-    )
   }
 
   openSwalEliminar(visita: any) {

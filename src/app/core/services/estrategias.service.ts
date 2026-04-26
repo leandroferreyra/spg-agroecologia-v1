@@ -19,6 +19,12 @@ export class EstrategiasService {
     return this.http.get<EstrategiaResponse[]>(environment.baseUrl + this.urlEstrategias, { headers });
   }
 
+  getParametrosHabilitados(): Observable<EstrategiaResponse[]> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<EstrategiaResponse[]>(environment.baseUrl + this.urlEstrategias + 'habilitados', { headers });
+  }
+
+
   save(estrategiaDTO: EstrategiaDTO): Observable<EstrategiaResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<EstrategiaResponse>(environment.baseUrl + this.urlEstrategias, JSON.stringify(estrategiaDTO), { headers });
