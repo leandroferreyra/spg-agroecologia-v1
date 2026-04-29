@@ -1,0 +1,80 @@
+<div class="panel mt-6 pb-0">
+
+    <div class="mb-5 flex flex-wrap items-center gap-2">
+        <h5 class="text-lg font-semibold dark:text-white-light">Próximas visitas</h5>
+        <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+            <icon-search />
+        </button>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-6">
+            <span *ngIf="visitas && visitas.length > 0" class="float-md-start color-gris">
+                Página: {{ currentPage}}/{{numPages.pageCount }}
+            </span>
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <span *ngIf="visitas && visitas.length > 0" class="float-md-end color-gris">
+                Ítems: {{itemsInPage}}/{{ visitas.length }}
+            </span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>Productor</th>
+                    <th>Dirección</th>
+                    <th>Fecha última visita</th>
+                    <th>Siguiente visita</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (showFilter) {
+                <tr>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.nombreProductor" />
+                    </td>
+                    <td>
+                        <input type="text" class="form-control campo-busqueda" [(ngModel)]="filtros.direccion" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                }
+                @for(data of filtrarDatos() | slice: pageSize | slice: 0:itemsPerPage ; track data.id; let i = $index) {
+                <tr>
+                    <td class="whitespace-nowrap">{{ data.quintaResponse.nombreProductor }} </td>
+                    <td class="whitespace-nowrap">{{ data.quintaResponse.direccion }} </td>
+                    <td class="whitespace-nowrap">{{ data.fechaVisita | date:'dd/MM/yyyy'}} </td>
+                    <td class="whitespace-nowrap">{{ siguienteVisita(data.fechaVisita) | date:'dd/MM/yyyy'}} </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="row mt-4 gy-3">
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end">
+                <ngb-pagination class="float-md-end" [collectionSize]="visitas.length" #numPages
+                    [pageSize]="itemsPerPage" [(page)]="currentPage" (pageChange)="onPageChange(currentPage)">
+                </ngb-pagination>
+            </div>
+
+            <div class="col-12 col-md-6 d-flex justify-content-start justify-content-md-end align-items-center">
+                <label for="paginacion" class="me-2 mb-0">Ítems por página:</label>
+                <ng-select [items]="[5,10,20,50,100]" [(ngModel)]="itemsPerPage" bindLabel="label" [clearable]="false"
+                    class="custom-select" [dropdownPosition]="'top'" (change)="obtenerVisitas()">
+                </ng-select>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-spin-fade">
+    <p style="font-size: 20px; color: white">Cargando</p>
+</ngx-spinner>

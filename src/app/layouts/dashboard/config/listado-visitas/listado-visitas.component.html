@@ -37,6 +37,7 @@
                     <th>
                         Fecha visita
                     </th>
+                    <th>Estado</th>
                     <th>Comentarios</th>
                     <th>
                         Acciones
@@ -48,6 +49,7 @@
                 <tr>
                     <td class="whitespace-nowrap">{{ i+1}} </td>
                     <td class="whitespace-nowrap">{{ data.fechaVisita | date:'dd/MM/yyyy'}} </td>
+                    <td class="whitespace-nowrap">{{data.estadoVisita}} </td>
                     <td class="whitespace-nowrap">{{data.comentarios}} </td>
                     <td>
                         <div class="flex items-center">
@@ -58,12 +60,14 @@
                                     <icon-file />
                                 </button>
                             </div>
+                            @if(data.estadoVisita === 'ABIERTA') {
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
                                     (click)="openModalVisita('EDIT',data)">
                                     <icon-pencil />
                                 </button>
                             </div>
+                            }
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Info"
                                     (click)="openModalVisita('INFO',data)">
@@ -71,10 +75,19 @@
                                 </button>
                             </div>
                             <div>
-                                <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)">
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Eliminar"
+                                    (click)="openSwalEliminar(data)">
                                     <icon-trash-lines />
                                 </button>
                             </div>
+                            @if(data.estadoVisita === 'ABIERTA') {
+                            <div>
+                                <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Cerrar visita"
+                                    (click)="cerrarVisita(data)">
+                                    <icon-check-circle />
+                                </button>
+                            </div>
+                            }
                             }
                         </div>
                     </td>
@@ -120,24 +133,21 @@
                                 <span>(Máximo 5)</span>
                             </label>
                             <input type="file" (change)="seleccionarImagen($event)" accept="image/*"
-                                class="form-control mb-3" id="imagenes" multiple>
+                                class="form-control mb-3" id="imagenes" multiple
+                                [disabled]="selectedVisita.estadoVisita !== 'ABIERTA'">
                     </div>
-                    <!-- <div class="form-group col-12 mb-2">
-                        <label for="comentarioImagenes">Comentarios generales sobre las imágenes:</label>
-                        <textarea type="text" class="form-control" id="comentarioImagenes"
-                            [(ngModel)]="comentariosImagenes">
-                            </textarea>
-                    </div> -->
                     }
                     <ngb-carousel [showNavigationIndicators]="false">
                         <ng-template ngbSlide *ngFor="let imagen of imagenesVisita; let i = index">
                             <div class="row mb-3">
                                 <div class="col-12 d-flex justify-content-center">
                                     @if (imagenesVisita.length < 5) { <button type="button"
+                                        [disabled]="selectedVisita.estadoVisita !== 'ABIERTA'"
                                         class="btn btn-wd btn-primary mr-4" (click)="agregarImagenes()">Agregar
                                         imágenes</button>
                                         }
                                         <button type="button" class="btn btn-wd btn-primary mr-4"
+                                            [disabled]="selectedVisita.estadoVisita !== 'ABIERTA'"
                                             (click)="eliminarImagen(imagen, i)">Eliminar imagen</button>
                                         <button id="back-button-with-border" type="button" class="btn btn-wd"
                                             style="z-index: 999" (click)="cerrarModalImagenes()">Cancelar</button>
@@ -157,17 +167,13 @@
                             <span>(Máximo 5)</span>
                         </label>
                         <input type="file" (change)="seleccionarImagen($event)" accept="image/*"
-                            class="form-control mb-3" id="imagenes" multiple>
+                            [disabled]="selectedVisita.estadoVisita !== 'ABIERTA'" class="form-control mb-3"
+                            id="imagenes" multiple>
                     </div>
-                    <!-- <div class="form-group col-12 mb-2">
-                        <label for="comentarioImagenes">Comentarios generales sobre las imágenes:</label>
-                        <textarea type="text" class="form-control" id="comentarioImagenes"
-                            [(ngModel)]="comentariosImagenes">
-                            </textarea>
-                    </div> -->
 
                     <div class="col-12 d-flex justify-content-center">
-                        <button type="button" class="btn btn-wd btn-primary mr-4" (click)="agregarImagenes()">Agregar
+                        <button type="button" class="btn btn-wd btn-primary mr-4" (click)="agregarImagenes()"
+                            [disabled]="selectedVisita.estadoVisita !== 'ABIERTA'">Agregar
                             imágenes</button>
                         <button id="back-button-with-border" type="button" class="btn btn-wd"
                             (click)="cerrarModalImagenes()">Cancelar</button>

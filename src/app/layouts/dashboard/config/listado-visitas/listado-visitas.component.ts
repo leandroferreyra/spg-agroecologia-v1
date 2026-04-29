@@ -27,6 +27,7 @@ import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { VisitasService } from 'src/app/core/services/visitas.service';
+import { IconCheckComponent } from 'src/app/shared/icon/icon-check';
 import { IconFileComponent } from 'src/app/shared/icon/icon-file';
 import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
@@ -40,7 +41,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [CommonModule, NgxCustomModalComponent, NgxTippyModule, DataTableModule, NgxSpinnerModule, FormsModule, ReactiveFormsModule,
     IconPlusComponent, IconPencilComponent, IconInfoCircleComponent, IconFileComponent, IconTrashLinesComponent,
-    NgbPagination, IconSearchComponent, FontAwesomeModule, NgSelectModule, NgbCarouselModule, FlatpickrDirective],
+    NgbPagination, IconSearchComponent, FontAwesomeModule, NgSelectModule, NgbCarouselModule, FlatpickrDirective, IconCheckComponent],
   templateUrl: './listado-visitas.component.html',
   styleUrl: './listado-visitas.component.css'
 })
@@ -119,7 +120,6 @@ export class ListadoVisitasComponent {
     this.subscription.add(
       forkJoin([$usuariosActivos, $parametros]).subscribe(
         ([respuesta1, respuesta2]) => {
-          // console.log(respuesta3);
           this.usuariosActivos = respuesta1;
           this.parametros = respuesta2;
         },
@@ -141,7 +141,7 @@ export class ListadoVisitasComponent {
         next: res => {
           this.spinner.hide();
           this.visitas = res;
-          console.log("🚀 ~ ListadoVisitasComponent ~ obtenerVisitas ~ this.visitas:", this.visitas)
+          // console.log("🚀 ~ ListadoVisitasComponent ~ obtenerVisitas ~ this.visitas:", this.visitas)
           this.modificarPaginacion(res);
         },
         error: error => {
@@ -307,12 +307,9 @@ export class ListadoVisitasComponent {
         this.subscription.add(
           this._visitaService.save(visitaDTO).subscribe(
             res => {
-              console.log(res);
               this.obtenerVisitas();
               this.cerrarModal();
               this.spinner.hide();
-              // this.aumentarPaginacion();
-              // this._toastr.success('Visita guardada correctamente', '');
             },
             error => {
               // this._toastr.error('Error al guardar la visita.', '');
@@ -325,21 +322,8 @@ export class ListadoVisitasComponent {
         this.subscription.add(
           this._visitaService.update(visitaDTO, this.selectedVisita.id).subscribe(
             res => {
-              // this.selectedVisita.integrantes = res.integrantes
-              // this.selectedVisita.comentarios = this.visitaForm.get('comentarios')!.value;
-              // this.selectedVisita.fechaVisita = this.visitaForm.get('fechaVisita')!.value;
-
-              // this.visitasParametros.controls.forEach((element: any) => {
-              //   const objetoEncontrado = this.selectedVisita.visitaParametrosResponse.find((obj: any) => obj.parametro.id === element.get('parametroId').value);
-              //   objetoEncontrado.cumple = element.get('cumple').value;
-              //   objetoEncontrado.comentarios = element.get('comentarios').value;
-              //   objetoEncontrado.sugerencias = element.get('sugerencias').value;
-              //   objetoEncontrado.aspiracionesFamiliares = element.get('aspiracionesFamiliares').value;
-              // });
-              // this.selectedVisita.imagenes = res.imagenes;
               this.obtenerVisitas();
               this.cerrarModal();
-              // this.spinner.hide();
             },
             error => {
               this.spinner.hide();
@@ -350,46 +334,6 @@ export class ListadoVisitasComponent {
       }
     }
   }
-
-  // confirmarPrincipio() {
-  //   this.isSubmit = true;
-  //   if (this.principioForm.valid) {
-  //     this.spinner.show();
-  //     let principio = new PrincipioDTO();
-  //     principio.nombre = this.principioForm.get('nombre')?.value;
-  //     if (!this.isEdicion) {
-  //       this.subscription.add(
-  //         this._principioService.save(principio).subscribe({
-  //           next: res => {
-  //             this.obtenerPrincipios();
-  //             this.cerrarModal();
-  //             this.spinner.hide();
-  //           },
-  //           error: error => {
-  //             this.swalService.toastError('top-right', error.error.message);
-  //             console.error(error);
-  //             this.spinner.hide();
-  //           }
-  //         })
-  //       )
-  //     } else {
-  //       this.subscription.add(
-  //         this._principioService.updatePrincipio(principio, this.principioForm.get('id')?.value).subscribe({
-  //           next: res => {
-  //             this.obtenerPrincipios();
-  //             this.cerrarModal();
-  //             this.spinner.hide();
-  //           },
-  //           error: error => {
-  //             console.error(error);
-  //             this.spinner.hide();
-  //             this.swalService.toastError('top-right', error.error.message);
-  //           }
-  //         })
-  //       )
-  //     }
-  //   }
-  // }
 
   cerrarModal() {
     this.isSubmit = false;
@@ -532,6 +476,19 @@ export class ListadoVisitasComponent {
           this.spinner.hide();
           console.error(error);
           // this._toastr.error('Error en la eliminación', '');
+        }
+      )
+    );
+  }
+
+  cerrarVisita(visita: VisitaResponse) {
+    this.subscription.add(
+      this._visitaService.cerrarVisita(visita.id).subscribe(
+        res => {
+          visita.estadoVisita = res.estadoVisita;
+        },
+        error => {
+          console.error(error);
         }
       )
     );

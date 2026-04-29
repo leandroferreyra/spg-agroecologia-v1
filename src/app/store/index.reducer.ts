@@ -76,25 +76,7 @@ function getMenuByRole(role: string) {
                 { label: 'Principios', route: 'principios' },
                 { label: 'Estrategias', route: 'estrategias' },
                 { label: 'Quintas', route: 'quintas' },
-                // { label: 'Clientes', route: 'clientes' },
-                // {
-                //     label: 'Configuraciones', route: 'config', submenu: [
-                //         { label: 'Usuarios', route: 'usuarios' },
-                //         { label: 'Bancos', route: 'bancos' },
-                //         { label: 'Países', route: 'paises' },
-                //         { label: 'Provincias', route: 'provincias' },
-                //         { label: 'Ciudades', route: 'ciudades' },
-                //         { label: 'Géneros', route: 'generos' },
-                //         { label: 'Monedas', route: 'monedas' },
-                //         { label: 'Ubicaciones', route: 'ubicaciones' },
-                //         { label: 'Tipos de cambio', route: 'exchanges' },
-                //         { label: 'Tipos de productos', route: 'tipos-productos' },
-                //         { label: 'Cuentas bancarias de LADIE', route: 'cuentas-bancarias' },
-                //         { label: 'Categorías de productos', route: 'categorias-productos' },
-                //         { label: 'Parámetros generales', route: 'parametros-generales' },
-                //         { label: 'Métodos de pago', route: 'metodos-pago' },
-                //     ]
-                // },
+                { label: 'Próximas visitas', route: 'proximas-visitas' },
                 { label: 'Mis datos', route: 'user-profile' },
             ];
         case 'ROLE_USER':

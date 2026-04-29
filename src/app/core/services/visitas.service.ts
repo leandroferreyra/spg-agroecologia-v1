@@ -16,6 +16,11 @@ export class VisitasService {
 
   constructor(private http: HttpClient) { }
 
+  getVisitas(): Observable<VisitaResponse[]> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.get<VisitaResponse[]>(environment.baseUrl + this.url, { headers });
+  }
+
   save(visitaDto: VisitaDTO): Observable<VisitaResponse> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<VisitaResponse>(environment.baseUrl + this.url, JSON.stringify(visitaDto), { headers });
@@ -27,25 +32,11 @@ export class VisitasService {
     return this.http.put<VisitaResponse>(environment.baseUrl + this.url + id, JSON.stringify(visitaDto), { headers });
   }
 
-  // getPrincipiosHabilitados(): Observable<PrincipioResponse[]> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.get<PrincipioResponse[]>(environment.baseUrl + this.url + 'habilitados', { headers });
-  // }
-
-  // save(principio: PrincipioDTO): Observable<PrincipioResponse> {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.post<PrincipioResponse>(environment.baseUrl + this.url, JSON.stringify(principio), { headers });
-  // }
-
-  // updateStatus(id: number) {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.put(environment.baseUrl + this.url + 'updateStatus/' + id, { headers });
-  // }
-
-  // updatePrincipio(principioDTO: PrincipioDTO, id: number) {
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  //   return this.http.put(environment.baseUrl + this.url + 'updateNombre/' + id, JSON.stringify(principioDTO), { headers });
-  // }
+  cerrarVisita(id: number): Observable<VisitaResponse> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json').set('ngrok-skip-browser-warning', "true");
+    return this.http.put<VisitaResponse>(environment.baseUrl + this.url + 'cerrarVisita/' + id, { headers });
+  }
 
   getVisitaByQuintaId(id: number): Observable<any[]> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

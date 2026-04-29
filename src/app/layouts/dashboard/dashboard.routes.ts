@@ -51,6 +51,11 @@ export const DASHBOARD_ROUTES: Routes = [
                 loadComponent: () => import('./config/listado-visitas/listado-visitas.component').then(m => m.ListadoVisitasComponent),
                 canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Visitas' }
             },
+            {
+                path: 'proximas-visitas',
+                loadComponent: () => import('./config/listado-proximas-visitas/listado-proximas-visitas.component').then(m => m.ListadoProximasVisitasComponent),
+                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Próximas visitas' }
+            },
 
         ]
     }
