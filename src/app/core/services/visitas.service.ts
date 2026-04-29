@@ -22,6 +22,11 @@ export class VisitasService {
 
   }
 
+  update(visitaDto: VisitaDTO, id: number): Observable<VisitaResponse> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put<VisitaResponse>(environment.baseUrl + this.url + id, JSON.stringify(visitaDto), { headers });
+  }
+
   // getPrincipiosHabilitados(): Observable<PrincipioResponse[]> {
   //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
   //   return this.http.get<PrincipioResponse[]>(environment.baseUrl + this.url + 'habilitados', { headers });

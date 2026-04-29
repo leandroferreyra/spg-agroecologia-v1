@@ -219,12 +219,6 @@ export class ListadoVisitasComponent {
         }));
       }
     } else if (this.selectedType === 'EDIT') {
-      // let fechaVisita = new Date(visita!.fechaVisita);
-      // const ngbDate: NgbDateStruct = {
-      //   year: fechaVisita.getFullYear(),
-      //   month: fechaVisita.getMonth() + 1,
-      //   day: fechaVisita.getDate()
-      // };
       this.visitaForm = new FormGroup({
         integrantes: new FormControl(visita?.integrantes, [Validators.required]),
         comentarios: new FormControl(visita?.comentarios, []),
@@ -236,10 +230,6 @@ export class ListadoVisitasComponent {
         idsIntegrantes.push(element.id);
       });
       this.visitaForm.get('integrantes')!.setValue(idsIntegrantes);
-      // if (!this.esAdmin) {
-      //   this.formVisita.get('integrantes').disable();
-      //   this.formVisita.get('fechaVisita').disable();
-      // }
       for (let i = this.visitasParametros.length; i < visita!.visitaParametrosResponse.length; i++) {
         let param = visita!.visitaParametrosResponse[i].parametro;
         let visitaParametro = visita!.visitaParametrosResponse[i];
@@ -255,16 +245,10 @@ export class ListadoVisitasComponent {
         }));
       }
     } else {
-      let fechaVisita = new Date(visita!.fechaVisita);
-      const ngbDate: NgbDateStruct = {
-        year: fechaVisita.getFullYear(),
-        month: fechaVisita.getMonth() + 1,
-        day: fechaVisita.getDate()
-      };
       this.visitaForm = new FormGroup({
         integrantes: new FormControl({ value: visita?.integrantes, disabled: true }, [Validators.required]),
         comentarios: new FormControl({ value: visita?.comentarios, disabled: true }, []),
-        fechaVisita: new FormControl({ value: ngbDate, disabled: true }, [Validators.required]),
+        fechaVisita: new FormControl({ value: this.formatearFechaParaFlatpickr(visita!.fechaVisita), disabled: true }, [Validators.required]),
         visitasParametros: new FormArray([])
       });
       let idsIntegrantes: number[] = [];
@@ -334,6 +318,32 @@ export class ListadoVisitasComponent {
               // this._toastr.error('Error al guardar la visita.', '');
               console.error(error);
               this.spinner.hide();
+            }
+          )
+        );
+      } else {
+        this.subscription.add(
+          this._visitaService.update(visitaDTO, this.selectedVisita.id).subscribe(
+            res => {
+              // this.selectedVisita.integrantes = res.integrantes
+              // this.selectedVisita.comentarios = this.visitaForm.get('comentarios')!.value;
+              // this.selectedVisita.fechaVisita = this.visitaForm.get('fechaVisita')!.value;
+
+              // this.visitasParametros.controls.forEach((element: any) => {
+              //   const objetoEncontrado = this.selectedVisita.visitaParametrosResponse.find((obj: any) => obj.parametro.id === element.get('parametroId').value);
+              //   objetoEncontrado.cumple = element.get('cumple').value;
+              //   objetoEncontrado.comentarios = element.get('comentarios').value;
+              //   objetoEncontrado.sugerencias = element.get('sugerencias').value;
+              //   objetoEncontrado.aspiracionesFamiliares = element.get('aspiracionesFamiliares').value;
+              // });
+              // this.selectedVisita.imagenes = res.imagenes;
+              this.obtenerVisitas();
+              this.cerrarModal();
+              // this.spinner.hide();
+            },
+            error => {
+              this.spinner.hide();
+              console.error(error);
             }
           )
         );
