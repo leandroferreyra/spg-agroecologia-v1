@@ -97,10 +97,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
       this.userService.getUsuarios().subscribe({
         next: res => {
           this.usuarios = res;
-          console.log("🚀 ~ ListadoUsuariosComponent ~ obtenerUsuarios ~ this.usuarios:", this.usuarios)
-          // this.modificarPaginacion(res);
           this.spinner.hide();
-          // this.tokenService.setToken(res.token);
         },
         error: error => {
           this.spinner.hide();
@@ -109,32 +106,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
       })
     )
   }
-
-  // modificarPaginacion(res: any) {
-  //   this.total_rows = res.meta.total;
-  //   this.last_page = res.meta.last_page;
-  //   if (this.usuarios.length <= this.itemsPerPage) {
-  //     if (res.meta?.current_page === res.meta?.last_page) {
-  //       this.itemsInPage = this.total_rows;
-  //     } else {
-  //       this.itemsInPage = this.currentPage * this.itemsPerPage;
-  //     }
-  //   }
-  // }
-
-  // obtenerRoles() {
-  //   this.subscription.add(
-  //     this.rolService.getRolesWithoutPermissions(this.actual_role).subscribe({
-  //       next: res => {
-  //         this.tokenService.setToken(res.token);
-  //         this.roles = res.data;
-  //       },
-  //       error: error => {
-  //         console.error(error);
-  //       }
-  //     })
-  //   )
-  // }
 
   isVerified(user: any): boolean {
     return (user.estado);
@@ -197,16 +168,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     }
   }
 
-  // openModalUsuarioView(usuario: any) {
-  //   this.usuarioView = usuario;
-  //   this.modalUsuarioView.options = this.modalOptions;
-  //   this.modalUsuarioView.open();
-  // }
-
-  // cerrarModal() {
-  //   this.modalUsuarioView.close();
-  // }
-
   openSwalEliminar(user: any) {
     Swal.fire({
       title: '',
@@ -248,73 +209,6 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
       })
     )
   }
-  // openModalRoles(usuario: any) {
-  //   this.usuarioInEdicion = usuario;
-  //   this.rolesForm = new FormGroup({});;
-  //   this.roles.forEach(rol => {
-  //     const tieneRol = this.usuarioTieneRol(rol.name, usuario);
-  //     this.rolesForm.addControl(rol.name, new FormControl(tieneRol));
-
-  //   });
-  //   this.modalRoles.options = this.modalOptionsRoles;
-  //   this.modalRoles.open();
-  // }
-  // usuarioTieneRol(rolName: string, usuario: any): boolean {
-  //   return usuario.roles.some((rol: Rol) => rol.name === rolName);
-  // }
-  // cerrarModalRoles() {
-  //   this.modalRoles.close();
-  // }
-
-  // confirmarRoles() {
-  //   let agregaEstosRoles: string[] = [];
-  //   this.roles.forEach(element => {
-  //     let value = this.rolesForm.get(element.name)?.value;
-  //     if (value) {
-  //       agregaEstosRoles.push(element.name);
-  //     }
-  //   });
-  //   if (agregaEstosRoles.length === 0) {
-  //     this.swalService.toastError('top-right', "Tenes que elegir al menos un rol.")
-  //   } else {
-  //     this.spinner.show();
-  //     this.subscription.add(
-  //       this.userService.syncRolesUsuario(this.usuarioInEdicion.uuid, this.actual_role, agregaEstosRoles).subscribe({
-  //         next: res => {
-  //           let roles = this.convertirRolesEnObject(agregaEstosRoles);
-  //           let usuario = this.usuarios.find(user => user.uuid === this.usuarioInEdicion.uuid);
-  //           usuario.roles = roles; // Le asigno los nuevos roles para que se vea en pantalla.
-  //           this.spinner.hide();
-  //           this.swalService.toastSuccess('top-right', res.message);
-  //           this.tokenService.setToken(res.token);
-  //           this.usuarioInEdicion = null;
-  //           this.cerrarModalRoles();
-  //         },
-  //         error: error => {
-  //           console.error(error);
-  //           this.spinner.hide();
-  //         }
-  //       })
-  //     )
-  //   }
-  // }
-  // convertirRolesEnObject(roles: string[]) {
-  //   let rolesObject: Rol[] = [];
-  //   roles.forEach(element => {
-  //     let rol = new Rol();
-  //     rol.name = element;
-  //     rolesObject.push(rol);
-  //   });
-  //   return rolesObject;
-  // }
-
-  // obtenerUsuariosPorNombre(value: string) {
-  //   this.filtros.operator.value = 'OR';
-  //   this.filtros['human.firstname'].value = value;
-  //   this.filtros['human.lastname'].value = value;
-  //   this.obtenerUsuarios();
-  // }
-
 
   filtrarDatos(): UsuarioResponse[] {
     let resultados = this.usuarios;

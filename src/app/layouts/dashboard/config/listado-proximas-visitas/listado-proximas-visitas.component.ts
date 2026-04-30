@@ -112,7 +112,6 @@ export class ListadoProximasVisitasComponent {
         next: res => {
           this.spinner.hide();
           this.visitas = res;
-          console.log("🚀 ~ ListadoVisitasComponent ~ obtenerVisitas ~ this.visitas:", this.visitas)
           this.modificarPaginacion(res);
         },
         error: error => {

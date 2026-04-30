@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { toggleAnimation } from 'src/app/shared/animations';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -11,10 +11,11 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
-import { NgxCustomModalComponent } from 'ngx-custom-modal';
+import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { SwalService } from 'src/app/core/services/swal.service';
+import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
     standalone: true,
@@ -29,6 +30,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     store: any;
 
     loginForm!: FormGroup;
+    recoveryPasswordForm!: FormGroup;
 
     envioEmailForm!: FormGroup;
     isSubmitRecuperoClave = false;
@@ -41,13 +43,14 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     iconEye = faEye;
     iconEyeSlash = faEyeSlash;
 
-    // // Obtén la referencia al modal
-    // @ViewChild('modalSeleccionRol') modalSeleccionRol!: NgxCustomModalComponent;
-    // modalOptions: ModalOptions = {
-    //     closeOnOutsideClick: false,
-    //     hideCloseButton: true,
-    //     closeOnEscape: false
-    // };
+    // Referencia al modal
+    @ViewChild('modalRecuperarClave') modalRecuperarClave!: NgxCustomModalComponent;
+    modalOptions: ModalOptions = {
+        closeOnOutsideClick: false,
+        hideCloseButton: true,
+        closeOnEscape: false
+    };
+
 
     constructor(
         public storeData: Store<any>,
@@ -55,6 +58,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         public _authService: AuthService,
         private _spinner: NgxSpinnerService,
         private _tokenService: TokenService,
+        private _userService: UserService,
         private _userLogged: UserLoggedService, private swalService: SwalService
     ) {
         this.initStore();
@@ -94,17 +98,16 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
             this.subscription.add(
                 this._authService.login(login).subscribe({
                     next: res => {
-                        console.log(res);
                         this.usuarioLogueado = res;
                         this._tokenService.setToken(this.usuarioLogueado.token);
                         this._userLogged.setUsuarioLogueado(this.usuarioLogueado);
-                        localStorage.setItem('userRole', this.usuarioLogueado.authorities[0].authority);
+                        localStorage.setItem('userRole', this.usuarioLogueado.authorities[0]?.authority);
                         this.storeData.dispatch({ type: 'setUserRole', payload: this.usuarioLogueado.authorities[0].authority });
                         this.router.navigate(['/dashboard/user-profile']);
                         this._spinner.hide();
                     },
                     error: error => {
-                        if (error.error.detalleError === "El email se encuentra deshabilitado. Revise su correo para activarlo.") {
+                        if (error.error.detalleError === "El email se encuentra deshabilitado. Aguarde a ser activado.") {
                             // this.openSwalResendMailVerificacion(error.error.message);
                             this.swalService.toastError('top-right', error.error.detalleError);
 
@@ -119,53 +122,6 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         }
     }
 
-    openSwalResendMailVerificacion(error: string) {
-        // Swal.fire({
-        //     title: error,
-        //     text: '¿Desea que le reenviemos el email de habilitación de usuario?',
-        //     icon: 'info',
-        //     confirmButtonText: 'Enviar',
-        //     showDenyButton: true,
-        //     denyButtonText: 'Cancelar',
-        //     didRender: () => {
-        //         const cancelButton = Swal.getDenyButton();
-        //         if (cancelButton) {
-        //             cancelButton.setAttribute('id', 'back-button-with-border');
-        //         }
-        //     }
-        // }).then((result) => {
-        //     if (result.isConfirmed) {
-        //         this._spinner.show();
-        //         let email = new EmailDTO();
-        //         if (this.isEmail(this.loginForm.get('usuario')?.value)) {
-        //             email.email = this.loginForm.get('usuario')?.value;
-        //         } else {
-        //             email.user_name = this.loginForm.get('usuario')?.value
-        //         }
-        //         this.subscription.add(
-        //             this._authService.reSendMail(email).subscribe({
-        //                 next: res => {
-        //                     this._spinner.hide();
-        //                     this.showSwalFire("¡Genial!. Se te ha enviado un e-mail a tu casilla de correo electrónico para confirmar tu cuenta. Recordá revisar SPAM.");
-        //                 },
-        //                 error: error => {
-        //                     this._spinner.hide();
-        //                     console.error(error);
-        //                 }
-        //             }
-        //             ));
-        //     }
-        // })
-    }
-
-    ingresarAlDashboard(rol: any) {
-        // this._authService.cambioRol(rol.name);
-    }
-
-    // cancelarSeleccionDashboard() {
-    //     this.closeModalSeleccionRol();
-    // }
-
     isEmail(value: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(value);
@@ -174,34 +130,6 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     tieneVariosRoles(): boolean {
         return (this.usuarioLogueado.roles.length > 1);
     }
-
-    enviarEmail() {
-        // this.isSubmitRecuperoClave = true;
-        // if (this.envioEmailForm.valid) {
-        //     this._spinner.show();
-        //     let email = new EmailDTO();
-        //     email.email = this.envioEmailForm.get('email')?.value;
-
-        //     this.subscription.add(
-        //         this._authService.sendMail(email).subscribe({
-        //             next: res => {
-        //                 this._spinner.hide();
-        //                 this.showSwalFire("Se le envió un correo con el link para cambiar la clave. Recuerde revisar los spam.");
-        //                 // this.closeModalRecuperoClave();
-        //             },
-        //             error: error => {
-        //                 console.error(error);
-        //                 this._spinner.hide();
-        //             }
-        //         }
-        //         ));
-
-        // }
-    }
-
-    // closeModalSeleccionRol() {
-    //     this.modalSeleccionRol.close();
-    // }
 
     showSwalFire(text: string) {
         Swal.fire({
@@ -220,46 +148,38 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         this.showPassword = !this.showPassword;
     }
 
-
-    async openModalRecuperoClave() {
-        // const { value: email } = await Swal.fire({
-        //     title: 'Recupera tu clave',
-        //     input: 'email',
-        //     inputLabel: 'Email',
-        //     inputPlaceholder: 'tuemail@ejemplo.com',
-        //     confirmButtonText: 'Recuperar',
-        //     showCancelButton: true,
-        //     allowOutsideClick: false,
-        //     inputValidator: (value) => {
-        //         if (!value) {
-        //             return '¡Email es requerido!';
-        //         }
-        //         return null;
-        //     },
-        // });
-
-        // if (email) {
-        //     this._spinner.show();
-        //     let emailDto = new EmailDTO();
-        //     emailDto.email = email;
-
-        //     this.subscription.add(
-        //         this._authService.sendMail(emailDto).subscribe({
-        //             next: res => {
-        //                 this._spinner.hide();
-        //                 this.showSwalFire("Se le envió un correo con el link para cambiar la clave. Recuerde revisar los spam.");
-        //             },
-        //             error: error => {
-        //                 console.error(error);
-        //                 this._spinner.hide();
-        //                 this.swalService.toastError('top-right', error.error.message);
-        //             }
-        //         }
-        //         ));
-        // }
+    openModalRecuperoClave() {
+        this.recoveryPasswordForm = new FormGroup({
+            email: new FormControl(null, [Validators.required, Validators.email])
+        });
+        this.modalRecuperarClave.options = this.modalOptions;
+        this.modalRecuperarClave.open();
     }
 
+    closeModalRecuperoClave() {
+        this.isSubmitRecuperoClave = false;
+        this.modalRecuperarClave.close();
+    }
 
+    confirmarRecuperoClave() {
+        this.isSubmitRecuperoClave = true;
+        if (this.recoveryPasswordForm.valid) {
+            this._spinner.show();
+            this.subscription.add(
+                this._userService.recoverPassword(this.recoveryPasswordForm.get('email')?.value).subscribe({
+                    next: res => {
+                        this._spinner.hide();
+                        this.swalService.toastInfo('top-right', 'Se envió un correo con su nueva clave.')
+                        this.closeModalRecuperoClave();
+                    },
+                    error: error => {
+                        this._spinner.hide();
+                        console.error(error);
+                    }
+                })
+            );
+        }
+    }
 
 
 }

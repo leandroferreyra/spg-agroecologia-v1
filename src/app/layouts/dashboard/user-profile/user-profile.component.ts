@@ -1,31 +1,33 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule, TitleStrategy } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
-import { forkJoin, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { CatalogoService } from 'src/app/core/services/catalogo.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { UserService } from 'src/app/core/services/user.service';
-import Swal from 'sweetalert2';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { IconRefreshComponent } from 'src/app/shared/icon/icon-refresh';
 import { IconLockComponent } from 'src/app/shared/icon/icon-lock';
 import { IconEditComponent } from 'src/app/shared/icon/icon-edit';
+import { PosicionService } from 'src/app/core/services/posicion.service';
+import { UsuarioDTO } from 'src/app/core/models/request/usuarioDTO';
+import { NgxTippyModule } from 'ngx-tippy-wrapper';
+import { ChangePasswordDTO } from 'src/app/core/models/request/changePasswordDTO';
 
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, NgxCustomModalComponent, RouterModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule,
-    NgSelectModule, NgxCustomModalComponent, IconRefreshComponent, IconLockComponent, IconEditComponent
+  imports: [CommonModule, NgxTippyModule, NgxCustomModalComponent, RouterModule, FontAwesomeModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule,
+    NgSelectModule, IconRefreshComponent, IconLockComponent, IconEditComponent
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
@@ -37,19 +39,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   actual_role: string = '';
 
   isEdicion: boolean = false;
+  mostrarOrganizacion: boolean = true;
   userForm!: FormGroup;
 
   // Catalogos
-  tiposDocumento: any[] = [];
-  paises: any[] = [];
-  provincias: any[] = [];
-  ciudades: any[] = [];
-  generos: any[] = [];
-  tipoDocumentos: any[] = [];
+  posiciones: any[] = [];
   dataLoaded = false;
 
   // Referencia al modal
-  @ViewChild('modalCambioRol') modalCambioRol!: NgxCustomModalComponent;
   @ViewChild('modalCambioClave') modalCambioClave!: NgxCustomModalComponent;
   modalOptions: ModalOptions = {
     closeOnOutsideClick: false,
@@ -58,6 +55,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   };
 
   changePasswordForm!: FormGroup;
+  isSubmit = false;
   isSubmitChangePassword = false;
   showPassword: boolean = false;
   showNewPassword: boolean = false;
@@ -69,8 +67,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
 
   constructor(public storeData: Store<any>, private _userLogged: UserLoggedService, private userService: UserService,
-    private _tokenService: TokenService, private spinner: NgxSpinnerService, private _catalogService: CatalogoService,
-    private authService: AuthService, private router: Router, private swalService: SwalService
+    private _tokenService: TokenService, private spinner: NgxSpinnerService, private _authService: AuthService,
+    private _posicionService: PosicionService, private router: Router, private swalService: SwalService
   ) {
     this.initStore();
   }
@@ -87,47 +85,71 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
-    // this.spinner.show();
-    // this.subscription.add(
-    //   this.userService.getUser(this.actual_role, this.usuarioLogueado.uuid).subscribe({
-    //     next: res => {
-    //       this.usuarioLogueado = res.data;
-    //       this.dataLoaded = true;
-    //       this.inicializarForm();
-    //       this._tokenService.setToken(res.token);
-    //       this.obtenerCatalogos();
-    //     },
-    //     error: error => {
-    //       this.spinner.hide();
-    //       console.error(error);
-    //     }
-    //   })
-    // );
+    this.spinner.show();
+    this.obtenerCatalogos();
+    this.obtenerUsuario();
+  }
+
+  obtenerUsuario() {
+    this.subscription.add(
+      this.userService.getUsuario(this.usuarioLogueado.id).subscribe({
+        next: res => {
+          // console.log(res);
+          this.spinner.hide();
+          this.usuarioLogueado = res;
+          this.inicializarForm(this.usuarioLogueado);
+          this.dataLoaded = true;
+        },
+        error: error => {
+          this.spinner.hide();
+          console.error(error);
+        }
+      })
+    );
   }
 
   obtenerCatalogos() {
-
+    this.subscription.add(
+      this._posicionService.getPosiciones().subscribe({
+        next: res => {
+          // console.log(res);
+          this.posiciones = res;
+        },
+        error: error => {
+          console.error(error);
+        }
+      })
+    );
   }
 
-  inicializarForm() {
+  inicializarForm(res: any) {
     this.userForm = new FormGroup({
-      email: new FormControl({ value: this.usuarioLogueado.email, disabled: true }, [Validators.required, Validators.email]),
-      usuario: new FormControl({ value: this.usuarioLogueado.user_name, disabled: true }, [Validators.required]),
-      nombres: new FormControl({ value: this.usuarioLogueado.human?.firstname, disabled: true }, [Validators.required]),
-      apellidos: new FormControl({ value: this.usuarioLogueado.human?.lastname, disabled: true }, [Validators.required]),
-      genero: new FormControl({ value: this.usuarioLogueado.human?.gender?.uuid, disabled: true }, []),
-      pais: new FormControl({ value: this.usuarioLogueado.human?.person?.city?.district?.country?.uuid, disabled: true }, []),
-      provincia: new FormControl({ value: this.usuarioLogueado.human?.person?.city?.district?.uuid, disabled: true }, []),
-      ciudad: new FormControl({ value: this.usuarioLogueado.human?.person?.city?.uuid, disabled: true }, []),
-      direccionCalle: new FormControl({ value: this.usuarioLogueado.human?.person?.street_name, disabled: true }, []),
-      direccionNumero: new FormControl({ value: this.usuarioLogueado.human?.person?.door_number, disabled: true }, []),
-      direccionDetalle: new FormControl({ value: this.usuarioLogueado.human?.person?.address_detail, disabled: true }, []),
+      email: new FormControl({ value: res.email, disabled: true }, [Validators.required, Validators.email]),
+      nombre: new FormControl({ value: res.nombre, disabled: true }, [Validators.required]),
+      celular: new FormControl({ value: res.celular, disabled: true }, [Validators.required]),
+      organizacion: new FormControl({ value: res.organizacion, disabled: true }, [Validators.required]),
+      posicion: new FormControl({ value: res.posicionResponse, disabled: true }, [Validators.required])
     });
+    if (this.userForm.get('posicion')?.value.nombre === 'Consumidor/a') {
+      this.mostrarOrganizacion = false;
+    } else {
+      this.mostrarOrganizacion = true;
+    }
     this.onFormChange();
   }
-
   onFormChange() {
-
+    this.userForm.get('posicion')!.valueChanges.subscribe(
+      (value: any) => {
+        if (value.nombre === 'Consumidor/a') {
+          this.mostrarOrganizacion = false;
+          this.userForm.get('organizacion')?.setValidators(null);
+          this.userForm.get('organizacion')?.updateValueAndValidity();
+        } else {
+          this.mostrarOrganizacion = true;
+          this.userForm.get('organizacion')?.setValidators(Validators.required);
+          this.userForm.get('organizacion')?.updateValueAndValidity();
+        }
+      });
   }
 
   toggleEdicion() {
@@ -141,95 +163,43 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   cancelarEdicion() {
     this.isEdicion = false;
-    this.inicializarForm();
+    this.inicializarForm(this.usuarioLogueado);
   }
 
   modificarValidacionesForm() {
-    this.userForm.get('email')?.enable();
-    this.userForm.get('usuario')?.enable();
-    this.userForm.get('nombres')?.enable();
-    this.userForm.get('apellidos')?.enable();
-    this.userForm.get('genero')?.enable();
-    this.userForm.get('pais')?.enable();
-    this.userForm.get('provincia')?.enable();
-    this.userForm.get('ciudad')?.enable();
-    this.userForm.get('direccionCalle')?.enable();
-    this.userForm.get('direccionNumero')?.enable();
-    this.userForm.get('direccionDetalle')?.enable();
+    this.userForm.get('celular')?.enable();
+    this.userForm.get('nombre')?.enable();
+    this.userForm.get('organizacion')?.enable();
+    this.userForm.get('posicion')?.enable();
   }
 
   confirmarEdicion() {
-    // if (this.userForm.valid && !this.userForm.pristine) {
-    //   this.spinner.show();
-    //   let registro = this.armarDTORegistro();
-    //   this.subscription.add(
-    //     this.humanService.updateHuman(this.usuarioLogueado.human.uuid, registro).subscribe({
-    //       next: res => {
-    //         this._tokenService.setToken(res.token);
-    //         if (this.usuarioLogueado.email !== registro.email) {
-    //           this.authService.logout().subscribe({
-    //             next: res => {
-    //               Swal.fire({
-    //                 title: "",
-    //                 text: `Se le envió un correo para verificar el nuevo email. Recuerde revisar spam`,
-    //                 icon: 'info',
-    //                 confirmButtonText: 'Aceptar',
-    //                 showDenyButton: false,
-    //               }).then((result) => {
-    //                 if (result.isConfirmed) {
-    //                   this.router.navigate(['auth/boxed-signin'])
-    //                 }
-    //               });
-    //             },
-    //             error: error => {
-    //               console.error(error);
-    //             }
-    //           });
-    //         }
-    //         this.spinner.hide();
-    //         this.usuarioLogueado.human.firstname = res.data.firstname;
-    //         this.usuarioLogueado.human.lastname = res.data.lastname;
-    //         this.usuarioLogueado.user_name = res.data.user.user_name;
-    //         if (res.data.gender?.uuid) {
-    //           this.usuarioLogueado.human.gender.uuid = res.data.gender?.uuid;
-    //         }
-    //         this.usuarioLogueado.human.person.city.uuid = res.data.person.city.uuid;;
-    //         this.usuarioLogueado.human.person.address_detail = res.data.person.address_detail;
-    //         this.usuarioLogueado.human.person.door_number = res.data.person.door_number;
-    //         this.usuarioLogueado.human.person.street_name = res.data.person.street_name;
-    //         this.usuarioLogueado.human.person.city.district.country.uuid = res.data.person.city.district.country.uuid;
-    //         this._userLogged.setUsuarioLogueado(this.usuarioLogueado);
-    //         this.inicializarForm();
-    //         this.isEdicion = false;
-    //         this.swalService.toastSuccess('top-right', "Usuario actualizado.");
-    //       },
-    //       error: error => {
-    //         this.spinner.hide();
-    //         console.error(error);
-    //         this.swalService.toastError('top-right', error.error.message);
-    //       }
-    //     })
-    //   );
-    // } else {
-    //   this.swalService.toastError('top-right', "Formulario inválido o sin cambios.");
-    // }
-  }
+    this.isSubmit = true;
+    if (this.userForm.valid && !this.userForm.pristine) {
+      this.spinner.show();
+      const usuario: UsuarioDTO = {
+        nombre: this.userForm.get('nombre')?.value,
+        celular: this.userForm.get('celular')?.value,
+        posicion: this.userForm.get('posicion')?.value?.id,
+        organizacion: this.userForm.get('organizacion')?.value
+      };
 
-  armarDTORegistro() {
-    // let registro = new RegistroDTO();
-    // registro.actual_role = this.actual_role;
-    // registro.with = ['gender', 'person.city', 'person.city.district', 'person.city.district.country'];
-    // registro.email = this.userForm.get('email')?.value;
-    // registro.user_name = this.userForm.get('usuario')?.value;
-    // registro.firstname = this.userForm.get('nombres')?.value;
-    // registro.lastname = this.userForm.get('apellidos')?.value;
-    // registro.gender_uuid = this.userForm.get('genero')?.value;
-    // registro.city_uuid = this.userForm.get('ciudad')?.value;
-    // registro.street_name = this.userForm.get('direccionCalle')?.value;
-    // registro.door_number = this.userForm.get('direccionNumero')?.value;
-    // registro.address_detail = this.userForm.get('direccionDetalle')?.value;
-
-    // return registro;
+      this.subscription.add(
+        this.userService.update(this.usuarioLogueado.id, usuario).subscribe({
+          next: res => {
+            this.obtenerUsuario();
+            this.isEdicion = false;
+            this.isSubmit = false;
+          },
+          error: error => {
+            this.spinner.hide();
+            console.error(error);
+          }
+        })
+      );
+    } else {
+      this.swalService.toastError('top-right', "Formulario inválido o sin cambios.");
+    }
   }
 
   // Modal cambio clave 
@@ -243,34 +213,33 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.modalCambioClave.open();
   }
   confirmarCambioClave() {
-    // this.isSubmitChangePassword = true;
-    // if (this.changePasswordForm.valid) {
-    //   if (this.changePasswordForm.get('newPassword')?.value === this.changePasswordForm.get('confirmPassword')?.value) {
-    //     this.spinner.show();
-    //     let changePasswordDTO = new ChangePasswordDTO();
-    //     changePasswordDTO.password = this.changePasswordForm.get('password')?.value;
-    //     changePasswordDTO.new_password = this.changePasswordForm.get('newPassword')?.value;
-    //     changePasswordDTO.new_password_confirmation = this.changePasswordForm.get('confirmPassword')?.value;
-    //     this.subscription.add(
-    //       this.authService.changePassword(this.actual_role, changePasswordDTO).subscribe({
-    //         next: res => {
-    //           this.spinner.hide();
-    //           this.closeModalCambioClave();
-    //           this._tokenService.setToken(res.token);
-    //           this.swalService.toastSuccess("top-right", "Contraseña actualizada.");
-    //         },
-    //         error: error => {
-    //           this.spinner.hide();
-    //           console.error(error);
-    //           this.swalService.toastError("top-right", "Error en la actualización de contraseña.");
-    //         }
-    //       })
-    //     );
-    //   } else {
-    //     this.swalService.toastError('top-right', "Las contraseñas no coinciden.");
-    //   }
-    // }
+    this.isSubmitChangePassword = true;
+    if (this.changePasswordForm.valid) {
+      if (this.changePasswordForm.get('newPassword')?.value === this.changePasswordForm.get('confirmPassword')?.value) {
+        this.spinner.show();
+        let changePasswordDTO = new ChangePasswordDTO();
+        changePasswordDTO.claveAnterior = this.changePasswordForm.get('password')?.value;
+        changePasswordDTO.claveNueva = this.changePasswordForm.get('newPassword')?.value;
+        this.subscription.add(
+          this.userService.changePassword(this.usuarioLogueado.id, changePasswordDTO).subscribe({
+            next: res => {
+              this.spinner.hide();
+              this.closeModalCambioClave();
+              this.swalService.toastSuccess("top-right", "Contraseña actualizada.");
+            },
+            error: error => {
+              this.spinner.hide();
+              console.error(error);
+              this.swalService.toastError("top-right", error.error.detalleError);
+            }
+          })
+        );
+      } else {
+        this.swalService.toastError('top-right', "Las contraseñas no coinciden.");
+      }
+    }
   }
+
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
@@ -284,20 +253,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   closeModalCambioClave() {
     this.isSubmitChangePassword = false;
     this.modalCambioClave.close();
-  }
-
-  // Modal cambio rol
-  openModalCambiarRol() {
-    this.modalCambioRol.options = this.modalOptions;
-    this.modalCambioRol.open();
-  }
-  ingresarAlDashboard(rol: any) {
-    // this.closeModalCambioRol();
-    // this.actual_role = rol;
-    // this.authService.cambioRol(rol);
-  }
-  closeModalCambioRol() {
-    this.modalCambioRol.close();
   }
 
 }

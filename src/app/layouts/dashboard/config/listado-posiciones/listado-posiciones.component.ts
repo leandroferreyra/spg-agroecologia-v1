@@ -77,7 +77,6 @@ export class ListadoPosicionesComponent implements OnInit, OnDestroy {
       .select((d) => d.index)
       .subscribe((d) => {
         this.actual_role = d.userRole;
-        console.log("🚀 ~ ListadoPosicionesComponent ~ initStore ~ this.actual_role:", this.actual_role)
       });
   }
 
@@ -96,7 +95,6 @@ export class ListadoPosicionesComponent implements OnInit, OnDestroy {
         next: res => {
           this.spinner.hide();
           this.posiciones = res;
-          console.log("🚀 ~ ListadoPosicionesComponent ~ obtenerPosiciones ~ this.posiciones:", this.posiciones)
           this.modificarPaginacion(res);
         },
         error: error => {

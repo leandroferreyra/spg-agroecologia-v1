@@ -133,6 +133,7 @@ export class BoxedSignupComponent implements OnInit, OnDestroy {
                         },
                         error: error => {
                             this.spinner.hide();
+                            this.swalService.toastError('top-right', error.error.detalleError);
                             console.error(error);
                         }
                     })

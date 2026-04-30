@@ -9,14 +9,10 @@ import { Store } from '@ngrx/store';
 import { ModalOptions, NgxCustomModalComponent } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
-import { forkJoin, Subscription } from 'rxjs';
-import { EstrategiaDTO } from 'src/app/core/models/request/estrategiaDTO';
+import { Subscription } from 'rxjs';
 import { ImagenInfoQuinta } from 'src/app/core/models/request/imagenInfoQuinta';
 import { QuintaDTO } from 'src/app/core/models/request/quintaDTO';
-import { EstrategiaResponse } from 'src/app/core/models/response/estrategiaResponse';
 import { QuintaResponse } from 'src/app/core/models/response/quintaResponse';
-import { EstrategiasService } from 'src/app/core/services/estrategias.service';
-import { PrincipioService } from 'src/app/core/services/principio.service';
 import { QuintasService } from 'src/app/core/services/quintas.service';
 import { SwalService } from 'src/app/core/services/swal.service';
 import { UserLoggedService } from 'src/app/core/services/user-logged.service';
@@ -111,7 +107,6 @@ export class ListadoQuintasComponent {
         next: res => {
           this.spinner.hide();
           this.quintas = res;
-          console.log("🚀 ~ ListadoQuintasComponent ~ obtenerQuintas ~ this.quintas:", this.quintas)
           this.modificarPaginacion(res);
         },
         error: error => {
@@ -440,9 +435,6 @@ export class ListadoQuintasComponent {
       imagenInfo.dato = 'data:' + element.tipo + ';base64,' + element.contenido;
       this.imagenesQuinta.push(imagenInfo);
     });
-
-    console.log(this.imagenesQuinta);
-    // this.modalService.open(content, { backdrop: 'static', size: 'xl', scrollable: true, centered: true });
     this.modalImagen.options = this.modalOptions;
     this.modalImagen.open();
   }
