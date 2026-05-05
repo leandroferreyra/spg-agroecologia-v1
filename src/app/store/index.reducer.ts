@@ -82,6 +82,8 @@ function getMenuByRole(role: string) {
         case 'ROLE_USER':
         default:
             return [
+                { label: 'Quintas', route: 'quintas' },
+                { label: 'Próximas visitas', route: 'proximas-visitas' },
                 { label: 'Mis datos', route: 'user-profile' },
             ];
     }

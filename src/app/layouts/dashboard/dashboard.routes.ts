@@ -1,9 +1,6 @@
 import { Routes } from "@angular/router";
 import { DashboardComponent } from "./dashboard.component";
 import { RoleGuard } from "src/app/core/guards/roleGuard";
-import path from "path";
-import { title } from "process";
-
 
 export const DASHBOARD_ROUTES: Routes = [
     {
@@ -44,17 +41,17 @@ export const DASHBOARD_ROUTES: Routes = [
             {
                 path: 'quintas',
                 loadComponent: () => import('./config/listado-quintas/listado-quintas.component').then(m => m.ListadoQuintasComponent),
-                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Quintas' }
+                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN', "ROLE_USER"], title: 'Quintas' }
             },
             {
                 path: 'quintas/:id/visitas',
                 loadComponent: () => import('./config/listado-visitas/listado-visitas.component').then(m => m.ListadoVisitasComponent),
-                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Visitas' }
+                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN', "ROLE_USER"], title: 'Visitas' }
             },
             {
                 path: 'proximas-visitas',
                 loadComponent: () => import('./config/listado-proximas-visitas/listado-proximas-visitas.component').then(m => m.ListadoProximasVisitasComponent),
-                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN'], title: 'Próximas visitas' }
+                canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_ADMIN', "ROLE_USER"], title: 'Próximas visitas' }
             },
 
         ]

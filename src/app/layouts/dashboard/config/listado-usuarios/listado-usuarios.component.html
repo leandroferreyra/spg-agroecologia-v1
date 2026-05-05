@@ -59,7 +59,7 @@
                     <td>
                         <div class="flex items-center gap-2 mt-2">
                             <label class="w-12 h-6 relative">
-                                <input type="checkbox"
+                                <input type="checkbox" [disabled]="isMismoUsuario(data)"
                                     (click)="openSwalCambiarEstadoUsuario(data, 'checkbox' + data.id)"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
                                     [checked]="isVerified(data)" [id]="'checkbox' + data.id" />
@@ -75,7 +75,7 @@
                             <label class="w-12 h-6 relative">
                                 <input type="checkbox" (click)="openSwalCambiarRol(data, 'checkbox-admin-' + data.id)"
                                     class="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer"
-                                    [checked]="data.isAdmin" [id]="'checkbox-admin-' + data.id" />
+                                    [checked]="data.isAdmin" [id]="'checkbox-admin-' + data.id" [disabled]="isMismoUsuario(data)"/>
                                 <span for="custom_switch_checkbox5"
                                     class="outline_checkbox bg-icon border-2 border-[#ebedf2] dark:border-white-dark block h-full rounded-full before:absolute before:left-1 before:bg-[#ebedf2] dark:before:bg-white-dark before:bottom-1 before:w-4 before:h-4 before:rounded-full before:bg-no-repeat before:bg-center peer-checked:before:left-7 peer-checked:border-primary peer-checked:before:bg-primary before:transition-all before:duration-300">
                                 </span>

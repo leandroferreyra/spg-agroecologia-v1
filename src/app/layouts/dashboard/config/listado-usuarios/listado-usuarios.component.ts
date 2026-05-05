@@ -1,15 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { NgbModule, NgbPagination, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Store } from '@ngrx/store';
 import { NgxCustomModalComponent, ModalOptions } from 'ngx-custom-modal';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { NgxTippyModule } from 'ngx-tippy-wrapper';
 import { Subscription } from 'rxjs';
-import { Rol } from 'src/app/core/models/response/rol';
 import { UsuarioResponse } from 'src/app/core/models/response/usuarioResponse';
 import { ArrayToStringPipe } from 'src/app/core/pipes/array-to-string.pipe';
 import { SwalService } from 'src/app/core/services/swal.service';
@@ -20,7 +19,6 @@ import { IconInfoCircleComponent } from 'src/app/shared/icon/icon-info-circle';
 import { IconPencilComponent } from 'src/app/shared/icon/icon-pencil';
 import { IconSearchComponent } from 'src/app/shared/icon/icon-search';
 import { IconTrashLinesComponent } from 'src/app/shared/icon/icon-trash-lines';
-import { Constantes } from 'src/Constantes';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -276,4 +274,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
     );
   }
 
+  isMismoUsuario(data: any) {
+    return this.usuarioLogueado.id === data.id;
+  }
 }
