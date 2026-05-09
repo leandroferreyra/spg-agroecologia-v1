@@ -1,7 +1,7 @@
 import { HttpClient, HttpEventType, HttpHeaders, HttpParams, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { filter, map, Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment.prod';
 import { PosicionResponse } from '../models/response/posicionResponse';
 
 @Injectable({

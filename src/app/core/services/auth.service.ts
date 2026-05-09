@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment.prod';
 import { LoginDTO } from '../models/request/loginDTO';
 import { Rol } from '../models/response/rol';
 import { Store } from '@ngrx/store';
