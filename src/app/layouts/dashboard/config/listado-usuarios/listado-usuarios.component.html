@@ -27,6 +27,7 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Email</th>
+                    <th>Celular</th>
                     <th>Posición</th>
                     <th>Organización</th>
                     <th>Estado</th>
@@ -54,6 +55,7 @@
                 <tr>
                     <td class="whitespace-nowrap">{{ data.nombre}} </td>
                     <td> {{data.email}} </td>
+                    <td> {{data.celular}} </td>
                     <td> {{data.posicionResponse.nombre}} </td>
                     <td> {{data.organizacion}} </td>
                     <td>
@@ -93,7 +95,7 @@
                             </div> -->
                             <div>
                                 <button type="button" ngxTippy="Eliminar" (click)="openSwalEliminar(data)"
-                                    [disabled]="data.email === usuarioLogueado.email">
+                                    [disabled]="isMismoUsuario(data)">
                                     <icon-trash-lines />
                                 </button>
                             </div>

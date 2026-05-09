@@ -95,6 +95,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
       this.userService.getUsuarios().subscribe({
         next: res => {
           this.usuarios = res;
+          console.log("🚀 ~ ListadoUsuariosComponent ~ obtenerUsuarios ~ this.usuarios:", this.usuarios)
           this.spinner.hide();
         },
         error: error => {

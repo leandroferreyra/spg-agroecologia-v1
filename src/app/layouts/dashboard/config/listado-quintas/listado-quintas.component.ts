@@ -443,5 +443,40 @@ export class ListadoQuintasComponent {
     this._router.navigate(['dashboard', 'quintas', quinta.id, 'visitas']);
   }
 
+  exportToCSV() {
+    const csvData = this.convertQuintaToCSV(this.quintas);
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'quintas.csv';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+  private convertQuintaToCSV(data: QuintaResponse[]): string {
+    const separator = ',';
+    const excludedFields = ['id', 'imagenes']; // Campos a excluir
+    const headers = Object.keys(data[0]).filter(header => !excludedFields.includes(header));
+    const rows = data.map((item: any) => {
+      const values = headers.map(header => {
+        const value = item[header];
+        if (value instanceof Date) {
+          // Formatear fechas como cadenas
+          return value.toISOString();
+        } else if (Array.isArray(value)) {
+          // Convertir arreglos a cadenas separadas por comas
+          return value.join(',');
+        } else {
+          return JSON.stringify(value);
+        }
+      });
+      return values.join(separator);
+    });
+    return [headers.join(separator), ...rows].join('\n');
+  }
+
 
 }

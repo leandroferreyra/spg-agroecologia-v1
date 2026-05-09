@@ -1,15 +1,25 @@
 <div class="panel mt-6 pb-0">
 
-    <div class="mb-5 flex flex-wrap items-center gap-2">
-        <h5 class="text-lg font-semibold dark:text-white-light">Quintas</h5>
-        @if(actual_role === 'ROLE_ADMIN') {
-        <button type="button" ngxTippy="Agregar estrategia" (click)="openModalNuevaQuinta('NEW')">
-            <icon-plus />
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
+
+        <div class="flex items-center gap-2">
+            <h5 class="text-lg font-semibold dark:text-white-light">Quintas</h5>
+
+            @if(actual_role === 'ROLE_ADMIN') {
+            <button type="button" ngxTippy="Agregar estrategia" (click)="openModalNuevaQuinta('NEW')">
+                <icon-plus />
+            </button>
+            }
+
+            <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
+                <icon-search />
+            </button>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary" ngxTippy="Exportar" (click)="exportToCSV()">
+            Exportar a CSV
         </button>
-        }
-        <button type="button" ngxTippy="Activar filtros" (click)="toggleFilter()">
-            <icon-search />
-        </button>
+
     </div>
 
 
