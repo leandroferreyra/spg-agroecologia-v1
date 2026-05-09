@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Constantes } from 'src/Constantes';
-import { environment } from 'src/environments/environment';
 import { LoginDTO } from '../models/request/loginDTO';
 import { Rol } from '../models/response/rol';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { Token } from '../models/response/token';
 import { RegistroDTO } from '../models/request/registroDTO';
-import { ChangePasswordDTO } from '../models/request/changePasswordDTO';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
