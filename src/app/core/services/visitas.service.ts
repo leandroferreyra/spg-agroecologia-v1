@@ -2,8 +2,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { PrincipioResponse } from '../models/response/principioResponse';
-import { PrincipioDTO } from '../models/request/principioDTO';
 import { VisitaDTO } from '../models/request/visitaDTO';
 import { VisitaResponse } from '../models/response/visitaResponse';
 
