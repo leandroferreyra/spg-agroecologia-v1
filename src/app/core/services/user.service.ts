@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment'
+import { environment } from 'src/environments/environment';
 import { UsuarioResponse } from '../models/response/usuarioResponse';
 import { UsuarioDTO } from '../models/request/usuarioDTO';
 import { ChangePasswordDTO } from '../models/request/changePasswordDTO';
