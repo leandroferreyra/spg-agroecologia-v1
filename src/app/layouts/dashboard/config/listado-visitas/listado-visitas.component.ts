@@ -20,11 +20,9 @@ import { ParametroResponse } from 'src/app/core/models/response/parametroRespons
 import { UsuarioResponse } from 'src/app/core/models/response/usuarioResponse';
 import { VisitaResponse } from 'src/app/core/models/response/visitaResponse';
 import { EstrategiasService } from 'src/app/core/services/estrategias.service';
-import { ImagenQuintaService } from 'src/app/core/services/imagenQuinta.service';
 import { ImagenVisitaService } from 'src/app/core/services/imagenVisita.service';
-import { PrincipioService } from 'src/app/core/services/principio.service';
 import { SwalService } from 'src/app/core/services/swal.service';
-import { TokenService } from 'src/app/core/services/token.service';
+import { UserLoggedService } from 'src/app/core/services/user-logged.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { VisitasService } from 'src/app/core/services/visitas.service';
 import { IconCheckComponent } from 'src/app/shared/icon/icon-check';
@@ -49,6 +47,7 @@ export class ListadoVisitasComponent {
 
   store: any;
   private subscription: Subscription = new Subscription();
+  usuarioLogueado: any;
 
   actual_role: string = '';
   selectedType!: string;
@@ -94,7 +93,7 @@ export class ListadoVisitasComponent {
 
   constructor(public storeData: Store<any>, private swalService: SwalService, private _estrategiaService: EstrategiasService,
     private spinner: NgxSpinnerService, private imagenService: ImagenVisitaService, private _visitaService: VisitasService,
-    private route: ActivatedRoute, private router: Router, private _usuarioService: UserService) {
+    private route: ActivatedRoute, private router: Router, private _usuarioService: UserService, private _userLogged: UserLoggedService) {
     this.initStore();
   }
 
@@ -112,6 +111,8 @@ export class ListadoVisitasComponent {
 
   ngOnInit(): void {
     // this.obtenerPrincipios();
+    this.usuarioLogueado = this._userLogged.getUsuarioLogueado;
+
     this.quintaId = this.route.snapshot.params['id'];
     this.obtenerVisitas();
     let $parametros = this._estrategiaService.getParametrosHabilitados();
@@ -492,6 +493,10 @@ export class ListadoVisitasComponent {
         }
       )
     );
+  }
+
+  esIntegrante(data: any) {
+    return data.integrantes.some((integrante: any) => integrante.email === this.usuarioLogueado.usuario);
   }
 
 }

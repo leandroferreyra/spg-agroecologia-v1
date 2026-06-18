@@ -138,7 +138,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   cambiarEstadoUsuario(user: any, checkbox: any) {
     this.spinner.show();
     this.subscription.add(
-      this.userService.setearEstado(user.id, checkbox ? 'DESACTIVAR' : 'ACTIVAR').subscribe({
+      this.userService.setearEstado(user.id, this.originalCheckedState ? 'DESACTIVAR' : 'ACTIVAR').subscribe({
         next: res => {
           console.log(res);
           this.swalService.toastSuccess('top-right', 'Estado modificado con éxito.');

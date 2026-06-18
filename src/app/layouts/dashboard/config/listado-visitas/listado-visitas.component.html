@@ -60,7 +60,8 @@
                                     <icon-file />
                                 </button>
                             </div>
-                            @if(data.estadoVisita === 'ABIERTA') {
+                            }
+                            @if(data.estadoVisita === 'ABIERTA' && actual_role === 'ROLE_ADMIN') {
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Editar"
                                     (click)="openModalVisita('EDIT',data)">
@@ -68,26 +69,30 @@
                                 </button>
                             </div>
                             }
+                            @if (actual_role === 'ROLE_ADMIN' || (actual_role === 'ROLE_USER' && esIntegrante(data))  ) {
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Info"
                                     (click)="openModalVisita('INFO',data)">
                                     <icon-info-circle />
                                 </button>
                             </div>
+                            }
+
+                            @if (actual_role === 'ROLE_ADMIN') {
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Eliminar"
                                     (click)="openSwalEliminar(data)">
                                     <icon-trash-lines />
                                 </button>
                             </div>
-                            @if(data.estadoVisita === 'ABIERTA') {
+                            }
+                            @if(data.estadoVisita === 'ABIERTA' && actual_role === 'ROLE_ADMIN') {
                             <div>
                                 <button type="button" class="ltr:mr-3 rtl:ml-2" ngxTippy="Cerrar visita"
                                     (click)="cerrarVisita(data)">
                                     <icon-check-circle />
                                 </button>
                             </div>
-                            }
                             }
                         </div>
                     </td>
