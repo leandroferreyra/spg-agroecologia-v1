@@ -79,11 +79,9 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
   }
 
   public onPageChange(pageNum: number): void {
+    this.currentPage = pageNum;
     this.pageSize = this.itemsPerPage * (pageNum - 1);
-    this.itemsInPage = pageNum * this.itemsPerPage;
-    if (this.itemsInPage > this.usuarios.length) {
-      this.itemsInPage = this.usuarios.length;
-    }
+    this.itemsInPage = Math.min(pageNum * this.itemsPerPage, this.usuarios.length);
   }
 
   public changePagesize(num: number): void {
@@ -95,7 +93,7 @@ export class ListadoUsuariosComponent implements OnInit, OnDestroy {
       this.userService.getUsuarios().subscribe({
         next: res => {
           this.usuarios = res;
-          console.log("🚀 ~ ListadoUsuariosComponent ~ obtenerUsuarios ~ this.usuarios:", this.usuarios)
+          this.itemsInPage = Math.min(this.itemsPerPage, this.usuarios.length);
           this.spinner.hide();
         },
         error: error => {
