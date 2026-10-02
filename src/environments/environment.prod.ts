@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
-    // TODO: reemplazar por la URL pública real donde quede desplegado el backend
-    // (dominio o IP:puerto del servidor donde corre spg-backend), antes de buildear.
-  baseUrl: 'https://spg-agroecologia.fly.dev/tesina'
+    // URL relativa: nginx (ver nginx.conf) reenvía /tesina/* al backend dentro
+    // del docker-compose, así funciona en cualquier servidor sin recompilar.
+  baseUrl: '/tesina'
 };
